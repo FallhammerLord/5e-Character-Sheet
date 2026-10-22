@@ -1,0 +1,8 @@
+/* Fallhammer Character Sheet. Colors only through --fhcs-* tokens; layout rules come with each phase. */
+
+.fhcs-sheet
+{
+   --fhcs-text-heading: 1.025rem;
+   --fhcs-text-body: 1rem;
+   --fhcs-text-small: 0.875rem;
+}

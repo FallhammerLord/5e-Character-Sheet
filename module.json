@@ -1,0 +1,44 @@
+{
+  "id": "fhcs",
+  "title": "Fallhammer Character Sheet",
+  "description": "A D&D 5e character sheet in the classic Tidy layout: clean information, obvious controls, and every mechanic from the dnd5e system sheet.",
+  "version": "0.0.1",
+  "authors": [
+    {
+      "name": "FallhammerLord",
+      "url": "https://github.com/FallhammerLord"
+    }
+  ],
+  "compatibility": {
+    "minimum": "14",
+    "verified": "14"
+  },
+  "relationships": {
+    "systems": [
+      {
+        "id": "dnd5e",
+        "type": "system",
+        "compatibility": {
+          "minimum": "6.0.0",
+          "verified": "6.0.6"
+        }
+      }
+    ]
+  },
+  "esmodules": [
+    "src/main.js"
+  ],
+  "styles": [
+    "styles/fhcs.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "url": "https://github.com/FallhammerLord/5e-Character-Sheet",
+  "manifest": "https://github.com/FallhammerLord/5e-Character-Sheet/releases/latest/download/module.json",
+  "download": "https://github.com/FallhammerLord/5e-Character-Sheet/releases/latest/download/module.zip"
+}

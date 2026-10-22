@@ -1,0 +1,32 @@
+# Fallhammer Character Sheet: working notes
+
+A Foundry VTT **v14** character sheet module for dnd5e 6.x (ID `fhcs`, CSS prefix `fhcs-`), in the classic Tidy 5e layout with our ADHD-friendly rules. Plain ES modules, no build step. Sister project: `fallhammer_quest_log` (same conventions; attach it only when comparing).
+
+This file holds rules only. Plan: `docs/ROADMAP.md`. Decisions: `docs/SCOPE.md`. What's verified or waiting: `docs/STATUS.md`. dnd5e internals: `docs/research/dnd5e-6.0-sheet.md`.
+
+## Working with the user
+
+- The user has dyslexia: keep replies concise, plain, and forward-stated.
+- Nothing here runs inside Foundry. The user tests in their v14 world and reports back with screenshots; ask for console errors (F12) when something breaks. Say what was verified and what wasn't.
+- Commit and push after each coherent slice. Don't open a PR unless asked. Update `docs/STATUS.md` and tick `docs/ROADMAP.md` as things land and get verified.
+
+## Commands
+
+```sh
+npm run check   # lint + load. Hooks run it before every git push; CI runs it on push.
+npm run load    # loads the module with Foundry and dnd5e mocked, checks the sheet registration and manifest files
+```
+
+Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies install on session start; each edited JS file is linted; `git push` is blocked until `npm run check` passes.
+
+## Rules
+
+- **Extend dnd5e, don't rebuild it.** Our sheet subclasses `CharacterActorSheet`, built at init by `makeCharacterSheet(Base)` (a module can't import the system by path). dnd5e keeps every mechanic; we own layout, templates and CSS.
+- **Keep dnd5e's hooks into the markup:** `data-action` names and the class names its code looks for (listed in the research note). Rename one and a mechanic silently stops.
+- **Prefer dnd5e's custom elements** (`dnd5e-inventory`, `dnd5e-effects`, and others) over rebuilt lists: they bring context menus, drag and filters.
+- **`src/compat.js`** is the only place for version-sensitive Foundry and dnd5e APIs.
+- **Imports:** one missing import stops the whole module in Foundry; ESLint won't see it. `npm run load` catches it.
+- **Manifest changes need a world relaunch** (Return to Setup), not a browser refresh.
+- **Code style:** Allman braces, 3-space indent, single quotes (matches the quest log).
+- **See each new check fail once** before trusting it.
+- Quest log rules that will apply as we build (copy them here when the first case comes up): three text sizes, 24px targets, tooltips two to four words, colors only through tokens, no `container-type` around text fields, `<prose-mirror toggled>` without `open`, HTML in templates, layout tests at many widths.
