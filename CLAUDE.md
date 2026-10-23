@@ -8,7 +8,7 @@ This file holds rules only. Plan: `docs/ROADMAP.md`. Decisions: `docs/SCOPE.md`.
 
 - The user has dyslexia: keep replies concise, plain, and forward-stated.
 - Nothing here runs inside Foundry. The user tests in their v14 world and reports back with screenshots; ask for console errors (F12) when something breaks. Say what was verified and what wasn't.
-- Commit and push after each coherent slice. Don't open a PR unless asked. Update `docs/STATUS.md` and tick `docs/ROADMAP.md` as things land and get verified.
+- `main` is the default branch, so a new chat starts from it. Each chat works on its own `claude/…` branch; when a slice lands, ask the user before bringing it into `main`. Commit and push after each coherent slice. Don't open a PR unless asked. Update `docs/STATUS.md` and tick `docs/ROADMAP.md` as things land and get verified.
 
 ## Commands
 

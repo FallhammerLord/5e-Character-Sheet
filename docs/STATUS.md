@@ -4,7 +4,8 @@ What's verified, what's waiting. Read when picking up work; CLAUDE.md holds only
 
 ## Verified in Foundry by the user
 
-- Tabs switch by hand, and both Quench batches pass (2026-10-24, user, after the second round's fixes). The user calls the styling "a right mess"; screenshots requested.
+- Tabs switch by hand, pips work, and both Quench batches pass, 26 of 26 (2026-10-24, user, after the second round's fixes). Quench covers: header rolls and chips, tab row and lock, skill roll, passive toggle and folds, death saves at 0 HP, rest, item use; usage cards, attack and damage bands, roll on use, no dialogs, late adds, standalone skill card, GM request, save band for selected tokens.
+- Unbuilt tabs (Inventory, Spellbook, Features, Effects, Biography) show Foundry's bare defaults: bulleted controls, no rows, loose numbers (2026-10-24, user's screenshots: "everything tossed into the tab"). Expected until each phase replaces them; Phase 3 starts with the shared list controls.
 - Our header and frame render in the user's v14 world, dark theme, with none of dnd5e's sheet look (2026-10-24, user's screenshot): portrait chips, HP, XP and level, origin line, AC, Init and the ability row. Fixes from that round: death save pips were oval (Foundry's button min-height; now reset, and the layout check imitates it and fails on a round control that isn't square), three successes cleared the pips (dnd5e's reset; now kept until HP rises above 0, which clears both rows: `src/sheet/death.js`), skill rows too tall (now 24px), death saves made the header much taller (now drawn over the greyed portrait), the title bar looked separate (now a slim strip in the sheet's colors, title hidden), and an `Item5e` "type: may not be undefined" error, most likely dnd5e's add button, unstyled once dnd5e's look was gone and creating an item with no type on the Attributes tab (now shown only on Inventory, Features, Spells and Effects, as dnd5e does).
 
 - Track R basic tests pass after updating the installed copy to this branch (2026-10-24, user: "works on basic tests as expected").
@@ -17,18 +18,13 @@ What's verified, what's waiting. Read when picking up work; CLAUDE.md holds only
 
 ## Waiting on the user
 
-**Track R test round** (all eight slices, none run in Foundry yet). Pull the branch, Return to Setup, relaunch the world. Send screenshots, and F12 console errors for anything that breaks.
+Play checks Quench can't make (Quench already passes for these):
 
-1. **Quench:** run "Fallhammer Character Sheet: core" (13 tests) and "…: chat cards" (11 tests) as GM. The chat batch turns "Roll damage on use" off while it runs and restores it.
-2. **Weapon attack:** one card with portrait, title, Description folded. Attack and damage land in it with no windows; their own cards don't appear. Attack band: total, the d20 (gold ring on a natural 20), words ("Natural 20 · Critical hit", hits or misses against your target). Damage band: total and type, "Critical: dice doubled" after a crit.
-3. **Open the bands:** dice math, Roll again; on damage, "Roll as critical" or "Roll as normal".
-4. **Late adds:** dashed d20 slots, − left (red) and + right (blue), the same size as the black primary die. Each click adds a die on that side and compares it with the die counting now (advantage keeps higher, disadvantage lower; nothing cancels). Up to five a side, then the slot goes. In an opened band or row, type 1d4, -1d4 or 2 and press Enter. Only the roll's author and the GM see these.
-5. **Fireball:** slot window still asks, damage rolls at once. As GM select three tokens, click the Save band: a row per token with Success or Failure. Apply section: dnd5e's damage tray, unfolded, halving for tokens that saved; effects tray if the spell has effects. A monster with Legendary Resistance shows the button on its failed row.
-6. **Sheet rolls:** a skill, a save, a death save, initiative: each is our card with one d20 band and late adds. A death save keeps its result line; a concentration save its Break Concentration button.
-7. **GM request:** request a save from the party. One card, a row per member, a Roll button on each player's own row; results fill in.
-8. **Settings:** "One card per action" (client) off brings dnd5e's cards back. World: "Always roll two d20s", "Roll the attack on use", "Roll damage on use", "No roll dialogs". Hold Shift on a roll to get its dialog.
-
-**Phase 1 and 2: the sheet.** Open a character with our sheet. It should look like our design only, with none of dnd5e's styling; tabs not built yet (Inventory, Spellbook, Features, Effects, Biography) look plain but work. Attributes: skills roll, the Passive button switches all and key passives, groups fold and stay folded after a reload, slot pips. Header: Check: art fits (round, square, tall), chips work (exhaustion tray, inspiration, rest tray), HP click-to-type, Temp, checks, saves, initiative, the window stops shrinking before the ability row wraps, both ability emphasis settings, and the milestone track with dnd5e's leveling set to no XP.
+1. **Fireball:** slot window still asks, damage rolls at once. As GM select three tokens, click the Save band: a row per token with Success or Failure. Apply: dnd5e's damage tray, unfolded, halving for tokens that saved; effects tray if the spell has effects. A monster with Legendary Resistance shows the button on its failed row.
+2. **Sheet rolls:** a save, a death save, initiative, each as our card; a concentration save keeps Break Concentration.
+3. **GM request** to the party: one card, a row per member, results fill in.
+4. **Settings:** "One card per action" off brings dnd5e's cards back; the world settings each do what they say; Shift brings a roll dialog back.
+5. **Header:** art fits (round, square, tall), both ability emphasis settings, the milestone track with dnd5e's leveling set to no XP.
 
 ## In code, not yet verified
 
@@ -56,4 +52,6 @@ What's verified, what's waiting. Read when picking up work; CLAUDE.md holds only
 
 ## Next session
 
-1. Track R: all eight slices in code, none verified in Foundry. Next: the user's test round ("Waiting on the user"), then fixes. Then the RSReforged step-aside, then Phase 1. (ROADMAP Track R, in order). Facts: `docs/research/dnd5e-6.0-chat.md`, `docs/research/ready-set-roll.md`. Then Phase 1, header: SCOPE §4.1 and `docs/reference/tidy-classic-attributes.png`. Replace dnd5e's `header` part with ours (same part ID, so `_prepareHeaderContext` still feeds it), add a layout case, and extend Quench with the header's rolls and pips.
+1. **Phase 3, Inventory** (user agreed 2026-10-24). Start with dnd5e's shared list controls (`item-list-controls`: search, filter, sort), which Inventory, Spellbook and Features all use; then item rows on `dnd5e-inventory` (24px controls, equip, attune, quantity, context menus, drag); then encumbrance as a bar and currency as a row. Replace dnd5e's `inventory` part (same ID). Each part gets a layout case and a Quench click test.
+2. **Exhaustion display mismatch** (user's screenshot, 2026-10-24): at exhaustion 6 the header shows Init and saves with −12, the Attributes tab shows skills without it. Check how dnd5e 6.0 applies the 2024 penalty (roll bonus or prepared total) and make both show the same thing.
+3. Then Spellbook (Phase 4), reusing the Inventory rows.
