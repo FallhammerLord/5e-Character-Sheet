@@ -33,8 +33,10 @@ globalThis.game = {
 class FakeChatLog
 {
    scrolled = 0;
+   isAtBottom = true;
    async postOne(message, options = {}) { this.notify = options.notify; await this.scrollBottom(); }
    async scrollBottom() { this.scrolled++; }
+   async updateMessage() {}
 }
 const chatLog = new FakeChatLog();
 globalThis.ui = { chat: chatLog };
@@ -62,6 +64,12 @@ try
       if (chatLog.scrolled !== 0 || chatLog.notify !== false) { problems.push('a folded roll still scrolls the chat log'); }
       await chatLog.postOne({ type: 'base', system: {} }, { notify: true });
       if (chatLog.scrolled !== 1) { problems.push('quiet posting stopped other messages from scrolling'); }
+      // A card that grows while the log is at the bottom follows it down; a player scrolled up isn't moved.
+      await chatLog.updateMessage({});
+      if (chatLog.scrolled !== 2) { problems.push('a card growing at the bottom of the log does not follow it down'); }
+      chatLog.isAtBottom = false;
+      await chatLog.updateMessage({});
+      if (chatLog.scrolled !== 2) { problems.push('a card re-rendering moved a player who was reading further up'); }
    }
    for (const name of ['dnd5e.renderChatMessage', 'dnd5e.postRollConfiguration', 'updateChatMessage', 'dnd5e.preRoll'])
    {

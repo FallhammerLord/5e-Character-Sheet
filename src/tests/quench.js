@@ -246,6 +246,8 @@ export function registerQuenchTests(quench)
                assert.isTrue(tray.hasAttribute('open'), 'apply tray unfolded');
 
                // "Roll as critical" sits in the band and rolls the damage again, doubled.
+               assert.strictEqual(band.querySelector('[data-fhcs-action="damageAgain"]')?.dataset.critical, 'false',
+                  'Roll again keeps normal damage normal');
                const button = band.querySelector('[data-fhcs-action="damageCritical"]');
                assert.ok(button, 'roll as critical offered');
                button.click();
@@ -255,6 +257,8 @@ export function registerQuenchTests(quench)
                html = await usage.renderHTML();
                band = html.querySelector('.fhcs-band-rolled.fhcs-band-damage');
                assert.ok(band.querySelector('[data-fhcs-action="damageNormal"]'), 'now offers roll as normal');
+               assert.strictEqual(band.querySelector('[data-fhcs-action="damageAgain"]')?.dataset.critical, 'true',
+                  'Roll again keeps critical damage critical');
             }
             finally
             {

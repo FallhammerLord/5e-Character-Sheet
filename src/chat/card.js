@@ -179,6 +179,8 @@ export function damageBand(facts, earlier, format, { canCrit = false } = {})
       history: earlierNote(earlier, format),
       historyLabel: format('FHCS.Card.History', {}),
       againLabel: format('FHCS.Card.RollAgain', {}),
+      // Roll again keeps this damage's critical state; dnd5e's own Damage action would re-read the attack.
+      againAction: 'damageAgain',
       extra
    };
 }
@@ -278,6 +280,9 @@ async function onCardAction(event, button, usage)
    {
       switch (button.dataset.fhcsAction)
       {
+         case 'damageAgain':
+            if (usage) { await rollCardDamage(usage, { event, isCritical: button.dataset.critical === 'true' }); }
+            break;
          case 'damageNormal': if (usage) { await rollCardDamage(usage, { event, isCritical: false }); } break;
          case 'damageCritical': if (usage) { await rollCardDamage(usage, { event, isCritical: true }); } break;
          case 'lateAdvantage': if (roll) { await addD20(roll, 'adv'); } break;

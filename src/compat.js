@@ -369,10 +369,16 @@ export async function refreshCard(message)
 }
 
 /**
- * Posts some messages without moving the chat log (user, 2026-10-24). Foundry scrolls the log to the bottom when the
- * user's own message posts; a roll drawn inside a card higher up the log is posted hidden, so the log jumped away
- * from the card being used. Wraps ChatLog#postOne (no scroll, no notification for quiet messages) and
- * ChatLog#scrollBottom (skipped while a quiet post renders). Logs and does nothing if Foundry renames either.
+ * Keeps the chat log where the player wants it (user, 2026-10-24).
+ *
+ * - Quiet posts: Foundry scrolls the log to the bottom when the user's own message posts. A roll drawn inside a card
+ *   higher up the log is posted hidden, so the log jumped away from the card being used. Such rolls now post with no
+ *   scroll and no notification (ChatLog#postOne; ChatLog#scrollBottom is skipped while one renders).
+ * - Follow a growing card: a new card fills in after it posts (its attack and damage fold in), so the first scroll
+ *   stopped short. When a card re-renders (ChatLog#updateMessage) and the log was at the bottom just before, it
+ *   scrolls to the bottom again; a player reading further up isn't moved.
+ *
+ * Logs and leaves chat alone if Foundry renames these methods.
  *
  * @param {Function} isQuiet   (message) => true to post without scrolling.
  * @returns {boolean} Whether the chat log was wrapped.
@@ -386,7 +392,7 @@ export function quietPosts(isQuiet)
       return false;
    }
    if (proto.postOne.fhcsQuiet) { return true; }
-   const { postOne, scrollBottom } = proto;
+   const { postOne, scrollBottom, updateMessage } = proto;
    let quiet = 0;
    proto.postOne = async function (message, options = {})
    {
@@ -400,5 +406,24 @@ export function quietPosts(isQuiet)
    {
       return quiet > 0 ? Promise.resolve() : scrollBottom.apply(this, args);
    };
+   if (typeof updateMessage === 'function')
+   {
+      proto.updateMessage = async function (...args)
+      {
+         const wasAtBottom = atBottom(this);
+         const result = await updateMessage.apply(this, args);
+         if (wasAtBottom) { await scrollBottom.call(this, { waitImages: true }); }
+         return result;
+      };
+   }
    return true;
+}
+
+/** Whether a chat log is scrolled to (within a few pixels of) its bottom. */
+function atBottom(log)
+{
+   if (typeof log.isAtBottom === 'boolean') { return log.isAtBottom; }
+   const scroller = log.element?.querySelector?.('.chat-scroll, #chat-log, ol.chat-log');
+   if (!scroller) { return false; }
+   return (scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight) < 20;
 }
