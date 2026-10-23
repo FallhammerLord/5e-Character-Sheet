@@ -173,6 +173,34 @@ export function registerQuenchTests(quench)
             const config = await reached;
             assert.ok(config, 'dnd5e started an attack roll');
          });
+
+         it('draws the attack in the card and hides the attack\'s own card', async function ()
+         {
+            // Posted privately to the GM and deleted at the end.
+            const results = await activity.use({ subsequentActions: false, consume: false }, { configure: false },
+               { rollMode: 'selfroll' });
+            const usage = results?.message;
+            assert.ok(usage?.id, 'usage card posted');
+            let attack = null;
+            try
+            {
+               const [roll] = await activity.rollAttack({}, { configure: false },
+                  { rollMode: 'selfroll', data: { system: { origin: usage.id } } }) ?? [];
+               attack = roll?.parent ?? usage.getAssociatedRolls('attack').at(-1);
+               assert.ok(attack, 'attack message posted');
+               assert.isTrue((await attack.renderHTML()).hidden, 'attack card hidden');
+               const html = await usage.renderHTML();
+               const band = html.querySelector('.fhcs-band-rolled.fhcs-band-attack');
+               assert.ok(band, 'rolled attack band');
+               assert.strictEqual(Number(band.querySelector('.fhcs-band-total').textContent), attack.rolls[0].total);
+               assert.ok(band.querySelector('.fhcs-die-primary'), 'primary d20 shown');
+            }
+            finally
+            {
+               await attack?.delete();
+               await usage.delete();
+            }
+         });
       });
    }, { displayName: 'Fallhammer Character Sheet: chat cards' });
 }

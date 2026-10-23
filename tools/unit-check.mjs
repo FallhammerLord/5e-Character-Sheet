@@ -5,6 +5,7 @@
 import { deepStrictEqual } from 'node:assert';
 import { describeRoll } from '../src/chat/outcome.js';
 import { cardParts } from '../src/chat/card.js';
+import { d20Row } from '../src/chat/d20.js';
 import { format, localize } from './templates.mjs';
 
 const facts = (over) => ({
@@ -76,5 +77,26 @@ for (const [name, buttons, expected] of PART_CASES)
    catch { problems.push(`${name}: got ${JSON.stringify(got)}, expected ${JSON.stringify(expected)}`); }
 }
 
+// d20 row: primary center, disadvantage left, advantage right; '*' marks the die that counts.
+const r = (result, counts = true) => ({ result, active: counts, discarded: !counts });
+const ROW_CASES = [
+   ['normal', [r(12)], 0, undefined, '| 12* |'],
+   ['advantage from dnd5e', [r(12, false), r(15)], 1, undefined, '| 12 | 15*'],
+   ['disadvantage from dnd5e', [r(12, false), r(4)], -1, undefined, '4* | 12 |'],
+   ['Elven Accuracy', [r(12, false), r(15, false), r(18)], 1, undefined, '| 12 | 15 18*'],
+   ['both sides recorded: they cancel, primary counts', [r(12), r(15, false), r(4, false)], 0, ['adv', 'dis'], '4 | 12* | 15'],
+   ['Halfling Lucky replaces a rerolled 1', [{ result: 1, active: false, rerolled: true }, r(9)], 0, undefined, '| 9* |']
+];
+const showRow = ({ left, center, right }) =>
+{
+   const die = (d) => `${d.value}${d.counts ? '*' : ''}`;
+   return `${left.map(die).join(' ')} | ${center ? die(center) : ''} | ${right.map(die).join(' ')}`.trim();
+};
+for (const [name, results, mode, sides, expected] of ROW_CASES)
+{
+   const got = showRow(d20Row(results, mode, sides));
+   if (got !== expected) { problems.push(`d20 row, ${name}: got "${got}", expected "${expected}"`); }
+}
+
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
-console.log(`${CASES.length} outcome lines and ${PART_CASES.length} card layouts read as expected.`);
+console.log(`${CASES.length} outcome lines, ${PART_CASES.length} card layouts and ${ROW_CASES.length} d20 rows read as expected.`);

@@ -4,6 +4,7 @@ import { makeCharacterSheet } from './apps/CharacterSheet.js';
 import { registerQuenchTests } from './tests/quench.js';
 import { registerSettings } from './settings.js';
 import { makeUsageMessageData } from './chat/card.js';
+import { addSpareD20, foldIntoCard } from './chat/rolls.js';
 
 Hooks.once('init', () =>
 {
@@ -22,6 +23,10 @@ Hooks.once('init', () =>
    registerCharacterSheet(makeCharacterSheet(Base), 'FHCS.SheetLabel');
    console.log(`${MODULE_ID} | Character sheet registered (dnd5e ${game.system?.version}).`);
 });
+
+// One card per action: rolls made from a card draw in its bands; d20 rolls carry a spare die.
+Hooks.on('dnd5e.renderChatMessage', foldIntoCard);
+Hooks.on('dnd5e.postRollConfiguration', addSpareD20);
 
 // In-world tests, only when the Quench module is active (src/tests/quench.js).
 Hooks.on('quenchReady', registerQuenchTests);

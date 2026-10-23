@@ -34,6 +34,10 @@ try
    await import(new URL('../src/main.js', import.meta.url));
    hooks.init?.();
    if (typeof hooks.quenchReady !== 'function') { problems.push('Quench tests are not hooked to quenchReady'); }
+   for (const name of ['dnd5e.renderChatMessage', 'dnd5e.postRollConfiguration'])
+   {
+      if (typeof hooks[name] !== 'function') { problems.push(`chat rolls are not hooked to ${name}`); }
+   }
    const usage = globalThis.CONFIG.ChatMessage.dataModels.usage;
    if (!(usage.prototype instanceof SystemUsageMessageData)) { problems.push('usage chat cards do not extend dnd5e\'s usage model'); }
 }

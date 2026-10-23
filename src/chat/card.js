@@ -8,7 +8,9 @@
  * `effect-application`) work inside our markup. Slices 2–8 fill the bands with results.
  */
 import { MODULE_ID } from '../constants.js';
-import { actorArtwork } from '../compat.js';
+import { actorArtwork, rollFacts, rollsFrom } from '../compat.js';
+import { describeRoll } from './outcome.js';
+import { d20Row, dieClasses } from './d20.js';
 
 export const CARD_TEMPLATE = `modules/${MODULE_ID}/templates/chat/usage-card.hbs`;
 
@@ -52,6 +54,41 @@ export function cardParts(buttons, localize)
    return { bands, others };
 }
 
+/**
+ * What a rolled d20 band shows: the total, the d20 row, the outcome in words, and (when opened) the dice math.
+ *
+ * @param {object} facts       From compat.rollFacts, for the latest roll.
+ * @param {number[]} earlier   Totals of earlier rolls from the same band, oldest first.
+ * @param {Function} format    (key, data) => localized text.
+ */
+export function d20Band(facts, earlier, format)
+{
+   const row = d20Row(facts.dice, facts.advantageMode, facts.sides);
+   const withClasses = (die) => ({ value: die.value, classes: dieClasses(die) });
+   const all = [...row.left, row.center, ...row.right].filter(Boolean);
+   const outcome = describeRoll(facts, format);
+   return {
+      total: facts.total,
+      critical: facts.isCritical,
+      verdict: outcome.verdict,
+      words: outcome.details,
+      row: { left: row.left.map(withClasses), center: row.center ? withClasses(row.center) : null,
+         right: row.right.map(withClasses) },
+      diceLabel: format('FHCS.Card.DiceLabel', {
+         dice: all.map((d) => format(d.counts ? 'FHCS.Card.DieCounts' : 'FHCS.Card.DieDropped', { value: d.value }))
+            .join(', ')
+      }),
+      formula: facts.formula,
+      math: `${facts.math} = ${facts.total}`,
+      spareText: facts.spare ? format('FHCS.Card.Spare', { value: facts.spare }) : '',
+      earlierText: earlier.length ? format('FHCS.Card.Earlier', { totals: earlier.join(', ') }) : '',
+      againLabel: format('FHCS.Card.RollAgain', {})
+   };
+}
+
+/** Roll message types drawn inside their usage card's bands, by band kind. */
+const BAND_ROLLS = { attack: 'attack' };
+
 /** Whether a message draws as our card: the setting is on and dnd5e didn't fall back to legacy HTML content. */
 const useCard = (system) => game.settings.get(MODULE_ID, 'cards') && !system.parent.content;
 
@@ -79,7 +116,17 @@ export function makeUsageMessageData(Base)
          const localize = (key) => game.i18n.localize(key);
          const actor = this.parent.getAssociatedActor();
          const item = context.item ?? {};
+         const format = (key, data) => game.i18n.format(key, data);
          const { bands, others } = cardParts(context.buttons ?? [], localize);
+         for (const band of bands)
+         {
+            const type = BAND_ROLLS[band.kind];
+            if (!type) { continue; }
+            const rolls = rollsFrom(this.parent, type);
+            const facts = rolls.length ? rollFacts(rolls.at(-1)) : null;
+            if (facts) { band.rolled = d20Band(facts, rolls.slice(0, -1).map((m) => m.rolls[0]?.total), format); }
+            else if (rolls.length) { band.text = localize('FHCS.Card.HiddenRoll'); }
+         }
          const tags = Object.values(context.rows ?? {}).flatMap((row) => row.entries ?? []).map((e) => e.label);
          context.fhcs = {
             portrait: await actorArtwork(actor),

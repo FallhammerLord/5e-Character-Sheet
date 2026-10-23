@@ -1,6 +1,6 @@
 import { MODULE_ID } from './constants.js';
 
-/** Client settings: each player chooses for themselves. */
+/** Our settings. Client ones each player chooses; world ones the GM sets for the table. */
 export function registerSettings()
 {
    game.settings.register(MODULE_ID, 'cards', {
@@ -11,5 +11,15 @@ export function registerSettings()
       type: Boolean,
       default: true,
       requiresReload: true
+   });
+
+   // World: the table plays by one rule. The spare d20 is part of every d20 roll's data.
+   game.settings.register(MODULE_ID, 'twoD20s', {
+      name: 'FHCS.Settings.TwoD20s.Name',
+      hint: 'FHCS.Settings.TwoD20s.Hint',
+      scope: 'world',
+      config: true,
+      type: Boolean,
+      default: true
    });
 }

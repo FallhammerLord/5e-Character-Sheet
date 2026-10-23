@@ -71,7 +71,9 @@ export function rollFacts(message)
    const target = Number.isFinite(roll.options.target) ? roll.options.target : null;
    const flavor = document.createElement('div');
    flavor.innerHTML = message.flavor ?? '';
+   const d20 = roll.d20;
    return {
+      messageId: message.id,
       kind,
       who: message.getAssociatedToken?.()?.name ?? message.alias ?? '',
       what: flavor.textContent.trim(),
@@ -83,6 +85,45 @@ export function rollFacts(message)
       isCritical: Boolean(system.canCrit && roll.isCritical),
       targets: (kind === 'attack') && showResult
          ? (system.evaluatedTargets ?? []).map((t) => ({ name: t.name, isMiss: t.isMiss }))
-         : []
+         : [],
+      dice: d20.results.map((r) => ({ result: r.result, active: r.active !== false, discarded: Boolean(r.discarded),
+         rerolled: Boolean(r.rerolled) })),
+      advantageMode: roll.options.advantageMode ?? 0,
+      sides: roll.options.fhcs?.sides ?? [],
+      spare: roll.options.fhcs?.spare ?? null,
+      formula: roll.formula,
+      math: roll.result
    };
+}
+
+/**
+ * Roll messages of one type made from a usage card's buttons, oldest first, that this user may see.
+ *
+ * @param {ChatMessage} usage   The usage card's message.
+ * @param {string} type         'attack', 'damage', 'save', 'check'.
+ */
+export function rollsFrom(usage, type)
+{
+   if (!usage.id) { return []; }
+   return (usage.getAssociatedRolls?.(type) ?? []).filter((m) => m.visible);
+}
+
+/** The usage card a roll message was made from, if it is one. */
+export function usageOrigin(message)
+{
+   const origin = message.system?.origin;
+   return origin?.type === 'usage' ? origin : null;
+}
+
+/** One d20 rolled now, from Foundry's random source (synchronous, for roll hooks that can't wait). */
+export function d20Now()
+{
+   return Math.ceil(CONFIG.Dice.randomUniform() * 20);
+}
+
+/** Whether a roll is one of dnd5e's d20 rolls (checks, saves, attacks). */
+export function isD20Roll(roll)
+{
+   const D20Roll = CONFIG.Dice.D20Roll;
+   return Boolean(D20Roll) && (roll instanceof D20Roll);
 }

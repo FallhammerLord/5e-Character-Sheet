@@ -5,6 +5,10 @@
       "Cards": {
         "Name": "One card per action",
         "Hint": "Draw each item use as one chat card: portrait, title, folded description, and a full-width band for each roll. Turn off to keep dnd5e's cards."
+      },
+      "TwoD20s": {
+        "Name": "Always roll two d20s",
+        "Hint": "Every d20 roll also rolls a second d20 in advance. Late advantage or disadvantage on the card uses it first."
       }
     },
     "Chat": {
@@ -32,7 +36,14 @@
         "rollDamage": "Roll damage",
         "rollHealing": "Roll healing",
         "rollFormula": "Roll"
-      }
+      },
+      "DiceLabel": "d20s: {dice}",
+      "DieCounts": "{value} counts",
+      "DieDropped": "{value} dropped",
+      "Spare": "Next d20 ready: {value}",
+      "Earlier": "Earlier rolls: {totals}",
+      "RollAgain": "Roll again",
+      "HiddenRoll": "Rolled (hidden)"
     }
   }
 }

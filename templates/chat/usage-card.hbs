@@ -21,10 +21,37 @@
    {{/if}}
 
    {{#each fhcs.bands}}
+   {{#if rolled}}
+   <details class="fhcs-band fhcs-band-{{ kind }} fhcs-band-rolled{{#if rolled.critical}} fhcs-band-critical{{/if}}"{{#if rolled.open}} open{{/if}}>
+      <summary class="fhcs-band-summary">
+         <span class="fhcs-band-top"><span class="fhcs-band-heading">{{ heading }}</span><span class="fhcs-band-end" aria-hidden="true"></span></span>
+         <span class="fhcs-band-result">
+            <strong class="fhcs-band-total">{{ rolled.total }}</strong>
+            <span class="fhcs-d20-row" role="group" aria-label="{{ rolled.diceLabel }}">
+               <span class="fhcs-d20-side fhcs-d20-left">{{#each rolled.row.left}}<span class="{{ classes }}">{{ value }}</span>{{/each}}</span>
+               {{#with rolled.row.center}}<span class="{{ classes }}">{{ value }}</span>{{/with}}
+               <span class="fhcs-d20-side fhcs-d20-right">{{#each rolled.row.right}}<span class="{{ classes }}">{{ value }}</span>{{/each}}</span>
+            </span>
+         </span>
+         {{#if rolled.words.length}}
+         <span class="fhcs-band-words{{#if rolled.verdict}} fhcs-verdict-{{ rolled.verdict }}{{/if}}">{{#each rolled.words}}<span>{{ this }}</span>{{/each}}</span>
+         {{/if}}
+      </summary>
+      <div class="fhcs-band-body">
+         <p class="fhcs-band-math">{{ rolled.formula }}<br><strong>{{ rolled.math }}</strong></p>
+         {{#if rolled.spareText}}<p class="fhcs-band-note">{{ rolled.spareText }}</p>{{/if}}
+         {{#if rolled.earlierText}}<p class="fhcs-band-note">{{ rolled.earlierText }}</p>{{/if}}
+         <div class="fhcs-card-actions">
+            <button type="button" class="fhcs-button" data-action="{{ action }}" data-index="{{ index }}">{{ rolled.againLabel }}</button>
+         </div>
+      </div>
+   </details>
+   {{else}}
    <button type="button" class="fhcs-band fhcs-band-{{ kind }}" data-action="{{ action }}" data-index="{{ index }}">
       <span class="fhcs-band-top"><span class="fhcs-band-heading">{{ heading }}</span><span class="fhcs-band-end"></span></span>
       <span class="fhcs-band-text">{{ text }}</span>
    </button>
+   {{/if}}
    {{/each}}
 
    {{#if fhcs.others.length}}

@@ -52,7 +52,7 @@ Runs alongside the sheet phases; works whatever sheet a player uses (client sett
 - ~~Outcome line on dnd5e's cards~~ (2026-10-23): built, then superseded by the one-card design (SCOPE §6.5); its wording code feeds the bands
 - [x] Mockup of the one card (attack with a rider save, Fireball, skill check, GM request, d20 row states) approved by the user (2026-10-23, "serviceable for now")
 - [ ] Card frame on usage cards: portrait, title, folding description, dnd5e's buttons as full-width bands (in code 2026-10-23; waits on the user)
-- [ ] d20 band: attack rolls drawn in the card, two d20s, natural and hit or miss in words, dice math on click
+- [ ] d20 band: attack rolls drawn in the card, two d20s, natural and hit or miss in words, dice math on click (in code 2026-10-23; waits on the user)
 - [ ] Damage band: drawn in the card, crits double without asking, dice math on click
 - [ ] Save / check band: roll for selected tokens, one row per token with its result in words
 - [ ] Apply: dnd5e's damage and effect trays in "selected" mode, labelled, at least 24px
