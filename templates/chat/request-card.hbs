@@ -19,7 +19,7 @@
                <div class="fhcs-band-body">
                   {{> "modules/fhcs/templates/chat/parts/d20-row.hbs" }}
                   {{#if words.length}}<span class="fhcs-band-words">{{#each words}}<span>{{ this }}</span>{{/each}}</span>{{/if}}
-                  {{#each mathLines}}<p class="fhcs-band-math">{{ formula }}<br><strong>{{ result }}</strong></p>{{/each}}
+                  {{#each mathLines}}<p class="fhcs-band-math"><span class="fhcs-band-note">{{ formula }}</span><br>{{ result }}</p>{{/each}}
                   {{#each notes}}<p class="fhcs-band-note">{{ this }}</p>{{/each}}
                   {{> "modules/fhcs/templates/chat/parts/bonus.hbs" }}
                </div>

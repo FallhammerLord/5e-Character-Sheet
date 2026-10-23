@@ -1,70 +1,123 @@
-/* Fallhammer Character Sheet. Colors only through --fhcs-* tokens; layout rules come with each phase. */
+/* Fallhammer Character Sheet.
+ *
+ * One small system for the whole module (user, 2026-10-24):
+ * - Colors only through --fhcs-* tokens, each with a light and a dark value; text meets WCAG contrast in both.
+ * - Three text styles, no others: display (large, bold), body (regular), label (small, bold capitals).
+ * - Two spacing steps (--fhcs-s1, --fhcs-s2) and one control height (--fhcs-control, above the 24px minimum).
+ */
+
+/* ---------- Tokens ---------- */
 
 .fhcs-sheet,
 .fhcs-chat
 {
-   --fhcs-text-heading: 1.025rem;
-   --fhcs-text-body: 1rem;
-   --fhcs-text-small: 0.875rem;
+   --fhcs-display-size: 1.25rem;
+   --fhcs-display-line: 1.15;
+   --fhcs-body-size: 0.875rem;
+   --fhcs-body-line: 1.35;
+   --fhcs-label-size: 0.75rem;
+   --fhcs-label-line: 1.2;
+
+   --fhcs-s1: 0.25rem;
+   --fhcs-s2: 0.5rem;
+   --fhcs-control: 28px;
+   --fhcs-die-size: 36px;
+   --fhcs-radius: 6px;
+
+   --fhcs-line: color-mix(in srgb, currentColor 28%, transparent);
+   --fhcs-line-soft: color-mix(in srgb, currentColor 14%, transparent);
+   --fhcs-fill: color-mix(in srgb, currentColor 5%, transparent);
+   --fhcs-muted: color-mix(in srgb, currentColor 72%, transparent);
    --fhcs-success: #1b6e2a;
    --fhcs-failure: #a3221b;
+   --fhcs-crit: #8a5a00;
+   --fhcs-adv: #1f5fa8;
+   --fhcs-dis: #a3221b;
+   /* The default die, and the number on any filled die. */
+   --fhcs-die-ink: #191813;
+   --fhcs-die-on-ink: #fff;
 }
 
+.theme-dark .fhcs-sheet,
+.fhcs-sheet.theme-dark,
 .theme-dark .fhcs-chat,
 .fhcs-chat.theme-dark
 {
    --fhcs-success: #7ed08a;
    --fhcs-failure: #ff8a80;
-}
-
-/* Chat cards (Track R, SCOPE §6.5): one card per action. Lines and fills mix from the text color, so the card
-   follows Foundry's light and dark chat themes. */
-
-.fhcs-chat
-{
-   --fhcs-line: color-mix(in srgb, currentColor 28%, transparent);
-   --fhcs-line-soft: color-mix(in srgb, currentColor 14%, transparent);
-   --fhcs-fill: color-mix(in srgb, currentColor 5%, transparent);
-   --fhcs-muted: color-mix(in srgb, currentColor 70%, transparent);
-   --fhcs-crit: #8a5a00;
-   --fhcs-adv: #1f5fa8;
-   --fhcs-dis: #a3221b;
-}
-
-.theme-dark .fhcs-chat,
-.fhcs-chat.theme-dark
-{
    --fhcs-crit: #e0b45a;
    --fhcs-adv: #8ab8ff;
    --fhcs-dis: #ff8a80;
-   /* The default die turns white on a dark card; numbers on filled dice turn dark (contrast, user 2026-10-24). */
    --fhcs-die-ink: #f4f1ea;
    --fhcs-die-on-ink: #191813;
 }
+
+/* ---------- The three text styles ---------- */
+
+/* Display: titles, totals, die values, the + and − signs. */
+.fhcs-chat :is(.fhcs-card-title, .fhcs-band-total, .fhcs-row-total, .fhcs-die-value, .fhcs-slot-sign)
+{
+   font-size: var(--fhcs-display-size);
+   line-height: var(--fhcs-display-line);
+   font-weight: bold;
+   font-style: normal;
+   text-transform: none;
+   letter-spacing: normal;
+}
+
+/* Body: everything read as text. */
+.fhcs-chat .fhcs-card,
+.fhcs-chat :is(.fhcs-band-text, .fhcs-band-prompt, .fhcs-band-words, .fhcs-band-parts, .fhcs-band-math, .fhcs-band-note,
+   .fhcs-button, .fhcs-bonus-input, .fhcs-row-who, .fhcs-row-verdict, .fhcs-card-description, .fhcs-card-flavor,
+   .fhcs-card-supplement, .fhcs-card-request)
+{
+   font-size: var(--fhcs-body-size);
+   line-height: var(--fhcs-body-line);
+   font-weight: normal;
+   text-transform: none;
+   letter-spacing: normal;
+}
+
+/* Label: band headings, panel titles, the actor line, tags, the badge on a die. */
+.fhcs-chat :is(.fhcs-band-heading, .fhcs-card-line, .fhcs-card-details > summary, .fhcs-card-tags, .fhcs-slot-badge)
+{
+   font-size: var(--fhcs-label-size);
+   line-height: var(--fhcs-label-line);
+   font-weight: bold;
+   text-transform: uppercase;
+   letter-spacing: 0.05em;
+}
+
+/* ---------- Card frame ---------- */
 
 .fhcs-chat .fhcs-card
 {
    display: flex;
    flex-direction: column;
-   gap: 0.5rem;
+   gap: var(--fhcs-s1);
    min-width: 0;
+}
+
+.fhcs-chat .fhcs-card p
+{
+   margin: 0;
 }
 
 .fhcs-chat .fhcs-card-header
 {
    display: flex;
    align-items: center;
-   gap: 0.625rem;
+   gap: var(--fhcs-s2);
    min-width: 0;
 }
 
 .fhcs-chat .fhcs-card-portrait
 {
    flex: none;
-   width: 52px;
-   height: 52px;
+   width: var(--fhcs-die-size);
+   height: var(--fhcs-die-size);
+   border: 1px solid var(--fhcs-line);
    border-radius: 50%;
-   border: 2px solid var(--fhcs-line);
    object-fit: cover;
    object-position: top;
 }
@@ -74,60 +127,88 @@
    display: flex;
    flex-direction: column;
    min-width: 0;
-   line-height: 1.25;
 }
 
-.fhcs-chat .fhcs-card-actor,
-.fhcs-chat .fhcs-card-subtitle
+.fhcs-chat .fhcs-card-line
 {
-   font-size: var(--fhcs-text-small);
+   display: flex;
+   flex-wrap: wrap;
+   column-gap: 0.35em;
    color: var(--fhcs-muted);
    overflow-wrap: anywhere;
+}
+
+.fhcs-chat .fhcs-card-line:empty
+{
+   display: none;
+}
+
+.fhcs-chat .fhcs-card-line > * + *::before
+{
+   content: '·';
+   margin-right: 0.35em;
 }
 
 .fhcs-chat .fhcs-card-title
 {
    all: unset;
-   font-size: var(--fhcs-text-heading);
+   font-size: var(--fhcs-display-size);
+   line-height: var(--fhcs-display-line);
    font-weight: bold;
    cursor: pointer;
    overflow-wrap: anywhere;
 }
 
-.fhcs-chat .fhcs-card-title:focus-visible,
-.fhcs-chat .fhcs-band:focus-visible,
-.fhcs-chat .fhcs-button:focus-visible,
-.fhcs-chat .fhcs-card-details > summary:focus-visible
-{
-   outline: 2px solid currentColor;
-   outline-offset: 2px;
-}
-
-.fhcs-chat .fhcs-card-details
+/* Folded panels: the description and Apply share one look. */
+.fhcs-chat :is(.fhcs-card-details, .fhcs-apply)
 {
    border: 1px solid var(--fhcs-line-soft);
-   border-radius: 6px;
-   font-size: var(--fhcs-text-small);
+   border-radius: var(--fhcs-radius);
 }
 
-.fhcs-chat .fhcs-card-details > summary
+.fhcs-chat :is(.fhcs-card-details > summary, .fhcs-apply-summary)
 {
    display: flex;
    align-items: center;
-   min-height: 28px;
-   padding: 0 0.625rem;
-   color: var(--fhcs-muted);
+   justify-content: space-between;
+   min-height: var(--fhcs-control);
+   padding: 0 var(--fhcs-s2);
+   list-style: none;
    cursor: pointer;
 }
 
-.fhcs-chat .fhcs-card-details[open] > summary
+/* Muted once: the summary's own label (the Apply heading carries its own muting). */
+.fhcs-chat .fhcs-card-details > summary
+{
+   color: var(--fhcs-muted);
+}
+
+.fhcs-chat :is(.fhcs-card-details > summary, .fhcs-apply-summary)::-webkit-details-marker
+{
+   display: none;
+}
+
+.fhcs-chat .fhcs-card-details > summary::after,
+.fhcs-chat .fhcs-apply .fhcs-band-end::after
+{
+   content: '▸';
+}
+
+.fhcs-chat .fhcs-card-details[open] > summary::after,
+.fhcs-chat .fhcs-apply[open] .fhcs-band-end::after
+{
+   content: '▾';
+}
+
+.fhcs-chat .fhcs-card-details[open] > summary,
+.fhcs-chat .fhcs-apply[open] > .fhcs-apply-summary
 {
    border-bottom: 1px solid var(--fhcs-line-soft);
 }
 
 .fhcs-chat .fhcs-card-details > :not(summary)
 {
-   margin: 0.5rem 0.625rem;
+   margin: var(--fhcs-s1) var(--fhcs-s2);
    overflow-wrap: anywhere;
 }
 
@@ -140,37 +221,136 @@
 {
    display: flex;
    flex-wrap: wrap;
-   gap: 0.25rem;
+   gap: var(--fhcs-s1);
    padding: 0;
    list-style: none;
 }
 
 .fhcs-chat .fhcs-card-tags > li
 {
-   padding: 0 0.5rem;
+   padding: 0 var(--fhcs-s2);
    border: 1px solid var(--fhcs-line);
    border-radius: 999px;
 }
 
-/* A band: full width; heading on its own top line (left, with the open/closed mark right), contents centered below
-   at full width, so a 240px chat still fits whole words. */
+.fhcs-chat :is(.fhcs-card-supplement, .fhcs-card-request)
+{
+   text-align: center;
+   overflow-wrap: anywhere;
+}
+
+.fhcs-chat .fhcs-card-request > :first-child { margin-top: 0; }
+.fhcs-chat .fhcs-card-request > :last-child { margin-bottom: 0; }
+
+/* ---------- Buttons and fields ---------- */
+
+.fhcs-chat .fhcs-button,
+.fhcs-chat .fhcs-bonus-input
+{
+   width: auto;
+   height: auto;
+   min-height: var(--fhcs-control);
+   margin: 0;
+   padding: 0 var(--fhcs-s2);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-fill);
+   color: inherit;
+   font-family: inherit;
+}
+
+.fhcs-chat .fhcs-button
+{
+   cursor: pointer;
+}
+
+.fhcs-chat .fhcs-bonus-input
+{
+   min-width: 0;
+   background: transparent;
+   text-align: center;
+}
+
+.fhcs-chat .fhcs-bonus-input::placeholder
+{
+   color: var(--fhcs-muted);
+   opacity: 1;
+}
+
+.fhcs-chat .fhcs-card-actions
+{
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+   gap: var(--fhcs-s1);
+}
+
+/* Every band's controls: two equal columns, so each button keeps its size and place. */
+.fhcs-chat .fhcs-band-controls
+{
+   display: grid;
+   grid-template-columns: repeat(2, minmax(0, 1fr));
+   gap: var(--fhcs-s1);
+}
+
+.fhcs-chat .fhcs-band-controls > :is(.fhcs-button, .fhcs-bonus-input)
+{
+   width: 100%;
+}
+
+.fhcs-chat .fhcs-switch
+{
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   gap: var(--fhcs-s1);
+}
+
+.fhcs-chat .fhcs-switch-box
+{
+   display: inline-grid;
+   flex: none;
+   place-items: center;
+   width: 14px;
+   height: 14px;
+   border: 2px solid currentColor;
+   border-radius: 3px;
+   font-size: 11px;
+   font-weight: bold;
+   line-height: 1;
+   overflow: hidden;
+}
+
+.fhcs-chat .fhcs-switch[aria-pressed="true"]
+{
+   border-color: var(--fhcs-crit);
+}
+
+.fhcs-chat :is(.fhcs-card-title, .fhcs-band, .fhcs-band-button, .fhcs-band-summary, .fhcs-button, .fhcs-slot,
+   .fhcs-row-summary, .fhcs-card-details > summary, .fhcs-apply-summary, .fhcs-history, .fhcs-rows):focus-visible
+{
+   outline: 2px solid currentColor;
+   outline-offset: -2px;
+}
+
+/* ---------- Bands ---------- */
+
 .fhcs-chat .fhcs-band
 {
    display: flex;
    flex-direction: column;
    align-items: stretch;
-   gap: 0.125rem;
+   gap: var(--fhcs-s1);
    width: 100%;
    height: auto;
-   min-height: 48px;
+   min-height: var(--fhcs-control);
    margin: 0;
-   padding: 0.375rem 0.625rem;
+   padding: var(--fhcs-s1) var(--fhcs-s2);
    border: 1px solid var(--fhcs-line);
-   border-radius: 6px;
+   border-radius: var(--fhcs-radius);
    background: var(--fhcs-fill);
    color: inherit;
-   font: inherit;
-   line-height: 1.3;
+   font-family: inherit;
    text-align: center;
    cursor: pointer;
 }
@@ -183,72 +363,31 @@
 .fhcs-chat .fhcs-band:disabled
 {
    cursor: progress;
-   opacity: 0.6;
 }
 
-.fhcs-chat .fhcs-band-top
+/* Rolled bands and save bands hold their own clickable parts. */
+.fhcs-chat :is(details.fhcs-band, .fhcs-band-group)
 {
-   display: flex;
-   justify-content: space-between;
-   gap: 0.5rem;
-}
-
-.fhcs-chat .fhcs-band-heading
-{
-   font-size: var(--fhcs-text-small);
-   font-weight: bold;
-   letter-spacing: 0.04em;
-   text-transform: uppercase;
-   color: var(--fhcs-muted);
-   overflow-wrap: anywhere;
-}
-
-.fhcs-chat .fhcs-band-text
-{
-   font-size: var(--fhcs-text-body);
-   font-weight: bold;
-   overflow-wrap: anywhere;
-}
-
-.fhcs-chat .fhcs-card-actions
-{
-   display: flex;
-   flex-wrap: wrap;
-   justify-content: center;
-   gap: 0.375rem;
-}
-
-.fhcs-chat .fhcs-button
-{
-   width: auto;
-   height: auto;
-   min-height: 32px;
-   margin: 0;
-   padding: 0.25rem 0.75rem;
-   border: 1px solid var(--fhcs-line);
-   border-radius: 6px;
-   background: var(--fhcs-fill);
-   color: inherit;
-   font: inherit;
-   font-size: var(--fhcs-text-small);
-   cursor: pointer;
-}
-
-/* A rolled band opens and closes; its summary is the band. */
-.fhcs-chat details.fhcs-band
-{
+   gap: 0;
    padding: 0;
    cursor: auto;
 }
 
-.fhcs-chat .fhcs-band-summary
+.fhcs-chat :is(.fhcs-band-summary, .fhcs-band-button)
 {
    display: flex;
    flex-direction: column;
    align-items: stretch;
-   gap: 0.25rem;
-   min-height: 48px;
-   padding: 0.375rem 0.625rem;
+   gap: var(--fhcs-s1);
+   width: 100%;
+   height: auto;
+   margin: 0;
+   padding: var(--fhcs-s1) var(--fhcs-s2);
+   border: 0;
+   background: transparent;
+   color: inherit;
+   font-family: inherit;
+   text-align: center;
    list-style: none;
    cursor: pointer;
 }
@@ -258,20 +397,75 @@
    display: none;
 }
 
-.fhcs-chat .fhcs-band-summary:focus-visible
+/* The top line: heading left, total centered, open/closed mark right. */
+.fhcs-chat .fhcs-band-top
 {
-   outline: 2px solid currentColor;
-   outline-offset: 2px;
+   display: grid;
+   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+   align-items: center;
+   gap: var(--fhcs-s1);
 }
 
-.fhcs-chat .fhcs-band-rolled .fhcs-band-end::after
+.fhcs-chat .fhcs-band-heading
 {
-   content: '▸';
+   justify-self: start;
+   margin: 0;
+   border: 0;
+   color: var(--fhcs-muted);
+   overflow-wrap: anywhere;
 }
 
-.fhcs-chat .fhcs-band-rolled[open] .fhcs-band-end::after
+.fhcs-chat .fhcs-band-end
 {
-   content: '▾';
+   grid-column: 3;
+   justify-self: end;
+   color: var(--fhcs-muted);
+}
+
+.fhcs-chat .fhcs-band-rolled .fhcs-band-end::after { content: '▸'; }
+.fhcs-chat .fhcs-band-rolled[open] .fhcs-band-end::after { content: '▾'; }
+
+.fhcs-chat :is(.fhcs-band-text, .fhcs-band-prompt, .fhcs-band-parts, .fhcs-band-words)
+{
+   overflow-wrap: anywhere;
+}
+
+.fhcs-chat .fhcs-band-prompt
+{
+   color: var(--fhcs-muted);
+}
+
+.fhcs-chat :is(.fhcs-band-parts, .fhcs-band-words)
+{
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+   column-gap: 0.35em;
+}
+
+.fhcs-chat .fhcs-band-words > span + span::before
+{
+   content: '·';
+   margin-right: 0.35em;
+}
+
+/* One line kept, filled or not, so a band keeps its height between rolls. */
+.fhcs-chat .fhcs-band-words-fixed
+{
+   align-content: flex-start;
+   min-height: calc(var(--fhcs-body-size) * var(--fhcs-body-line));
+}
+
+.fhcs-chat .fhcs-verdict-success > span:first-child,
+.fhcs-chat .fhcs-row-verdict.fhcs-verdict-success
+{
+   color: var(--fhcs-success);
+}
+
+.fhcs-chat .fhcs-verdict-failure > span:first-child,
+.fhcs-chat .fhcs-row-verdict.fhcs-verdict-failure
+{
+   color: var(--fhcs-failure);
 }
 
 .fhcs-chat .fhcs-band-critical
@@ -280,46 +474,50 @@
    box-shadow: inset 3px 0 0 var(--fhcs-crit);
 }
 
-.fhcs-chat .fhcs-band-result
+/* An open band: the math, then the buttons (never pushed by what follows), then notes and earlier rolls. */
+.fhcs-chat .fhcs-band-body
 {
    display: flex;
    flex-direction: column;
-   align-items: center;
-   gap: 0.375rem;
+   gap: var(--fhcs-s1);
+   padding: var(--fhcs-s1) var(--fhcs-s2) var(--fhcs-s2);
+   border-top: 1px solid var(--fhcs-line-soft);
+   text-align: center;
+   overflow-wrap: anywhere;
 }
 
-.fhcs-chat .fhcs-band-total
+.fhcs-chat .fhcs-band-note
 {
-   font-size: 1.75rem;
-   line-height: 1;
+   color: var(--fhcs-muted);
 }
 
-.fhcs-chat .fhcs-band-parts
+/* Long lists scroll inside their panel, about five lines tall. */
+.fhcs-chat .fhcs-history
 {
-   display: flex;
-   flex-wrap: wrap;
-   justify-content: center;
-   column-gap: 0.75rem;
-   font-weight: bold;
+   max-height: calc(5 * var(--fhcs-body-size) * var(--fhcs-body-line) + var(--fhcs-s2));
+   overflow-y: auto;
+   padding-top: var(--fhcs-s1);
+   border-top: 1px solid var(--fhcs-line-soft);
 }
 
-/* The d20 row: equal side columns keep the primary die centered. */
+/* ---------- The d20 row ---------- */
+
 .fhcs-chat .fhcs-d20
 {
    display: flex;
    flex-direction: column;
-   gap: 0.25rem;
+   gap: var(--fhcs-s1);
    width: 100%;
 }
 
-/* The − slot, the primary die and the + slot: three fixed places, the slots right beside the die. */
+/* The − cell, the primary die and the + cell: three fixed places. The tray below uses the same columns. */
 .fhcs-chat .fhcs-d20-row,
 .fhcs-chat .fhcs-d20-tray
 {
    display: grid;
    grid-template-columns: minmax(0, 1fr) var(--fhcs-die-size) minmax(0, 1fr);
    align-items: start;
-   gap: 0.375rem;
+   gap: var(--fhcs-s1);
    width: 100%;
 }
 
@@ -328,40 +526,14 @@
 {
    display: flex;
    flex-wrap: wrap;
-   gap: 0.25rem;
+   gap: var(--fhcs-s1);
    min-width: 0;
 }
 
-/* The tray keeps one die's height even while empty. */
-.fhcs-chat .fhcs-d20-tray
-{
-   min-height: var(--fhcs-die-size);
-}
+.fhcs-chat .fhcs-d20-left { justify-content: flex-end; }
+.fhcs-chat .fhcs-d20-right { justify-content: flex-start; }
 
-.fhcs-chat .fhcs-d20-left
-{
-   justify-content: flex-end;
-}
-
-.fhcs-chat .fhcs-d20-right
-{
-   justify-content: flex-start;
-}
-
-.fhcs-chat .fhcs-slot-spent
-{
-   visibility: hidden;
-}
-
-.fhcs-chat
-{
-   --fhcs-die-size: 40px;
-   /* The default die, and the number on any filled die; swapped in dark themes above. */
-   --fhcs-die-ink: #191813;
-   --fhcs-die-on-ink: #fff;
-}
-
-/* Every die and slot: a d20 silhouette, one size everywhere (user, 2026-10-24). */
+/* Every die and slot: a d20 silhouette of one size. */
 .fhcs-chat .fhcs-die,
 .fhcs-chat .fhcs-slot
 {
@@ -377,7 +549,7 @@
    border: 0;
    background: none;
    color: inherit;
-   font: inherit;
+   font-family: inherit;
    line-height: 1;
 }
 
@@ -404,47 +576,21 @@
    opacity: 0.35;
 }
 
-.fhcs-chat .fhcs-die-value
+.fhcs-chat :is(.fhcs-die-value, .fhcs-slot-sign)
 {
    position: relative;
-   font-size: var(--fhcs-text-body);
-   font-weight: bold;
 }
 
-/* The default roll: a black die. */
-.fhcs-chat .fhcs-die-primary
-{
-   color: var(--fhcs-die-ink);
-}
+.fhcs-chat .fhcs-die-primary { color: var(--fhcs-die-ink); }
+.fhcs-chat .fhcs-die-adv { color: var(--fhcs-adv); }
+.fhcs-chat .fhcs-die-dis { color: var(--fhcs-dis); }
 
-.fhcs-chat .fhcs-die-primary.fhcs-die-counts .fhcs-die-shape polygon:first-child
-{
-   fill: var(--fhcs-die-ink);
-}
-
-.fhcs-chat .fhcs-die-primary.fhcs-die-counts .fhcs-die-value
-{
-   color: var(--fhcs-die-on-ink);
-}
-
-.fhcs-chat .fhcs-die-adv
-{
-   color: var(--fhcs-adv);
-}
-
-.fhcs-chat .fhcs-die-dis
-{
-   color: var(--fhcs-dis);
-}
-
-.fhcs-chat .fhcs-die-adv.fhcs-die-counts .fhcs-die-shape polygon:first-child,
-.fhcs-chat .fhcs-die-dis.fhcs-die-counts .fhcs-die-shape polygon:first-child
+.fhcs-chat .fhcs-die-counts .fhcs-die-shape polygon:first-child
 {
    fill: currentColor;
 }
 
-.fhcs-chat .fhcs-die-adv.fhcs-die-counts .fhcs-die-value,
-.fhcs-chat .fhcs-die-dis.fhcs-die-counts .fhcs-die-value
+.fhcs-chat .fhcs-die-counts .fhcs-die-value
 {
    color: var(--fhcs-die-on-ink);
 }
@@ -466,102 +612,54 @@
    stroke-width: 4;
 }
 
-
-.fhcs-chat .fhcs-band-words
+/* Add slots: a dashed d20 marked − or + until a die lands; then that side's newest die, with a small badge. */
+.fhcs-chat .fhcs-slot
 {
-   display: flex;
-   flex-wrap: wrap;
-   justify-content: center;
-   column-gap: 0.35em;
-   font-size: var(--fhcs-text-small);
-   font-weight: bold;
-   text-align: center;
-}
-
-.fhcs-chat .fhcs-band-words > span + span::before
-{
-   content: '·';
-   margin-right: 0.35em;
-   font-weight: normal;
-}
-
-.fhcs-chat .fhcs-verdict-success > span:first-child
-{
-   color: var(--fhcs-success);
-}
-
-.fhcs-chat .fhcs-verdict-failure > span:first-child
-{
-   color: var(--fhcs-failure);
-}
-
-.fhcs-chat .fhcs-band-body
-{
-   display: flex;
-   flex-direction: column;
-   gap: 0.375rem;
-   padding: 0.5rem 0.625rem;
-   border-top: 1px solid var(--fhcs-line-soft);
-   font-size: var(--fhcs-text-small);
-   text-align: center;
-   overflow-wrap: anywhere;
-}
-
-.fhcs-chat .fhcs-band-body p
-{
-   margin: 0;
-}
-
-.fhcs-chat .fhcs-band-note
-{
-   color: var(--fhcs-muted);
-}
-
-/* A save or check band: its button rolls for selected tokens; one row per token below it. */
-.fhcs-chat .fhcs-band-group
-{
-   padding: 0;
-   cursor: auto;
-}
-
-.fhcs-chat .fhcs-band-button
-{
-   display: flex;
-   flex-direction: column;
-   align-items: stretch;
-   gap: 0.125rem;
-   width: 100%;
-   height: auto;
-   min-height: 48px;
-   margin: 0;
-   padding: 0.375rem 0.625rem;
-   border: 0;
-   border-radius: 6px;
-   background: transparent;
-   color: inherit;
-   font: inherit;
-   line-height: 1.3;
-   text-align: center;
    cursor: pointer;
 }
 
-.fhcs-chat .fhcs-band-button:focus-visible,
-.fhcs-chat .fhcs-row-summary:focus-visible
+.fhcs-chat .fhcs-slot:not(.fhcs-die) .fhcs-die-shape polygon
 {
-   outline: 2px solid currentColor;
-   outline-offset: -2px;
+   stroke-dasharray: 4 3;
 }
 
-.fhcs-chat .fhcs-band-prompt
+.fhcs-chat .fhcs-slot-dis { color: var(--fhcs-dis); }
+.fhcs-chat .fhcs-slot-adv { color: var(--fhcs-adv); }
+
+.fhcs-chat .fhcs-slot:hover .fhcs-die-shape polygon:first-child
 {
-   font-size: var(--fhcs-text-small);
-   color: var(--fhcs-muted);
+   stroke-width: 3.5;
 }
+
+.fhcs-chat .fhcs-slot-badge
+{
+   position: absolute;
+   top: 0;
+   right: 0;
+   display: grid;
+   place-items: center;
+   width: 14px;
+   height: 14px;
+   border-radius: 50%;
+   color: var(--fhcs-die-on-ink);
+}
+
+.fhcs-chat .fhcs-slot-dis .fhcs-slot-badge { background: var(--fhcs-dis); }
+.fhcs-chat .fhcs-slot-adv .fhcs-slot-badge { background: var(--fhcs-adv); }
+
+.fhcs-chat .fhcs-slot-spent
+{
+   visibility: hidden;
+}
+
+/* ---------- Save rows ---------- */
 
 .fhcs-chat .fhcs-rows
 {
+   max-height: calc(5 * (var(--fhcs-control) + 1px));
    margin: 0;
    padding: 0;
+   overflow-y: auto;
    list-style: none;
    border-top: 1px solid var(--fhcs-line-soft);
 }
@@ -571,33 +669,23 @@
    display: flex;
    flex-direction: column;
    align-items: center;
-   gap: 0.25rem;
+   gap: var(--fhcs-s1);
    border-top: 1px solid var(--fhcs-line-soft);
 }
 
-.fhcs-chat .fhcs-row:first-child
-{
-   border-top: 0;
-}
+.fhcs-chat .fhcs-row:first-child { border-top: 0; }
+.fhcs-chat .fhcs-row > .fhcs-button { margin-bottom: var(--fhcs-s1); }
 
-.fhcs-chat .fhcs-row > .fhcs-button
-{
-   margin-bottom: 0.375rem;
-}
-
-.fhcs-chat .fhcs-row-details
-{
-   width: 100%;
-}
+.fhcs-chat .fhcs-row-details { width: 100%; }
 
 .fhcs-chat .fhcs-row-summary
 {
    display: grid;
    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
    align-items: center;
-   gap: 0.5rem;
-   min-height: 32px;
-   padding: 0.125rem 0.625rem;
+   gap: var(--fhcs-s2);
+   min-height: var(--fhcs-control);
+   padding: 0 var(--fhcs-s2);
    list-style: none;
    cursor: pointer;
 }
@@ -607,226 +695,19 @@
    display: none;
 }
 
-.fhcs-chat .fhcs-row-who
-{
-   text-align: left;
-   overflow-wrap: anywhere;
-}
-
-.fhcs-chat .fhcs-row-total
-{
-   font-size: var(--fhcs-text-heading);
-}
-
-.fhcs-chat .fhcs-row-verdict
-{
-   justify-self: end;
-   font-weight: bold;
-}
-
-.fhcs-chat .fhcs-row-verdict.fhcs-verdict-success
-{
-   color: var(--fhcs-success);
-}
-
-.fhcs-chat .fhcs-row-verdict.fhcs-verdict-failure
-{
-   color: var(--fhcs-failure);
-}
-
-/* Apply: dnd5e's own trays, unfolded, with controls at least 24px (SCOPE §5) and labelled. */
-.fhcs-chat .fhcs-apply
-{
-   border: 1px solid var(--fhcs-line);
-   border-radius: 6px;
-   text-align: center;
-}
-
-.fhcs-chat .fhcs-apply-summary
-{
-   display: flex;
-   align-items: center;
-   justify-content: space-between;
-   min-height: 32px;
-   padding: 0 0.625rem;
-   list-style: none;
-   cursor: pointer;
-}
-
-.fhcs-chat .fhcs-apply-summary::-webkit-details-marker
-{
-   display: none;
-}
-
-.fhcs-chat .fhcs-apply-summary:focus-visible
-{
-   outline: 2px solid currentColor;
-   outline-offset: -2px;
-}
-
-.fhcs-chat .fhcs-apply .fhcs-band-end::after
-{
-   content: '▸';
-}
-
-.fhcs-chat .fhcs-apply[open] .fhcs-band-end::after
-{
-   content: '▾';
-}
-
-.fhcs-chat .fhcs-apply-body
-{
-   display: flex;
-   flex-direction: column;
-   gap: 0.375rem;
-   padding: 0.375rem 0.625rem 0.5rem;
-   border-top: 1px solid var(--fhcs-line-soft);
-}
-
-.fhcs-chat .fhcs-apply .fhcs-band-note
-{
-   margin: 0;
-   font-size: var(--fhcs-text-small);
-}
-
-.fhcs-chat .fhcs-apply :is(button, .multiplier-button, .apply-button)
-{
-   min-height: 28px;
-   min-width: 28px;
-}
-
-.fhcs-chat .fhcs-apply .apply-button
-{
-   font-weight: bold;
-}
-
-/* Late adds: dashed d20 slots marked + or − either side of the d20 row, and the bonus field. */
-.fhcs-chat .fhcs-slot
-{
-   cursor: pointer;
-}
-
-.fhcs-chat .fhcs-slot .fhcs-die-shape polygon
-{
-   stroke-dasharray: 4 3;
-}
-
-.fhcs-chat .fhcs-slot-sign
-{
-   position: relative;
-   font-size: 1.5rem;
-   font-weight: 900;
-}
-
-.fhcs-chat .fhcs-slot-dis
-{
-   color: var(--fhcs-dis);
-}
-
-.fhcs-chat .fhcs-slot-adv
-{
-   color: var(--fhcs-adv);
-}
-
-.fhcs-chat .fhcs-slot:hover .fhcs-die-shape polygon
-{
-   fill: color-mix(in srgb, currentColor 12%, transparent);
-}
-
-.fhcs-chat .fhcs-slot:focus-visible
-{
-   outline: 2px solid currentColor;
-   outline-offset: 2px;
-}
-
-/* Every band's controls: two equal columns, so each button keeps its size and place (user, 2026-10-24). */
-.fhcs-chat .fhcs-band-controls
-{
-   display: grid;
-   grid-template-columns: repeat(2, minmax(0, 1fr));
-   gap: 0.375rem;
-}
-
-.fhcs-chat .fhcs-band-controls > .fhcs-button,
-.fhcs-chat .fhcs-band-controls > .fhcs-bonus-input
-{
-   width: 100%;
-   min-height: 32px;
-}
-
-.fhcs-chat .fhcs-switch
-{
-   display: inline-flex;
-   align-items: center;
-   justify-content: center;
-   gap: 0.375rem;
-}
-
-.fhcs-chat .fhcs-switch-box
-{
-   display: inline-grid;
-   flex: none;
-   place-items: center;
-   width: 16px;
-   height: 16px;
-   border: 2px solid currentColor;
-   border-radius: 3px;
-   font-size: 12px;
-   font-weight: bold;
-   line-height: 1;
-   overflow: hidden;
-}
-
-.fhcs-chat .fhcs-switch[aria-pressed="true"]
-{
-   border-color: var(--fhcs-crit);
-}
-
-.fhcs-chat .fhcs-bonus-input
-{
-   min-width: 0;
-   height: auto;
-   min-height: 32px;
-   padding: 0 0.375rem;
-   border: 1px solid var(--fhcs-line);
-   border-radius: 6px;
-   background: transparent;
-   color: inherit;
-   font: inherit;
-   text-align: center;
-}
-
-/* Standalone rolls and requests: dnd5e's own lines, the request's text, rows still to roll. */
-.fhcs-chat .fhcs-card-supplement,
-.fhcs-chat .fhcs-card-request
-{
-   margin: 0;
-   font-size: var(--fhcs-text-small);
-   text-align: center;
-   overflow-wrap: anywhere;
-}
-
-.fhcs-chat .fhcs-card-request > :first-child
-{
-   margin-top: 0;
-}
-
-.fhcs-chat .fhcs-card-request > :last-child
-{
-   margin-bottom: 0;
-}
-
-.fhcs-chat .fhcs-band-pad
-{
-   padding: 0.375rem 0.625rem 0;
-}
-
 .fhcs-chat .fhcs-row-open
 {
    width: 100%;
    cursor: auto;
 }
 
+.fhcs-chat .fhcs-row-who
+{
+   text-align: left;
+   overflow-wrap: anywhere;
+}
+
+.fhcs-chat .fhcs-row-verdict,
 .fhcs-chat .fhcs-row-roll
 {
    justify-self: end;
@@ -835,49 +716,31 @@
 .fhcs-chat .fhcs-row-wait
 {
    color: var(--fhcs-muted);
-   font-weight: normal;
    font-style: italic;
 }
 
-.fhcs-chat .fhcs-bonus-input::placeholder
+.fhcs-chat .fhcs-band-pad
 {
-   color: var(--fhcs-muted);
-   opacity: 1;
+   padding: var(--fhcs-s1) var(--fhcs-s2) 0;
 }
 
-/* Long lists scroll inside their panel, about five lines tall (user, 2026-10-24): a band's earlier rolls, a save's
-   token rows. */
-.fhcs-chat .fhcs-history
+/* ---------- Apply ---------- */
+
+.fhcs-chat .fhcs-apply
 {
-   max-height: calc(5 * 1.4em + 0.5rem);
-   overflow-y: auto;
-   padding: 0.25rem 0;
-   border-top: 1px solid var(--fhcs-line-soft);
-   line-height: 1.4;
+   text-align: center;
 }
 
-.fhcs-chat .fhcs-history > p
+.fhcs-chat .fhcs-apply-body
 {
-   margin: 0;
+   display: flex;
+   flex-direction: column;
+   gap: var(--fhcs-s1);
+   padding: var(--fhcs-s1) var(--fhcs-s2) var(--fhcs-s2);
 }
 
-.fhcs-chat .fhcs-rows
+.fhcs-chat .fhcs-apply :is(button, .multiplier-button, .apply-button)
 {
-   max-height: calc(5 * 33px);
-   overflow-y: auto;
-}
-
-.fhcs-chat .fhcs-history:focus-visible,
-.fhcs-chat .fhcs-rows:focus-visible
-{
-   outline: 2px solid currentColor;
-   outline-offset: -2px;
-}
-
-/* A band's words keep two lines' room, filled or not, so its buttons don't move between rolls (user, 2026-10-24). */
-.fhcs-chat .fhcs-band-words-fixed
-{
-   align-content: flex-start;
-   min-height: calc(2 * 1.3em);
-   line-height: 1.3;
+   min-width: var(--fhcs-control);
+   min-height: var(--fhcs-control);
 }

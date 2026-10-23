@@ -16,7 +16,7 @@ import { d20Row, dieClasses, MAX_PER_SIDE } from './d20.js';
 export const CARD_TEMPLATE = `modules/${MODULE_ID}/templates/chat/usage-card.hbs`;
 
 /** Parts the card templates include by path; preloaded at init. */
-export const CARD_PARTS = ['header', 'rolled-band', 'd20-row', 'die', 'bonus']
+export const CARD_PARTS = ['header', 'rolled-band', 'd20-row', 'd20-tray', 'die', 'bonus']
    .map((name) => `modules/${MODULE_ID}/templates/chat/parts/${name}.hbs`);
 // (roll-card.hbs and request-card.hbs include the same parts.)
 
@@ -79,20 +79,40 @@ const bonusField = (facts, format) => (facts.canEdit
    : null);
 
 /**
- * The late advantage and disadvantage slots either side of the d20 row: a dashed d20 marked + or −, the same size as
- * the dice; a side holding five dice keeps an empty space instead, so nothing moves. The words go to screen readers
- * and the tooltip.
+ * The d20 row's two side cells and the tray under it (SCOPE §6.6, user 2026-10-24). Each side's newest die sits in the
+ * cell beside the primary and is that side's add button (a + or − badge on it); before any die is added the cell is a
+ * dashed d20 marked + or −. Older dice move to the tray. A side holding five dice shows its newest die, no longer a
+ * button. So the button never moves and the latest result sits next to the primary.
+ *
+ * @param {object} facts    From compat.rollFacts (canEdit).
+ * @param {object} row      From d20Row: left (newest first), center, right (oldest first).
+ * @param {Function} format
+ * @param {Function} withClasses   die => { value, classes }
  */
-function lateSlots(facts, row, format)
+export function d20Cells(facts, row, format, withClasses)
 {
-   if (!facts.canEdit) { return null; }
-   const slot = (side, dice) => (dice.length >= MAX_PER_SIDE ? { full: true } : {
-      action: side === 'dis' ? 'lateDisadvantage' : 'lateAdvantage',
-      side,
-      sign: side === 'dis' ? '−' : '+',
-      aria: format(side === 'dis' ? 'FHCS.Card.AddDisadvantage' : 'FHCS.Card.AddAdvantage', {})
-   });
-   return { left: slot('dis', row.left), right: slot('adv', row.right) };
+   const cell = (side, dice) =>
+   {
+      const newest = dice.length ? withClasses(dice[0]) : null;
+      const canAdd = facts.canEdit && (dice.length < MAX_PER_SIDE);
+      return {
+         die: newest,
+         slot: canAdd ? {
+            action: side === 'dis' ? 'lateDisadvantage' : 'lateAdvantage',
+            side,
+            sign: side === 'dis' ? '−' : '+',
+            aria: format(side === 'dis' ? 'FHCS.Card.AddDisadvantage' : 'FHCS.Card.AddAdvantage', {})
+         } : null
+      };
+   };
+   const right = [...row.right].reverse();
+   return {
+      left: cell('dis', row.left),
+      right: cell('adv', right),
+      // Older dice, oldest nearest the primary on each side.
+      trayLeft: row.left.slice(1).map(withClasses),
+      trayRight: right.slice(1).reverse().map(withClasses)
+   };
 }
 
 /**
@@ -113,16 +133,12 @@ export function d20Band(facts, earlier, format)
       critical: facts.isCritical,
       verdict: outcome.verdict,
       words: outcome.details,
-      row: { left: row.left.map(withClasses), center: row.center ? withClasses(row.center) : null,
-         right: row.right.map(withClasses) },
+      row: { center: row.center ? withClasses(row.center) : null, ...d20Cells(facts, row, format, withClasses) },
       diceLabel: format('FHCS.Card.DiceLabel', {
          dice: all.map((d) => format(d.counts ? 'FHCS.Card.DieCounts' : 'FHCS.Card.DieDropped', { value: d.value }))
             .join(', ')
       }),
       rollId: facts.messageId,
-      slots: lateSlots(facts, row, format),
-      // The tray under the d20 row is there whenever dice can be added, so the first die added moves nothing.
-      tray: Boolean(facts.canEdit || row.left.length || row.right.length),
       bonus: bonusField(facts, format),
       mathLines: [{ formula: facts.formula, result: `${facts.math} = ${facts.total}` }],
       notes: [
@@ -208,8 +224,6 @@ export function saveRow(facts, format)
       row: band.row,
       diceLabel: band.diceLabel,
       rollId: band.rollId,
-      slots: band.slots,
-      tray: band.tray,
       bonus: band.bonus,
       notes: band.notes,
       mathLines: band.mathLines,

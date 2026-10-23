@@ -111,7 +111,7 @@ for (const path of preloaded)
 }
 const included = new Set();
 for (const file of ['templates/chat/usage-card.hbs', 'templates/chat/roll-card.hbs', 'templates/chat/request-card.hbs',
-   'templates/chat/parts/rolled-band.hbs', 'templates/chat/parts/d20-row.hbs'])
+   'templates/chat/parts/rolled-band.hbs', 'templates/chat/parts/d20-row.hbs', 'templates/chat/parts/d20-tray.hbs'])
 {
    for (const [, path] of readFileSync(new URL(file, root), 'utf8').matchAll(/{{>\s*"([^"]+)"/g)) { included.add(path); }
 }

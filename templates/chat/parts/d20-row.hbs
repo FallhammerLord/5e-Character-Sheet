@@ -1,17 +1,11 @@
-{{!-- The d20 row (SCOPE §6.6): the − slot, the primary die, the + slot, always in the same three places (user,
-     2026-10-24); a full side keeps an empty space. Added dice go in the tray below: disadvantage left, advantage
-     right, so clicking a slot again never moves it. Context: a rolled band or row. --}}
+{{!-- The d20 row (SCOPE §6.6): the − cell, the primary die, the + cell, always in the same three places. Each cell
+     holds that side's newest die, which is also its add button (or a dashed d20 before any die). Older dice go in
+     the tray below. Context: a rolled band or row. --}}
 <span class="fhcs-d20" role="group" aria-label="{{ diceLabel }}">
    <span class="fhcs-d20-row">
-      <span class="fhcs-d20-cell fhcs-d20-left">{{#with slots.left}}{{#if full}}<span class="fhcs-slot fhcs-slot-spent" aria-hidden="true"></span>{{else}}<button type="button" class="fhcs-slot fhcs-slot-dis" data-fhcs-action="{{ action }}" data-roll-id="{{ ../rollId }}" aria-label="{{ aria }}" data-fhcs-tip="{{ aria }}"><svg class="fhcs-die-shape" viewBox="0 0 40 40" aria-hidden="true"><polygon points="20,1.5 37,11 37,29 20,38.5 3,29 3,11"/></svg><span class="fhcs-slot-sign" aria-hidden="true">{{ sign }}</span></button>{{/if}}{{/with}}</span>
+      <span class="fhcs-d20-cell fhcs-d20-left">{{#with row.left}}{{#if slot}}<button type="button" class="fhcs-slot fhcs-slot-dis{{#if die}} {{ die.classes }}{{/if}}" data-fhcs-action="{{ slot.action }}" data-roll-id="{{ ../rollId }}" aria-label="{{ slot.aria }}" data-fhcs-tip="{{ slot.aria }}"><svg class="fhcs-die-shape" viewBox="0 0 40 40" aria-hidden="true"><polygon points="20,1.5 37,11 37,29 20,38.5 3,29 3,11"/>{{#if die}}<polygon class="fhcs-die-face" points="20,8 31.5,27 8.5,27"/>{{/if}}</svg>{{#if die}}<span class="fhcs-die-value">{{ die.value }}</span><span class="fhcs-slot-badge" aria-hidden="true">{{ slot.sign }}</span>{{else}}<span class="fhcs-slot-sign" aria-hidden="true">{{ slot.sign }}</span>{{/if}}</button>{{else if die}}{{#with die}}{{> "modules/fhcs/templates/chat/parts/die.hbs" }}{{/with}}{{else}}<span class="fhcs-slot fhcs-slot-spent" aria-hidden="true"></span>{{/if}}{{/with}}</span>
       {{#with row.center}}{{> "modules/fhcs/templates/chat/parts/die.hbs" }}{{/with}}
-      <span class="fhcs-d20-cell fhcs-d20-right">{{#with slots.right}}{{#if full}}<span class="fhcs-slot fhcs-slot-spent" aria-hidden="true"></span>{{else}}<button type="button" class="fhcs-slot fhcs-slot-adv" data-fhcs-action="{{ action }}" data-roll-id="{{ ../rollId }}" aria-label="{{ aria }}" data-fhcs-tip="{{ aria }}"><svg class="fhcs-die-shape" viewBox="0 0 40 40" aria-hidden="true"><polygon points="20,1.5 37,11 37,29 20,38.5 3,29 3,11"/></svg><span class="fhcs-slot-sign" aria-hidden="true">{{ sign }}</span></button>{{/if}}{{/with}}</span>
+      <span class="fhcs-d20-cell fhcs-d20-right">{{#with row.right}}{{#if slot}}<button type="button" class="fhcs-slot fhcs-slot-adv{{#if die}} {{ die.classes }}{{/if}}" data-fhcs-action="{{ slot.action }}" data-roll-id="{{ ../rollId }}" aria-label="{{ slot.aria }}" data-fhcs-tip="{{ slot.aria }}"><svg class="fhcs-die-shape" viewBox="0 0 40 40" aria-hidden="true"><polygon points="20,1.5 37,11 37,29 20,38.5 3,29 3,11"/>{{#if die}}<polygon class="fhcs-die-face" points="20,8 31.5,27 8.5,27"/>{{/if}}</svg>{{#if die}}<span class="fhcs-die-value">{{ die.value }}</span><span class="fhcs-slot-badge" aria-hidden="true">{{ slot.sign }}</span>{{else}}<span class="fhcs-slot-sign" aria-hidden="true">{{ slot.sign }}</span>{{/if}}</button>{{else if die}}{{#with die}}{{> "modules/fhcs/templates/chat/parts/die.hbs" }}{{/with}}{{else}}<span class="fhcs-slot fhcs-slot-spent" aria-hidden="true"></span>{{/if}}{{/with}}</span>
    </span>
-   {{#if tray}}
-   <span class="fhcs-d20-tray">
-      <span class="fhcs-d20-side fhcs-d20-left">{{#each row.left}}{{> "modules/fhcs/templates/chat/parts/die.hbs" }}{{/each}}</span>
-      <span class="fhcs-d20-gap"></span>
-      <span class="fhcs-d20-side fhcs-d20-right">{{#each row.right}}{{> "modules/fhcs/templates/chat/parts/die.hbs" }}{{/each}}</span>
-   </span>
-   {{/if}}
+   {{#if row.trayLeft.length}}{{> "modules/fhcs/templates/chat/parts/d20-tray.hbs" }}{{else if row.trayRight.length}}{{> "modules/fhcs/templates/chat/parts/d20-tray.hbs" }}{{/if}}
 </span>

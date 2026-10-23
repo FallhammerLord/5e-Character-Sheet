@@ -1,0 +1,6 @@
+{{!-- Older late dice under the d20 row: disadvantage left, advantage right. Context: a rolled band or row. --}}
+<span class="fhcs-d20-tray">
+   <span class="fhcs-d20-side fhcs-d20-left">{{#each row.trayLeft}}{{> "modules/fhcs/templates/chat/parts/die.hbs" }}{{/each}}</span>
+   <span></span>
+   <span class="fhcs-d20-side fhcs-d20-right">{{#each row.trayRight}}{{> "modules/fhcs/templates/chat/parts/die.hbs" }}{{/each}}</span>
+</span>

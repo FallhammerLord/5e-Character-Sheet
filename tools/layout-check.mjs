@@ -1,7 +1,7 @@
 /**
  * Renders our templates and stylesheets in Chromium at a range of sheet widths, in light and dark themes, and reports
  * anything that overflows its box or the window, siblings drawn over each other, text below WCAG contrast (4.5:1, or
- * 3:1 for large text), and any text field inside a width container. Writes screenshots to tools/out/.
+ * 3:1 for large text), more than three text styles, and any text field inside a width container. Writes screenshots to tools/out/.
  * Usage: npm run layout (set CHROMIUM_PATH to use an installed Chromium instead of Playwright's download)
  *
  * Every run starts with a self-test: a known-good page must pass and known-bad pages must fail, so an empty or
@@ -127,6 +127,22 @@ function findProblems()
       if (got < needed) { issues.push(`contrast ${got.toFixed(2)}:1 below ${needed}:1: ${el.tagName.toLowerCase()}.${[...el.classList].join('.')} "${text.slice(0, 30)}"`); }
    }
 
+   // Three text styles, no more (user, 2026-10-24): size, weight and capitals of every piece of text in our parts.
+   const styles = new Map();
+   for (const el of app.querySelectorAll(':is(.fhcs-chat, .fhcs-sheet) *'))
+   {
+      if (el.ownerSVGElement || el.closest('[aria-hidden="true"], [hidden]') || !el.getClientRects().length) { continue; }
+      const own = [...el.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent).join('').trim();
+      if (!own) { continue; }
+      const cs = getComputedStyle(el);
+      const key = `${cs.fontSize} ${Number(cs.fontWeight) >= 600 ? 'bold' : 'regular'} ${cs.textTransform === 'uppercase' ? 'capitals' : 'mixed'}`;
+      if (!styles.has(key)) { styles.set(key, `${el.tagName.toLowerCase()}.${[...el.classList].join('.')} "${own.slice(0, 20)}"`); }
+   }
+   if (styles.size > 3)
+   {
+      issues.push(`${styles.size} text styles (3 allowed): ${[...styles].map(([k, v]) => `${k} (${v})`).join('; ')}`);
+   }
+
    // Foundry's form and editor styles collapse inside a size container (quest log lesson).
    for (const field of app.querySelectorAll('input, textarea, select, prose-mirror'))
    {
@@ -147,6 +163,7 @@ const SELF_TEST = [
    { id: 'self-wide', expect: true, body: '<div style="width:100px"><span style="display:inline-block;width:300px">Too wide</span></div>' },
    { id: 'self-past-edge', expect: true, body: '<div style="width:2000px">Past the edge</div>' },
    { id: 'self-container', expect: true, body: '<div style="container-type:inline-size"><input type="text"></div>' },
+   { id: 'self-styles', expect: true, body: '<div class="fhcs-chat"><p style="font-size:10px">a</p><p style="font-size:11px">b</p><p style="font-size:12px">c</p><p style="font-size:13px">d</p></div>' },
    { id: 'self-contrast', expect: true, body: '<p style="color:#bbb">Too faint to read</p>' },
    { id: 'self-overlap', expect: true, body: '<div style="display:grid;grid-template-columns:40px 1fr"><span style="justify-self:start;white-space:nowrap">Runs into the next</span><span>x</span></div>' }
 ];

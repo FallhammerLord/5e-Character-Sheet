@@ -1,13 +1,13 @@
-{{!-- A card's header: the actor's portrait, the actor, the action's title and subtitle. Context: the card's fhcs. --}}
+{{!-- A card's header: the actor's portrait; one label line (actor · details) over the action's title.
+     Context: the card's fhcs. --}}
 <header class="fhcs-card-header">
    {{#if portrait}}<img class="fhcs-card-portrait" src="{{ portrait }}" alt="{{ actorName }}">{{/if}}
    <div class="fhcs-card-titles">
-      {{#if actorName}}<span class="fhcs-card-actor">{{ actorName }}</span>{{/if}}
+      <span class="fhcs-card-line">{{#if actorName}}<span class="fhcs-card-actor">{{ actorName }}</span>{{/if}}{{#if subtitle}}<span class="fhcs-card-subtitle">{{{ subtitle }}}</span>{{/if}}</span>
       {{#if itemUuid}}
       <button type="button" class="fhcs-card-title" data-action="showDocument" data-uuid="{{ itemUuid }}">{{ title }}</button>
       {{else}}
       <span class="fhcs-card-title">{{ title }}</span>
       {{/if}}
-      {{#if subtitle}}<span class="fhcs-card-subtitle">{{{ subtitle }}}</span>{{/if}}
    </div>
 </header>
