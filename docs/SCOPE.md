@@ -84,8 +84,20 @@ So Track R is mostly presentation over dnd5e's own buttons; late advantage is th
 
 The user's principle (2026-10-23): keep a pencil-and-paper feel. A card should read like what someone says at the table, and actions stay in the players' and GM's hands. Show the dice; never auto-apply damage, saves or effects; every step is a button someone chooses to press.
 
+### 6.4 Fewest clicks: no held keys, no pop-up windows
+
+The user's rule (2026-10-23): the chat card holds everything; nobody holds a key or answers a Foundry dialog. How, against dnd5e 6.0 (checked in its source):
+
+- **Roll dialogs:** every roll fires the generic `dnd5e.preRoll` hook first (`dice/basic-roll.mjs`); setting `dialog.configure = false` there skips the dialog for all rolls. Advantage moves to the card (late advantage), so Alt and Ctrl are never needed.
+- **Damage on the same card:** Roll damage adds the damage to the attack's card instead of posting a new one; a critical hit doubles the dice without asking. Apply buttons sit under it.
+- **Saves on the same card:** Roll save for selected lists each token's result on the card that asked, with success or failure against the DC in words; concentration requests and their saves the same.
+- **Activity dialog** (`_requiresConfigurationDialog`, `documents/activity/mixin.mjs`): it opens to start concentration, choose consumption, or upcast. Use the defaults and skip it; consumption is shown on the card with Undo.
+- **Open — upcasting:** casting at a higher level needs the level before the roll. Options: level buttons on the sheet's spell row, or cast at the lowest level and offer "Cast at level N" buttons on the card that re-roll the scaled effect.
+- **Open — situational bonuses** (a one-off +2 the dialog used to take): a small "+ bonus" field on the card that adds to the total, or leave it to active effects.
+
 ## 7. Open questions
 
 - Shared themes with the quest log, or Light and Dark first?
 - Which sheet-changing modules matter at the user's table?
 - Does the "Now" strip live in the header, a tab, or both?
+- Upcasting and situational bonuses without dialogs (§6.4).

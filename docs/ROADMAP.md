@@ -52,7 +52,7 @@ Runs alongside the sheet phases; works whatever sheet a player uses (client sett
 - [ ] Clear chat cards: outcome first in one line (who · what · total), success or failure in words vs a known DC, natural 1 and 20 in words, labelled buttons at least 24px, tags folded, rolls in a row from one speaker grouped
 - [ ] Late advantage and disadvantage on d20 cards (the one new mechanic; SCOPE §6.2)
 - [ ] dnd5e's own Roll damage, Roll save and Apply buttons: labelled, at least 24px, target trays open with "selected" or "targeted" in words
-- [ ] Quick-roll keys (Shift, Alt, Ctrl) explained in a tips panel
+- [ ] No held keys, no pop-up windows (SCOPE §6.4): roll and activity dialogs skipped, damage and saves land on the card that asked
 - [ ] Compatibility: step aside cleanly when RSReforged is active
 
 ## Mechanical parity checklist
