@@ -174,22 +174,28 @@ export function rollsFrom(usage, types)
 }
 
 /**
- * Rolls a card's damage again, as a critical or not, the way dnd5e's Damage button does (last attack's ability,
- * ammunition and mode; the card's scaling and targets), without the damage dialog. The click's event links the roll
- * to the card (`system.origin`).
+ * Rolls a card's damage the way dnd5e's Damage button does (last attack's ability, ammunition and mode; the card's
+ * scaling and targets), as a critical or not, without the damage dialog, linked to the card (`system.origin`).
  *
  * @param {ChatMessage} usage
- * @param {Event} event
- * @param {boolean} isCritical
+ * @param {object} options
+ * @param {boolean} options.isCritical
+ * @param {Event} [options.event]   The click, when there is one.
  */
-export async function rollDamageAgain(usage, event, isCritical)
+export async function rollCardDamage(usage, { isCritical, event = null })
 {
    const activity = usage.getAssociatedActivity?.({ scaled: true });
-   if (!activity?.rollDamage) { return; }
+   if (!activity?.rollDamage || !activity.damage?.parts?.length) { return; }
    const lastAttack = usage.getAssociatedRolls('attack').at(-1);
    const { ability, ammunitionItem: ammunition, mode: attackMode } = lastAttack?.system ?? {};
    await activity.rollDamage({ event, ability, ammunition, attackMode, isCritical }, { configure: false },
-      { data: { system: { targets: usage.system.targets } } });
+      { data: { system: { origin: usage.id, targets: usage.system.targets } } });
+}
+
+/** Whether dnd5e's "skip dialog" key (Shift by default, rebindable) is held for this event. */
+export function skipKeyHeld(event)
+{
+   return Boolean(event && globalThis.dnd5e?.utils?.areKeysPressed?.(event, 'skipDialogNormal'));
 }
 
 /** The usage card a roll message was made from, if it is one. */

@@ -9,6 +9,18 @@
       "TwoD20s": {
         "Name": "Always roll two d20s",
         "Hint": "Every d20 roll also rolls a second d20 in advance. Late advantage or disadvantage on the card uses it first."
+      },
+      "RollAttackOnUse": {
+        "Name": "Roll the attack on use",
+        "Hint": "Using an item with an attack rolls the attack into its card at once. Off: the attack is a button on the card."
+      },
+      "RollDamageOnUse": {
+        "Name": "Roll damage on use",
+        "Hint": "Damage rolls into the card at once: after each attack (doubled on a critical hit), and right after a save spell or a damage or healing activity. Off: damage is a button on the card."
+      },
+      "NoRollDialogs": {
+        "Name": "No roll dialogs",
+        "Hint": "Rolls go straight to the card, without the roll configuration window. Hold the skip-dialog key (Shift) to get the window back. Spellcasting and activity choices still ask."
       }
     },
     "Chat": {

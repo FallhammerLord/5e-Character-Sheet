@@ -113,6 +113,16 @@ export function registerQuenchTests(quench)
       const { describe, it, assert, before, after } = context;
       let actor = null;
       let activity = null;
+      let rollDamageOnUse = true;
+
+      /** Waits up to three seconds for a condition. */
+      const waitFor = async (condition) =>
+      {
+         for (let waited = 0; !condition() && (waited < 3000); waited += 100)
+         {
+            await new Promise((resolve) => { setTimeout(resolve, 100); });
+         }
+      };
 
       /** A usage card for the test weapon, rendered but never posted, and its element. */
       const renderCard = async () =>
@@ -128,6 +138,9 @@ export function registerQuenchTests(quench)
          before(async function ()
          {
             if (!game.user.isGM) { this.skip(); }
+            // Damage on use would add rolls mid-test; the test for it switches it back on.
+            rollDamageOnUse = game.settings.get(MODULE_ID, 'rollDamageOnUse');
+            await game.settings.set(MODULE_ID, 'rollDamageOnUse', false);
             actor = await Actor.implementation.create({ name: 'FHCS test (safe to delete)', type: 'character' });
             const [item] = await actor.createEmbeddedDocuments('Item', [{
                name: 'FHCS test sword',
@@ -141,6 +154,7 @@ export function registerQuenchTests(quench)
          after(async function ()
          {
             await actor?.delete();
+            if (game.user.isGM) { await game.settings.set(MODULE_ID, 'rollDamageOnUse', rollDamageOnUse); }
          });
 
          it('draws usage cards with our model', function ()
@@ -230,10 +244,7 @@ export function registerQuenchTests(quench)
                const button = band.querySelector('[data-fhcs-action="damageCritical"]');
                assert.ok(button, 'roll as critical offered');
                button.click();
-               for (let waited = 0; (damage().length < 2) && (waited < 3000); waited += 100)
-               {
-                  await new Promise((resolve) => { setTimeout(resolve, 100); });
-               }
+               await waitFor(() => damage().length >= 2);
                assert.lengthOf(damage(), 2, 'second damage message posted');
                assert.isTrue(damage().at(-1).rolls[0].isCritical, 'second roll is a critical');
                html = await usage.renderHTML();
@@ -243,6 +254,36 @@ export function registerQuenchTests(quench)
             finally
             {
                for (const message of damage()) { await message.delete(); }
+               await usage.delete();
+            }
+         });
+
+         it('skips roll dialogs unless the skip-dialog key is held', function ()
+         {
+            const dialog = {};
+            Hooks.call('dnd5e.preRoll', { event: null }, dialog, {});
+            assert.strictEqual(dialog.configure, game.settings.get(MODULE_ID, 'noRollDialogs') ? false : undefined);
+         });
+
+         it('rolls damage after an attack made from the card, critical when the attack is', async function ()
+         {
+            await game.settings.set(MODULE_ID, 'rollDamageOnUse', true);
+            const results = await activity.use({ subsequentActions: false, consume: false }, { configure: false },
+               { rollMode: 'selfroll' });
+            const usage = results?.message;
+            try
+            {
+               const [roll] = await activity.rollAttack({}, { configure: false },
+                  { rollMode: 'selfroll', data: { system: { origin: usage.id } } }) ?? [];
+               await waitFor(() => usage.getAssociatedRolls('damage').length > 0);
+               const [damage] = usage.getAssociatedRolls('damage');
+               assert.ok(damage, 'damage rolled after the attack');
+               assert.strictEqual(damage.rolls[0].isCritical, roll.isCritical === true);
+            }
+            finally
+            {
+               await game.settings.set(MODULE_ID, 'rollDamageOnUse', false);
+               for (const message of usage.getAssociatedRolls()) { await message.delete(); }
                await usage.delete();
             }
          });

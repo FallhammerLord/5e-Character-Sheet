@@ -113,7 +113,8 @@ The same frame serves every roll: a skill check from the sheet is header plus d2
 
 ### 6.6 Settings, selection and targets (user, 2026-10-23)
 
-- **Roll on use:** using an item rolls its attack and its damage into the card at once. Each is a world setting, on by default; off makes it a button in its band.
+- **Roll on use:** using an item rolls its attack and its damage into the card at once. Each is a world setting, on by default; off makes it a button in its band. Damage follows every attack made from the card (doubled on a critical), and a save spell's damage rolls right after it is cast.
+- **No roll dialogs:** world setting, on by default. Holding dnd5e's skip-dialog key (Shift) brings the window back for a one-off bonus; the spellcasting and activity-choice windows still ask.
 - **Always roll two d20s:** world setting, on by default. The next d20 is rolled in advance; the first side die added uses it, later ones roll fresh.
 - **The d20 row** (user, 2026-10-23): the primary die in the center; disadvantage dice to its left (red outline), advantage dice to its right (blue outline, colorblind-safe against the red). A side slot adds a die and never clears the other side, so Elven Accuracy (two advantage dice) and advantage-plus-disadvantage (they cancel; the primary counts) both work. The die that counts is filled; the rest are struck through.
 - **Who can click:** a card's author uses its rolls, late adds and saves; the GM uses every card. Foundry lets a player control and change only what they own, so a player's Apply reaches their own tokens (healing themselves); damage to enemies is the GM's click.

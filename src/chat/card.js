@@ -8,7 +8,7 @@
  * `effect-application`) work inside our markup. Slices 2–8 fill the bands with results.
  */
 import { MODULE_ID } from '../constants.js';
-import { actorArtwork, answersButton, canApplyDamage, damageFacts, openTrays, preferSelected, rollDamageAgain, rollFacts,
+import { actorArtwork, answersButton, canApplyDamage, damageFacts, openTrays, preferSelected, rollCardDamage, rollFacts,
    rollsFrom } from '../compat.js';
 import { describeRoll } from './outcome.js';
 import { d20Row, dieClasses } from './d20.js';
@@ -260,8 +260,8 @@ export function makeUsageMessageData(Base)
          {
             switch (button.dataset.fhcsAction)
             {
-               case 'damageNormal': await rollDamageAgain(this.parent, event, false); break;
-               case 'damageCritical': await rollDamageAgain(this.parent, event, true); break;
+               case 'damageNormal': await rollCardDamage(this.parent, { event, isCritical: false }); break;
+               case 'damageCritical': await rollCardDamage(this.parent, { event, isCritical: true }); break;
             }
          }
          finally { button.disabled = false; }
