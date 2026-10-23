@@ -1,12 +1,13 @@
-{{!-- The d20 row (SCOPE §6.6): disadvantage dice left, the primary center, advantage dice right, with the late-add slots. Context: a rolled band or row. --}}
+{{!-- The d20 row (SCOPE §6.6): disadvantage dice left, the primary center, advantage dice right, each side with its add
+     slot (a dashed d20 marked − or +) until it holds five dice. Context: a rolled band or row. --}}
 <span class="fhcs-d20-row" role="group" aria-label="{{ diceLabel }}">
    <span class="fhcs-d20-side fhcs-d20-left">
-      {{#with slots.left}}<button type="button" class="fhcs-slot fhcs-slot-dis{{#if small}} fhcs-slot-small{{/if}}" data-fhcs-action="{{ action }}" data-roll-id="{{ ../rollId }}" aria-label="{{ aria }}">{{ label }}</button>{{/with}}
-      {{#each row.left}}<span class="{{ classes }}">{{ value }}</span>{{/each}}
+      {{#with slots.left}}<button type="button" class="fhcs-slot fhcs-slot-dis" data-fhcs-action="{{ action }}" data-roll-id="{{ ../rollId }}" aria-label="{{ aria }}" data-tooltip="{{ aria }}"><svg class="fhcs-die-shape" viewBox="0 0 40 40" aria-hidden="true"><polygon points="20,1.5 37,11 37,29 20,38.5 3,29 3,11"/></svg><span class="fhcs-slot-sign" aria-hidden="true">{{ sign }}</span></button>{{/with}}
+      {{#each row.left}}{{> "modules/fhcs/templates/chat/parts/die.hbs" }}{{/each}}
    </span>
-   {{#with row.center}}<span class="{{ classes }}">{{ value }}</span>{{/with}}
+   {{#with row.center}}{{> "modules/fhcs/templates/chat/parts/die.hbs" }}{{/with}}
    <span class="fhcs-d20-side fhcs-d20-right">
-      {{#each row.right}}<span class="{{ classes }}">{{ value }}</span>{{/each}}
-      {{#with slots.right}}<button type="button" class="fhcs-slot fhcs-slot-adv{{#if small}} fhcs-slot-small{{/if}}" data-fhcs-action="{{ action }}" data-roll-id="{{ ../rollId }}" aria-label="{{ aria }}">{{ label }}</button>{{/with}}
+      {{#each row.right}}{{> "modules/fhcs/templates/chat/parts/die.hbs" }}{{/each}}
+      {{#with slots.right}}<button type="button" class="fhcs-slot fhcs-slot-adv" data-fhcs-action="{{ action }}" data-roll-id="{{ ../rollId }}" aria-label="{{ aria }}" data-tooltip="{{ aria }}"><svg class="fhcs-die-shape" viewBox="0 0 40 40" aria-hidden="true"><polygon points="20,1.5 37,11 37,29 20,38.5 3,29 3,11"/></svg><span class="fhcs-slot-sign" aria-hidden="true">{{ sign }}</span></button>{{/with}}
    </span>
 </span>

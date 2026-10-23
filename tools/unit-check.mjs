@@ -98,15 +98,18 @@ for (const [name, results, mode, sides, expected] of ROW_CASES)
    if (got !== expected) { problems.push(`d20 row, ${name}: got "${got}", expected "${expected}"`); }
 }
 
-// Late adds: which die counts once dice sit on either side, and the mode dnd5e records.
+// Late adds: which die counts, by click order, and the mode dnd5e records.
 const KEEP_CASES = [
    ['no extra dice', [12], [], 0, 0],
    ['advantage takes the higher', [12, 15], ['adv'], 1, 1],
    ['advantage keeps the primary when it is higher', [18, 3], ['adv'], 0, 1],
    ['disadvantage takes the lower', [12, 4], ['dis'], 1, -1],
    ['Elven Accuracy: highest of three', [12, 15, 18], ['adv', 'adv'], 2, 1],
-   ['both sides cancel: primary counts', [12, 19, 2], ['adv', 'dis'], 0, 0],
-   ['a tie goes to the primary', [15, 15], ['adv'], 0, 1]
+   ['advantage then disadvantage: the later click decides', [12, 19, 2], ['adv', 'dis'], 2, -1],
+   ['disadvantage then advantage: the later click decides', [12, 2, 19], ['dis', 'adv'], 2, 1],
+   ['disadvantage lower than the counting die takes over', [12, 19, 15], ['adv', 'dis'], 2, -1],
+   ['a disadvantage die that rolls higher changes nothing', [12, 4, 9], ['dis', 'dis'], 1, -1],
+   ['a tie keeps the die already counting', [15, 15], ['adv'], 0, 1]
 ];
 for (const [name, values, sides, keep, mode] of KEEP_CASES)
 {

@@ -48,33 +48,35 @@ export function dieClasses(die)
    ].filter(Boolean).join(' ');
 }
 
+/** Late dice allowed on each side of the d20 row (user, 2026-10-24). */
+export const MAX_PER_SIDE = 5;
+
 /**
- * Which die counts once dice sit on both sides (SCOPE §6.6): advantage dice alone, the highest of them and the
- * primary; disadvantage dice alone, the lowest; both sides, they cancel and the primary counts. Ties go to the
- * primary, then the earlier die.
+ * Which die counts, by click order (SCOPE §6.6, user 2026-10-24): start with the primary; each die added on the
+ * advantage side replaces the counting die if it is higher, each on the disadvantage side if it is lower. Nothing
+ * cancels: the table decides what to click, the card doesn't adjudicate. Ties keep the die already counting.
  *
  * @param {number[]} values   The primary die, then each extra die, in the order rolled.
- * @param {string[]} sides    'adv' or 'dis' for each extra die.
+ * @param {string[]} sides    'adv' or 'dis' for each extra die, in the same order.
  * @returns {number} Index into values.
  */
 export function countingDie(values, sides)
 {
-   const adv = [];
-   const dis = [];
-   sides.forEach((side, i) => (side === 'dis' ? dis : adv).push(i + 1));
-   if ((adv.length && dis.length) || (!adv.length && !dis.length)) { return 0; }
-   const pool = [0, ...(adv.length ? adv : dis)];
-   const best = (adv.length ? Math.max : Math.min)(...pool.map((i) => values[i]));
-   return pool.find((i) => values[i] === best);
+   let keep = 0;
+   sides.forEach((side, i) =>
+   {
+      const value = values[i + 1];
+      if ((side === 'adv') ? (value > values[keep]) : (value < values[keep])) { keep = i + 1; }
+   });
+   return keep;
 }
 
-/** The advantage mode dnd5e should record once dice sit on these sides. */
+/** The advantage mode dnd5e records: the side of the last die added (it only labels the roll). */
 export function modeForSides(sides)
 {
-   const adv = sides.includes('adv');
-   const dis = sides.includes('dis');
-   if (adv && !dis) { return ADVANTAGE; }
-   if (dis && !adv) { return DISADVANTAGE; }
+   const last = sides.at(-1);
+   if (last === 'adv') { return ADVANTAGE; }
+   if (last === 'dis') { return DISADVANTAGE; }
    return 0;
 }
 

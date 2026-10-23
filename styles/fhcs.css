@@ -328,55 +328,116 @@
    justify-content: flex-start;
 }
 
-.fhcs-chat .fhcs-die
+.fhcs-chat
 {
-   display: inline-flex;
-   align-items: center;
-   justify-content: center;
-   min-width: 32px;
-   height: 32px;
-   padding: 0 0.25rem;
-   border: 2px solid currentColor;
-   border-radius: 6px;
+   --fhcs-die-size: 40px;
+   --fhcs-die-ink: #191813;
+}
+
+/* Every die and slot: a d20 silhouette, one size everywhere (user, 2026-10-24). */
+.fhcs-chat .fhcs-die,
+.fhcs-chat .fhcs-slot
+{
+   position: relative;
+   display: inline-grid;
+   flex: none;
+   place-items: center;
+   width: var(--fhcs-die-size);
+   min-width: var(--fhcs-die-size);
+   height: var(--fhcs-die-size);
+   margin: 0;
+   padding: 0;
+   border: 0;
+   background: none;
+   color: inherit;
+   font: inherit;
+   line-height: 1;
+}
+
+.fhcs-chat .fhcs-die-shape
+{
+   position: absolute;
+   inset: 0;
+   width: 100%;
+   height: 100%;
+   overflow: visible;
+}
+
+.fhcs-chat .fhcs-die-shape polygon
+{
+   fill: none;
+   stroke: currentColor;
+   stroke-width: 2.5;
+   stroke-linejoin: round;
+}
+
+.fhcs-chat .fhcs-die-shape .fhcs-die-face
+{
+   stroke-width: 1;
+   opacity: 0.35;
+}
+
+.fhcs-chat .fhcs-die-value
+{
+   position: relative;
+   font-size: var(--fhcs-text-body);
    font-weight: bold;
 }
 
+/* The default roll: a black die. */
 .fhcs-chat .fhcs-die-primary
 {
-   min-width: 40px;
-   height: 40px;
-   font-size: var(--fhcs-text-heading);
+   color: var(--fhcs-die-ink);
+}
+
+.fhcs-chat .fhcs-die-primary.fhcs-die-counts .fhcs-die-shape polygon:first-child
+{
+   fill: var(--fhcs-die-ink);
+}
+
+.fhcs-chat .fhcs-die-primary.fhcs-die-counts .fhcs-die-value
+{
+   color: #fff;
 }
 
 .fhcs-chat .fhcs-die-adv
 {
-   border-color: var(--fhcs-adv);
    color: var(--fhcs-adv);
 }
 
 .fhcs-chat .fhcs-die-dis
 {
-   border-color: var(--fhcs-dis);
    color: var(--fhcs-dis);
 }
 
-.fhcs-chat .fhcs-die-counts
+.fhcs-chat .fhcs-die-adv.fhcs-die-counts .fhcs-die-shape polygon:first-child,
+.fhcs-chat .fhcs-die-dis.fhcs-die-counts .fhcs-die-shape polygon:first-child
 {
-   background: color-mix(in srgb, currentColor 16%, transparent);
+   fill: currentColor;
+}
+
+.fhcs-chat .fhcs-die-adv.fhcs-die-counts .fhcs-die-value,
+.fhcs-chat .fhcs-die-dis.fhcs-die-counts .fhcs-die-value
+{
+   color: #fff;
 }
 
 .fhcs-chat .fhcs-die-dropped
 {
-   opacity: 0.55;
-   text-decoration: line-through;
-   border-style: dashed;
+   opacity: 0.5;
 }
 
-.fhcs-chat .fhcs-die-nat-high.fhcs-die-counts
+.fhcs-chat .fhcs-die-dropped .fhcs-die-value
 {
-   border-color: var(--fhcs-crit);
-   box-shadow: 0 0 0 2px var(--fhcs-crit);
+   text-decoration: line-through;
 }
+
+.fhcs-chat .fhcs-die-nat-high.fhcs-die-counts .fhcs-die-shape polygon:first-child
+{
+   stroke: var(--fhcs-crit);
+   stroke-width: 4;
+}
+
 
 .fhcs-chat .fhcs-band-words
 {
@@ -581,29 +642,22 @@
    font-weight: bold;
 }
 
-/* Late adds: slots either side of the d20 row, and the bonus field. */
+/* Late adds: dashed d20 slots marked + or − either side of the d20 row, and the bonus field. */
 .fhcs-chat .fhcs-slot
 {
-   width: auto;
-   height: auto;
-   min-height: 32px;
-   margin: 0;
-   padding: 0.125rem 0.5rem;
-   border: 2px dashed currentColor;
-   border-radius: 6px;
-   background: transparent;
-   font: inherit;
-   font-size: var(--fhcs-text-small);
-   font-weight: bold;
    cursor: pointer;
 }
 
-.fhcs-chat .fhcs-slot-small
+.fhcs-chat .fhcs-slot .fhcs-die-shape polygon
 {
-   min-width: 28px;
-   min-height: 28px;
-   padding: 0;
-   border-radius: 50%;
+   stroke-dasharray: 4 3;
+}
+
+.fhcs-chat .fhcs-slot-sign
+{
+   position: relative;
+   font-size: 1.5rem;
+   font-weight: 900;
 }
 
 .fhcs-chat .fhcs-slot-dis
@@ -614,6 +668,11 @@
 .fhcs-chat .fhcs-slot-adv
 {
    color: var(--fhcs-adv);
+}
+
+.fhcs-chat .fhcs-slot:hover .fhcs-die-shape polygon
+{
+   fill: color-mix(in srgb, currentColor 12%, transparent);
 }
 
 .fhcs-chat .fhcs-slot:focus-visible

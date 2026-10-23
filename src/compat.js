@@ -3,7 +3,7 @@
  * Checked against dnd5e 6.0.6 and Foundry 14 rolls (`Roll#_evaluateTotal`, `Roll#resetFormula`, `Roll.fromData`) (module/applications/actor/character-sheet.mjs, dnd5e.mjs, documents/chat-message.mjs,
  * data/chat-message/, dice/d20-roll.mjs). Chat facts: docs/research/dnd5e-6.0-chat.md.
  */
-import { countingDie, modeForSides } from './chat/d20.js';
+import { countingDie, MAX_PER_SIDE, modeForSides } from './chat/d20.js';
 
 /** dnd5e's own character sheet, which ours extends so every mechanic keeps working. Set by dnd5e before init. */
 export function systemCharacterSheet()
@@ -267,8 +267,9 @@ function editable(message, index)
 }
 
 /**
- * Late advantage or disadvantage (SCOPE §6.6): adds a d20 on one side of a d20 roll, keeps every die already there,
- * recomputes which die counts, and saves the roll in place. The first die added is the spare rolled in advance.
+ * Late advantage or disadvantage (SCOPE §6.6): adds a d20 on one side of a d20 roll (at most five a side), keeps
+ * every die already there, recomputes which die counts by click order, and saves the roll in place. The first die
+ * added is the spare rolled in advance.
  *
  * @param {ChatMessage} message   A check, save or attack message.
  * @param {'adv'|'dis'} side
@@ -281,6 +282,7 @@ export async function addD20(message, side)
    const live = d20.results.filter((r) => !r.rerolled);
    const mode = copy.options.advantageMode ?? 0;
    const sides = copy.options.fhcs.sides ?? live.slice(1).map(() => (mode === -1 ? 'dis' : 'adv'));
+   if (sides.filter((s) => s === side).length >= MAX_PER_SIDE) { return; }
    const value = copy.options.fhcs.spare ?? await freshD20();
    const added = { result: value, active: true };
    d20.results.push(added);

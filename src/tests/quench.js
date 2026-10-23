@@ -312,12 +312,15 @@ export function registerQuenchTests(quench)
 
                await addD20(attack(), 'dis');
                roll = attack().rolls[0];
-               assert.strictEqual(roll.options.advantageMode, 0, 'both sides cancel');
-               assert.strictEqual(roll.total, primary + bonus, 'primary counts');
+               const disDie = roll.d20.results.at(-1).result;
+               // Click order decides: the disadvantage die counts only if lower than the die counting before it.
+               const counted = Math.min(Math.max(primary, advDie), disDie);
+               assert.strictEqual(roll.options.advantageMode, -1, 'last click was disadvantage');
+               assert.strictEqual(roll.total, counted + bonus, 'disadvantage compares with the counting die');
                assert.lengthOf(roll.d20.results, 3, 'no die erased');
 
                assert.isTrue(await addBonus(attack(), '2'));
-               assert.strictEqual(attack().rolls[0].total, primary + bonus + 2, 'bonus added as its own term');
+               assert.strictEqual(attack().rolls[0].total, counted + bonus + 2, 'bonus added as its own term');
             }
             finally
             {

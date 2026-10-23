@@ -100,6 +100,18 @@ const request = () => ({
 
 export const CASES = [
    {
+      name: 'card-attack-full-side',
+      template: 'chat/usage-card',
+      frame: 'chat',
+      context: rolledAttack(attack({
+         total: 10, natural: 2, isCritical: false, spare: null, sides: ['adv', 'dis', 'dis', 'dis', 'dis', 'dis'],
+         dice: [{ result: 12, active: false, discarded: true }, { result: 17, active: false, discarded: true },
+            { result: 9, active: false, discarded: true }, { result: 5, active: false, discarded: true },
+            { result: 14, active: false, discarded: true }, { result: 2, active: true }, { result: 11, active: false, discarded: true }],
+         math: '2 + 5 + 3'
+      }))
+   },
+   {
       name: 'card-standalone-check',
       template: 'chat/roll-card',
       frame: 'chat',

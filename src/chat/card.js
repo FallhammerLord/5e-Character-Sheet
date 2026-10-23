@@ -11,12 +11,12 @@ import { MODULE_ID } from '../constants.js';
 import { actorArtwork, addBonus, addD20, answersButton, canApplyDamage, damageFacts, openTrays, preferSelected,
    rollCardDamage, rollFacts, rollsFrom } from '../compat.js';
 import { describeRoll } from './outcome.js';
-import { d20Row, dieClasses } from './d20.js';
+import { d20Row, dieClasses, MAX_PER_SIDE } from './d20.js';
 
 export const CARD_TEMPLATE = `modules/${MODULE_ID}/templates/chat/usage-card.hbs`;
 
 /** Parts the card templates include by path; preloaded at init. */
-export const CARD_PARTS = ['header', 'rolled-band', 'd20-row', 'bonus']
+export const CARD_PARTS = ['header', 'rolled-band', 'd20-row', 'die', 'bonus']
    .map((name) => `modules/${MODULE_ID}/templates/chat/parts/${name}.hbs`);
 // (roll-card.hbs and request-card.hbs include the same parts.)
 
@@ -75,15 +75,17 @@ const bonusField = (facts, format) => (facts.canEdit
       aria: format('FHCS.Card.BonusAria', {}) }
    : null);
 
-/** The late advantage and disadvantage slots either side of the d20 row: a word while empty, "+" once dice are there. */
+/**
+ * The late advantage and disadvantage slots either side of the d20 row: a dashed d20 marked + or −, the same size as
+ * the dice, until that side holds five dice. The words go to screen readers and the tooltip.
+ */
 function lateSlots(facts, row, format)
 {
    if (!facts.canEdit) { return null; }
-   const slot = (side, dice) => ({
+   const slot = (side, dice) => (dice.length >= MAX_PER_SIDE ? null : {
       action: side === 'dis' ? 'lateDisadvantage' : 'lateAdvantage',
       side,
-      small: dice.length > 0,
-      label: dice.length ? '+' : format(side === 'dis' ? 'FHCS.Card.Disadvantage' : 'FHCS.Card.Advantage', {}),
+      sign: side === 'dis' ? '−' : '+',
       aria: format(side === 'dis' ? 'FHCS.Card.AddDisadvantage' : 'FHCS.Card.AddAdvantage', {})
    });
    return { left: slot('dis', row.left), right: slot('adv', row.right) };

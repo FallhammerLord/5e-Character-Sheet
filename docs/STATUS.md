@@ -4,6 +4,7 @@ What's verified, what's waiting. Read when picking up work; CLAUDE.md holds only
 
 ## Verified in Foundry by the user
 
+- Track R basic tests pass after updating the installed copy to this branch (2026-10-24, user: "works on basic tests as expected").
 - The module registers: "Fallhammer Character Sheet" appears in a character's Sheet configuration (2026-10-23).
 
 ## Verified offline
@@ -17,7 +18,7 @@ What's verified, what's waiting. Read when picking up work; CLAUDE.md holds only
 1. **Quench:** run "Fallhammer Character Sheet: core" (6 tests) and "…: chat cards" (11 tests) as GM. The chat batch turns "Roll damage on use" off while it runs and restores it.
 2. **Weapon attack:** one card with portrait, title, Description folded. Attack and damage land in it with no windows; their own cards don't appear. Attack band: total, the d20 (gold ring on a natural 20), words ("Natural 20 · Critical hit", hits or misses against your target). Damage band: total and type, "Critical: dice doubled" after a crit.
 3. **Open the bands:** dice math, Roll again; on damage, "Roll as critical" or "Roll as normal".
-4. **Late adds:** "Adv." right of the d20, "Disadv." left; the counting die fills, the total updates for everyone; "+" adds more (Elven Accuracy); both sides cancel. In an opened band or row, type 1d4, -1d4 or 2 and press Enter. Only the roll's author and the GM see these.
+4. **Late adds:** dashed d20 slots, − left (red) and + right (blue), the same size as the black primary die. Each click adds a die on that side and compares it with the die counting now (advantage keeps higher, disadvantage lower; nothing cancels). Up to five a side, then the slot goes. In an opened band or row, type 1d4, -1d4 or 2 and press Enter. Only the roll's author and the GM see these.
 5. **Fireball:** slot window still asks, damage rolls at once. As GM select three tokens, click the Save band: a row per token with Success or Failure. Apply section: dnd5e's damage tray, unfolded, halving for tokens that saved; effects tray if the spell has effects. A monster with Legendary Resistance shows the button on its failed row.
 6. **Sheet rolls:** a skill, a save, a death save, initiative: each is our card with one d20 band and late adds. A death save keeps its result line; a concentration save its Break Concentration button.
 7. **GM request:** request a save from the party. One card, a row per member, a Roll button on each player's own row; results fill in.

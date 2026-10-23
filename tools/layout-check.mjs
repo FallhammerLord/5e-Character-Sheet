@@ -55,6 +55,8 @@ function findProblems()
    {
       const cs = getComputedStyle(el);
       if (cs.display === 'none' || cs.visibility === 'hidden' || el.closest('[hidden], .sr-only')) { continue; }
+      // Shapes inside one SVG drawing overlap by design.
+      if (el.ownerSVGElement) { continue; }
       const r = el.getBoundingClientRect();
       if (!r.width) { continue; }
       const label = `${el.tagName.toLowerCase()}.${[...el.classList].join('.')} "${(el.textContent || el.value || '').trim().slice(0, 30)}"`;
