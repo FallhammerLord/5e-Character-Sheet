@@ -10,7 +10,7 @@
          <li class="fhcs-row" data-uuid="{{ uuid }}"{{#if result}} data-message-id="{{ result.id }}"{{/if}}>
             {{#if result}}
             {{#with result}}
-            <details class="fhcs-row-details">
+            <details class="fhcs-row-details" data-fold-key="row-{{ id }}">
                <summary class="fhcs-row-summary">
                   <span class="fhcs-row-who">{{ who }}</span>
                   <strong class="fhcs-row-total">{{ total }}</strong>

@@ -360,6 +360,30 @@ export function registerQuenchTests(quench)
             assert.ok(row.querySelector('[data-action="handleRequest"]'), 'roll button keeps dnd5e\'s action');
          });
 
+         it('keeps an opened band open when the card renders again', async function ()
+         {
+            const results = await activity.use({ subsequentActions: false, consume: false }, { configure: false },
+               { rollMode: 'selfroll' });
+            const usage = results?.message;
+            try
+            {
+               await activity.rollAttack({}, { configure: false },
+                  { rollMode: 'selfroll', data: { system: { origin: usage.id } } });
+               const band = (html) => html.querySelector('details.fhcs-band-rolled.fhcs-band-attack');
+               const first = band(await usage.renderHTML());
+               assert.isFalse(first.open, 'starts folded');
+               const toggled = new Promise((resolve) => { first.addEventListener('toggle', resolve, { once: true }); });
+               first.open = true;
+               await toggled;
+               assert.isTrue(band(await usage.renderHTML()).open, 'still open after a re-render');
+            }
+            finally
+            {
+               for (const message of usage.getAssociatedRolls()) { await message.delete(); }
+               await usage.delete();
+            }
+         });
+
          it('lists each save in the card\'s save band, and rolls for selected tokens', async function ()
          {
             const [spell] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test blast', type: 'spell', system: { level: 1 } }]);

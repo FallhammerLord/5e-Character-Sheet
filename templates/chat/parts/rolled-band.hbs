@@ -1,5 +1,5 @@
 {{!-- A rolled band: total, d20 row or damage types, words; opened, the dice math, late adds and roll again. Context: a band. --}}
-<details class="fhcs-band fhcs-band-{{ kind }} fhcs-band-rolled{{#if rolled.critical}} fhcs-band-critical{{/if}}"{{#if rolled.open}} open{{/if}}>
+<details class="fhcs-band fhcs-band-{{ kind }} fhcs-band-rolled{{#if rolled.critical}} fhcs-band-critical{{/if}}" data-fold-key="band-{{ kind }}-{{ index }}"{{#if rolled.open}} open{{/if}}>
    <summary class="fhcs-band-summary">
       <span class="fhcs-band-top"><span class="fhcs-band-heading">{{ heading }}</span><span class="fhcs-band-end" aria-hidden="true"></span></span>
       <span class="fhcs-band-result">

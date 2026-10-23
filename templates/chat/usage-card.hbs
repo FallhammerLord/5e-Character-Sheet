@@ -2,7 +2,7 @@
    {{> "modules/fhcs/templates/chat/parts/header.hbs" fhcs }}
 
    {{#if fhcs.hasDetails}}
-   <details class="fhcs-card-details">
+   <details class="fhcs-card-details" data-fold-key="description">
       <summary>{{ localize "FHCS.Card.Description" }}</summary>
       {{#if fhcs.flavor}}<div class="fhcs-card-flavor">{{{ fhcs.flavor }}}</div>{{/if}}
       {{#if fhcs.description}}<div class="fhcs-card-description">{{{ fhcs.description }}}</div>{{/if}}
@@ -25,7 +25,7 @@
       <ul class="fhcs-rows">
          {{#each rows}}
          <li class="fhcs-row" data-message-id="{{ id }}">
-            <details class="fhcs-row-details"{{#if open}} open{{/if}}>
+            <details class="fhcs-row-details" data-fold-key="row-{{ id }}"{{#if open}} open{{/if}}>
                <summary class="fhcs-row-summary">
                   <span class="fhcs-row-who">{{ who }}</span>
                   <strong class="fhcs-row-total">{{ total }}</strong>

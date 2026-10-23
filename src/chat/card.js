@@ -214,14 +214,38 @@ const BAND_ROLLS = {
 };
 
 /**
+ * Which panels a player has open, by message and panel (`data-fold-key`). A roll changed by a button re-renders the
+ * whole card; without this every panel would fold shut again (user, 2026-10-24). Kept for the page's life.
+ */
+const folds = new Map();
+
+/**
+ * Restores open panels after a render and records each toggle.
+ *
+ * @param {HTMLElement} element   The rendered message, carrying its `data-message-id`.
+ */
+export function keepFolds(element)
+{
+   const messageId = element.dataset.messageId;
+   if (!messageId) { return; }
+   for (const panel of element.querySelectorAll('details[data-fold-key]'))
+   {
+      const key = `${messageId}|${panel.dataset.foldKey}`;
+      if (folds.has(key)) { panel.open = folds.get(key); }
+      panel.addEventListener('toggle', () => folds.set(key, panel.open));
+   }
+}
+
+/**
  * Binds our own card buttons (dnd5e's carry `data-action` and go through dnd5e): late adds on any card, damage
- * re-rolls on a usage card, and Enter in a bonus field.
+ * re-rolls on a usage card, and Enter in a bonus field; and keeps open panels open across re-renders.
  *
  * @param {HTMLElement} element   The rendered message.
  * @param {ChatMessage|null} usage   The usage card, when the element is one.
  */
 export function bindCardActions(element, usage)
 {
+   keepFolds(element);
    for (const button of element.querySelectorAll('[data-fhcs-action]'))
    {
       button.addEventListener('click', (event) => onCardAction(event, button, usage));
