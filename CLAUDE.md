@@ -16,7 +16,8 @@ This file holds rules only. Plan: `docs/ROADMAP.md`. Decisions: `docs/SCOPE.md`.
 npm run check   # lint + load + unit. Hooks run it before every git push; CI runs it on push.
 npm run load    # loads the module with Foundry and dnd5e mocked, checks the sheet registration, chat hook, settings and manifest files
 npm run unit    # pure functions offline (roll outcomes, usage card bands)
-npm run layout  # renders templates (cases in tools/fixtures.mjs) at sheet widths 560–900 or chat widths 240–380, fails on overflow or overlapping siblings; self-tests first
+npm run layout  # renders templates (cases in tools/fixtures.mjs) in light and dark themes at sheet widths 560–900 or chat widths 240–380;
+                # fails on overflow, overlapping siblings or text below WCAG contrast; self-tests first
                 # set CHROMIUM_PATH (here: /opt/pw-browsers/chromium)
 # In Foundry: install Quench, open it as GM, run "Fallhammer Character Sheet: core" and "…: chat cards". It opens our sheet on a
 # temporary character and clicks a roll, a rest and an item use, stopping each at dnd5e's pre-hook.
@@ -39,4 +40,5 @@ Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies insta
 - **Manifest changes need a world relaunch** (Return to Setup), not a browser refresh.
 - **Code style:** Allman braces, 3-space indent, single quotes (matches the quest log).
 - **See each new check fail once** before trusting it.
-- Quest log rules that will apply as we build (copy them here when the first case comes up): three text sizes, 24px targets, tooltips two to four words, colors only through tokens, no `container-type` around text fields, `<prose-mirror toggled>` without `open`, HTML in templates, layout tests at many widths.
+- **Colors only through tokens, and contrast in both themes** (user, 2026-10-24): every token has a light value and a dark one (`.theme-dark .fhcs-chat`); text meets WCAG 4.5:1 (3:1 large) against what it sits on, dice included. The layout check enforces it; don't fade text that carries information (mark it another way).
+- Quest log rules that will apply as we build (copy them here when the first case comes up): three text sizes, 24px targets, tooltips two to four words, no `container-type` around text fields, `<prose-mirror toggled>` without `open`, HTML in templates, layout tests at many widths.

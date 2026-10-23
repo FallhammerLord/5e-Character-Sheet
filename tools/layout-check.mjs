@@ -1,6 +1,7 @@
 /**
- * Renders our templates and stylesheets in Chromium at a range of sheet widths and reports anything that overflows
- * its box or the window, and any text field inside a width container. Writes screenshots to tools/out/.
+ * Renders our templates and stylesheets in Chromium at a range of sheet widths, in light and dark themes, and reports
+ * anything that overflows its box or the window, siblings drawn over each other, text below WCAG contrast (4.5:1, or
+ * 3:1 for large text), and any text field inside a width container. Writes screenshots to tools/out/.
  * Usage: npm run layout (set CHROMIUM_PATH to use an installed Chromium instead of Playwright's download)
  *
  * Every run starts with a self-test: a known-good page must pass and known-bad pages must fail, so an empty or
@@ -34,10 +35,13 @@ const FRAMES = {
    }
 };
 
-/** A window like Foundry's, with the classes dnd5e and our code put on it. */
-const frame = (kind, width, theme, body) => `<section class="application ${FRAMES[kind].classes} fhcs-theme-${theme}"
+/** Foundry's light and dark themes, as the page and text colors a card sits on. */
+const THEMES = { light: 'background:#f4f1ea;color:#191813', dark: 'background:#26252b;color:#e8e6e3' };
+
+/** A window like Foundry's, with the classes dnd5e, Foundry's theme and our code put on it. */
+const frame = (kind, width, theme, body) => `<section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"
    style="width:${width}px;height:${HEIGHT}px;display:flex;flex-direction:column;border:1px solid #000;margin:8px;
-   background:#f4f1ea;color:#191813">
+   ${THEMES[theme]}">
    <header style="background:#111;color:#eee;padding:4px 8px;font:13px sans-serif">${width}px</header>
    <div class="window-content" style="flex:1;min-height:0;overflow:auto">${FRAMES[kind].wrap(body)}</div></section>`;
 
@@ -81,6 +85,48 @@ function findProblems()
          issues.push(`content wider than box by ${el.scrollWidth - el.clientWidth}px: ${label}`);
       }
    }
+   // Contrast: each piece of text against what it is drawn on (a die's number against the die's fill).
+   const parse = (value) =>
+   {
+      let m = /rgba?\(([^)]+)\)/.exec(value);
+      if (m) { const p = m[1].split(/[\s,/]+/).filter(Boolean).map(Number); return { r: p[0], g: p[1], b: p[2], a: p[3] ?? 1 }; }
+      m = /color\(srgb ([^)]+)\)/.exec(value);
+      if (m) { const p = m[1].split(/[\s/]+/).filter(Boolean).map(Number); return { r: p[0] * 255, g: p[1] * 255, b: p[2] * 255, a: p[3] ?? 1 }; }
+      return { r: 0, g: 0, b: 0, a: 0 };
+   };
+   const over = (top, bottom) => ({
+      r: top.r * top.a + bottom.r * (1 - top.a), g: top.g * top.a + bottom.g * (1 - top.a),
+      b: top.b * top.a + bottom.b * (1 - top.a), a: 1
+   });
+   const chain = (el) => { const list = []; for (let n = el; n && n !== app; n = n.parentElement) { list.unshift(n); } return list; };
+   const backdrop = (el) => chain(el).reduce((bg, n) => over(parse(getComputedStyle(n).backgroundColor), bg),
+      parse(getComputedStyle(app).backgroundColor));
+   const opacity = (el) => [app, ...chain(el)].reduce((o, n) => o * Number(getComputedStyle(n).opacity), 1);
+   const luminance = ({ r, g, b }) =>
+   {
+      const lin = (c) => { const x = c / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; };
+      return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+   };
+   const ratio = (a, b) => { const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x); return (hi + 0.05) / (lo + 0.05); };
+   for (const el of app.querySelectorAll('.window-content *'))
+   {
+      if (el.ownerSVGElement || el.closest('[hidden]') || !el.getClientRects().length) { continue; }
+      const text = [...el.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent).join('').trim();
+      if (!text) { continue; }
+      const cs = getComputedStyle(el);
+      if (cs.visibility === 'hidden') { continue; }
+      let bg = backdrop(el);
+      const shape = el.parentElement?.querySelector(':scope > svg polygon');
+      if (shape) { bg = over(parse(getComputedStyle(shape).fill), bg); }
+      const fg = parse(cs.color);
+      const seen = over({ ...fg, a: fg.a * opacity(el) }, bg);
+      const size = parseFloat(cs.fontSize);
+      const large = size >= 24 || (size >= 18.66 && Number(cs.fontWeight) >= 700);
+      const needed = large ? 3 : 4.5;
+      const got = ratio(seen, bg);
+      if (got < needed) { issues.push(`contrast ${got.toFixed(2)}:1 below ${needed}:1: ${el.tagName.toLowerCase()}.${[...el.classList].join('.')} "${text.slice(0, 30)}"`); }
+   }
+
    // Foundry's form and editor styles collapse inside a size container (quest log lesson).
    for (const field of app.querySelectorAll('input, textarea, select, prose-mirror'))
    {
@@ -101,6 +147,7 @@ const SELF_TEST = [
    { id: 'self-wide', expect: true, body: '<div style="width:100px"><span style="display:inline-block;width:300px">Too wide</span></div>' },
    { id: 'self-past-edge', expect: true, body: '<div style="width:2000px">Past the edge</div>' },
    { id: 'self-container', expect: true, body: '<div style="container-type:inline-size"><input type="text"></div>' },
+   { id: 'self-contrast', expect: true, body: '<p style="color:#bbb">Too faint to read</p>' },
    { id: 'self-overlap', expect: true, body: '<div style="display:grid;grid-template-columns:40px 1fr"><span style="justify-self:start;white-space:nowrap">Runs into the next</span><span>x</span></div>' }
 ];
 
@@ -129,15 +176,18 @@ for (const c of CASES)
 {
    const body = template(c.template)(c.context);
    const kind = c.frame ?? 'sheet';
-   for (const width of WIDTHS[kind])
+   for (const theme of c.theme ? [c.theme] : Object.keys(THEMES))
    {
-      const id = `${c.name}-${width}`;
-      for (const issue of await check(id, frame(kind, width, c.theme ?? 'light', body), true)) { problems.push(`${id}: ${issue}`); }
-      checked++;
+      for (const width of WIDTHS[kind])
+      {
+         const id = `${c.name}-${theme}-${width}`;
+         for (const issue of await check(id, frame(kind, width, theme, body), true)) { problems.push(`${id}: ${issue}`); }
+         checked++;
+      }
    }
 }
 await browser.close();
 
 console.log(problems.length ? problems.join('\n') : 'No overflow found; self-test passed.');
-console.log(`\n${checked} layouts checked (${CASES.length} cases at their frame's widths). Screenshots in tools/out/.`);
+console.log(`\n${checked} layouts checked (${CASES.length} cases, light and dark, at their frame's widths). Screenshots in tools/out/.`);
 process.exit(problems.length ? 1 : 0);

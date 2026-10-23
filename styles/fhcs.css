@@ -37,6 +37,9 @@
    --fhcs-crit: #e0b45a;
    --fhcs-adv: #8ab8ff;
    --fhcs-dis: #ff8a80;
+   /* The default die turns white on a dark card; numbers on filled dice turn dark (contrast, user 2026-10-24). */
+   --fhcs-die-ink: #f4f1ea;
+   --fhcs-die-on-ink: #191813;
 }
 
 .fhcs-chat .fhcs-card
@@ -331,7 +334,9 @@
 .fhcs-chat
 {
    --fhcs-die-size: 40px;
+   /* The default die, and the number on any filled die; swapped in dark themes above. */
    --fhcs-die-ink: #191813;
+   --fhcs-die-on-ink: #fff;
 }
 
 /* Every die and slot: a d20 silhouette, one size everywhere (user, 2026-10-24). */
@@ -397,7 +402,7 @@
 
 .fhcs-chat .fhcs-die-primary.fhcs-die-counts .fhcs-die-value
 {
-   color: #fff;
+   color: var(--fhcs-die-on-ink);
 }
 
 .fhcs-chat .fhcs-die-adv
@@ -419,12 +424,13 @@
 .fhcs-chat .fhcs-die-adv.fhcs-die-counts .fhcs-die-value,
 .fhcs-chat .fhcs-die-dis.fhcs-die-counts .fhcs-die-value
 {
-   color: #fff;
+   color: var(--fhcs-die-on-ink);
 }
 
-.fhcs-chat .fhcs-die-dropped
+/* A die that doesn't count keeps full color (contrast); a dashed outline and strike-through mark it. */
+.fhcs-chat .fhcs-die-dropped .fhcs-die-shape polygon:first-child
 {
-   opacity: 0.5;
+   stroke-dasharray: 3 3;
 }
 
 .fhcs-chat .fhcs-die-dropped .fhcs-die-value
@@ -744,4 +750,10 @@
    color: var(--fhcs-muted);
    font-weight: normal;
    font-style: italic;
+}
+
+.fhcs-chat .fhcs-bonus-input::placeholder
+{
+   color: var(--fhcs-muted);
+   opacity: 1;
 }
