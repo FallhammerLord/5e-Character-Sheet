@@ -22,6 +22,8 @@ The user's table: players used to Tidy 5e's classic layout. Private use for now 
 
 Target: Tidy 5e Classic, as in `docs/reference/` (screenshots) and its source at Tidy commit `54fdbad4` (the last before Classic was removed, 2026-09-01; `src/sheets/classic/character/`). Default window 740 × 810.
 
+**Skeleton, our style** (user, 2026-10-24): every part sits where Classic puts it, so muscle memory carries over; type, spacing, contrast and controls follow our rules (§5, CLAUDE.md). Everything visual goes through tokens, so themes beyond light and dark can follow the first working sheet.
+
 ### 4.1 Header
 
 - **Portrait** (round, about 150px) down the left edge. On it: exhaustion (top left), inspiration (top right), rest button (bottom left), HP bar (bottom center), hit dice left (bottom right). Under it: Temp and Max HP.
