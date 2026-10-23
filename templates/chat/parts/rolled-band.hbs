@@ -16,11 +16,17 @@
    <div class="fhcs-band-body">
       {{#each rolled.mathLines}}<p class="fhcs-band-math">{{ formula }}<br><strong>{{ result }}</strong></p>{{/each}}
       {{#each rolled.notes}}<p class="fhcs-band-note">{{ this }}</p>{{/each}}
+      {{!-- Buttons sit above the history, so more rolls never push them down. --}}
       {{> "modules/fhcs/templates/chat/parts/bonus.hbs" rolled }}
       {{#if @root.fhcs.canAct}}
       <div class="fhcs-card-actions">
          {{#if action}}<button type="button" class="fhcs-button" data-action="{{ action }}" data-index="{{ index }}">{{ rolled.againLabel }}</button>{{/if}}
          {{#each rolled.extra}}<button type="button" class="fhcs-button" data-fhcs-action="{{ action }}">{{ label }}</button>{{/each}}
+      </div>
+      {{/if}}
+      {{#if rolled.history.length}}
+      <div class="fhcs-history" role="region" tabindex="0" aria-label="{{ rolled.historyLabel }}">
+         {{#each rolled.history}}<p class="fhcs-band-note">{{ this }}</p>{{/each}}
       </div>
       {{/if}}
    </div>

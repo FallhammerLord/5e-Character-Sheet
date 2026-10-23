@@ -109,7 +109,7 @@ Top to bottom, each part only when the action has it:
 
 Buttons and band contents are centered (user, 2026-10-23). A band's heading sits on its own top line, left, with the open/closed mark right; side columns squeezed the words to a few letters per line at 240px.
 
-Panels the player opened stay open when the card re-renders (a re-roll, a late die, a bonus; user 2026-10-24).
+Panels the player opened stay open when the card re-renders (a re-roll, a late die, a bonus; user 2026-10-24). Inside an open band the buttons sit right under the current roll's math, and earlier rolls follow in their own scrolling box, newest first, about five lines tall, so repeated re-rolls never move the buttons. A save band's token rows scroll the same way past about five.
 
 The same frame serves every roll: a skill check from the sheet is header plus d20 band; a GM request is header plus the check band. The card updates in place when a later roll arrives.
 

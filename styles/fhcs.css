@@ -757,3 +757,32 @@
    color: var(--fhcs-muted);
    opacity: 1;
 }
+
+/* Long lists scroll inside their panel, about five lines tall (user, 2026-10-24): a band's earlier rolls, a save's
+   token rows. */
+.fhcs-chat .fhcs-history
+{
+   max-height: calc(5 * 1.4em + 0.5rem);
+   overflow-y: auto;
+   padding: 0.25rem 0;
+   border-top: 1px solid var(--fhcs-line-soft);
+   line-height: 1.4;
+}
+
+.fhcs-chat .fhcs-history > p
+{
+   margin: 0;
+}
+
+.fhcs-chat .fhcs-rows
+{
+   max-height: calc(5 * 33px);
+   overflow-y: auto;
+}
+
+.fhcs-chat .fhcs-history:focus-visible,
+.fhcs-chat .fhcs-rows:focus-visible
+{
+   outline: 2px solid currentColor;
+   outline-offset: -2px;
+}

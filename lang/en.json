@@ -81,7 +81,8 @@
       "Done": "Done",
       "Waiting": "waiting",
       "RollShort": "Roll",
-      "Dropped": "Rerolled or dropped: {dice}"
+      "Dropped": "Rerolled or dropped: {dice}",
+      "History": "Earlier rolls"
     }
   }
 }

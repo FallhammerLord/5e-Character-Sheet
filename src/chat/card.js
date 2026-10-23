@@ -63,8 +63,8 @@ export function cardParts(buttons, localize)
    return { bands, others };
 }
 
-/** Notes under a band's dice math: each earlier roll from the same band, with its own dice shown. */
-const earlierNote = (earlier, format) => earlier.map((math) => format('FHCS.Card.Earlier', { math }));
+/** A band's history: each earlier roll from the same band with its own dice shown, newest first. */
+const earlierNote = (earlier, format) => [...earlier].reverse().map((math) => format('FHCS.Card.Earlier', { math }));
 
 /** One earlier roll's dice math, as a line: a d20 roll's sum, or each damage roll's. */
 const earlierMath = (facts) => (Array.isArray(facts.math) ? facts.math.map((m) => m.result).join(' · ') : `${facts.math} = ${facts.total}`);
@@ -124,9 +124,10 @@ export function d20Band(facts, earlier, format)
       mathLines: [{ formula: facts.formula, result: `${facts.math} = ${facts.total}` }],
       notes: [
          ...bonusNotes(facts.bonuses ?? [], format),
-         ...(facts.spare ? [format('FHCS.Card.Spare', { value: facts.spare })] : []),
-         ...earlierNote(earlier, format)
+         ...(facts.spare ? [format('FHCS.Card.Spare', { value: facts.spare })] : [])
       ],
+      history: earlierNote(earlier, format),
+      historyLabel: format('FHCS.Card.History', {}),
       againLabel: format('FHCS.Card.RollAgain', {}),
       extra: []
    };
@@ -170,9 +171,10 @@ export function damageBand(facts, earlier, format, { canCrit = false } = {})
       notes: [
          ...facts.math.filter((m) => m.dropped?.length)
             .map((m) => format('FHCS.Card.Dropped', { dice: m.dropped.join(', ') })),
-         ...bonusNotes(facts.bonuses ?? [], format),
-         ...earlierNote(earlier, format)
+         ...bonusNotes(facts.bonuses ?? [], format)
       ],
+      history: earlierNote(earlier, format),
+      historyLabel: format('FHCS.Card.History', {}),
       againLabel: format('FHCS.Card.RollAgain', {}),
       extra
    };

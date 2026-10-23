@@ -48,7 +48,8 @@ const rolledAttack = (facts, earlier = [], damageFacts = null) =>
 {
    const context = card({}, ATTACK);
    context.fhcs.bands[0].rolled = { ...d20Band(facts, earlier, format), open: true };
-   if (damageFacts) { context.fhcs.bands[1].rolled = { ...damageBand(damageFacts, ['(3 + 1) + 5 = 9'], format, { canCrit: true }), open: true }; }
+   if (damageFacts) { context.fhcs.bands[1].rolled = { ...damageBand(damageFacts, ['(6 + 7) + 0 = 13', '(7 + 3) + 0 = 10', '(3 + 6) + 0 = 9', '(8 + 8) + 0 = 16', '(7 + 7) + 0 = 14',
+      '(2 + 3) + 0 = 5', '(1 + 8) + 0 = 9'], format, { canCrit: true }), open: true }; }
    return context;
 };
 
