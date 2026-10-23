@@ -4,7 +4,7 @@
  *
  * A case: { name, template: 'path/without-hbs', context: {...}, frame?: 'sheet' | 'chat', theme?: 'light' }
  */
-import { cardParts, d20Band, damageBand } from '../src/chat/card.js';
+import { cardParts, d20Band, damageBand, saveRow } from '../src/chat/card.js';
 import { format, localize } from './templates.mjs';
 
 /** A usage card's context as FHCSUsageMessageData#_prepareContext builds it, with overrides. */
@@ -51,7 +51,31 @@ const rolledAttack = (facts, earlier = [], damageFacts = null) =>
    return context;
 };
 
+/** Facts for one token's save, as compat.rollFacts returns them. */
+const save = (who, total, natural, success, over = {}) => ({
+   kind: 'save', who, what: 'Dexterity Saving Throw', total, natural, target: 15, showResult: true, success,
+   isCritical: false, targets: [], dice: [{ result: natural, active: true }], advantageMode: 0, sides: [], spare: 11,
+   formula: '1d20 + 2', math: `${natural} + 2`, canResist: false, messageId: who, ...over
+});
+
+/** Fireball with three saves in, one of them a monster that can still use Legendary Resistance. */
+const fireball = () =>
+{
+   const context = card({ title: 'Fireball', subtitle: '3rd-level evocation' }, FIREBALL);
+   const band = context.fhcs.bands[0];
+   band.prompt = localize('FHCS.Card.RollForSelected');
+   band.rows = [
+      saveRow(save('Goblin', 9, 7, false), format),
+      saveRow(save('Bugbear', 17, 15, true), format),
+      saveRow(save('Adult Red Dragon of the Smoking Peaks', 4, 1, false, { canResist: true }), format)
+   ];
+   context.fhcs.bands[1].rolled = damageBand({ healing: false, critical: false, total: 28, parts: [{ type: 'fire', label: 'Fire', total: 28 }],
+      math: [{ formula: '8d6', result: '6 + 5 + 4 + 3 + 2 + 4 + 1 + 3 = 28', label: 'Fire' }], onSave: 'Half Damage' }, [], format);
+   return context;
+};
+
 export const CASES = [
+   { name: 'card-fireball-saves', template: 'chat/usage-card', frame: 'chat', context: fireball() },
    { name: 'card-attack-crit', template: 'chat/usage-card', frame: 'chat', context: rolledAttack(attack(), [14, 9], damage()) },
    {
       name: 'card-damage-mixed',

@@ -8,7 +8,8 @@
  * `effect-application`) work inside our markup. Slices 2–8 fill the bands with results.
  */
 import { MODULE_ID } from '../constants.js';
-import { actorArtwork, damageFacts, rollDamageAgain, rollFacts, rollsFrom } from '../compat.js';
+import { actorArtwork, answersButton, damageFacts, preferSelected, rollDamageAgain, rollFacts, rollsFrom }
+   from '../compat.js';
 import { describeRoll } from './outcome.js';
 import { d20Row, dieClasses } from './d20.js';
 
@@ -44,6 +45,9 @@ export function cardParts(buttons, localize)
       const rollText = localize(`FHCS.Card.Roll.${button.action}`);
       bands.push({
          kind,
+         isSave: kind === 'save',
+         // Which saves or checks answer this button: one button per ability, skill or tool.
+         match: button.dataset?.skill ?? button.dataset?.tool ?? button.dataset?.ability ?? null,
          action: button.action,
          index: button.index,
          heading: localize(`FHCS.Card.Band.${button.action}`),
@@ -116,11 +120,39 @@ export function damageBand(facts, earlier, format, { canCrit = false } = {})
       verdict: null,
       words,
       row: null,
-      parts: facts.parts.map((p) => ({ text: p.label ? `${p.total} ${p.label}` : `${p.total}` })),
+      // One damage type: its name under the total; several: each type's own total.
+      parts: facts.parts.length === 1
+         ? (facts.parts[0].label ? [{ text: facts.parts[0].label }] : [])
+         : facts.parts.map((p) => ({ text: p.label ? `${p.total} ${p.label}` : `${p.total}` })),
       mathLines: facts.math.map((m) => ({ formula: m.label ? `${m.formula} (${m.label})` : m.formula, result: m.result })),
       notes: earlierNote(earlier, format),
       againLabel: format('FHCS.Card.RollAgain', {}),
       extra
+   };
+}
+
+/**
+ * One token's row in a save or check band: who, the total, success or failure, and (when opened) its d20s and math.
+ *
+ * @param {object} facts     From compat.rollFacts, for one save or check message.
+ * @param {Function} format  (key, data) => localized text.
+ */
+export function saveRow(facts, format)
+{
+   const band = d20Band(facts, [], format);
+   const verdict = band.verdict;
+   return {
+      id: facts.messageId,
+      who: facts.who,
+      total: facts.total,
+      verdict,
+      verdictWord: verdict ? format(verdict === 'success' ? 'FHCS.Chat.Success' : 'FHCS.Chat.Failure', {}) : '',
+      words: verdict ? band.words.slice(1) : band.words,
+      row: band.row,
+      diceLabel: band.diceLabel,
+      mathLines: band.mathLines,
+      canResist: facts.canResist,
+      resistLabel: format('FHCS.Card.Resist', {})
    };
 }
 
@@ -160,6 +192,14 @@ export function makeUsageMessageData(Base)
          const format = (key, data) => game.i18n.format(key, data);
          const { bands, others } = cardParts(context.buttons ?? [], localize);
          const canCrit = bands.some((b) => b.kind === 'attack');
+         for (const band of bands.filter((b) => b.isSave))
+         {
+            band.prompt = localize('FHCS.Card.RollForSelected');
+            band.rows = rollsFrom(this.parent, ['save', 'check']).filter((m) => answersButton(m, band.match))
+               .map((m) => rollFacts(m)).filter(Boolean).map((facts) => saveRow(facts, format));
+         }
+         // Saves and checks are drawn as rows in their bands; dnd5e's own summaries of them would repeat them.
+         context.summaries = (context.summaries ?? []).filter((s) => !['save', 'check'].includes(game.messages.get(s.id)?.type));
          for (const band of bands)
          {
             const source = BAND_ROLLS[band.kind];
@@ -197,6 +237,7 @@ export function makeUsageMessageData(Base)
          super._onRender(element, options);
          if (options.summary || !useCard(this)) { return; }
          element.classList.add('fhcs-chat', 'fhcs-card-message');
+         preferSelected(this.parent);
          for (const button of element.querySelectorAll('[data-fhcs-action]'))
          {
             button.addEventListener('click', (event) => this.#onCardAction(event, button));

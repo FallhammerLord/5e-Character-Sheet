@@ -4,7 +4,7 @@
  */
 import { deepStrictEqual } from 'node:assert';
 import { describeRoll } from '../src/chat/outcome.js';
-import { cardParts, damageBand } from '../src/chat/card.js';
+import { cardParts, damageBand, saveRow } from '../src/chat/card.js';
 import { d20Row } from '../src/chat/d20.js';
 import { format, localize } from './templates.mjs';
 
@@ -102,10 +102,16 @@ for (const [name, results, mode, sides, expected] of ROW_CASES)
 const dmg = (over) => ({ healing: false, critical: false, total: 12, parts: [{ type: 'fire', label: 'Fire', total: 12 }], math: [],
    onSave: '', ...over });
 const DAMAGE_CASES = [
-   ['plain, no attack on the card', dmg({}), {}, { words: [], parts: ['12 Fire'], extra: [] }],
-   ['plain, card has an attack', dmg({}), { canCrit: true }, { words: [], parts: ['12 Fire'], extra: ['damageCritical'] }],
-   ['critical', dmg({ critical: true }), { canCrit: true }, { words: ['Critical: dice doubled'], parts: ['12 Fire'], extra: ['damageNormal'] }],
-   ['half on a save', dmg({ onSave: 'Half Damage' }), {}, { words: ['On a save: Half Damage'], parts: ['12 Fire'], extra: [] }]
+   ['plain, no attack on the card', dmg({}), {}, { words: [], parts: ['Fire'], extra: [] }],
+   ['plain, card has an attack', dmg({}), { canCrit: true }, { words: [], parts: ['Fire'], extra: ['damageCritical'] }],
+   ['critical', dmg({ critical: true }), { canCrit: true }, { words: ['Critical: dice doubled'], parts: ['Fire'], extra: ['damageNormal'] }],
+   ['half on a save', dmg({ onSave: 'Half Damage' }), {}, { words: ['On a save: Half Damage'], parts: ['Fire'], extra: [] }],
+   [
+      'two types',
+      dmg({ total: 15, parts: [{ type: 'slashing', label: 'Slashing', total: 9 }, { type: 'fire', label: 'Fire', total: 6 }] }),
+      {},
+      { words: [], parts: ['9 Slashing', '6 Fire'], extra: [] }
+   ]
 ];
 for (const [name, facts, options, expected] of DAMAGE_CASES)
 {
@@ -115,5 +121,21 @@ for (const [name, facts, options, expected] of DAMAGE_CASES)
    catch { problems.push(`damage band, ${name}: got ${JSON.stringify(got)}, expected ${JSON.stringify(expected)}`); }
 }
 
+// Save rows: the verdict as one word; the rest of the outcome stays in the opened row.
+const saveFacts = (over) => ({ ...facts({}), dice: [{ result: 11, active: true }], advantageMode: 0, sides: [], spare: null,
+   formula: '1d20 + 3', math: '11 + 3', canResist: false, messageId: 'm1', ...over });
+const SAVE_CASES = [
+   ['failure', saveFacts({}), { verdict: 'failure', verdictWord: 'Failure', words: [] }],
+   ['success, natural 20', saveFacts({ total: 23, natural: 20, success: true }), { verdict: 'success', verdictWord: 'Success', words: ['Natural 20'] }],
+   ['DC hidden from this player', saveFacts({ showResult: false }), { verdict: null, verdictWord: '', words: [] }]
+];
+for (const [name, input, expected] of SAVE_CASES)
+{
+   const { verdict, verdictWord, words } = saveRow(input, format);
+   try { deepStrictEqual({ verdict, verdictWord, words }, expected); }
+   catch { problems.push(`save row, ${name}: got ${JSON.stringify({ verdict, verdictWord, words })}, expected ${JSON.stringify(expected)}`); }
+}
+
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
-console.log(`${CASES.length} outcome lines, ${PART_CASES.length} card layouts, ${ROW_CASES.length} d20 rows and ${DAMAGE_CASES.length} damage bands read as expected.`);
+console.log(`${CASES.length} outcome lines, ${PART_CASES.length} card layouts, ${ROW_CASES.length} d20 rows, `
+   + `${DAMAGE_CASES.length} damage bands and ${SAVE_CASES.length} save rows read as expected.`);

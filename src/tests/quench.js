@@ -243,6 +243,40 @@ export function registerQuenchTests(quench)
                await usage.delete();
             }
          });
+
+         it('lists each save in the card\'s save band, and rolls for selected tokens', async function ()
+         {
+            const [spell] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test blast', type: 'spell', system: { level: 1 } }]);
+            const saveActivity = await spell.createActivity('save', { save: { ability: ['dex'] } }, { renderSheet: false })
+               ?? spell.system.activities.contents[0];
+            const results = await saveActivity.use({ subsequentActions: false, consume: false }, { configure: false },
+               { rollMode: 'selfroll' });
+            const usage = results?.message;
+            let save = null;
+            try
+            {
+               let html = await usage.renderHTML();
+               assert.ok(html.querySelector('.fhcs-band-save [data-action="rollSave"]'), 'save band');
+               assert.strictEqual(usage._targetState?.mode, 'selected', 'rolls for selected tokens');
+
+               await actor.rollSavingThrow({ ability: 'dex', target: 99 }, { configure: false },
+                  { rollMode: 'selfroll', data: { system: { origin: usage.id } } });
+               save = usage.getAssociatedRolls('save').at(-1);
+               assert.ok(save, 'save message posted');
+               assert.isTrue((await save.renderHTML()).hidden, 'save card hidden');
+               html = await usage.renderHTML();
+               const row = html.querySelector(`.fhcs-row[data-message-id="${save.id}"]`);
+               assert.ok(row, 'row for the save');
+               assert.include(row.querySelector('.fhcs-row-verdict').textContent, 'Failure');
+               assert.lengthOf(html.querySelectorAll('.card-summary'), 0, 'no repeat of dnd5e\'s summary');
+            }
+            finally
+            {
+               await save?.delete();
+               await usage.delete();
+               await spell.delete();
+            }
+         });
       });
    }, { displayName: 'Fallhammer Character Sheet: chat cards' });
 }

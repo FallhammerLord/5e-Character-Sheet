@@ -9,8 +9,8 @@
 import { MODULE_ID } from '../constants.js';
 import { d20Now, isD20Roll, usageOrigin } from '../compat.js';
 
-/** Roll message types drawn inside a usage card's bands. Later slices add saves and checks. */
-export const FOLDED_TYPES = new Set(['attack', 'damage', 'healing']);
+/** Roll message types drawn inside a usage card's bands. */
+export const FOLDED_TYPES = new Set(['attack', 'damage', 'healing', 'save', 'check']);
 
 /**
  * `dnd5e.renderChatMessage`: hides a roll's own card when its usage card draws it.

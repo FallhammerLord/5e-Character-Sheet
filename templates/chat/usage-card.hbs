@@ -21,7 +21,42 @@
    {{/if}}
 
    {{#each fhcs.bands}}
-   {{#if rolled}}
+   {{#if isSave}}
+   <div class="fhcs-band fhcs-band-{{ kind }} fhcs-band-group">
+      <button type="button" class="fhcs-band-button" data-action="{{ action }}" data-index="{{ index }}">
+         <span class="fhcs-band-top"><span class="fhcs-band-heading">{{ heading }}</span><span class="fhcs-band-end"></span></span>
+         <span class="fhcs-band-text">{{ text }}</span>
+         <span class="fhcs-band-prompt">{{ prompt }}</span>
+      </button>
+      {{#if rows.length}}
+      <ul class="fhcs-rows">
+         {{#each rows}}
+         <li class="fhcs-row" data-message-id="{{ id }}">
+            <details class="fhcs-row-details">
+               <summary class="fhcs-row-summary">
+                  <span class="fhcs-row-who">{{ who }}</span>
+                  <strong class="fhcs-row-total">{{ total }}</strong>
+                  <span class="fhcs-row-verdict{{#if verdict}} fhcs-verdict-{{ verdict }}{{/if}}">{{ verdictWord }}</span>
+               </summary>
+               <div class="fhcs-band-body">
+                  <span class="fhcs-d20-row" role="group" aria-label="{{ diceLabel }}">
+                     <span class="fhcs-d20-side fhcs-d20-left">{{#each row.left}}<span class="{{ classes }}">{{ value }}</span>{{/each}}</span>
+                     {{#with row.center}}<span class="{{ classes }}">{{ value }}</span>{{/with}}
+                     <span class="fhcs-d20-side fhcs-d20-right">{{#each row.right}}<span class="{{ classes }}">{{ value }}</span>{{/each}}</span>
+                  </span>
+                  {{#if words.length}}<span class="fhcs-band-words">{{#each words}}<span>{{ this }}</span>{{/each}}</span>{{/if}}
+                  {{#each mathLines}}<p class="fhcs-band-math">{{ formula }}<br><strong>{{ result }}</strong></p>{{/each}}
+               </div>
+            </details>
+            {{#if canResist}}
+            <button type="button" class="fhcs-button" data-action="resistSave">{{ resistLabel }}</button>
+            {{/if}}
+         </li>
+         {{/each}}
+      </ul>
+      {{/if}}
+   </div>
+   {{else if rolled}}
    <details class="fhcs-band fhcs-band-{{ kind }} fhcs-band-rolled{{#if rolled.critical}} fhcs-band-critical{{/if}}"{{#if rolled.open}} open{{/if}}>
       <summary class="fhcs-band-summary">
          <span class="fhcs-band-top"><span class="fhcs-band-heading">{{ heading }}</span><span class="fhcs-band-end" aria-hidden="true"></span></span>

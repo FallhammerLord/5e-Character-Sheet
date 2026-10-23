@@ -92,8 +92,26 @@ export function rollFacts(message)
       sides: roll.options.fhcs?.sides ?? [],
       spare: roll.options.fhcs?.spare ?? null,
       formula: roll.formula,
-      math: roll.result
+      math: roll.result,
+      canResist: Boolean(system.canResist)
    };
+}
+
+/** Whether a save or check message answers a card's save or check button (by skill, tool or ability). */
+export function answersButton(message, match)
+{
+   if (!match) { return true; }
+   const { skill, tool, ability } = message.system ?? {};
+   return [skill, tool, ability].includes(match);
+}
+
+/**
+ * Points a card's "roll for" buttons at selected tokens (SCOPE §6.6): dnd5e's save and check buttons roll for
+ * `message.system.evaluatedTargets`, which follows the message's targeting mode; its default is the player's targets.
+ */
+export function preferSelected(message)
+{
+   if (message._targetState && !message._targetState.mode) { message._targetState.mode = 'selected'; }
 }
 
 /**
