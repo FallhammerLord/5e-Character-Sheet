@@ -29,6 +29,8 @@ Portrait, name, class and level, HP and temp HP, AC, initiative, speed, proficie
 
 Classic layout: skills and saves column; resources; favorites; traits (senses, languages, proficiencies, resistances).
 
+- [x] Mockup approved with answers (2026-10-24): half proficiency mark, passive toggle, folding favorite groups; death saves move to the header (shown at 0 HP)
+
 ## Phase 3: Inventory
 
 Built on dnd5e's `dnd5e-inventory` element. Equip, attune, quantity, weight and encumbrance, containers, currency, drag and drop, context menus.

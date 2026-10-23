@@ -53,6 +53,14 @@ Across the top, under the header: Actions, Attributes, Inventory, Spellbook, Fea
 - **Side panel** (about 240px, left): skills list (proficiency, name, ability, modifier, passive), then traits (senses, languages, damage immunities, resistances and vulnerabilities, condition immunities, weapon, armor and tool proficiencies).
 - **Main panel:** pinned and favorite items, grouped (Inventory, Spell Level N with slots used / total). Columns: name, uses, spell components, activation (1 Action, 1 Bonus Action).
 
+Attributes decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, Attributes boards):
+- **Skills:** one 28px roll button per skill. Proficiency is a mark, not bold text: empty circle none, half-filled half (Jack of All Trades), filled proficient, ringed expertise.
+- **Passive scores:** a toggle in the Skills heading switches between every skill's passive and only Perception, Insight and Investigation; each player's choice is remembered.
+- **Traits:** empty ones hidden in play, all shown in edit mode.
+- **Favorites:** grouped as dnd5e groups them; each group folds, and stays as the player left it. Equipped rows green, prepared blue, each with a left edge and an icon as well. Spell slots as 24px pips with "used / total".
+- **Resources:** counters above the favorites, only when the character has any.
+- **Death saves** go in the header, shown only at 0 HP.
+
 ### 4.4 Actions tab
 
 Everything usable, grouped by Action, Bonus Action, Reaction, Other. Each row: icon, name with a small subtitle (type, spell level and school), uses, range and target, hit or DC, damage, roll.
