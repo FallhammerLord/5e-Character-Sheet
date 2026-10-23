@@ -50,7 +50,7 @@ Themes shared with the quest log. Compatibility with modules that change the she
 Runs alongside the sheet phases; works whatever sheet a player uses (client setting, on by default). Built on dnd5e's `dnd5e.renderChatMessage` hook and its roll hooks, never replacing its roll pipeline. SCOPE §6.
 
 - ~~Outcome line on dnd5e's cards~~ (2026-10-23): built, then superseded by the one-card design (SCOPE §6.5); its wording code feeds the bands
-- [ ] Mockup of the one card (attack with a rider save, Fireball, skill check) approved by the user
+- [x] Mockup of the one card (attack with a rider save, Fireball, skill check, GM request, d20 row states) approved by the user (2026-10-23, "serviceable for now")
 - [ ] Card frame on usage cards: portrait, title, folding description, dnd5e's buttons as full-width bands
 - [ ] d20 band: attack rolls drawn in the card, two d20s, natural and hit or miss in words, dice math on click
 - [ ] Damage band: drawn in the card, crits double without asking, dice math on click

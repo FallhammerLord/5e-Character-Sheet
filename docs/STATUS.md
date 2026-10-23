@@ -13,7 +13,6 @@ What's verified, what's waiting. Read when picking up work; CLAUDE.md holds only
 ## Waiting on the user
 
 - With Quench installed, run "Fallhammer Character Sheet: core" as GM. All six should pass. It makes and deletes a character named "FHCS test (safe to delete)".
-- **Review the one-card mockup** (SCOPE §6.5, link in the session). No need to test the outcome line in Foundry: the one-card design replaces it.
 
 ## In code, not yet verified
 
@@ -21,4 +20,4 @@ What's verified, what's waiting. Read when picking up work; CLAUDE.md holds only
 
 ## Next session
 
-1. Track R: once the mockup is approved, build the card frame on usage cards (ROADMAP Track R, in order). Facts: `docs/research/dnd5e-6.0-chat.md`, `docs/research/ready-set-roll.md`. Then Phase 1, header: SCOPE §4.1 and `docs/reference/tidy-classic-attributes.png`. Replace dnd5e's `header` part with ours (same part ID, so `_prepareHeaderContext` still feeds it), add a layout case, and extend Quench with the header's rolls and pips.
+1. Track R: mockup approved (2026-10-23). Build the card frame on usage cards (ROADMAP Track R, in order). Facts: `docs/research/dnd5e-6.0-chat.md`, `docs/research/ready-set-roll.md`. Then Phase 1, header: SCOPE §4.1 and `docs/reference/tidy-classic-attributes.png`. Replace dnd5e's `header` part with ours (same part ID, so `_prepareHeaderContext` still feeds it), add a layout case, and extend Quench with the header's rolls and pips.
