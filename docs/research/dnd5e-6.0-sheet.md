@@ -44,4 +44,8 @@ Our templates must keep these class names, or override the methods that use them
 - `_prepareContext` and each `_prepare*Context`: what data each part gets.
 - `_onRender` and `_attachPartListeners`: listeners bound to specific markup.
 - How Favorites are stored (`system.favorites`) and used.
-- How Tidy's Quadrone sheet subclasses or replaces this (its source is the best map of the pitfalls).
+- How Tidy's Quadrone sheet handles favorites, pins and the tab selection.
+
+## How Tidy did it (checked 2026-10-23)
+
+Tidy's Classic sheet (`Tidy5eActorSheetClassicV2Base`, Tidy commit `54fdbad4`) extends Foundry's plain `ActorSheetV2` through a Svelte mixin. It does **not** extend dnd5e's sheet: Tidy reimplements each mechanic through its own adapter layer. That's why it needs a release for every dnd5e version. Ours inherits from `CharacterActorSheet` to avoid that cost; the trade-off is that our markup must keep dnd5e's class names and actions.

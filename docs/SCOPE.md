@@ -18,7 +18,40 @@ The user's table first: players used to Tidy 5e's classic layout. Public release
 
 ## 4. Layout
 
-Waiting on screenshots of classic Tidy from the user's world.
+Target: Tidy 5e Classic, as in `docs/reference/` (screenshots) and its source at Tidy commit `54fdbad4` (the last before Classic was removed, 2026-09-01; `src/sheets/classic/character/`). Default window 740 × 810.
+
+### 4.1 Header
+
+- **Portrait** (round, about 150px) down the left edge. On it: exhaustion (top left), inspiration (top right), rest button (bottom left), HP bar (bottom center), hit dice left (bottom right). Under it: Temp and Max HP.
+- **Beside it, in rows:**
+  1. Name (large small caps); on the right: XP bar with current / next, level badge, ⋮ menu.
+  2. Classes and subclasses ("Cleric 12 Life Domain").
+  3. Origin line: size • creature type • species • background • alignment; on the right: Proficiency bonus.
+  4. Speed.
+  5. AC shield badge, then Initiative, then six ability columns. Each column: abbreviation, score (large), boxed modifier and save, save proficiency.
+
+### 4.2 Tabs
+
+Across the top, under the header: Actions, Attributes, Inventory, Spellbook, Features, Effects; Biography and Journal optional. Players choose and order them (Classic's tab selection window). Sheet lock at the far right of the tab row.
+
+### 4.3 Attributes tab
+
+- **Side panel** (about 240px, left): skills list (proficiency, name, ability, modifier, passive), then traits (senses, languages, damage immunities, resistances and vulnerabilities, condition immunities, weapon, armor and tool proficiencies).
+- **Main panel:** pinned and favorite items, grouped (Inventory, Spell Level N with slots used / total). Columns: name, uses, spell components, activation (1 Action, 1 Bonus Action).
+
+### 4.4 Actions tab
+
+Everything usable, grouped by Action, Bonus Action, Reaction, Other. Each row: icon, name with a small subtitle (type, spell level and school), uses, range and target, hit or DC, damage, roll.
+
+### 4.5 Where we change Classic (ADHD rules)
+
+Keep the layout players know; fix what costs attention:
+
+- **Gear and pencil icons only in edit mode.** Classic shows about 30 of them in play; each is a target under 24px.
+- **Equipped and prepared** get an icon or label as well as the green and blue row color (color alone fails the colorblind player).
+- **Actions tab is the "Now" home** (Phase 7): it's already grouped by action type, so turn economy fits there. Make it the default tab in play.
+- **Targets at least 24px**, three text sizes, tooltips two to four words.
+- **Pinned header:** HP, AC and conditions never scroll away.
 
 ## 5. ADHD rules carried over
 

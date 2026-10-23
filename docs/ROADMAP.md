@@ -9,9 +9,9 @@ Every phase ends with the user testing in their own v14 world. A phase is done w
 - [x] Module scaffold: manifest, sheet registered beside dnd5e's (not the default), `compat.js`, load check with dnd5e mocked
 - [x] Claude Code hooks: install on session start, lint on edit, check before push
 - [x] CI: `npm run check` on push
-- [ ] Layout spec from the user's screenshots of classic Tidy (every tab, wide and narrow) → `docs/SCOPE.md` §Layout
+- [x] Layout spec from Tidy Classic's screenshots and source → `docs/SCOPE.md` §4
 - [ ] Finish `docs/research/dnd5e-6.0-sheet.md`: context data, listeners, favorites
-- [ ] Read Tidy Quadrone's source for how it extends the dnd5e sheet
+- [x] Read Tidy Classic's source: it rebuilds mechanics on `ActorSheetV2`; we extend dnd5e instead
 - [ ] Layout check (Playwright, many widths, fails on overflow), as in the quest log
 - [ ] Quench in-world tests: open, roll, use an item, rest, on a temporary actor
 
