@@ -26,8 +26,18 @@ globalThis.foundry = {
 };
 globalThis.game = {
    system: { version: 'mock' },
-   settings: { register: (scope, key, config) => settings.push({ scope, key, config }) }
+   settings: { register: (scope, key, config) => settings.push({ scope, key, config }), get: () => true },
+   messages: { get: () => null }
 };
+// A chat log that scrolls to the bottom whenever a message posts, as Foundry's does for the user's own messages.
+class FakeChatLog
+{
+   scrolled = 0;
+   async postOne(message, options = {}) { this.notify = options.notify; await this.scrollBottom(); }
+   async scrollBottom() { this.scrolled++; }
+}
+const chatLog = new FakeChatLog();
+globalThis.ui = { chat: chatLog };
 globalThis.dnd5e = { applications: { actor: { CharacterActorSheet: SystemCharacterSheet } } };
 class SystemUsageMessageData {}
 class SystemCheckMessageData {}
@@ -43,6 +53,16 @@ try
    await import(new URL('../src/main.js', import.meta.url));
    hooks.init?.();
    if (typeof hooks.quenchReady !== 'function') { problems.push('Quench tests are not hooked to quenchReady'); }
+   if (typeof hooks.ready !== 'function') { problems.push('quiet chat posts are not hooked to ready'); }
+   else
+   {
+      // A roll folded into its usage card posts without scrolling or notifying; anything else still scrolls.
+      hooks.ready();
+      await chatLog.postOne({ type: 'attack', system: { origin: { type: 'usage', content: '' } } }, { notify: true });
+      if (chatLog.scrolled !== 0 || chatLog.notify !== false) { problems.push('a folded roll still scrolls the chat log'); }
+      await chatLog.postOne({ type: 'base', system: {} }, { notify: true });
+      if (chatLog.scrolled !== 1) { problems.push('quiet posting stopped other messages from scrolling'); }
+   }
    for (const name of ['dnd5e.renderChatMessage', 'dnd5e.postRollConfiguration', 'updateChatMessage', 'dnd5e.preRoll'])
    {
       if (typeof hooks[name] !== 'function') { problems.push(`chat rolls are not hooked to ${name}`); }

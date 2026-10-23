@@ -10,6 +10,7 @@
  *   healing activity (`subsequentActions`); our settings switch those off, and add damage after each attack and
  *   right after a save spell.
  * - No roll dialogs (SCOPE §6.4); holding dnd5e's skip-dialog key brings the dialog back.
+ * - Folded rolls post quietly: no scroll to the bottom of the chat log, no notification (compat.quietPosts).
  */
 import { MODULE_ID } from '../constants.js';
 import { d20Now, isD20Roll, refreshCard, requestOf, rollCardDamage, skipKeyHeld, usageOrigin } from '../compat.js';
@@ -27,10 +28,19 @@ export const FOLDED_TYPES = new Set(['attack', 'damage', 'healing', 'save', 'che
  */
 export function foldIntoCard(message, html)
 {
-   if (!FOLDED_TYPES.has(message.type) || !game.settings.get(MODULE_ID, 'cards')) { return; }
+   if (isFolded(message)) { html.hidden = true; }
+}
+
+/**
+ * Whether a roll message is drawn inside another card (its usage card, or a request's rows) rather than as its own.
+ *
+ * @param {ChatMessage} message
+ */
+export function isFolded(message)
+{
+   if (!FOLDED_TYPES.has(message.type) || !game.settings.get(MODULE_ID, 'cards')) { return false; }
    const origin = usageOrigin(message);
-   // A request's results show as rows on the request card.
-   if ((origin && !origin.content) || requestOf(message)) { html.hidden = true; }
+   return Boolean((origin && !origin.content) || requestOf(message));
 }
 
 /**

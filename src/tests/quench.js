@@ -162,6 +162,11 @@ export function registerQuenchTests(quench)
             assert.strictEqual(CONFIG.ChatMessage.dataModels.usage.name, 'FHCSUsageMessageData');
          });
 
+         it('posts folded rolls without scrolling the chat log', function ()
+         {
+            assert.isTrue(Boolean(ui.chat.constructor.prototype.postOne.fhcsQuiet), 'ChatLog#postOne wrapped');
+         });
+
          it('has a header, and an attack band carrying dnd5e\'s action', async function ()
          {
             const { html } = await renderCard();

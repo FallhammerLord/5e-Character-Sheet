@@ -367,3 +367,38 @@ export async function refreshCard(message)
    await origin.system?.onDescendentRefresh?.(message);
    ui.chat?.updateMessage(origin);
 }
+
+/**
+ * Posts some messages without moving the chat log (user, 2026-10-24). Foundry scrolls the log to the bottom when the
+ * user's own message posts; a roll drawn inside a card higher up the log is posted hidden, so the log jumped away
+ * from the card being used. Wraps ChatLog#postOne (no scroll, no notification for quiet messages) and
+ * ChatLog#scrollBottom (skipped while a quiet post renders). Logs and does nothing if Foundry renames either.
+ *
+ * @param {Function} isQuiet   (message) => true to post without scrolling.
+ * @returns {boolean} Whether the chat log was wrapped.
+ */
+export function quietPosts(isQuiet)
+{
+   const proto = ui.chat?.constructor?.prototype;
+   if (!proto || (typeof proto.postOne !== 'function') || (typeof proto.scrollBottom !== 'function'))
+   {
+      console.warn('fhcs | ChatLog#postOne or #scrollBottom not found; rolls folded into cards may scroll the chat log.');
+      return false;
+   }
+   if (proto.postOne.fhcsQuiet) { return true; }
+   const { postOne, scrollBottom } = proto;
+   let quiet = 0;
+   proto.postOne = async function (message, options = {})
+   {
+      if (!isQuiet(message)) { return postOne.call(this, message, options); }
+      quiet++;
+      try { return await postOne.call(this, message, { ...options, notify: false }); }
+      finally { quiet--; }
+   };
+   proto.postOne.fhcsQuiet = true;
+   proto.scrollBottom = function (...args)
+   {
+      return quiet > 0 ? Promise.resolve() : scrollBottom.apply(this, args);
+   };
+   return true;
+}
