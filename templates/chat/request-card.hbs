@@ -1,0 +1,45 @@
+<div class="fhcs-card">
+   {{> "modules/fhcs/templates/chat/parts/header.hbs" fhcs }}
+   {{#if content}}<div class="fhcs-card-request">{{{ content }}}</div>{{/if}}
+
+   <div class="fhcs-band fhcs-band-save fhcs-band-group">
+      <span class="fhcs-band-top fhcs-band-pad"><span class="fhcs-band-heading">{{ fhcs.heading }}</span></span>
+      <ul class="fhcs-rows">
+         {{#each fhcs.rows}}
+         {{!-- dnd5e's roll button reads the actor from data-uuid; a result's own buttons read its message id. --}}
+         <li class="fhcs-row" data-uuid="{{ uuid }}"{{#if result}} data-message-id="{{ result.id }}"{{/if}}>
+            {{#if result}}
+            {{#with result}}
+            <details class="fhcs-row-details">
+               <summary class="fhcs-row-summary">
+                  <span class="fhcs-row-who">{{ who }}</span>
+                  <strong class="fhcs-row-total">{{ total }}</strong>
+                  <span class="fhcs-row-verdict{{#if verdict}} fhcs-verdict-{{ verdict }}{{/if}}">{{ verdictWord }}</span>
+               </summary>
+               <div class="fhcs-band-body">
+                  {{> "modules/fhcs/templates/chat/parts/d20-row.hbs" }}
+                  {{#if words.length}}<span class="fhcs-band-words">{{#each words}}<span>{{ this }}</span>{{/each}}</span>{{/if}}
+                  {{#each mathLines}}<p class="fhcs-band-math">{{ formula }}<br><strong>{{ result }}</strong></p>{{/each}}
+                  {{#each notes}}<p class="fhcs-band-note">{{ this }}</p>{{/each}}
+                  {{> "modules/fhcs/templates/chat/parts/bonus.hbs" }}
+               </div>
+            </details>
+            {{/with}}
+            {{else}}
+            <div class="fhcs-row-summary fhcs-row-open">
+               <span class="fhcs-row-who">{{ who }}</span>
+               <strong class="fhcs-row-total">–</strong>
+               {{#if done}}
+               <span class="fhcs-row-verdict">{{ doneText }}</span>
+               {{else if canRoll}}
+               <button type="button" class="fhcs-button fhcs-row-roll" data-action="handleRequest">{{ rollLabel }}</button>
+               {{else}}
+               <span class="fhcs-row-verdict fhcs-row-wait">{{ waitText }}</span>
+               {{/if}}
+            </div>
+            {{/if}}
+         </li>
+         {{/each}}
+      </ul>
+   </div>
+</div>

@@ -77,7 +77,45 @@ const fireball = () =>
    return context;
 };
 
+/** A standalone roll card (a check or save from the sheet) around one rolled d20 band. */
+const standaloneCard = (title, heading, facts, extra = {}) => ({
+   fhcs: {
+      portrait: '', actorName: 'Kira', title, itemUuid: '', subtitle: '', canAct: false, supplements: [], others: [],
+      bands: [{ kind: 'd20', heading, action: null, rolled: d20Band(facts, [], format) }], ...extra
+   }
+});
+
+/** A GM's request: one result in, one player who may roll, one still waiting. */
+const request = () => ({
+   content: '<p>Everyone make a DC 14 Wisdom saving throw.</p>',
+   fhcs: {
+      portrait: '', actorName: 'Game Master', title: 'Roll Wisdom Saving Throw', itemUuid: '', subtitle: '', heading: 'Party',
+      rows: [
+         { uuid: 'Actor.k', who: 'Kira', done: true, result: saveRow(save('Kira', 19, 15, true, { what: 'Wisdom Saving Throw', target: 14 }), format) },
+         { uuid: 'Actor.t', who: 'Thorn', done: false, canRoll: true, rollLabel: 'Roll', waitText: 'waiting' },
+         { uuid: 'Actor.w', who: 'Wren of the Whispering Marsh', done: false, canRoll: false, waitText: 'waiting' }
+      ]
+   }
+});
+
 export const CASES = [
+   {
+      name: 'card-standalone-check',
+      template: 'chat/roll-card',
+      frame: 'chat',
+      context: standaloneCard('Perception Skill Check', 'Check', save('Kira', 17, 12, null, {
+         kind: 'check', what: 'Perception Skill Check', target: null, formula: '1d20 + 5', math: '12 + 5'
+      }))
+   },
+   {
+      name: 'card-death-save',
+      template: 'chat/roll-card',
+      frame: 'chat',
+      context: standaloneCard('Death Saving Throw', 'Death save', save('Kira', 20, 20, true, {
+         what: 'Death Saving Throw', target: 10, formula: '1d20', math: '20'
+      }), { supplements: ['Kira regains 1 hit point.'], others: [{ action: 'breakConcentration', index: 0, label: 'Break Concentration' }] })
+   },
+   { name: 'card-request', template: 'chat/request-card', frame: 'chat', context: request() },
    { name: 'card-fireball-saves', template: 'chat/usage-card', frame: 'chat', context: fireball() },
    { name: 'card-attack-crit', template: 'chat/usage-card', frame: 'chat', context: rolledAttack(attack(), [14, 9], damage()) },
    {

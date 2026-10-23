@@ -1,0 +1,12 @@
+{{!-- The d20 row (SCOPE §6.6): disadvantage dice left, the primary center, advantage dice right, with the late-add slots. Context: a rolled band or row. --}}
+<span class="fhcs-d20-row" role="group" aria-label="{{ diceLabel }}">
+   <span class="fhcs-d20-side fhcs-d20-left">
+      {{#with slots.left}}<button type="button" class="fhcs-slot fhcs-slot-dis{{#if small}} fhcs-slot-small{{/if}}" data-fhcs-action="{{ action }}" data-roll-id="{{ ../rollId }}" aria-label="{{ aria }}">{{ label }}</button>{{/with}}
+      {{#each row.left}}<span class="{{ classes }}">{{ value }}</span>{{/each}}
+   </span>
+   {{#with row.center}}<span class="{{ classes }}">{{ value }}</span>{{/with}}
+   <span class="fhcs-d20-side fhcs-d20-right">
+      {{#each row.right}}<span class="{{ classes }}">{{ value }}</span>{{/each}}
+      {{#with slots.right}}<button type="button" class="fhcs-slot fhcs-slot-adv{{#if small}} fhcs-slot-small{{/if}}" data-fhcs-action="{{ action }}" data-roll-id="{{ ../rollId }}" aria-label="{{ aria }}">{{ label }}</button>{{/with}}
+   </span>
+</span>

@@ -53,3 +53,9 @@ So SCOPE §6.4's "saves on the same card" exists already; our work there is word
 - `recorded-targets`, `effect-application` and `damage-application` find their message through `closest("[data-message-id]")`; they work inside any markup.
 - `CONFIG.ChatMessage.dataModels` is set in dnd5e's init; swapping `usage` for a subclass in our init (later) applies to every message, since the world's messages are built after init. The subclass keeps `metadata`, schema and migrations; we override `template` and extend `_prepareContext`.
 - `activity.use(usage, dialog, { create: false })` returns the message data without posting; `usage.subsequentActions: false` skips the automatic follow-up roll. **dnd5e already rolls the attack after an attack activity is used** (`AttackActivity#_triggerSubsequentActions`), and a damage activity's damage likewise.
+
+## Requests (checked for standalone rolls, 2026-10-23)
+
+- `RequestMessageData` (`type: "request"`): `system.targets` = `{ actor (uuid), result (message), user }`; `system.handler` names a function in `CONFIG.DND5E.requests`; `system.button` its label and icon. The template's per-target button is `data-action="handleRequest"` inside `[data-uuid]`.
+- A result message gets `flags.dnd5e.requestResult = { actorUuid, requestId }`; the active GM then writes the result's id into the request's `system.targets` (`onCreateMessage`, `onUpdateResultMessage`), which re-renders the request.
+- Late adds change a result's rolls, not the request; we re-render the request ourselves (`compat.refreshCard`).

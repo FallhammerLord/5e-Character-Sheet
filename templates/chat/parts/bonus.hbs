@@ -1,0 +1,7 @@
+{{!-- The late "+ Bonus" field. Context: a rolled band or row. --}}
+{{#if bonus}}
+<span class="fhcs-bonus">
+   <input type="text" class="fhcs-bonus-input" placeholder="{{ bonus.placeholder }}" aria-label="{{ bonus.aria }}">
+   <button type="button" class="fhcs-button" data-fhcs-action="addBonus" data-roll-id="{{ rollId }}">{{ bonus.label }}</button>
+</span>
+{{/if}}

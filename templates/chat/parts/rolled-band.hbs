@@ -1,0 +1,27 @@
+{{!-- A rolled band: total, d20 row or damage types, words; opened, the dice math, late adds and roll again. Context: a band. --}}
+<details class="fhcs-band fhcs-band-{{ kind }} fhcs-band-rolled{{#if rolled.critical}} fhcs-band-critical{{/if}}"{{#if rolled.open}} open{{/if}}>
+   <summary class="fhcs-band-summary">
+      <span class="fhcs-band-top"><span class="fhcs-band-heading">{{ heading }}</span><span class="fhcs-band-end" aria-hidden="true"></span></span>
+      <span class="fhcs-band-result">
+         <strong class="fhcs-band-total">{{ rolled.total }}</strong>
+         {{#if rolled.row}}{{> "modules/fhcs/templates/chat/parts/d20-row.hbs" rolled }}{{/if}}
+         {{#if rolled.parts.length}}
+         <span class="fhcs-band-parts">{{#each rolled.parts}}<span>{{ text }}</span>{{/each}}</span>
+         {{/if}}
+      </span>
+      {{#if rolled.words.length}}
+      <span class="fhcs-band-words{{#if rolled.verdict}} fhcs-verdict-{{ rolled.verdict }}{{/if}}">{{#each rolled.words}}<span>{{ this }}</span>{{/each}}</span>
+      {{/if}}
+   </summary>
+   <div class="fhcs-band-body">
+      {{#each rolled.mathLines}}<p class="fhcs-band-math">{{ formula }}<br><strong>{{ result }}</strong></p>{{/each}}
+      {{#each rolled.notes}}<p class="fhcs-band-note">{{ this }}</p>{{/each}}
+      {{> "modules/fhcs/templates/chat/parts/bonus.hbs" rolled }}
+      {{#if @root.fhcs.canAct}}
+      <div class="fhcs-card-actions">
+         {{#if action}}<button type="button" class="fhcs-button" data-action="{{ action }}" data-index="{{ index }}">{{ rolled.againLabel }}</button>{{/if}}
+         {{#each rolled.extra}}<button type="button" class="fhcs-button" data-fhcs-action="{{ action }}">{{ label }}</button>{{/each}}
+      </div>
+      {{/if}}
+   </div>
+</details>

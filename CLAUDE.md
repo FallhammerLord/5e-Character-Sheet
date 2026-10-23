@@ -34,6 +34,7 @@ Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies insta
 - **`SYSTEM_ACTIONS`** (`src/constants.js`) lists the dnd5e actions our markup relies on; Quench fails if dnd5e drops one. Keep it in step with the research note.
 - **Prefer dnd5e's custom elements** (`dnd5e-inventory`, `dnd5e-effects`, and others) over rebuilt lists: they bring context menus, drag and filters.
 - **`src/compat.js`** is the only place for version-sensitive Foundry and dnd5e APIs.
+- **Chat cards subclass dnd5e's chat models** (`compat.extendChatModel` at init) and swap templates; dnd5e keeps binding clicks (`data-action`, `data-index`) and its trays find their message by the nearest `data-message-id`. A roll drawn in another card hides its own card (`src/chat/rolls.js`). Template parts included by path must be in `CARD_PARTS` (the load check fails otherwise).
 - **Imports:** one missing import stops the whole module in Foundry; ESLint won't see it. `npm run load` catches it.
 - **Manifest changes need a world relaunch** (Return to Setup), not a browser refresh.
 - **Code style:** Allman braces, 3-space indent, single quotes (matches the quest log).

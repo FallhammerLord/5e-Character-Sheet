@@ -1,0 +1,24 @@
+<div class="fhcs-card">
+   {{> "modules/fhcs/templates/chat/parts/header.hbs" fhcs }}
+
+   {{#each fhcs.bands}}
+   {{#if rolled}}
+   {{> "modules/fhcs/templates/chat/parts/rolled-band.hbs" }}
+   {{else}}
+   <div class="fhcs-band fhcs-band-{{ kind }}">
+      <span class="fhcs-band-top"><span class="fhcs-band-heading">{{ heading }}</span></span>
+      <span class="fhcs-band-text">{{ text }}</span>
+   </div>
+   {{/if}}
+   {{/each}}
+
+   {{#each fhcs.supplements}}<p class="fhcs-card-supplement">{{ this }}</p>{{/each}}
+
+   {{#if fhcs.others.length}}
+   <div class="fhcs-card-actions">
+      {{#each fhcs.others}}
+      <button type="button" class="fhcs-button" data-action="{{ action }}" data-index="{{ index }}">{{ label }}</button>
+      {{/each}}
+   </div>
+   {{/if}}
+</div>

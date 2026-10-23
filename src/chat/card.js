@@ -15,6 +15,11 @@ import { d20Row, dieClasses } from './d20.js';
 
 export const CARD_TEMPLATE = `modules/${MODULE_ID}/templates/chat/usage-card.hbs`;
 
+/** Parts the card templates include by path; preloaded at init. */
+export const CARD_PARTS = ['header', 'rolled-band', 'd20-row', 'bonus']
+   .map((name) => `modules/${MODULE_ID}/templates/chat/parts/${name}.hbs`);
+// (roll-card.hbs and request-card.hbs include the same parts.)
+
 /** dnd5e's chat button actions that become bands, and the kind of band each is. */
 const BAND_KINDS = {
    rollAttack: 'attack',
@@ -198,6 +203,60 @@ const BAND_ROLLS = {
    damage: { types: ['damage', 'healing'], facts: damageFacts, draw: damageBand }
 };
 
+/**
+ * Binds our own card buttons (dnd5e's carry `data-action` and go through dnd5e): late adds on any card, damage
+ * re-rolls on a usage card, and Enter in a bonus field.
+ *
+ * @param {HTMLElement} element   The rendered message.
+ * @param {ChatMessage|null} usage   The usage card, when the element is one.
+ */
+export function bindCardActions(element, usage)
+{
+   for (const button of element.querySelectorAll('[data-fhcs-action]'))
+   {
+      button.addEventListener('click', (event) => onCardAction(event, button, usage));
+   }
+   for (const input of element.querySelectorAll('.fhcs-bonus-input'))
+   {
+      input.addEventListener('keydown', (event) =>
+      {
+         if (event.key !== 'Enter') { return; }
+         event.preventDefault();
+         input.closest('.fhcs-bonus')?.querySelector('[data-fhcs-action="addBonus"]')?.click();
+      });
+   }
+}
+
+/** One of our card buttons, clicked. */
+async function onCardAction(event, button, usage)
+{
+   // Buttons can sit inside a band's <summary>; a click there must not also fold the band.
+   event.preventDefault();
+   event.stopPropagation();
+   const roll = game.messages.get(button.dataset.rollId);
+   button.disabled = true;
+   try
+   {
+      switch (button.dataset.fhcsAction)
+      {
+         case 'damageNormal': if (usage) { await rollCardDamage(usage, { event, isCritical: false }); } break;
+         case 'damageCritical': if (usage) { await rollCardDamage(usage, { event, isCritical: true }); } break;
+         case 'lateAdvantage': if (roll) { await addD20(roll, 'adv'); } break;
+         case 'lateDisadvantage': if (roll) { await addD20(roll, 'dis'); } break;
+         case 'addBonus':
+         {
+            const input = button.closest('.fhcs-bonus')?.querySelector('input');
+            if (roll && input?.value.trim() && !(await addBonus(roll, input.value)))
+            {
+               ui.notifications?.warn(game.i18n.format('FHCS.Card.BonusInvalid', { formula: input.value }));
+            }
+            break;
+         }
+      }
+   }
+   finally { button.disabled = false; }
+}
+
 /** Whether a message draws as our card: the setting is on and dnd5e didn't fall back to legacy HTML content. */
 const useCard = (system) => game.settings.get(MODULE_ID, 'cards') && !system.parent.content;
 
@@ -281,50 +340,7 @@ export function makeUsageMessageData(Base)
          element.classList.add('fhcs-chat', 'fhcs-card-message');
          preferSelected(this.parent);
          openTrays(element);
-         for (const button of element.querySelectorAll('[data-fhcs-action]'))
-         {
-            button.addEventListener('click', (event) => this.#onCardAction(event, button));
-         }
-         // Enter in a bonus field adds the bonus.
-         for (const input of element.querySelectorAll('.fhcs-bonus-input'))
-         {
-            input.addEventListener('keydown', (event) =>
-            {
-               if (event.key !== 'Enter') { return; }
-               event.preventDefault();
-               input.closest('.fhcs-bonus')?.querySelector('[data-fhcs-action="addBonus"]')?.click();
-            });
-         }
-      }
-
-      /** Our own card buttons (dnd5e's have `data-action` and go through dnd5e). */
-      async #onCardAction(event, button)
-      {
-         // Buttons can sit inside a band's <summary>; a click there must not also fold the band.
-         event.preventDefault();
-         event.stopPropagation();
-         const roll = game.messages.get(button.dataset.rollId);
-         button.disabled = true;
-         try
-         {
-            switch (button.dataset.fhcsAction)
-            {
-               case 'damageNormal': await rollCardDamage(this.parent, { event, isCritical: false }); break;
-               case 'damageCritical': await rollCardDamage(this.parent, { event, isCritical: true }); break;
-               case 'lateAdvantage': if (roll) { await addD20(roll, 'adv'); } break;
-               case 'lateDisadvantage': if (roll) { await addD20(roll, 'dis'); } break;
-               case 'addBonus':
-               {
-                  const input = button.closest('.fhcs-bonus')?.querySelector('input');
-                  if (roll && input?.value.trim() && !(await addBonus(roll, input.value)))
-                  {
-                     ui.notifications?.warn(game.i18n.format('FHCS.Card.BonusInvalid', { formula: input.value }));
-                  }
-                  break;
-               }
-            }
-         }
-         finally { button.disabled = false; }
+         bindCardActions(element, this.parent);
       }
    };
 }

@@ -45,6 +45,12 @@ export async function actorArtwork(actor)
    return (art && !art.isVideo ? art.src : actor.img) ?? '';
 }
 
+/** Registers template parts as Handlebars partials named by their paths, so card templates can include them. */
+export function preloadTemplates(paths)
+{
+   return foundry.applications.handlebars.loadTemplates(paths);
+}
+
 /** Renders one of our templates by its Foundry path. */
 export function renderTemplate(path, data)
 {
@@ -216,6 +222,13 @@ export function usageOrigin(message)
    return origin?.type === 'usage' ? origin : null;
 }
 
+/** The request card a roll answers (dnd5e flags each result `requestResult`), if it is still there. */
+export function requestOf(message)
+{
+   const requestId = message.getFlag?.('dnd5e', 'requestResult')?.requestId;
+   return requestId ? (game.messages.get(requestId) ?? null) : null;
+}
+
 /** One d20 rolled now, from Foundry's random source (synchronous, for roll hooks that can't wait). */
 export function d20Now()
 {
@@ -319,6 +332,8 @@ export async function addBonus(message, formula, index = 0)
  */
 export async function refreshCard(message)
 {
+   const request = requestOf(message);
+   if (request) { ui.chat?.updateMessage(request); }
    const origin = usageOrigin(message);
    if (!origin) { return; }
    await origin.system?.onDescendentRefresh?.(message);

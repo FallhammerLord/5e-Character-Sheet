@@ -326,6 +326,37 @@ export function registerQuenchTests(quench)
             }
          });
 
+         it('draws a skill check from the sheet as its own card with a rolled d20 band', async function ()
+         {
+            await actor.rollSkill({ skill: 'prc' }, { configure: false }, { rollMode: 'selfroll' });
+            const message = game.messages.contents.filter((m) => (m.type === 'check') && (m.speaker.actor === actor.id)).at(-1);
+            try
+            {
+               assert.ok(message, 'check posted');
+               const html = await message.renderHTML();
+               assert.isFalse(html.hidden, 'its own card shows');
+               assert.ok(html.querySelector('.fhcs-card .fhcs-card-header'), 'our header');
+               const band = html.querySelector('.fhcs-band-rolled');
+               assert.ok(band, 'rolled d20 band');
+               assert.strictEqual(Number(band.querySelector('.fhcs-band-total').textContent), message.rolls[0].total);
+               assert.ok(band.querySelector('[data-fhcs-action="lateAdvantage"]'), 'late advantage offered');
+            }
+            finally { await message?.delete(); }
+         });
+
+         it('draws a GM request with a row per party member and dnd5e\'s roll action', async function ()
+         {
+            const message = new ChatMessage.implementation({
+               type: 'request',
+               content: '<p>FHCS test request</p>',
+               system: { handler: 'fhcsTest', button: { label: 'Roll something' }, targets: [{ actor: actor.uuid }] }
+            });
+            const html = await message.renderHTML();
+            const row = html.querySelector(`.fhcs-row[data-uuid="${actor.uuid}"]`);
+            assert.ok(row, 'row for the party member');
+            assert.ok(row.querySelector('[data-action="handleRequest"]'), 'roll button keeps dnd5e\'s action');
+         });
+
          it('lists each save in the card\'s save band, and rolls for selected tokens', async function ()
          {
             const [spell] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test blast', type: 'spell', system: { level: 1 } }]);

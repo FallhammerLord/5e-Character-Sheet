@@ -17,8 +17,12 @@ class SystemCharacterSheet
 
 globalThis.Hooks = { on: (name, fn) => { hooks[name] = fn; }, once: (name, fn) => { hooks[name] = fn; } };
 globalThis.Actor = class {};
+const preloaded = [];
 globalThis.foundry = {
-   applications: { apps: { DocumentSheetConfig: { registerSheet: (...args) => registered.push(args) } } }
+   applications: {
+      apps: { DocumentSheetConfig: { registerSheet: (...args) => registered.push(args) } },
+      handlebars: { loadTemplates: (paths) => preloaded.push(...paths) }
+   }
 };
 globalThis.game = {
    system: { version: 'mock' },
@@ -26,7 +30,12 @@ globalThis.game = {
 };
 globalThis.dnd5e = { applications: { actor: { CharacterActorSheet: SystemCharacterSheet } } };
 class SystemUsageMessageData {}
-globalThis.CONFIG = { ChatMessage: { dataModels: { usage: SystemUsageMessageData } } };
+class SystemCheckMessageData {}
+class SystemSaveMessageData {}
+class SystemRequestMessageData {}
+const systemModels = { usage: SystemUsageMessageData, check: SystemCheckMessageData, save: SystemSaveMessageData,
+   request: SystemRequestMessageData };
+globalThis.CONFIG = { ChatMessage: { dataModels: { ...systemModels } } };
 
 const problems = [];
 try
@@ -38,8 +47,11 @@ try
    {
       if (typeof hooks[name] !== 'function') { problems.push(`chat rolls are not hooked to ${name}`); }
    }
-   const usage = globalThis.CONFIG.ChatMessage.dataModels.usage;
-   if (!(usage.prototype instanceof SystemUsageMessageData)) { problems.push('usage chat cards do not extend dnd5e\'s usage model'); }
+   for (const [type, Model] of Object.entries(systemModels))
+   {
+      const ours = globalThis.CONFIG.ChatMessage.dataModels[type];
+      if (!(ours.prototype instanceof Model)) { problems.push(`${type} chat cards do not extend dnd5e's ${type} model`); }
+   }
 }
 catch (err)
 {
@@ -63,6 +75,18 @@ else
 
 // Everything the manifest names exists, and every label key the code uses is in lang/en.json.
 const root = new URL('../', import.meta.url);
+// Every template part a card includes is preloaded and exists (Foundry won't find a partial it hasn't loaded).
+for (const path of preloaded)
+{
+   if (!existsSync(new URL(path.replace(/^modules\/fhcs\//, ''), root))) { problems.push(`preloaded template ${path} is missing`); }
+}
+const included = new Set();
+for (const file of ['templates/chat/usage-card.hbs', 'templates/chat/roll-card.hbs', 'templates/chat/request-card.hbs',
+   'templates/chat/parts/rolled-band.hbs'])
+{
+   for (const [, path] of readFileSync(new URL(file, root), 'utf8').matchAll(/{{>\s*"([^"]+)"/g)) { included.add(path); }
+}
+for (const path of included) { if (!preloaded.includes(path)) { problems.push(`${path} is included but not preloaded`); } }
 const manifest = JSON.parse(readFileSync(new URL('module.json', root), 'utf8'));
 for (const path of [...manifest.esmodules, ...manifest.styles, ...manifest.languages.map((l) => l.path)])
 {

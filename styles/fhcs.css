@@ -643,3 +643,46 @@
    font: inherit;
    text-align: center;
 }
+
+/* Standalone rolls and requests: dnd5e's own lines, the request's text, rows still to roll. */
+.fhcs-chat .fhcs-card-supplement,
+.fhcs-chat .fhcs-card-request
+{
+   margin: 0;
+   font-size: var(--fhcs-text-small);
+   text-align: center;
+   overflow-wrap: anywhere;
+}
+
+.fhcs-chat .fhcs-card-request > :first-child
+{
+   margin-top: 0;
+}
+
+.fhcs-chat .fhcs-card-request > :last-child
+{
+   margin-bottom: 0;
+}
+
+.fhcs-chat .fhcs-band-pad
+{
+   padding: 0.375rem 0.625rem 0;
+}
+
+.fhcs-chat .fhcs-row-open
+{
+   width: 100%;
+   cursor: auto;
+}
+
+.fhcs-chat .fhcs-row-roll
+{
+   justify-self: end;
+}
+
+.fhcs-chat .fhcs-row-wait
+{
+   color: var(--fhcs-muted);
+   font-weight: normal;
+   font-style: italic;
+}

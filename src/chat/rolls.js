@@ -1,7 +1,8 @@
 /**
  * Roll hooks for one card per action (Track R, SCOPE §6.5–6.6).
  *
- * - A roll made from one of our usage cards is drawn in that card's band, so its own card is hidden. dnd5e re-renders
+ * - A roll made from one of our usage cards is drawn in that card's band, and a request's result in the request's
+ *   rows, so its own card is hidden. dnd5e re-renders
  *   the usage card when the roll arrives (`system.origin`); see docs/research/dnd5e-6.0-chat.md.
  * - With "always roll two d20s", every d20 roll carries one more d20 rolled in advance, for late advantage or
  *   disadvantage to use first.
@@ -11,7 +12,7 @@
  * - No roll dialogs (SCOPE §6.4); holding dnd5e's skip-dialog key brings the dialog back.
  */
 import { MODULE_ID } from '../constants.js';
-import { d20Now, isD20Roll, refreshCard, rollCardDamage, skipKeyHeld, usageOrigin } from '../compat.js';
+import { d20Now, isD20Roll, refreshCard, requestOf, rollCardDamage, skipKeyHeld, usageOrigin } from '../compat.js';
 
 const setting = (key) => game.settings.get(MODULE_ID, key);
 
@@ -28,7 +29,8 @@ export function foldIntoCard(message, html)
 {
    if (!FOLDED_TYPES.has(message.type) || !game.settings.get(MODULE_ID, 'cards')) { return; }
    const origin = usageOrigin(message);
-   if (origin && !origin.content) { html.hidden = true; }
+   // A request's results show as rows on the request card.
+   if ((origin && !origin.content) || requestOf(message)) { html.hidden = true; }
 }
 
 /**

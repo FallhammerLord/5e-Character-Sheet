@@ -41,7 +41,10 @@
         "rollCheck": "Check",
         "rollDamage": "Damage",
         "rollHealing": "Healing",
-        "rollFormula": "Roll"
+        "rollFormula": "Roll",
+        "death": "Death save",
+        "initiative": "Initiative",
+        "request": "Party"
       },
       "Roll": {
         "rollAttack": "Roll attack",
@@ -74,7 +77,10 @@
       "BonusPlaceholder": "1d4 or 2",
       "BonusAria": "Bonus to add",
       "Added": "Added {formula}: {total}",
-      "BonusInvalid": "Not a roll: {formula}"
+      "BonusInvalid": "Not a roll: {formula}",
+      "Done": "Done",
+      "Waiting": "waiting",
+      "RollShort": "Roll"
     }
   }
 }

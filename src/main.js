@@ -1,20 +1,25 @@
 import { MODULE_ID } from './constants.js';
-import { extendChatModel, registerCharacterSheet, systemCharacterSheet } from './compat.js';
+import { extendChatModel, preloadTemplates, registerCharacterSheet, systemCharacterSheet } from './compat.js';
 import { makeCharacterSheet } from './apps/CharacterSheet.js';
 import { registerQuenchTests } from './tests/quench.js';
 import { registerSettings } from './settings.js';
-import { makeUsageMessageData } from './chat/card.js';
+import { CARD_PARTS, makeUsageMessageData } from './chat/card.js';
+import { makeRequestMessageData, makeRollMessageData } from './chat/roll-card.js';
 import { addSpareD20, damageAfterAttack, damageAfterUse, foldIntoCard, refreshOnRollChange, rollOnUse, skipRollDialog }
    from './chat/rolls.js';
 
 Hooks.once('init', () =>
 {
    registerSettings();
+   preloadTemplates(CARD_PARTS);
    // One card per action (Track R): runs for every dnd5e usage card, whatever sheet the player uses.
    if (!extendChatModel('usage', makeUsageMessageData))
    {
       console.error(`${MODULE_ID} | dnd5e's usage chat cards were not found; chat cards keep dnd5e's layout.`);
    }
+   // Standalone checks and saves, and GM requests, in the same frame.
+   for (const type of ['check', 'save']) { extendChatModel(type, makeRollMessageData); }
+   extendChatModel('request', makeRequestMessageData);
    const Base = systemCharacterSheet();
    if (!Base)
    {
