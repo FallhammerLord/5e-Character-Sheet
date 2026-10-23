@@ -34,6 +34,14 @@ Target: Tidy 5e Classic, as in `docs/reference/` (screenshots) and its source at
   4. Speed.
   5. AC shield badge, then Initiative, then six ability columns. Each column: abbreviation, score (large), boxed modifier and save, save proficiency.
 
+Header decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf):
+- **Portrait frame 160 wide, up to 240 tall:** round, square and tall art all fit; the header grows with tall art and nothing else moves. HP, its bar and Temp sit under the frame.
+- **Corner chips on the frame:** exhaustion, inspiration, rest, hit dice.
+- **Ability emphasis is a per-player choice** (client setting): modifier large with the score small (our default), or Classic's large score.
+- **Leveling follows dnd5e's `levelingMode` world setting** (the GM's choice; we add no setting of our own). XP modes show the usual XP bar. Milestone mode (`noxp`) shows a fold-out tray of the milestones the character has collected in place of the bar.
+- **Pinned strip** when scrolled (§4.5): portrait thumbnail, name, HP and bar, AC, conditions, inspiration.
+- At 560px the AC, Init and ability columns wrap into two rows of four.
+
 ### 4.2 Tabs
 
 Across the top, under the header: Actions, Attributes, Inventory, Spellbook, Features, Effects; Biography and Journal optional. Players choose and order them (Classic's tab selection window). Sheet lock at the far right of the tab row.
