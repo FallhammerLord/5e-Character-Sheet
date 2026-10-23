@@ -49,14 +49,17 @@ Themes shared with the quest log. Compatibility with modules that change the she
 
 Runs alongside the sheet phases; works whatever sheet a player uses (client setting, on by default). Built on dnd5e's `dnd5e.renderChatMessage` hook and its roll hooks, never replacing its roll pipeline. SCOPE §6.
 
-- [ ] Clear chat cards
-  - [ ] Outcome first: who · what · total, success or failure in words vs a known DC, natural 1 and 20 in words, hits and misses (in code 2026-10-23; waits on the user)
-  - [ ] Labelled buttons at least 24px, tags folded
-  - [ ] Rolls in a row from one speaker grouped
-- [ ] Late advantage and disadvantage on d20 cards (the one new mechanic; SCOPE §6.2)
-- [ ] dnd5e's own Roll damage, Roll save and Apply buttons: labelled, at least 24px, target trays open with "selected" or "targeted" in words
-- [ ] No held keys, no roll pop-ups (SCOPE §6.4): roll dialogs skipped, damage and saves land on the card that asked; dnd5e's spellcasting and activity chooser windows stay
-- [ ] Late bonuses on the card: a flat number or a die roll added to any roll, shown as its own term
+- ~~Outcome line on dnd5e's cards~~ (2026-10-23): built, then superseded by the one-card design (SCOPE §6.5); its wording code feeds the bands
+- [ ] Mockup of the one card (attack with a rider save, Fireball, skill check) approved by the user
+- [ ] Card frame on usage cards: portrait, title, folding description, dnd5e's buttons as full-width bands
+- [ ] d20 band: attack rolls drawn in the card, two d20s, natural and hit or miss in words, dice math on click
+- [ ] Damage band: drawn in the card, crits double without asking, dice math on click
+- [ ] Save / check band: roll for selected tokens, one row per token with its result in words
+- [ ] Apply: dnd5e's damage and effect trays in "selected" mode, labelled, at least 24px
+- [ ] Settings: roll attack on use, roll damage on use, always two d20s (world, on by default)
+- [ ] No roll pop-ups (SCOPE §6.4): roll dialogs skipped; dnd5e's spellcasting and activity chooser windows stay
+- [ ] Late adds: advantage, disadvantage, + bonus (a number or a die) on any roll, shown as its own term
+- [ ] Standalone rolls (sheet checks, saves, death saves, GM requests) in the same frame
 - [ ] Compatibility: step aside cleanly when RSReforged is active
 
 ## Mechanical parity checklist
