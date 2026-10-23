@@ -130,6 +130,10 @@ else
    for (const id of ['header', 'tabs']) { if (!parts[id]?.template.startsWith('modules/fhcs/')) { problems.push(`the ${id} part is still dnd5e's`); } }
    if (parts.details?.container?.id !== 'tabs') { problems.push('dnd5e\'s tab bodies lost their container'); }
 }
+for (const name of ['dnd5e.rollDeathSaveV2', 'preUpdateActor'])
+{
+   if (typeof hooks[name] !== 'function') { problems.push(`death saves are not hooked to ${name}`); }
+}
 if (typeof hooks['dnd5e.advancementManagerComplete'] !== 'function') { problems.push('level order is not hooked to dnd5e.advancementManagerComplete'); }
 
 // Everything the manifest names exists, and every label key the code uses is in lang/en.json.

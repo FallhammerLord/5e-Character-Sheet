@@ -794,8 +794,80 @@
 
 .fhcs-sheet .tab[data-group="primary"]:not(.active) { display: none; }
 
+/* Foundry's control sizes (button min-height) made our round pips oval; each of our controls sets its own size.
+   :where() keeps this weaker than our own control rules, but stronger than Foundry's bare `button`. */
+.fhcs-sheet :where(.window-content button)
+{
+   min-width: 0;
+   min-height: 0;
+   line-height: inherit;
+}
+
+/* The window itself: our surface and a thin line, so frame and sheet read as one (user, 2026-10-24). */
+.fhcs-sheet
+{
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-surface);
+   color: var(--fhcs-ink);
+}
+
+/* The title bar: a slim strip in the sheet's own colors, no divider. The name is in our header, so the title is
+   hidden but kept for screen readers; the window still drags from the strip and keeps Foundry's controls. */
+.fhcs-sheet > .window-header
+{
+   min-height: var(--fhcs-control);
+   padding: 0 var(--fhcs-s1) 0 var(--fhcs-s2);
+   border: 0;
+   background: var(--fhcs-surface);
+   color: var(--fhcs-muted);
+}
+
+.fhcs-sheet > .window-header :is(.window-title, .window-icon)
+{
+   position: absolute;
+   width: 1px;
+   height: 1px;
+   overflow: hidden;
+   clip-path: inset(50%);
+}
+
+.fhcs-sheet > .window-header > :is(.window-title, .window-icon) + * { margin-left: auto; }
+
+.fhcs-sheet > .window-header .header-control
+{
+   width: 24px;
+   min-width: 0;
+   height: 24px;
+   min-height: 0;
+   padding: 0;
+   border: 0;
+   background: none;
+   color: inherit;
+}
+
+.fhcs-sheet > .window-header .header-control:hover { color: var(--fhcs-ink); }
+
 /* dnd5e's play/edit switch in the window header; the lock in our tab row does the same. */
 .fhcs-sheet .window-header .mode-slider { display: none; }
+
+/* dnd5e's add button: only on tabs that hold things to add, as dnd5e shows it; in our style. */
+.fhcs-sheet .create-child
+{
+   display: none;
+   position: absolute;
+   right: var(--fhcs-s2);
+   bottom: var(--fhcs-s2);
+   width: var(--fhcs-control);
+   height: var(--fhcs-control);
+   padding: 0;
+   border: 0;
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-die-ink);
+   color: var(--fhcs-die-on-ink);
+}
+
+.fhcs-sheet:is(.tab-inventory, .tab-features, .tab-spells, .tab-effects) .create-child { display: block; }
 
 /* ---------- Tab row (SCOPE §4.2) ---------- */
 
@@ -1214,15 +1286,24 @@
 .fhcs-sheet .fhcs-prof.fhcs-on { background: currentColor; }
 
 /* Death saves, only at 0 HP: successes in green with a tick, failures in red with a cross, so color isn't alone. */
-/* Successes over failures, the roll beside both. */
+/* At 0 HP: the art goes grey, and the death saves sit over it, successes over failures with the roll beside. */
+.fhcs-sheet .fhcs-dying .fhcs-portrait-art { filter: grayscale(1) brightness(0.7); }
+
 .fhcs-sheet .fhcs-death
 {
+   position: absolute;
+   top: 50%;
+   left: 50%;
+   transform: translate(-50%, -50%);
+   padding: var(--fhcs-s1);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-surface);
+   box-shadow: 0 2px 8px rgb(0 0 0 / 30%);
    display: grid;
    grid-template-columns: auto auto;
    grid-template-rows: auto auto;
    align-items: center;
-   justify-content: space-between;
-   gap: var(--fhcs-s1);
+   gap: var(--fhcs-s1) var(--fhcs-s2);
 }
 
 .fhcs-sheet .fhcs-death-success { grid-area: 1 / 1; }
@@ -1329,7 +1410,8 @@
    align-items: center;
    gap: var(--fhcs-s1);
    width: 100%;
-   min-height: var(--fhcs-control);
+   /* 24px: the smallest target (user, 2026-10-24: rows were too tall). */
+   height: 24px;
    margin: 0;
    padding: 0 var(--fhcs-s1);
    border: 0;

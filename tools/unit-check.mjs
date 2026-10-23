@@ -8,6 +8,7 @@ import { cardParts, damageBand, saveRow } from '../src/chat/card.js';
 import { countingDie, d20Row, modeForSides } from '../src/chat/d20.js';
 import { diceMath } from '../src/chat/math.js';
 import { attributesView } from '../src/sheet/attributes.js';
+import { healUpdates, keepStable } from '../src/sheet/death.js';
 import { headerMinWidth, headerView, levelOrder, levelTrack, signed, tabRow } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
@@ -252,6 +253,22 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const marks = down.death ? [down.death.success.map((p) => p.filled), down.death.failure.map((p) => p.filled)] : null;
    try { deepStrictEqual(marks, [[true, true, false], [true, false, false]]); }
    catch { problems.push(`death saves at 0 HP: ${JSON.stringify(marks)}`); }
+}
+
+// Death saves: the third success stays; healing above 0 clears both rows.
+{
+   const details = { outcome: 'stable', updates: { 'system.attributes.death.success': 0, 'system.attributes.death.failure': 0 } };
+   keepStable([], details);
+   try { deepStrictEqual(details.updates, { 'system.attributes.death.success': 3 }); }
+   catch { problems.push(`third success: ${JSON.stringify(details.updates)}`); }
+   const cleared = { 'system.attributes.death.success': 0, 'system.attributes.death.failure': 0 };
+   const HEAL_CASES = [[0, 5, { success: 3, failure: 1 }, cleared], [0, 0, { success: 3, failure: 0 }, null],
+      [4, 9, { success: 1, failure: 0 }, null], [0, 5, { success: 0, failure: 0 }, null]];
+   for (const [from, to, death, expected] of HEAL_CASES)
+   {
+      try { deepStrictEqual(healUpdates(from, to, death), expected); }
+      catch { problems.push(`heal ${from}→${to}: ${JSON.stringify(healUpdates(from, to, death))}`); }
+   }
 }
 
 // Each extra ability (honor, sanity) widens the minimum by one column and its gap.

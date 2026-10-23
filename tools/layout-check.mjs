@@ -49,6 +49,8 @@ const frame = (kind, width, theme, body) => `<section class="application ${FRAME
 
 const page = (html) => `<!doctype html><html><head><meta charset="utf-8">
    <style>body{margin:0;background:#444;font-family:sans-serif}*{box-sizing:border-box}button,input,select{font:inherit}
+   /* Foundry core's control defaults, roughly (v13/v14 foundry.css): ours must override them. */
+   button{min-height:var(--button-size,2rem);padding:0 .5rem;line-height:1.5}input[type=text]{height:var(--input-height,2rem)}
    ${css}</style></head><body>${html}</body></html>`;
 
 /** Runs in the page: lists everything that overflows, and text fields inside width containers. */
@@ -91,6 +93,17 @@ function findProblems()
       if (!clipsOnPurpose && wider > 1 && el.clientWidth > 0 && !['INPUT', 'SELECT', 'TEXTAREA'].includes(el.tagName))
       {
          issues.push(`content wider than box by ${wider}px: ${label}`);
+      }
+   }
+   // A round control stays round: Foundry's button sizes once made our pips oval (user, 2026-10-24).
+   for (const el of app.querySelectorAll('.window-content :is(button, span, div)'))
+   {
+      const cs = getComputedStyle(el);
+      if (cs.borderRadius !== '50%' || cs.display === 'none' || !el.getClientRects().length) { continue; }
+      const r = el.getBoundingClientRect();
+      if (Math.abs(r.width - r.height) > 1)
+      {
+         issues.push(`round element is ${Math.round(r.width)}×${Math.round(r.height)}: ${el.tagName.toLowerCase()}.${[...el.classList].join('.')}`);
       }
    }
    // Contrast: each piece of text against what it is drawn on (a die's number against the die's fill).
@@ -176,6 +189,7 @@ const SELF_TEST = [
    { id: 'self-container', expect: true, body: '<div style="container-type:inline-size"><input type="text"></div>' },
    { id: 'self-styles', expect: true, body: '<div class="fhcs-chat"><p style="font-size:10px">a</p><p style="font-size:11px">b</p><p style="font-size:12px">c</p><p style="font-size:13px">d</p></div>' },
    { id: 'self-contrast', expect: true, body: '<p style="color:#bbb">Too faint to read</p>' },
+   { id: 'self-oval', expect: true, body: '<button style="width:40px;height:24px;min-height:0;border-radius:50%"></button>' },
    { id: 'self-tray', expect: false, body: '<div style="position:relative;width:40px"><div class="fhcs-tray" style="position:absolute;width:200px">A tray</div></div>' },
    { id: 'self-shape-contrast', expect: true, body: '<span style="position:relative;display:grid;color:#333"><svg style="position:absolute" width="40" height="40"><path d="M0 0h40v40H0z" fill="#222"/></svg><span>16</span></span>' },
    { id: 'self-overlap', expect: true, body: '<div style="display:grid;grid-template-columns:40px 1fr"><span style="justify-self:start;white-space:nowrap">Runs into the next</span><span>x</span></div>' }
