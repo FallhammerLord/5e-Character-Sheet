@@ -6,7 +6,8 @@
   "scripts": {
     "lint": "eslint src tools .claude/hooks",
     "load": "node tools/load-check.mjs",
-    "check": "npm run lint && npm run load",
+    "unit": "node tools/unit-check.mjs",
+    "check": "npm run lint && npm run load && npm run unit",
     "layout": "node tools/layout-check.mjs"
   },
   "devDependencies": {

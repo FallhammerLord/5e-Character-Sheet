@@ -1,5 +1,19 @@
 {
   "FHCS": {
-    "SheetLabel": "Fallhammer Character Sheet"
+    "SheetLabel": "Fallhammer Character Sheet",
+    "Settings": {
+      "ClearCards": {
+        "Name": "Clear chat cards",
+        "Hint": "Start every d20 roll card with its outcome in words: who rolled what, the total, success or failure against the DC, and a natural 1 or 20."
+      }
+    },
+    "Chat": {
+      "SuccessVsDC": "Success vs DC {dc}",
+      "FailureVsDC": "Failure vs DC {dc}",
+      "Natural": "Natural {n}",
+      "CriticalHit": "Critical hit",
+      "Hits": "Hits {names}",
+      "Misses": "Misses {names}"
+    }
   }
 }

@@ -49,7 +49,10 @@ Themes shared with the quest log. Compatibility with modules that change the she
 
 Runs alongside the sheet phases; works whatever sheet a player uses (client setting, on by default). Built on dnd5e's `dnd5e.renderChatMessage` hook and its roll hooks, never replacing its roll pipeline. SCOPE §6.
 
-- [ ] Clear chat cards: outcome first in one line (who · what · total), success or failure in words vs a known DC, natural 1 and 20 in words, labelled buttons at least 24px, tags folded, rolls in a row from one speaker grouped
+- [ ] Clear chat cards
+  - [ ] Outcome first: who · what · total, success or failure in words vs a known DC, natural 1 and 20 in words, hits and misses (in code 2026-10-23; waits on the user)
+  - [ ] Labelled buttons at least 24px, tags folded
+  - [ ] Rolls in a row from one speaker grouped
 - [ ] Late advantage and disadvantage on d20 cards (the one new mechanic; SCOPE §6.2)
 - [ ] dnd5e's own Roll damage, Roll save and Apply buttons: labelled, at least 24px, target trays open with "selected" or "targeted" in words
 - [ ] No held keys, no roll pop-ups (SCOPE §6.4): roll dialogs skipped, damage and saves land on the card that asked; dnd5e's spellcasting and activity chooser windows stay

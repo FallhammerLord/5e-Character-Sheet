@@ -15,18 +15,31 @@ const root = new URL('..', import.meta.url).pathname;
 const out = `${root}tools/out`;
 mkdirSync(out, { recursive: true });
 
-// Classic Tidy opens at 740 wide (SCOPE §4); dnd5e's own sheet at 800.
-const WIDTHS = [560, 650, 740, 900];
+// Classic Tidy opens at 740 wide (SCOPE §4); dnd5e's own sheet at 800. Foundry's chat sidebar is about 300 wide;
+// players drag it narrower or wider, and pop messages out.
+const WIDTHS = { sheet: [560, 650, 740, 900], chat: [240, 300, 380] };
 const HEIGHT = 810;
 // Every stylesheet module.json loads, in its order.
 const css = JSON.parse(readFileSync(`${root}module.json`, 'utf8')).styles
    .map((path) => readFileSync(`${root}${path}`, 'utf8')).join('\n');
 
-/** A window like Foundry's, with the classes dnd5e and our sheet put on it. */
-const frame = (width, theme, body) => `<section class="application sheet actor character fhcs-sheet fhcs-theme-${theme}"
-   style="width:${width}px;height:${HEIGHT}px;display:flex;flex-direction:column;border:1px solid #000;margin:8px">
+/** The classes and wrapper Foundry and dnd5e give each kind of frame. */
+const FRAMES = {
+   sheet: { classes: 'sheet actor character fhcs-sheet', wrap: (body) => body },
+   chat: {
+      classes: 'chat-sidebar',
+      wrap: (body) => `<ol class="chat-log" style="list-style:none;margin:0;padding:6px">
+         <li class="chat-message message dnd5e2 fhcs-chat">
+         <div class="message-content">${body}</div></li></ol>`
+   }
+};
+
+/** A window like Foundry's, with the classes dnd5e and our code put on it. */
+const frame = (kind, width, theme, body) => `<section class="application ${FRAMES[kind].classes} fhcs-theme-${theme}"
+   style="width:${width}px;height:${HEIGHT}px;display:flex;flex-direction:column;border:1px solid #000;margin:8px;
+   background:#f4f1ea;color:#191813">
    <header style="background:#111;color:#eee;padding:4px 8px;font:13px sans-serif">${width}px</header>
-   <div class="window-content" style="flex:1;min-height:0;overflow:auto">${body}</div></section>`;
+   <div class="window-content" style="flex:1;min-height:0;overflow:auto">${FRAMES[kind].wrap(body)}</div></section>`;
 
 const page = (html) => `<!doctype html><html><head><meta charset="utf-8">
    <style>body{margin:0;background:#444;font-family:sans-serif}*{box-sizing:border-box}button,input,select{font:inherit}
@@ -91,7 +104,7 @@ async function check(id, html, screenshot)
 const problems = [];
 for (const t of SELF_TEST)
 {
-   const caught = (await check(t.id, frame(WIDTHS[0], 'light', t.body), false)).length > 0;
+   const caught = (await check(t.id, frame('sheet', WIDTHS.sheet[0], 'light', t.body), false)).length > 0;
    if (caught !== t.expect) { problems.push(`self-test ${t.id}: expected ${t.expect ? 'a problem' : 'none'}, got ${caught ? 'a problem' : 'none'}`); }
 }
 
@@ -99,15 +112,16 @@ let checked = 0;
 for (const c of CASES)
 {
    const body = template(c.template)(c.context);
-   for (const width of WIDTHS)
+   const kind = c.frame ?? 'sheet';
+   for (const width of WIDTHS[kind])
    {
       const id = `${c.name}-${width}`;
-      for (const issue of await check(id, frame(width, c.theme ?? 'light', body), true)) { problems.push(`${id}: ${issue}`); }
+      for (const issue of await check(id, frame(kind, width, c.theme ?? 'light', body), true)) { problems.push(`${id}: ${issue}`); }
       checked++;
    }
 }
 await browser.close();
 
 console.log(problems.length ? problems.join('\n') : 'No overflow found; self-test passed.');
-console.log(`\n${checked} layouts checked (${CASES.length} cases × ${WIDTHS.length} widths). Screenshots in tools/out/.`);
+console.log(`\n${checked} layouts checked (${CASES.length} cases at their frame's widths). Screenshots in tools/out/.`);
 process.exit(problems.length ? 1 : 0);

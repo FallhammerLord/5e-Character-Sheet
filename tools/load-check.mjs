@@ -1,6 +1,6 @@
 /**
  * Loads the whole module graph in Node with Foundry and dnd5e mocked, runs the init hook, and checks the sheet was
- * registered as a subclass of dnd5e's character sheet. One bad import stops the entire module in Foundry, and ESLint
+ * registered as a subclass of dnd5e's character sheet, the chat hook is in place and settings are registered. One bad import stops the entire module in Foundry, and ESLint
  * doesn't check that imports exist.
  * Usage: npm run load
  */
@@ -8,6 +8,7 @@ const { readFileSync, existsSync } = await import('node:fs');
 
 const hooks = {};
 const registered = [];
+const settings = [];
 class SystemCharacterSheet
 {
    static DEFAULT_OPTIONS = { classes: ['character'] };
@@ -18,7 +19,10 @@ globalThis.Actor = class {};
 globalThis.foundry = {
    applications: { apps: { DocumentSheetConfig: { registerSheet: (...args) => registered.push(args) } } }
 };
-globalThis.game = { system: { version: 'mock' } };
+globalThis.game = {
+   system: { version: 'mock' },
+   settings: { register: (scope, key, config) => settings.push({ scope, key, config }) }
+};
 globalThis.dnd5e = { applications: { actor: { CharacterActorSheet: SystemCharacterSheet } } };
 
 const problems = [];
@@ -27,6 +31,7 @@ try
    await import(new URL('../src/main.js', import.meta.url));
    hooks.init?.();
    if (typeof hooks.quenchReady !== 'function') { problems.push('Quench tests are not hooked to quenchReady'); }
+   if (typeof hooks['dnd5e.renderChatMessage'] !== 'function') { problems.push('chat cards are not hooked to dnd5e.renderChatMessage'); }
 }
 catch (err)
 {
@@ -56,8 +61,15 @@ for (const path of [...manifest.esmodules, ...manifest.styles, ...manifest.langu
    if (!existsSync(new URL(path, root))) { problems.push(`module.json names missing file ${path}`); }
 }
 const lang = JSON.parse(readFileSync(new URL('lang/en.json', root), 'utf8'));
+const inLang = (key) => key.split('.').reduce((node, part) => node?.[part], lang);
 const label = options?.label ?? '';
-if (!label.split('.').reduce((node, key) => node?.[key], lang)) { problems.push(`label ${label} is not in lang/en.json`); }
+if (!inLang(label)) { problems.push(`label ${label} is not in lang/en.json`); }
+if (!settings.length) { problems.push('no settings registered at init'); }
+for (const { scope, key, config } of settings)
+{
+   if (scope !== 'fhcs') { problems.push(`setting ${key} registered under "${scope}", not "fhcs"`); }
+   for (const text of [config.name, config.hint]) { if (!inLang(text ?? '')) { problems.push(`setting ${key}: ${text} is not in lang/en.json`); } }
+}
 
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
-console.log('Module graph loads; the sheet registers as a dnd5e character sheet; manifest files exist.');
+console.log('Module graph loads; the sheet registers as a dnd5e character sheet; chat cards and settings are hooked; manifest files exist.');

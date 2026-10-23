@@ -1,5 +1,6 @@
 import { MODULE_ID, SHEET_ID, SYSTEM_ACTIONS } from '../constants.js';
 import { systemCharacterSheet } from '../compat.js';
+import { decorateMessage } from '../chat/outcome.js';
 
 /** How long a click may take to reach dnd5e's hook before a test fails. */
 const HOOK_WAIT_MS = 3000;
@@ -106,4 +107,46 @@ export function registerQuenchTests(quench)
          });
       });
    }, { displayName: 'Fallhammer Character Sheet: core' });
+
+   // Chat cards: renders dnd5e check messages in memory (never posted to chat) and reads our outcome line.
+   quench.registerBatch(`${MODULE_ID}.chat`, (context) =>
+   {
+      const { describe, it, assert } = context;
+
+      /** Renders an unsaved check message with a fixed d20 against a DC and returns our outcome line's text. */
+      const outcomeFor = async (evaluate, target) =>
+      {
+         const roll = await new CONFIG.Dice.D20Roll('1d20', {}, { target }).evaluate(evaluate);
+         const message = new ChatMessage.implementation({
+            type: 'check',
+            flavor: 'Strength Check',
+            speaker: { alias: 'FHCS test' },
+            rolls: [roll.toJSON()],
+            system: { ability: 'str' }
+         });
+         const html = await message.renderHTML();
+         await decorateMessage(message, html);
+         const lines = html.querySelectorAll('.fhcs-outcome');
+         assert.lengthOf(lines, 1, 'exactly one outcome line');
+         return lines[0].textContent.replace(/\s+/g, ' ').trim();
+      };
+
+      describe('Clear chat cards', function ()
+      {
+         it('says failure, the DC and a natural 20', async function ()
+         {
+            const text = await outcomeFor({ maximize: true }, 21);
+            assert.include(text, 'Strength Check');
+            assert.include(text, 'Failure vs DC 21');
+            assert.include(text, 'Natural 20');
+         });
+
+         it('says success and a natural 1', async function ()
+         {
+            const text = await outcomeFor({ minimize: true }, 1);
+            assert.include(text, 'Success vs DC 1');
+            assert.include(text, 'Natural 1');
+         });
+      });
+   }, { displayName: 'Fallhammer Character Sheet: chat cards' });
 }

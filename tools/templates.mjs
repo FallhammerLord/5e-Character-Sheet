@@ -12,6 +12,9 @@ const lang = JSON.parse(readFileSync(`${root}lang/en.json`, 'utf8'));
 /** @returns {string} The English text for a key, or the key. */
 export const localize = (key) => key.replace(/^FHCS\./, '').split('.').reduce((o, p) => o?.[p], lang.FHCS) ?? key;
 
+/** @returns {string} The English text for a key with its {placeholders} filled, like game.i18n.format. */
+export const format = (key, data = {}) => localize(key).replace(/{(\w+)}/g, (match, name) => data[name] ?? match);
+
 Handlebars.registerHelper('localize', (key) => localize(key));
 if (existsSync(`${root}templates`))
 {
