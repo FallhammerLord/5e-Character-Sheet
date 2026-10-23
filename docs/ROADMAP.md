@@ -60,7 +60,7 @@ Runs alongside the sheet phases; works whatever sheet a player uses (client sett
 - [ ] No roll pop-ups (SCOPE §6.4): roll dialogs skipped; dnd5e's spellcasting and activity chooser windows stay (in code 2026-10-23, world setting; Shift brings a dialog back; waits on the user)
 - [x] Late adds: advantage, disadvantage, + bonus (a number or a die) on any roll, shown as its own term (verified 2026-10-24)
 - [ ] Standalone rolls (sheet checks, saves, death saves, GM requests) in the same frame (in code 2026-10-23; waits on the user)
-- [ ] Compatibility: step aside cleanly when RSReforged is active
+- ~~Compatibility: step aside when RSReforged is active~~ dropped (user, 2026-10-24): this replaces Ready Set Roll at the table; no RSR alongside it
 
 ## Mechanical parity checklist
 

@@ -8,13 +8,14 @@ A Foundry VTT v14 module (ID `fhcs`, CSS prefix `fhcs-`) adding a character shee
 
 ## 2. Who it's for
 
-The user's table first: players used to Tidy 5e's classic layout. Public release later.
+The user's table: players used to Tidy 5e's classic layout. Private use for now (user, 2026-10-24); a public release is not planned.
 
 ## 3. Decisions
 
 - **Extend, don't rebuild** (2026-10-22): subclass `CharacterActorSheet`; reuse dnd5e's custom elements (`dnd5e-inventory` and others) where they fit.
 - **Characters only** to start; NPCs and vehicles keep dnd5e's sheets.
 - **Offered beside dnd5e's sheet**, never forced as the default.
+- **Replaces Ready Set Roll; private use for now** (user, 2026-10-24): no compatibility layer for RSR or its forks; the module is for the user's table, public release later if ever.
 - **Track R (rolls and chat cards) before Phase 1** (2026-10-23, user deferred to our call): it's used by every player and the GM every session whatever sheet they use, it's mostly presentation over dnd5e's own buttons, and it ends the table's reliance on an experimental Ready Set Roll fork. The sheet header follows.
 
 ## 4. Layout
