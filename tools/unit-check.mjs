@@ -9,6 +9,7 @@ import { countingDie, d20Row, modeForSides } from '../src/chat/d20.js';
 import { diceMath } from '../src/chat/math.js';
 import { attributesView } from '../src/sheet/attributes.js';
 import { healUpdates, keepStable } from '../src/sheet/death.js';
+import { currencyIconRules } from '../src/sheet/currency.js';
 import { headerMinWidth, headerView, levelOrder, levelTrack, signed, tabRow } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
@@ -269,6 +270,15 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
       try { deepStrictEqual(healUpdates(from, to, death), expected); }
       catch { problems.push(`heal ${from}→${to}: ${JSON.stringify(healUpdates(from, to, death))}`); }
    }
+}
+
+// Coin icons: one rule per currency with an icon, scoped to our sheet; odd keys and quotes can't break out.
+{
+   const css = currencyIconRules({ gp: { icon: 'systems/dnd5e/icons/currency/gold.webp' }, xx: {}, 'a b': { icon: 'x.webp' },
+      bad: { icon: 'x"); } body { color: red' } });
+   const expected = '.fhcs-sheet :is(i, span).currency.gp { background-image: url("systems/dnd5e/icons/currency/gold.webp"); }\n'
+      + '.fhcs-sheet :is(i, span).currency.bad { background-image: url("x); } body { color: red"); }';
+   if (css !== expected) { problems.push(`coin icons: ${css}`); }
 }
 
 // Each extra ability (honor, sanity) widens the minimum by one column and its gap.

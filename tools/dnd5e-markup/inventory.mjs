@@ -85,11 +85,58 @@ const SECTIONS = [
    ]]
 ];
 
+/** Encumbrance as templates/inventory/encumbrance.hbs draws it, with breakpoints. */
+const encumbrance = (value, max, pct) => `<div class="meter progress" role="meter" aria-valuemin="0" aria-valuenow="${pct}" aria-valuetext="${value}" aria-valuemax="${max}"
+   style="--bar-percentage: ${pct}%; --breakpoint-low: 33.3%; --breakpoint-high: 66.6%;">
+   <div class="label"><i class="fa-solid fa-weight-hanging" inert></i><span class="value">${value}</span><span class="separator">/</span><span class="max">${max}</span></div>
+   <i class="breakpoint breakpoint-low arrow-up" role="presentation"></i><i class="breakpoint breakpoint-low arrow-down" role="presentation"></i>
+   <i class="breakpoint breakpoint-high arrow-up" role="presentation"></i><i class="breakpoint breakpoint-high arrow-down" role="presentation"></i>
+</div>`;
+
+/** Inventory's top block (tabs/character-inventory.hbs) and currency (inventory.hbs), for an owner. */
+function top()
+{
+   const container = (id, name, pct, equipped) => `<li class="container draggable" data-item-id="${id}" data-uuid="Actor.a.Item.${id}">
+      <a class="item-action" data-action="showDocument" data-tooltip aria-label="${name}">
+         <div class="meter progress" role="meter" aria-valuemin="0" aria-valuenow="${pct}" aria-valuetext="${pct}" aria-valuemax="100" style="--bar-percentage: ${pct}%"></div>
+         <img src="${ICON}" alt="${name}" draggable="false">
+         ${equipped ? '<i class="equipped fa-solid fa-shield-halved" data-tooltip aria-label="Equipped"></i>' : ''}
+      </a></li>`;
+   return `<div class="top">
+      <div class="encumbrance card">
+         ${encumbrance(87.5, 180, 48.6)}
+         <div class="info">
+            <div class="strength"><span class="label">Strength</span><span class="value">12</span></div>
+            <div class="size"><span class="label">Size</span><span class="value" aria-label="Medium">Med</span></div>
+            <div class="multiplier"><span class="label">Multiplier</span><span class="value"><span class="sign">×</span> 1</span></div>
+         </div>
+      </div>
+      <ul class="containers unlist">${container('k1', 'Backpack', 40, true)}${container('k2', 'Bag of Holding', 5, false)}</ul>
+   </div>`;
+}
+
+const CURRENCY = { pp: 0, gp: 152, ep: 0, sp: 31, cp: 1250 };
+
+function currency({ editMode })
+{
+   return `<section class="currency">
+      ${editMode ? '' : '<button type="button" class="item-action unbutton always-interactive" data-action="currency" aria-label="Manage Currency"><i class="fa-solid fa-coins" inert></i></button>'}
+      ${Object.entries(CURRENCY).map(([key, value]) => `<label aria-label="${key}"><i class="currency ${key}" data-tooltip="${key}"></i>
+         <input type="text" class="uninput always-interactive" name="system.currency.${key}" value="${value}" data-dtype="Number" inputmode="numeric"></label>`).join('')}
+   </section>`;
+}
+
+/** What dnd5e's _renderAttunement appends to `.middle` (base-actor-sheet.mjs). */
+const attunement = ({ editMode }) => `<div class="attunement"><i class="fa-solid fa-sun" data-tooltip="DND5E.Attunement" aria-label="Attunement"></i>
+   <span class="value">1</span><span class="separator">/</span>${editMode ? '<input type="number" name="system.attributes.attunement.max" class="max" min="0" step="1" value="3">' : '<span class="max">3</span>'}</div>`;
+
 /** The inventory element with its controls and sections, as dnd5e renders it for an owner. */
 export function inventoryMarkup({ editMode = false } = {})
 {
    return `<div class="tab-body"><section class="tab inventory active" data-tab="inventory" data-group="primary">
+   ${top()}
    <dnd5e-inventory class="inventory-element">
+      ${currency({ editMode })}
       <div class="middle">
          <item-list-controls for="inventory" collection="items" label="Search inventory">
             <search aria-label="Search inventory">
@@ -102,9 +149,40 @@ export function inventoryMarkup({ editMode = false } = {})
                </ul>
             </search>
          </item-list-controls>
+         ${attunement({ editMode })}
       </div>
       <section class="items-list inventory-list" data-item-list="inventory">
          ${SECTIONS.map(([label, items]) => section(label, items, { editMode })).join('')}
+      </section>
+   </dnd5e-inventory>
+</section></div>`;
+}
+
+/** The Features tab (tabs/character-features.hbs): class pills (parts/actor-classes.hbs) over the item list. */
+export function featuresMarkup({ editMode = false } = {})
+{
+   const pill = (id, name, subclass, level) => `<div class="class pill-lg" data-item-id="${id}">
+      <img class="underlay" src="${ICON}" alt="" inert>
+      <div class="icons ${subclass ? 'subclass' : ''}">
+         <img class="draggable gold-icon item-tooltip" src="${ICON}" alt="${name}" data-action="showDocument" data-uuid="Actor.a.Item.${id}" data-item-id="${id}">
+         ${subclass ? `<img class="draggable gold-icon item-tooltip" src="${ICON}" alt="${subclass}" data-action="showDocument" data-uuid="Actor.a.Item.${id}s" data-item-id="${id}s">`
+            : '<a class="gold-icon subclass-icon" data-action="findItem" data-item-type="subclass" data-tooltip="DND5E.SubclassAdd" aria-label="Add Subclass"><i class="fa-solid fa-circle-plus" inert></i></a>'}
+         ${editMode ? `<div class="controls"><a class="deletion-control item-control item-action" data-action="deleteDocument" data-uuid="Actor.a.Item.${id}" data-item-id="${id}" aria-label="Delete Item"><i class="fas fa-circle-xmark" inert></i></a></div>` : ''}
+      </div>
+      <div class="name-stacked"><div class="title">${name}</div>${subclass ? `<div class="subtitle">${subclass}</div>` : ''}</div>
+      <div class="level">${editMode ? `<select class="level-selector"><option value="0" selected>${level}</option><option value="1">+1</option></select>` : `<span>${level}</span>`}</div>
+   </div>`;
+   return `<div class="tab-body"><section class="tab features active" data-tab="features" data-group="primary">
+   <section class="classes pills-lg ${editMode ? 'editing' : ''}">
+      ${pill('b1', 'Barbarian', 'Path of the Unreasonably Long Subclass Name', 5)}${pill('f1', 'Fighter', null, 2)}
+      <div class="pill-lg empty roboto-upper" data-action="findItem" data-item-type="class">Add Class</div>
+   </section>
+   <dnd5e-inventory class="inventory-element">
+      <section class="items-list features-list" data-item-list="features">
+         ${section('Barbarian Features', [
+            { id: 'r1', name: 'Rage', subtitle: 'Bonus Action', quantity: 1, uses: [2, 3] },
+            { id: 'r2', name: 'Unarmored Defense', subtitle: 'Passive', quantity: 1 }
+         ], { editMode })}
       </section>
    </dnd5e-inventory>
 </section></div>`;

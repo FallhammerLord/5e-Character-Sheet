@@ -1869,3 +1869,387 @@
    border: 1px solid var(--fhcs-line);
    border-radius: var(--fhcs-radius);
 }
+
+/* ---------- Inventory's top block, currency and attunement (Phase 3b) ---------- */
+
+/* Encumbrance beside the containers. */
+.fhcs-sheet .tab.inventory > .top
+{
+   display: flex;
+   align-items: flex-start;
+   gap: var(--fhcs-s2);
+   margin-bottom: var(--fhcs-s2);
+}
+
+.fhcs-sheet .tab.inventory .encumbrance.card
+{
+   display: flex;
+   flex: 1;
+   flex-direction: column;
+   gap: var(--fhcs-s1);
+   min-width: 0;
+}
+
+/* dnd5e's meter: a bar filled to --bar-percentage, the weight over it, ticks at the encumbered and heavy marks. */
+.fhcs-sheet .tab.inventory .encumbrance .meter
+{
+   position: relative;
+   display: flex;
+   align-items: center;
+   height: var(--fhcs-control);
+   padding: 0 var(--fhcs-s2);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   overflow: hidden;
+}
+
+.fhcs-sheet .tab.inventory .encumbrance .meter::before
+{
+   content: '';
+   position: absolute;
+   inset: 0 auto 0 0;
+   width: min(var(--bar-percentage, 0%), 100%);
+   background: var(--fhcs-line-soft);
+}
+
+.fhcs-sheet .tab.inventory .encumbrance .meter .label
+{
+   position: relative;
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s1);
+}
+
+.fhcs-sheet .tab.inventory .encumbrance .breakpoint
+{
+   position: absolute;
+   top: 0;
+   bottom: 0;
+   width: 2px;
+   background: var(--fhcs-crit);
+}
+
+.fhcs-sheet .tab.inventory .encumbrance .breakpoint-low { left: var(--breakpoint-low); }
+.fhcs-sheet .tab.inventory .encumbrance .breakpoint-high { left: var(--breakpoint-high); background: var(--fhcs-failure); }
+.fhcs-sheet .tab.inventory .encumbrance .arrow-down { display: none; }
+
+/* Strength, size and multiplier on one line. */
+.fhcs-sheet .tab.inventory .encumbrance .info
+{
+   display: flex;
+   flex-wrap: wrap;
+   gap: var(--fhcs-s1) var(--fhcs-s2);
+}
+
+.fhcs-sheet .tab.inventory .encumbrance .info > div
+{
+   display: flex;
+   align-items: baseline;
+   gap: var(--fhcs-s1);
+}
+
+/* Containers: small tiles, each with its fill bar along the bottom. */
+.fhcs-sheet .tab.inventory .containers
+{
+   display: flex;
+   flex-wrap: wrap;
+   gap: var(--fhcs-s1);
+   margin: 0;
+   padding: 0;
+   list-style: none;
+}
+
+.fhcs-sheet .tab.inventory .container > a
+{
+   position: relative;
+   display: block;
+   width: 40px;
+   height: 40px;
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   overflow: hidden;
+   color: inherit;
+   cursor: pointer;
+}
+
+.fhcs-sheet .tab.inventory .container img
+{
+   display: block;
+   width: 100%;
+   height: 100%;
+   object-fit: cover;
+}
+
+.fhcs-sheet .tab.inventory .container .meter
+{
+   position: absolute;
+   inset: auto 0 0 0;
+   height: 4px;
+   background: var(--fhcs-line-soft);
+}
+
+.fhcs-sheet .tab.inventory .container .meter::before
+{
+   content: '';
+   display: block;
+   width: min(var(--bar-percentage, 0%), 100%);
+   height: 100%;
+   background: var(--fhcs-ink);
+}
+
+.fhcs-sheet .tab.inventory .container .equipped
+{
+   position: absolute;
+   top: 2px;
+   right: 2px;
+   padding: 2px;
+   border-radius: 4px;
+   background: var(--fhcs-die-ink);
+   color: var(--fhcs-die-on-ink);
+   font-size: var(--fhcs-label-size);
+}
+
+/* Currency: one row of coin fields, the manager button first. */
+.fhcs-sheet .inventory-element section.currency
+{
+   display: flex;
+   flex-wrap: wrap;
+   align-items: center;
+   gap: var(--fhcs-s1);
+}
+
+.fhcs-sheet .inventory-element section.currency label
+{
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s1);
+   height: var(--fhcs-control);
+   padding: 0 var(--fhcs-s1);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+}
+
+.fhcs-sheet .inventory-element section.currency input
+{
+   width: 4.5em;
+   height: 24px;
+   padding: 0;
+   border: 0;
+   background: transparent;
+   color: inherit;
+   font-family: inherit;
+   text-align: right;
+}
+
+.fhcs-sheet .inventory-element section.currency [data-action="currency"]
+{
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   width: var(--fhcs-control);
+   height: var(--fhcs-control);
+   padding: 0;
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-fill);
+   color: inherit;
+   cursor: pointer;
+}
+
+/* Coin icons: dnd5e adds their images at runtime for its own class; src/sheet/currency.js adds ours. */
+.fhcs-sheet :is(i, span).currency
+{
+   display: inline-block;
+   flex: none;
+   width: 16px;
+   height: 16px;
+   background: transparent no-repeat center / contain;
+}
+
+/* The search bar with dnd5e's attunement count after it. */
+.fhcs-sheet .inventory-element .middle
+{
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s2);
+}
+
+.fhcs-sheet .inventory-element .middle > item-list-controls { flex: 1; min-width: 0; }
+
+.fhcs-sheet .inventory-element .attunement
+{
+   display: flex;
+   flex: none;
+   align-items: center;
+   gap: 2px;
+}
+
+.fhcs-sheet .inventory-element .attunement input
+{
+   width: 3em;
+   height: 24px;
+   padding: 0;
+   border: 1px solid var(--fhcs-line-soft);
+   border-radius: 4px;
+   background: transparent;
+   color: inherit;
+   font-family: inherit;
+   text-align: center;
+}
+
+.fhcs-sheet .tab.inventory :is(.encumbrance .label, .encumbrance .info .value, section.currency input, .attunement,
+   .attunement input)
+{
+   font-size: var(--fhcs-body-size);
+   line-height: var(--fhcs-body-line);
+   font-weight: normal;
+   text-transform: none;
+   letter-spacing: normal;
+}
+
+.fhcs-sheet .tab.inventory .encumbrance .info .label
+{
+   font-size: var(--fhcs-label-size);
+   line-height: var(--fhcs-label-line);
+   font-weight: bold;
+   text-transform: uppercase;
+   letter-spacing: 0.05em;
+}
+
+/* ---------- Features tab: dnd5e's class pills (parts/actor-classes.hbs) ---------- */
+
+.fhcs-sheet .classes.pills-lg
+{
+   display: flex;
+   flex-wrap: wrap;
+   gap: var(--fhcs-s1);
+   margin-bottom: var(--fhcs-s2);
+}
+
+.fhcs-sheet .classes .pill-lg
+{
+   display: flex;
+   flex: 1 1 260px;
+   align-items: center;
+   gap: var(--fhcs-s2);
+   min-width: 0;
+   min-height: 40px;
+   padding: var(--fhcs-s1) var(--fhcs-s2);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+}
+
+/* The class art behind the pill: decoration that fought the text, so it goes. */
+.fhcs-sheet .classes .underlay { display: none; }
+
+.fhcs-sheet .classes .icons
+{
+   display: flex;
+   flex: none;
+   align-items: center;
+   gap: var(--fhcs-s1);
+}
+
+.fhcs-sheet .classes .icons > :is(img, a)
+{
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   width: 32px;
+   height: 32px;
+   border-radius: var(--fhcs-radius);
+   object-fit: cover;
+   color: inherit;
+   cursor: pointer;
+}
+
+.fhcs-sheet .classes .subclass-icon { border: 1px dashed var(--fhcs-line); }
+
+.fhcs-sheet .classes .controls { display: flex; }
+
+.fhcs-sheet .classes .deletion-control
+{
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   width: 24px;
+   height: 24px;
+   color: var(--fhcs-failure);
+   cursor: pointer;
+}
+
+.fhcs-sheet .classes .name-stacked
+{
+   display: flex;
+   flex: 1;
+   flex-direction: column;
+   min-width: 0;
+}
+
+.fhcs-sheet .classes .name-stacked > div
+{
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+}
+
+.fhcs-sheet .classes :is(.title, .subtitle)
+{
+   font-size: var(--fhcs-body-size);
+   line-height: var(--fhcs-body-line);
+   font-weight: normal;
+   text-transform: none;
+   letter-spacing: normal;
+}
+
+.fhcs-sheet .classes .subtitle { color: var(--fhcs-muted); }
+
+.fhcs-sheet .classes .level
+{
+   flex: none;
+   font-size: var(--fhcs-display-size);
+   line-height: var(--fhcs-display-line);
+   font-weight: bold;
+}
+
+.fhcs-sheet .classes .level-selector
+{
+   height: var(--fhcs-control);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-surface);
+   color: inherit;
+   font-family: inherit;
+   font-size: var(--fhcs-body-size);
+}
+
+/* Add a class: a dashed pill that reads as a button. */
+.fhcs-sheet .classes .pill-lg.empty
+{
+   flex: 0 1 auto;
+   justify-content: center;
+   border-style: dashed;
+   cursor: pointer;
+   font-size: var(--fhcs-label-size);
+   line-height: var(--fhcs-label-line);
+   font-weight: bold;
+   text-transform: uppercase;
+   letter-spacing: 0.05em;
+}
+
+/* ---------- Tabs not built yet (Effects, Biography): kept readable until their phase ---------- */
+
+/* dnd5e's own sizes left with its look; without them its art draws full size and its lists show bullets.
+   :where() keeps these weaker than any real rule, ours or a later phase's. */
+:where(.fhcs-sheet .tab-body) img { max-width: 48px; max-height: 48px; }
+:where(.fhcs-sheet .tab-body) :is(ul, ol) { margin: 0; padding: 0; list-style: none; }
+
+:where(.fhcs-sheet .tab-body) :is(h1, h2, h3, h4)
+{
+   margin: var(--fhcs-s2) 0 var(--fhcs-s1);
+   font-size: var(--fhcs-label-size);
+   line-height: var(--fhcs-label-line);
+   font-weight: bold;
+   text-transform: uppercase;
+   letter-spacing: 0.05em;
+}

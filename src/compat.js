@@ -616,3 +616,13 @@ export function hideTooltip()
 {
    game.tooltip?.deactivate?.();
 }
+
+/** Adds coin icons for our sheet from dnd5e's currencies (dnd5e.mjs builds the same for `.dnd5e2` only). */
+export function addCurrencyIcons(rulesFor)
+{
+   const style = document.createElement('style');
+   style.id = 'fhcs-currency-icons';
+   style.textContent = rulesFor(CONFIG.DND5E?.currencies);
+   document.getElementById(style.id)?.remove();
+   document.head.append(style);
+}

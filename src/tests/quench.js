@@ -218,6 +218,7 @@ export function registerQuenchTests(quench)
             await sheet.render({ mode: sheet.constructor.MODES.PLAY });
             sheet.changeTab('inventory', 'primary');
             assert.ok(sheet.element.querySelector('.tab[data-tab="inventory"] item-list-controls search input'), 'search bar');
+            assert.include(document.getElementById('fhcs-currency-icons')?.textContent ?? '', '.currency.gp', 'coin icons for our sheet');
             const row = sheet.element.querySelector(`.tab[data-tab="inventory"] [data-item-id="${item.id}"] .item-row`);
             assert.ok(row, 'item row');
             assert.strictEqual(getComputedStyle(row).display, 'flex', 'our row style applies');

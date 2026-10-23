@@ -168,7 +168,7 @@ function findProblems()
    }
 
    // Targets at least 24px each way (WCAG 2.5.8; quest log rule), for everything a player clicks on the sheet.
-   for (const el of app.querySelectorAll('.window-content :is(button, a[data-action], [role="button"], summary)'))
+   for (const el of app.querySelectorAll('.window-content :is(button, [data-action], [role="button"], summary)'))
    {
       if (!el.closest('.fhcs-sheet') || el.closest('[hidden]') || !el.getClientRects().length) { continue; }
       const r = el.getBoundingClientRect();

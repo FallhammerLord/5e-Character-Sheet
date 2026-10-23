@@ -9,7 +9,7 @@ import { cardParts, d20Band, damageBand, saveRow } from '../src/chat/card.js';
 import { headerView, tabRow } from '../src/sheet/header.js';
 import { attributesView } from '../src/sheet/attributes.js';
 import { format, localize } from './templates.mjs';
-import { inventoryMarkup } from './dnd5e-markup/inventory.mjs';
+import { featuresMarkup, inventoryMarkup } from './dnd5e-markup/inventory.mjs';
 
 /** A usage card's context as FHCSUsageMessageData#_prepareContext builds it, with overrides. */
 const card = (over = {}, buttons = []) => ({
@@ -194,6 +194,8 @@ export const CASES = [
    { name: 'attributes-empty', template: 'sheet/attributes', context: attributes({ favorites: [], resources: [], traits: [] }) },
    { name: 'inventory', html: inventoryMarkup() },
    { name: 'inventory-editing', html: inventoryMarkup({ editMode: true }) },
+   { name: 'features', html: featuresMarkup() },
+   { name: 'features-editing', html: featuresMarkup({ editMode: true }) },
    { name: 'tabs', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }) },
    { name: 'tabs-editing', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: true }) },
    { name: 'header', template: 'sheet/header', context: header() },

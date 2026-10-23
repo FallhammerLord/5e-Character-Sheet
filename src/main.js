@@ -1,8 +1,9 @@
 import { MODULE_ID } from './constants.js';
-import { extendChatModel, preloadTemplates, quietPosts, recordLevelOrder, registerCharacterSheet,
+import { addCurrencyIcons, extendChatModel, preloadTemplates, quietPosts, recordLevelOrder, registerCharacterSheet,
    systemCharacterSheet } from './compat.js';
 import { levelOrder } from './sheet/header.js';
 import { clearOnHeal, keepStable } from './sheet/death.js';
+import { currencyIconRules } from './sheet/currency.js';
 import { makeCharacterSheet } from './apps/CharacterSheet.js';
 import { registerQuenchTests } from './tests/quench.js';
 import { registerSettings } from './settings.js';
@@ -47,6 +48,9 @@ Hooks.on('dnd5e.preRoll', skipRollDialog);
 
 // The milestone track: record the order class levels are gained, once dnd5e's advancement finishes.
 Hooks.on('dnd5e.advancementManagerComplete', (manager) => recordLevelOrder(manager, MODULE_ID, levelOrder));
+
+// Coin icons on our sheet, from dnd5e's currencies once every module has added its own.
+Hooks.once('ready', () => addCurrencyIcons(currencyIconRules));
 
 // Death saves: three successes stay shown until HP rises above 0, which clears them.
 Hooks.on('dnd5e.rollDeathSaveV2', keepStable);

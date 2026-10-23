@@ -28,7 +28,21 @@ class SystemCharacterSheet
    }
 }
 
-globalThis.Hooks = { on: (name, fn) => { hooks[name] = fn; }, once: (name, fn) => { hooks[name] = fn; } };
+// Every handler is kept; hooks[name] runs them all, as Foundry does.
+const handlers = {};
+const addHook = (name, fn) =>
+{
+   (handlers[name] ??= []).push(fn);
+   hooks[name] = (...args) => { for (const h of handlers[name]) { h(...args); } };
+};
+globalThis.Hooks = { on: addHook, once: addHook };
+// Just enough DOM for the style our ready hook adds (coin icons).
+const appended = [];
+globalThis.document = {
+   createElement: (tag) => ({ tagName: tag.toUpperCase() }),
+   getElementById: () => null,
+   head: { append: (el) => appended.push(el) }
+};
 globalThis.Actor = class {};
 const preloaded = [];
 globalThis.foundry = {
@@ -59,7 +73,8 @@ class SystemSaveMessageData {}
 class SystemRequestMessageData {}
 const systemModels = { usage: SystemUsageMessageData, check: SystemCheckMessageData, save: SystemSaveMessageData,
    request: SystemRequestMessageData };
-globalThis.CONFIG = { ChatMessage: { dataModels: { ...systemModels } } };
+globalThis.CONFIG = { ChatMessage: { dataModels: { ...systemModels } },
+   DND5E: { currencies: { gp: { icon: 'systems/dnd5e/icons/currency/gold.webp' } } } };
 
 const problems = [];
 try
@@ -70,8 +85,13 @@ try
    if (typeof hooks.ready !== 'function') { problems.push('quiet chat posts are not hooked to ready'); }
    else
    {
-      // A roll folded into its usage card posts without scrolling or notifying.
       hooks.ready();
+      // Coin icons for our sheet, from dnd5e's currencies.
+      if (!appended.some((el) => el.tagName === 'STYLE' && el.textContent?.includes('.fhcs-sheet :is(i, span).currency.gp')))
+      {
+         problems.push('coin icons are not added for our sheet at ready');
+      }
+      // A roll folded into its usage card posts without scrolling or notifying.
       const folded = { id: 'r1', isAuthor: true, type: 'attack', system: { origin: { type: 'usage', content: '' } } };
       await chatLog.postOne(folded, { notify: true });
       if (chatLog.scrolled !== 0 || chatLog.notify !== false) { problems.push('a folded roll still scrolls the chat log'); }
