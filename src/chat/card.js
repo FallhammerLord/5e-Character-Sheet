@@ -8,8 +8,8 @@
  * `effect-application`) work inside our markup. Slices 2–8 fill the bands with results.
  */
 import { MODULE_ID } from '../constants.js';
-import { actorArtwork, addBonus, addD20, answersButton, canApplyDamage, damageFacts, openTrays, preferSelected,
-   rollCardDamage, rollFacts, rollsFrom } from '../compat.js';
+import { actorArtwork, addBonus, addD20, answersButton, canApplyDamage, damageFacts, hideTooltip, openTrays,
+   preferSelected, rollCardDamage, rollFacts, rollsFrom, showTooltip } from '../compat.js';
 import { describeRoll } from './outcome.js';
 import { d20Row, dieClasses, MAX_PER_SIDE } from './d20.js';
 
@@ -247,6 +247,32 @@ export function keepFolds(element)
    }
 }
 
+/** How long the pointer must rest on one of our buttons before its tooltip shows (user, 2026-10-24). */
+const TIP_DELAY_MS = 1500;
+
+/**
+ * Our buttons' tooltips (`data-fhcs-tip`): shown only after the pointer rests for TIP_DELAY_MS, above the button, and
+ * cleared at once by a click. Foundry's own tooltips appear on hover and covered the dice a click had just added.
+ *
+ * @param {HTMLElement} element   The rendered message.
+ */
+function delayTips(element)
+{
+   for (const target of element.querySelectorAll('[data-fhcs-tip]'))
+   {
+      let timer = null;
+      const cancel = () => { clearTimeout(timer); timer = null; };
+      target.addEventListener('pointerenter', () =>
+      {
+         cancel();
+         // A card redrawn meanwhile has replaced this button; show nothing then.
+         timer = setTimeout(() => { if (target.isConnected) { showTooltip(target, target.dataset.fhcsTip); } }, TIP_DELAY_MS);
+      });
+      target.addEventListener('pointerleave', () => { cancel(); hideTooltip(); });
+      target.addEventListener('pointerdown', () => { cancel(); hideTooltip(); });
+   }
+}
+
 /**
  * Binds our own card buttons (dnd5e's carry `data-action` and go through dnd5e): late adds on any card, damage
  * re-rolls on a usage card, and Enter in a bonus field; and keeps open panels open across re-renders.
@@ -257,6 +283,7 @@ export function keepFolds(element)
 export function bindCardActions(element, usage)
 {
    keepFolds(element);
+   delayTips(element);
    for (const button of element.querySelectorAll('[data-fhcs-action]'))
    {
       button.addEventListener('click', (event) => onCardAction(event, button, usage));

@@ -447,3 +447,15 @@ function watchForPlayer(log, stop)
       element.addEventListener(type, stop, { passive: true, capture: true });
    }
 }
+
+/** Shows Foundry's tooltip on an element, above it (our delayed tooltips; chat/card.js). */
+export function showTooltip(element, text)
+{
+   game.tooltip?.activate?.(element, { text, direction: 'UP' });
+}
+
+/** Hides Foundry's tooltip. */
+export function hideTooltip()
+{
+   game.tooltip?.deactivate?.();
+}

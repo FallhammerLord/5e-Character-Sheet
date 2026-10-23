@@ -352,6 +352,8 @@ export function registerQuenchTests(quench)
                assert.ok(band, 'rolled d20 band');
                assert.strictEqual(Number(band.querySelector('.fhcs-band-total').textContent), message.rolls[0].total);
                assert.ok(band.querySelector('[data-fhcs-action="lateAdvantage"]'), 'late advantage offered');
+               assert.notOk(band.querySelector('[data-fhcs-action="lateAdvantage"]').dataset.tooltip,
+                  'no instant Foundry tooltip on the slot (ours waits)');
             }
             finally { await message?.delete(); }
          });

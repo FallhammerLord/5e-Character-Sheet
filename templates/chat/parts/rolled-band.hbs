@@ -26,7 +26,7 @@
          <button type="button" class="fhcs-button" data-action="{{ action }}" data-index="{{ index }}">{{ rolled.againLabel }}</button>
          {{else}}<span></span>{{/if}}
          {{#each rolled.extra}}
-         <button type="button" class="fhcs-button fhcs-switch" data-fhcs-action="{{ action }}" aria-pressed="{{#if pressed}}true{{else}}false{{/if}}" aria-label="{{ title }}" data-tooltip="{{ title }}"><span class="fhcs-switch-box" aria-hidden="true">{{#if pressed}}✓{{/if}}</span>{{ label }}</button>
+         <button type="button" class="fhcs-button fhcs-switch" data-fhcs-action="{{ action }}" aria-pressed="{{#if pressed}}true{{else}}false{{/if}}" aria-label="{{ title }}" data-fhcs-tip="{{ title }}"><span class="fhcs-switch-box" aria-hidden="true">{{#if pressed}}✓{{/if}}</span>{{ label }}</button>
          {{else}}
          <span></span>
          {{/each}}

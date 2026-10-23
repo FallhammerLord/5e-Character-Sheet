@@ -41,4 +41,5 @@ Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies insta
 - **Code style:** Allman braces, 3-space indent, single quotes (matches the quest log).
 - **See each new check fail once** before trusting it.
 - **Colors only through tokens, and contrast in both themes** (user, 2026-10-24): every token has a light value and a dark one (`.theme-dark .fhcs-chat`); text meets WCAG 4.5:1 (3:1 large) against what it sits on, dice included. The layout check enforces it; don't fade text that carries information (mark it another way).
+- **Tooltips on our card buttons use `data-fhcs-tip`** (shown after a 1.5 s rest, above the button, cleared by a click), never `data-tooltip`, which shows at once and covered dice a click had just added (user, 2026-10-24).
 - Quest log rules that will apply as we build (copy them here when the first case comes up): three text sizes, 24px targets, tooltips two to four words, no `container-type` around text fields, `<prose-mirror toggled>` without `open`, HTML in templates, layout tests at many widths.

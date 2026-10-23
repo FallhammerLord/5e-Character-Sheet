@@ -51,7 +51,7 @@ Keep the layout players know; fix what costs attention:
 - **Gear and pencil icons only in edit mode.** Classic shows about 30 of them in play; each is a target under 24px.
 - **Equipped and prepared** get an icon or label as well as the green and blue row color (color alone fails the colorblind player).
 - **Actions tab is the "Now" home** (Phase 7): it's already grouped by action type, so turn economy fits there. Make it the default tab in play.
-- **Targets at least 24px**, three text sizes, tooltips two to four words.
+- **Targets at least 24px**, three text sizes, tooltips two to four words. On chat cards, our tooltips wait 1.5 s, open above the button and clear on a click (user, 2026-10-24).
 - **Pinned header:** HP, AC and conditions never scroll away.
 
 ## 5. ADHD rules carried over
