@@ -87,3 +87,13 @@ dnd5e's CSS is built from LESS at release (`dnd5e.css` isn't in the repository),
 ## How Tidy did it (checked 2026-10-23)
 
 Tidy's Classic sheet (`Tidy5eActorSheetClassicV2Base`, Tidy commit `54fdbad4`) extends Foundry's plain `ActorSheetV2` through a Svelte mixin. It does **not** extend dnd5e's sheet: Tidy reimplements each mechanic through its own adapter layer. That's why it needs a release for every dnd5e version. Ours inherits from `CharacterActorSheet` to avoid that cost; the trade-off is that our markup must keep dnd5e's class names and actions.
+
+## Item lists (Inventory, Features, Spellbook; read 2026-10-24)
+
+- One template for all three: `templates/inventory/inventory.hbs` inside `<dnd5e-inventory class="inventory-element">` (`components/inventory.mjs`). Sections are `.items-section` with an `.items-header` (an `h3.item-name` and one `.item-header[data-column-id]` per column) over `ol.item-list` of `li.item` → `.item-row` (`.item-name` with `data-action="use"`, then one `.item-detail[data-column-id]` per column) and `.item-description.collapsible-content` (shown when `li` lacks `.collapsed`).
+- Columns (`Inventory.COLUMNS`): price 80, weight 60, quantity 70, charges and uses 70, controls 70, formula and target 80, range 50, recovery 60, roll, school and time 40, capacity 200. On resize dnd5e adds `.hidden-width` to low-priority columns, computed from those widths; it sets no inline widths, so its CSS (or ours) sizes them.
+- Controls column (`columns/controls.hbs`): in edit mode Edit and Delete; in play mode Attune (`.attuned` / `.not-attuned`), Equip and Prepare (`.active` when on); always Expand (`toggleExpand`) and ⋮ (`data-context-menu`). The inventory element handles these clicks itself, not the sheet's actions.
+- Quantity (`columns/quantity.hbs`): `a.adjustment-button` (`decrease`, `increase`) around an input, unless `@root.locked` (not editable), then plain text. `locked` is `!isEditable`, so owners get the buttons in play mode too.
+- `item-list-controls` builds its own DOM on connect: `<search>` with an `input` and `ul.controls` of `button.filter-control` (`clear`, `filter`, `sort`, `group`; `.active` when in use).
+- Creating an embedded item re-renders the sheet in edit mode (`primary-sheet-mixin.mjs:99`, `renderContext === "createItem"`).
+- Not yet styled: currency (`section.currency`, `i.currency.<denomination>` icons are dnd5e CSS backgrounds), encumbrance (`.meter.progress` with `--bar-percentage` and breakpoints), containers (`ul.containers`), and the `.top` block on Inventory.

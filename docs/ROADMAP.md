@@ -38,8 +38,8 @@ Classic layout: skills and saves column; resources; favorites; traits (senses, l
 
 Built on dnd5e's `dnd5e-inventory` element. Equip, attune, quantity, weight and encumbrance, containers, currency, drag and drop, context menus. Next up (2026-10-24).
 
-- [ ] Shared list controls (search, filter, sort), styled once for Inventory, Spellbook and Features
-- [ ] Item rows: 24px controls, equip, attune, quantity, context menus, drag
+- [ ] Shared list controls (search, filter, sort), styled once for Inventory, Spellbook and Features (in code 2026-10-24)
+- [ ] Item rows: 24px controls, equip, attune, quantity, context menus, drag (in code 2026-10-24)
 - [ ] Encumbrance bar and currency row
 - [ ] Containers
 

@@ -167,6 +167,37 @@ function findProblems()
       issues.push(`${styles.size} text styles (3 allowed): ${[...styles].map(([k, v]) => `${k} (${v})`).join('; ')}`);
    }
 
+   // Targets at least 24px each way (WCAG 2.5.8; quest log rule), for everything a player clicks on the sheet.
+   for (const el of app.querySelectorAll('.window-content :is(button, a[data-action], [role="button"], summary)'))
+   {
+      if (!el.closest('.fhcs-sheet') || el.closest('[hidden]') || !el.getClientRects().length) { continue; }
+      const r = el.getBoundingClientRect();
+      if ((r.width < 23.5) || (r.height < 23.5))
+      {
+         issues.push(`target ${Math.round(r.width)}×${Math.round(r.height)} under 24px: ${el.tagName.toLowerCase()}.${[...el.classList].join('.')} [${el.dataset.action ?? el.getAttribute('aria-label') ?? ''}]`);
+      }
+   }
+   // dnd5e's list rows keep their cells side by side (unstyled, they stack one per line).
+   for (const row of app.querySelectorAll('.window-content :is(.item-row, .items-header)'))
+   {
+      const cells = [...row.children].filter((c) => getComputedStyle(c).display !== 'none' && c.getClientRects().length);
+      // Empty cells (no height) sit on the row's center line; only cells with content can stack.
+      const boxes = cells.map((c) => c.getBoundingClientRect()).filter((b) => b.height > 1);
+      if (boxes.some((a) => boxes.some((b) => a.top >= b.bottom - 1)))
+      {
+         issues.push(`row cells stack instead of sitting side by side: ${row.className} "${row.textContent.trim().slice(0, 30)}"`);
+      }
+   }
+   // No list bullets or numbers: every list in the sheet is a row of controls or a list of rows.
+   for (const li of app.querySelectorAll('.window-content li'))
+   {
+      const cs = getComputedStyle(li);
+      if (cs.display === 'list-item' && cs.listStyleType !== 'none' && li.getClientRects().length)
+      {
+         issues.push(`list marker showing: li "${li.textContent.trim().slice(0, 30)}"`);
+      }
+   }
+
    // Foundry's tab action finds a tab button only as a child of `.tabs`; anywhere else the click does nothing.
    for (const tab of app.querySelectorAll('[data-action="tab"]'))
    {
@@ -193,6 +224,9 @@ const SELF_TEST = [
    { id: 'self-wide', expect: true, body: '<div style="width:100px"><span style="display:inline-block;width:300px">Too wide</span></div>' },
    { id: 'self-past-edge', expect: true, body: '<div style="width:2000px">Past the edge</div>' },
    { id: 'self-tab', expect: true, body: '<nav><button type="button" data-action="tab" data-tab="a">A</button></nav>' },
+   { id: 'self-target', expect: true, body: '<div class="fhcs-sheet"><button style="width:16px;height:16px;min-height:0;padding:0"></button></div>' },
+   { id: 'self-row', expect: true, body: '<div class="item-row"><div>Name</div><div>Price</div></div>' },
+   { id: 'self-bullet', expect: true, body: '<ul><li>Bulleted</li></ul>' },
    { id: 'self-container', expect: true, body: '<div style="container-type:inline-size"><input type="text"></div>' },
    { id: 'self-styles', expect: true, body: '<div class="fhcs-chat"><p style="font-size:10px">a</p><p style="font-size:11px">b</p><p style="font-size:12px">c</p><p style="font-size:13px">d</p></div>' },
    { id: 'self-contrast', expect: true, body: '<p style="color:#bbb">Too faint to read</p>' },
@@ -227,7 +261,7 @@ for (const c of CASES)
 {
    // `open` lists folded panels to draw open, by their data-fold-key.
    const body = (c.open ?? []).reduce((html, key) => html.replace(`data-fold-key="${key}"`, `data-fold-key="${key}" open`),
-      template(c.template)(c.context));
+      c.html ?? template(c.template)(c.context));
    const kind = c.frame ?? 'sheet';
    for (const theme of c.theme ? [c.theme] : Object.keys(THEMES))
    {

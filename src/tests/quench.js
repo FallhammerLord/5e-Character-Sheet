@@ -210,6 +210,29 @@ export function registerQuenchTests(quench)
             // dnd5e uses a copy of the item (activity/mixin.mjs:229), so compare IDs.
             assert.strictEqual(activity.item.id, item.id);
          });
+
+         it('lists items in dnd5e\'s inventory with our styling, and equips one from its row', async function ()
+         {
+            const [item] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test shield', type: 'equipment', system: { type: { value: 'shield' }, equipped: false } }]);
+            // Creating an item puts dnd5e's sheet in edit mode; equip buttons show in play mode.
+            await sheet.render({ mode: sheet.constructor.MODES.PLAY });
+            sheet.changeTab('inventory', 'primary');
+            assert.ok(sheet.element.querySelector('.tab[data-tab="inventory"] item-list-controls search input'), 'search bar');
+            const row = sheet.element.querySelector(`.tab[data-tab="inventory"] [data-item-id="${item.id}"] .item-row`);
+            assert.ok(row, 'item row');
+            assert.strictEqual(getComputedStyle(row).display, 'flex', 'our row style applies');
+            const equipped = new Promise((resolve) =>
+            {
+               const id = Hooks.on('updateItem', (doc, change) =>
+               {
+                  if (doc === item && foundry.utils.hasProperty(change, 'system.equipped')) { Hooks.off('updateItem', id); resolve(); }
+               });
+            });
+            row.querySelector('[data-action="equip"]').click();
+            await equipped;
+            assert.isTrue(item.system.equipped);
+            sheet.changeTab('details', 'primary');
+         });
       });
    }, { displayName: 'Fallhammer Character Sheet: core' });
 

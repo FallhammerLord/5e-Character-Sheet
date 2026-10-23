@@ -2,12 +2,14 @@
  * Layout cases: each renders one of our templates with sample data. The layout check draws every case at every
  * width of its frame and fails on overflow. Each phase adds its parts here (Phase 1: the header).
  *
- * A case: { name, template: 'path/without-hbs', context: {...}, frame?: 'sheet' | 'chat', theme?: 'light' }
+ * A case: { name, template: 'path/without-hbs', context: {...}, frame?: 'sheet' | 'chat', theme?: 'light' }, or
+ * { name, html } for dnd5e's own markup that we only style (tools/dnd5e-markup/).
  */
 import { cardParts, d20Band, damageBand, saveRow } from '../src/chat/card.js';
 import { headerView, tabRow } from '../src/sheet/header.js';
 import { attributesView } from '../src/sheet/attributes.js';
 import { format, localize } from './templates.mjs';
+import { inventoryMarkup } from './dnd5e-markup/inventory.mjs';
 
 /** A usage card's context as FHCSUsageMessageData#_prepareContext builds it, with overrides. */
 const card = (over = {}, buttons = []) => ({
@@ -190,6 +192,8 @@ export const CASES = [
    { name: 'attributes-key-passives-folded', template: 'sheet/attributes', context: attributes({ passives: 'key', folded: ['inventory', 'spell-1'] }) },
    { name: 'attributes-editing', template: 'sheet/attributes', context: attributes({ editing: true }) },
    { name: 'attributes-empty', template: 'sheet/attributes', context: attributes({ favorites: [], resources: [], traits: [] }) },
+   { name: 'inventory', html: inventoryMarkup() },
+   { name: 'inventory-editing', html: inventoryMarkup({ editMode: true }) },
    { name: 'tabs', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }) },
    { name: 'tabs-editing', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: true }) },
    { name: 'header', template: 'sheet/header', context: header() },

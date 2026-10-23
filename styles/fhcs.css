@@ -1594,3 +1594,278 @@
 .fhcs-sheet .fhcs-prepared .fhcs-state { color: var(--fhcs-adv); }
 .fhcs-sheet .fhcs-state-fill { fill: currentColor; stroke: none; }
 .fhcs-sheet .fhcs-empty { margin: 0; padding: var(--fhcs-s2); }
+
+/* ---------- dnd5e's item lists (Phase 3): Inventory, and the Features and Spellbook tabs that share them ---------- */
+
+/* dnd5e draws these lists itself (`dnd5e-inventory`, `item-list-controls`, templates/inventory/), which keeps its
+   context menus, drag, filters and columns. Its own CSS left with its look classes, so we style its markup. Every
+   class below is dnd5e's: rename none (docs/research/dnd5e-6.0-sheet.md). */
+
+.fhcs-sheet :is(.inventory-element, item-list-controls) :is(ul, ol)
+{
+   margin: 0;
+   padding: 0;
+   list-style: none;
+}
+
+.fhcs-sheet .inventory-element
+{
+   display: flex;
+   flex-direction: column;
+   gap: var(--fhcs-s2);
+}
+
+/* Text: dnd5e's elements on our three styles. */
+.fhcs-sheet .inventory-element :is(item-list-controls input, .item-name .title, .item-name .subtitle, .item-detail,
+   .item-detail input, .item-summary, .item-summary *)
+{
+   font-size: var(--fhcs-body-size);
+   line-height: var(--fhcs-body-line);
+   font-weight: normal;
+   text-transform: none;
+   letter-spacing: normal;
+}
+
+.fhcs-sheet .inventory-element :is(.items-header .item-name, .item-header, .pill)
+{
+   margin: 0;
+   font-size: var(--fhcs-label-size);
+   line-height: var(--fhcs-label-line);
+   font-weight: bold;
+   text-transform: uppercase;
+   letter-spacing: 0.05em;
+}
+
+/* The search bar: one row, the field takes what the buttons leave. */
+.fhcs-sheet item-list-controls search
+{
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s1);
+}
+
+.fhcs-sheet item-list-controls input
+{
+   flex: 1;
+   min-width: 0;
+   height: var(--fhcs-control);
+   padding: 0 var(--fhcs-s2);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: transparent;
+   color: inherit;
+   font-family: inherit;
+}
+
+.fhcs-sheet .inventory-element input::placeholder { color: var(--fhcs-muted); opacity: 1; }
+
+.fhcs-sheet item-list-controls .controls,
+.fhcs-sheet .inventory-element .item-controls
+{
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s1);
+}
+
+/* Icon buttons: search controls and each row's equip, attune, expand and ⋮. */
+.fhcs-sheet :is(item-list-controls .filter-control, .inventory-element .item-control)
+{
+   display: inline-flex;
+   flex: none;
+   align-items: center;
+   justify-content: center;
+   width: var(--fhcs-control);
+   height: var(--fhcs-control);
+   margin: 0;
+   padding: 0;
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-fill);
+   color: inherit;
+   cursor: pointer;
+}
+
+.fhcs-sheet .inventory-element .item-control { width: 24px; height: 24px; }
+
+/* On: sorting or grouping in use, equipped, prepared, attuned. Filled, so it isn't told by color alone. */
+.fhcs-sheet :is(item-list-controls .filter-control.active, .inventory-element .item-control:is(.active, .attuned))
+{
+   border-color: var(--fhcs-die-ink);
+   background: var(--fhcs-die-ink);
+   color: var(--fhcs-die-on-ink);
+}
+
+/* Needs attunement, not attuned yet. */
+.fhcs-sheet .inventory-element .item-control.not-attuned { border-style: dashed; }
+.fhcs-sheet .inventory-element .item-control[aria-disabled="true"] { cursor: not-allowed; }
+
+.fhcs-sheet :is(item-list-controls .filter-control, .inventory-element .item-control, .inventory-element .adjustment-button,
+   .inventory-element .item-name[role="button"]):focus-visible
+{
+   outline: 2px solid currentColor;
+   outline-offset: 1px;
+}
+
+/* Sections: a label row over the item rows. */
+.fhcs-sheet .inventory-element .items-section
+{
+   display: flex;
+   flex-direction: column;
+}
+
+.fhcs-sheet .inventory-element :is(.items-header, .item-row)
+{
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s1);
+   min-width: 0;
+   padding: 0 var(--fhcs-s1);
+}
+
+.fhcs-sheet .inventory-element .items-header
+{
+   min-height: 24px;
+   border-bottom: 1px solid var(--fhcs-line);
+}
+
+.fhcs-sheet .inventory-element .items-header .item-name { flex: 1; min-width: 0; }
+
+.fhcs-sheet .inventory-element .item-row
+{
+   min-height: var(--fhcs-control);
+   border-radius: var(--fhcs-radius);
+}
+
+.fhcs-sheet .inventory-element .item-list > .item:nth-child(even) > .item-row { background: var(--fhcs-fill); }
+.fhcs-sheet .inventory-element .item-row:hover { box-shadow: inset 0 0 0 1px var(--fhcs-line); }
+
+/* The name cell: icon, name over subtitle, property icons. Click uses the item. */
+.fhcs-sheet .inventory-element .item-row > .item-name
+{
+   display: flex;
+   flex: 1;
+   align-items: center;
+   gap: var(--fhcs-s2);
+   min-width: 0;
+   min-height: 24px;
+   cursor: pointer;
+}
+
+.fhcs-sheet .inventory-element .item-image
+{
+   flex: none;
+   width: 24px;
+   height: 24px;
+   border-radius: 4px;
+   object-fit: cover;
+}
+
+.fhcs-sheet .inventory-element .item-name .name
+{
+   display: flex;
+   flex-direction: column;
+   min-width: 0;
+}
+
+.fhcs-sheet .inventory-element .item-name :is(.title, .subtitle)
+{
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+}
+
+.fhcs-sheet .inventory-element .item-name .subtitle { color: var(--fhcs-muted); }
+
+.fhcs-sheet .inventory-element .item-name .tags
+{
+   display: flex;
+   flex: none;
+   gap: 2px;
+   margin-left: auto;
+   color: var(--fhcs-muted);
+}
+
+.fhcs-sheet .inventory-element .item-name .tags dnd5e-icon
+{
+   display: block;
+   width: 16px;
+   height: 16px;
+}
+
+/* Columns: dnd5e's widths (components/inventory.mjs COLUMNS), wider where our 24px controls need the room. dnd5e
+   hides low-priority columns on narrow sheets with .hidden-width. */
+.fhcs-sheet .inventory-element :is(.item-header, .item-detail)
+{
+   display: flex;
+   flex: none;
+   align-items: center;
+   justify-content: center;
+   gap: 2px;
+   width: var(--fhcs-col, 70px);
+   min-width: 0;
+   text-align: center;
+}
+
+.fhcs-sheet .inventory-element .hidden-width { display: none; }
+.fhcs-sheet .inventory-element [data-column-id="price"] { --fhcs-col: 80px; }
+.fhcs-sheet .inventory-element [data-column-id="weight"] { --fhcs-col: 60px; }
+.fhcs-sheet .inventory-element [data-column-id="quantity"] { --fhcs-col: 84px; }
+.fhcs-sheet .inventory-element [data-column-id="charges"],
+.fhcs-sheet .inventory-element [data-column-id="uses"] { --fhcs-col: 70px; }
+.fhcs-sheet .inventory-element [data-column-id="formula"],
+.fhcs-sheet .inventory-element [data-column-id="target"] { --fhcs-col: 80px; }
+.fhcs-sheet .inventory-element [data-column-id="range"] { --fhcs-col: 50px; }
+.fhcs-sheet .inventory-element [data-column-id="recovery"] { --fhcs-col: 60px; }
+.fhcs-sheet .inventory-element :is([data-column-id="roll"], [data-column-id="school"], [data-column-id="time"]) { --fhcs-col: 40px; }
+.fhcs-sheet .inventory-element [data-column-id="capacity"] { --fhcs-col: 200px; }
+/* Controls: room for four 24px buttons on every row, so the columns before it line up with their headings. */
+.fhcs-sheet .inventory-element [data-column-id="controls"] { --fhcs-col: 108px; justify-content: flex-end; }
+
+/* Quantity and charges: a small field, with − and + targets around quantity. */
+.fhcs-sheet .inventory-element .item-detail input
+{
+   width: 2.25em;
+   height: 24px;
+   min-width: 0;
+   padding: 0;
+   border: 1px solid var(--fhcs-line-soft);
+   border-radius: 4px;
+   background: transparent;
+   color: inherit;
+   font-family: inherit;
+   text-align: center;
+}
+
+.fhcs-sheet .inventory-element .adjustment-button
+{
+   display: inline-flex;
+   flex: none;
+   align-items: center;
+   justify-content: center;
+   width: 24px;
+   height: 24px;
+   border-radius: 4px;
+   color: inherit;
+   cursor: pointer;
+}
+
+.fhcs-sheet .inventory-element .adjustment-button:hover { background: var(--fhcs-fill); }
+
+/* The expanded row: description and property pills under the row. */
+.fhcs-sheet .inventory-element .item.collapsed > .collapsible-content { display: none; }
+.fhcs-sheet .inventory-element .item-description .wrapper { padding: var(--fhcs-s1) var(--fhcs-s2) var(--fhcs-s2) 36px; }
+.fhcs-sheet .inventory-element .item-summary p { margin: 0 0 var(--fhcs-s1); }
+
+.fhcs-sheet .inventory-element .pills
+{
+   display: flex;
+   flex-wrap: wrap;
+   gap: var(--fhcs-s1);
+}
+
+.fhcs-sheet .inventory-element .pill
+{
+   padding: 2px var(--fhcs-s1);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+}
