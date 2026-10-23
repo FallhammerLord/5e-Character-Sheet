@@ -7,6 +7,7 @@ import { describeRoll } from '../src/chat/outcome.js';
 import { cardParts, damageBand, saveRow } from '../src/chat/card.js';
 import { countingDie, d20Row, modeForSides } from '../src/chat/d20.js';
 import { diceMath } from '../src/chat/math.js';
+import { attributesView } from '../src/sheet/attributes.js';
 import { headerMinWidth, levelOrder, levelTrack, signed, tabRow } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
@@ -211,6 +212,33 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    if (edit !== 'details,inventory,spells,features,effects,specialTraits') { problems.push(`tab row in edit mode: ${edit}`); }
    const names = tabRow(dnd5eTabs, { canEdit: true, editing: false }, localize).tabs.map((t) => t.label);
    if (names[0] !== 'Attributes' || names[2] !== 'Spellbook') { problems.push(`tab names: ${names.join()}`); }
+}
+
+// Attributes: key passives, empty traits hidden in play, favorites grouped in Classic's order with slot pips.
+{
+   const skill = (key, prof) => ({ key, label: key, abbr: 'Wis', total: 2, passive: 12, prof });
+   const row = (title, group, level = null) => ({ id: title, title, group, level, uses: null, quantity: 0, state: null });
+   const facts = {
+      skills: [skill('prc', 1), skill('ath', 0.5), skill('ste', 2)],
+      traits: [{ key: 'languages', title: 'Languages', values: ['Common'] }, { key: 'di', title: 'Immunities', values: [] }],
+      favorites: [row('Fireball', 'spell', 3), row('Mace', 'inventory'), row('Light', 'spell', 0), row('Bless', 'spell', 1), row('Rage', 'features')],
+      resources: [], slots: { 1: { value: 1, max: 2 } }, editing: false, passives: 'key', folded: ['inventory']
+   };
+   const view = attributesView(facts, { format, localize });
+   const got = {
+      passives: view.skills.map((s) => s.passive), marks: view.skills.map((s) => s.mark),
+      traits: view.traits.map((t) => t.key), groups: view.favorites.map((g) => g.label),
+      open: view.favorites.map((g) => g.open), pips: view.favorites.find((g) => g.slots)?.slots.pips.map((p) => p.filled)
+   };
+   const expected = {
+      passives: [12, '', ''], marks: ['full', 'half', 'expert'], traits: ['languages'],
+      groups: ['Inventory', 'Features', 'Cantrips', 'Spell level 1', 'Spell level 3'],
+      open: [false, true, true, true, true], pips: [true, false]
+   };
+   try { deepStrictEqual(got, expected); }
+   catch { problems.push(`attributes: got ${JSON.stringify(got)}, expected ${JSON.stringify(expected)}`); }
+   const editing = attributesView({ ...facts, editing: true }, { format, localize });
+   if (editing.traits.map((t) => t.text).join() !== 'Common,\u2014') { problems.push('edit mode does not list empty traits'); }
 }
 
 // Each extra ability (honor, sanity) widens the minimum by one column and its gap.

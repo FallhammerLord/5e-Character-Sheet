@@ -6,6 +6,7 @@
  */
 import { cardParts, d20Band, damageBand, saveRow } from '../src/chat/card.js';
 import { headerView, tabRow } from '../src/sheet/header.js';
+import { attributesView } from '../src/sheet/attributes.js';
 import { format, localize } from './templates.mjs';
 
 /** A usage card's context as FHCSUsageMessageData#_prepareContext builds it, with overrides. */
@@ -138,7 +139,57 @@ const DND5E_TABS = Object.fromEntries(['details', 'inventory', 'features', 'spel
    .map((id, i) => [id, { id, label: ['Details', 'Inventory', 'Features', 'Spells', 'Effects', 'Biography', 'Bastion', 'Special Traits'][i], active: id === 'details' }]));
 const tabs = (mode) => ({ fhcsTabs: tabRow(DND5E_TABS, mode, localize) });
 
+/** The Attributes tab's facts as compat.attributesFacts gathers them, with overrides. */
+const SKILLS = [['acr', 'Acrobatics', 'Dex', 0, 10, 0], ['ani', 'Animal Handling', 'Wis', 5, 15, 0], ['arc', 'Arcana', 'Int', -1, 9, 0],
+   ['ath', 'Athletics', 'Str', 4, 14, 0.5], ['dec', 'Deception', 'Cha', -1, 9, 0], ['his', 'History', 'Int', 3, 13, 1],
+   ['ins', 'Insight', 'Wis', 9, 19, 1], ['itm', 'Intimidation', 'Cha', -1, 9, 0], ['inv', 'Investigation', 'Int', -1, 9, 0],
+   ['med', 'Medicine', 'Wis', 9, 19, 1], ['nat', 'Nature', 'Int', -1, 9, 0], ['prc', 'Perception', 'Wis', 13, 23, 2],
+   ['prf', 'Performance', 'Cha', -1, 9, 0], ['per', 'Persuasion', 'Cha', -1, 9, 0], ['rel', 'Religion', 'Int', 3, 13, 1],
+   ['slt', 'Sleight of Hand', 'Dex', 0, 10, 0], ['ste', 'Stealth', 'Dex', 0, 10, 0], ['sur', 'Survival', 'Wis', 5, 15, 0]]
+   .map(([key, label, abbr, total, passive, prof]) => ({ key, label, abbr, total, passive, prof }));
+const ICON = (fill) => art(48, 48, `<rect width="48" height="48" rx="6" fill="${fill}"/>`);
+const fav = (title, group, over = {}) => ({
+   id: `.Item.${title}`, type: 'item', title, subtitle: '', img: ICON('#6b5a3a'), uses: null, quantity: 0,
+   itemId: title, activityId: '', effectId: '', key: '', rollableClass: 'rollable', group, level: null, state: null, ...over
+});
+const attributesFacts = (over = {}) => ({
+   skills: SKILLS,
+   traits: [
+      { key: 'senses', title: 'Senses', values: ['Darkvision 60 ft'] },
+      { key: 'languages', title: 'Languages', values: ['Common', 'Draconic', 'Giant', 'Halfling'] },
+      { key: 'di', title: 'Damage Immunities', values: [] },
+      { key: 'dr', title: 'Damage Resistances', values: ['Cold'] },
+      { key: 'ci', title: 'Condition Immunities', values: [] },
+      { key: 'weapon', title: 'Weapon Proficiencies', values: ['Simple Weapons'] },
+      { key: 'armor', title: 'Armor Proficiencies', values: ['Light Armor', 'Medium Armor', 'Heavy Armor', 'Shields'] },
+      { key: 'tool', title: 'Tool Proficiencies', values: ['Herbalism Kit'] }
+   ],
+   favorites: [
+      fav('Light Crossbow', 'inventory', { subtitle: 'Ranged Weapon Attack', state: 'equipped' }),
+      fav('Mace', 'inventory', { subtitle: 'Melee Weapon Attack', state: 'equipped' }),
+      fav('Shield', 'inventory', { state: 'equipped' }),
+      fav('Torch', 'inventory', { uses: { value: 1, max: 1 }, quantity: 3 }),
+      fav('Bless', 'spell', { level: 1, subtitle: 'V S M \u00b7 1 Action', state: 'prepared' }),
+      fav('Healing Word', 'spell', { level: 1, subtitle: 'V \u00b7 1 Bonus Action', state: 'prepared' }),
+      fav('Detect Magic', 'spell', { level: 1, subtitle: 'V S \u00b7 1 Action' }),
+      fav('Counterspell', 'spell', { level: 3, subtitle: 'S \u00b7 1 Reaction', state: 'prepared' }),
+      fav('Sacred Flame', 'spell', { level: 0, subtitle: 'V S \u00b7 1 Action' }),
+      fav('Channel Divinity: Preserve Life', 'features', { subtitle: '1 Action \u00b7 Short Rest', uses: { value: 1, max: 2 } })
+   ],
+   resources: [{ id: 'resources.primary', title: 'Harness Divine Power', value: 1, max: 1 }],
+   slots: { 1: { value: 3, max: 4 }, 3: { value: 3, max: 3 } },
+   editing: false, passives: 'all', folded: [], ...over
+});
+const attributes = (over) => ({
+   tab: { id: 'details', group: 'primary', cssClass: 'active' }, rollableClass: 'rollable',
+   fhcsAttributes: attributesView(attributesFacts(over), { format, localize })
+});
+
 export const CASES = [
+   { name: 'attributes', template: 'sheet/attributes', context: attributes() },
+   { name: 'attributes-key-passives-folded', template: 'sheet/attributes', context: attributes({ passives: 'key', folded: ['inventory', 'spell-1'] }) },
+   { name: 'attributes-editing', template: 'sheet/attributes', context: attributes({ editing: true }) },
+   { name: 'attributes-empty', template: 'sheet/attributes', context: attributes({ favorites: [], resources: [], traits: [] }) },
    { name: 'tabs', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }) },
    { name: 'tabs-editing', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: true }) },
    { name: 'header', template: 'sheet/header', context: header() },

@@ -1,13 +1,41 @@
 import { MODULE_ID, MODULE_PATH } from '../constants.js';
-import { headerFacts } from '../compat.js';
+import { attributesFacts, headerFacts } from '../compat.js';
+import { attributesView } from '../sheet/attributes.js';
 import { headerMinWidth, headerView, tabRow } from '../sheet/header.js';
 import { delayTips, keepFolds } from '../chat/card.js';
 
 /** Our template parts, by dnd5e part ID. */
 export const SHEET_PARTS = {
    header: `${MODULE_PATH}/templates/sheet/header.hbs`,
-   tabs: `${MODULE_PATH}/templates/sheet/tabs.hbs`
+   tabs: `${MODULE_PATH}/templates/sheet/tabs.hbs`,
+   // The Attributes tab takes dnd5e's Details tab: same ID, so dnd5e's tab handling still applies.
+   details: `${MODULE_PATH}/templates/sheet/attributes.hbs`
 };
+
+/** Each player's own choices, kept on their user so they follow them to every character and device. */
+const PREFS = { passives: 'passives', folded: 'foldedFavorites' };
+
+/** Shows every passive, or only the key ones (Perception, Insight, Investigation). */
+async function togglePassives()
+{
+   const current = game.user.getFlag(MODULE_ID, PREFS.passives) ?? 'all';
+   await game.user.setFlag(MODULE_ID, PREFS.passives, current === 'all' ? 'key' : 'all');
+   this.render();
+}
+
+/** Folds or opens a favorites group, and remembers it. */
+async function toggleGroup(event, target)
+{
+   const group = target.closest('[data-fhcs-group]');
+   const list = group?.querySelector('.fhcs-favorites');
+   if (!list) { return; }
+   list.hidden = !list.hidden;
+   target.setAttribute('aria-expanded', String(!list.hidden));
+   const folded = new Set(game.user.getFlag(MODULE_ID, PREFS.folded) ?? []);
+   if (list.hidden) { folded.add(group.dataset.fhcsGroup); }
+   else { folded.delete(group.dataset.fhcsGroup); }
+   await game.user.setFlag(MODULE_ID, PREFS.folded, [...folded]);
+}
 
 /**
  * dnd5e parts we drop: our header holds the ability scores; the sidebar's portrait, HP and AC are in the header, its
@@ -29,8 +57,15 @@ function ourParts(baseParts)
 {
    const entries = Object.entries(baseParts ?? {})
       .filter(([id]) => !DROPPED_PARTS.includes(id))
-      // Ours keep only dnd5e's part ID, not its classes.
-      .map(([id, part]) => [id, SHEET_PARTS[id] ? { ...(part.id ? { id: part.id } : {}), template: SHEET_PARTS[id] } : part]);
+      // Ours keep dnd5e's part settings (ID, container, scrolling) but not its classes or extra templates.
+      .map(([id, part]) =>
+      {
+         if (!SHEET_PARTS[id]) { return [id, part]; }
+         const kept = { ...part, template: SHEET_PARTS[id] };
+         delete kept.classes;
+         delete kept.templates;
+         return [id, kept];
+      });
    const rank = (id) => (LEADING_PARTS.includes(id) ? LEADING_PARTS.indexOf(id) : LEADING_PARTS.length);
    return Object.fromEntries(entries.sort(([a], [b]) => rank(a) - rank(b)));
 }
@@ -39,14 +74,16 @@ function ourParts(baseParts)
  * Our character sheet: dnd5e's own sheet class with our layout. Built from the class dnd5e provides at init,
  * since a module can't import from the system by path. dnd5e keeps every mechanic; the look is ours alone.
  *
- * Phase 1: our header. Phase 2: our frame and tab row in place of dnd5e's sidebar and vertical tabs.
+ * Phase 1: our header. Phase 2: our frame, tab row and Attributes tab in place of dnd5e's sidebar, vertical tabs
+ * and Details tab.
  */
 export function makeCharacterSheet(Base)
 {
    return class FHCSCharacterSheet extends Base
    {
       static DEFAULT_OPTIONS = {
-         classes: ['fhcs-sheet']
+         classes: ['fhcs-sheet'],
+         actions: { fhcsTogglePassives: togglePassives, fhcsToggleGroup: toggleGroup }
       };
 
       static PARTS = ourParts(Base.PARTS);
@@ -68,6 +105,14 @@ export function makeCharacterSheet(Base)
          {
             const facts = await headerFacts(this, context, MODULE_ID, game.settings.get(MODULE_ID, 'abilityEmphasis'));
             context.fhcs = { ...headerView(facts, i18n), editable: facts.editable };
+         }
+         if (partId === 'details')
+         {
+            const prefs = {
+               passives: game.user.getFlag(MODULE_ID, PREFS.passives) ?? 'all',
+               folded: game.user.getFlag(MODULE_ID, PREFS.folded) ?? []
+            };
+            context.fhcsAttributes = attributesView(await attributesFacts(this, context, prefs), i18n);
          }
          if (partId === 'tabs')
          {

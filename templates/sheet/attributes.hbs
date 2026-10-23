@@ -1,0 +1,97 @@
+{{!-- The Attributes tab (SCOPE §4.3): skills and traits on the left, favorites on the right. It takes dnd5e's
+      "details" tab, so dnd5e's tab switching and part ID still apply. --}}
+<section class="tab fhcs-attributes {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
+   {{#with fhcsAttributes}}
+   <div class="fhcs-attributes-side">
+      <div class="fhcs-panel">
+         <div class="fhcs-panel-head">
+            <span class="fhcs-label">{{ text.skills }}</span>
+            <button type="button" class="fhcs-button fhcs-label fhcs-passive-toggle" data-action="fhcsTogglePassives"
+                    aria-pressed="{{#if showAllPassives}}true{{else}}false{{/if}}" aria-label="{{ text.passiveToggle }}"
+                    data-fhcs-tip="{{ text.passiveToggle }}">{{ text.passive }}</button>
+         </div>
+         <ul class="fhcs-skills">
+            {{#each skills}}
+            {{!-- dnd5e's roll action reads the skill from the nearest data-key. --}}
+            <li data-key="{{ key }}">
+               <button type="button" class="fhcs-skill {{ @root.rollableClass }}" data-action="roll" data-type="skill"
+                       aria-label="{{ rollLabel }}">
+                  <span class="fhcs-prof-mark fhcs-prof-{{ mark }}" aria-hidden="true"></span>
+                  <span class="fhcs-body fhcs-skill-name">{{ label }}</span>
+                  <span class="fhcs-label fhcs-muted">{{ abbr }}</span>
+                  <span class="fhcs-body fhcs-skill-mod">{{ mod }}</span>
+                  <span class="fhcs-label fhcs-muted fhcs-skill-passive">{{ passive }}</span>
+               </button>
+            </li>
+            {{/each}}
+         </ul>
+      </div>
+
+      {{#if traits.length}}
+      <dl class="fhcs-traits">
+         {{#each traits}}
+         <div class="fhcs-trait">
+            <dt class="fhcs-label fhcs-muted">{{ title }}</dt>
+            <dd class="fhcs-body">{{ text }}</dd>
+         </div>
+         {{/each}}
+      </dl>
+      {{/if}}
+   </div>
+
+   <div class="fhcs-attributes-main">
+      {{#if resources.length}}
+      <div class="fhcs-resources">
+         {{#each resources}}
+         <div class="fhcs-resource" role="group" aria-label="{{ label }}">
+            <span class="fhcs-body">{{ title }}</span>
+            <span class="fhcs-display">{{ value }}</span>
+            <span class="fhcs-body fhcs-muted">/ {{ max }}</span>
+         </div>
+         {{/each}}
+      </div>
+      {{/if}}
+
+      {{#each favorites}}
+      {{!-- Each group folds and stays as the player left it (user, 2026-10-24); its slot pips sit outside the fold button. --}}
+      <div class="fhcs-group" data-fhcs-group="{{ key }}">
+         <div class="fhcs-group-head">
+            <button type="button" class="fhcs-group-toggle" data-action="fhcsToggleGroup" aria-expanded="{{#if open}}true{{else}}false{{/if}}">
+               <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+               <span class="fhcs-label">{{ label }}</span>
+            </button>
+            {{#if slots}}
+            <span class="fhcs-slots" data-prop="{{ slots.prop }}">
+               {{#each slots.pips}}
+               <button type="button" class="fhcs-slot{{#if filled}} fhcs-on{{/if}}" data-action="togglePip" data-n="{{ n }}"
+                       aria-pressed="{{#if filled}}true{{else}}false{{/if}}" aria-label="{{ label }}"></button>
+               {{/each}}
+               <span class="fhcs-label fhcs-muted">{{ slots.text }}</span>
+            </span>
+            {{/if}}
+         </div>
+         <ul class="fhcs-favorites"{{#unless open}} hidden{{/unless}}>
+            {{#each rows}}
+            {{!-- dnd5e's useFavorite reads these ids from the row and the button. --}}
+            <li class="fhcs-favorite{{#if equipped}} fhcs-equipped{{/if}}{{#if prepared}} fhcs-prepared{{/if}}"
+                data-favorite-id="{{ id }}"{{#if itemId}} data-item-id="{{ itemId }}"{{/if}}{{#if key}} data-key="{{ key }}"{{/if}}
+                {{#if effectId}} data-effect-id="{{ effectId }}"{{/if}}{{#if activityId}} data-activity-id="{{ activityId }}"{{/if}}>
+               <img class="fhcs-favorite-img" src="{{ img }}" alt="">
+               <button type="button" class="fhcs-favorite-use {{ rollableClass }}" data-action="useFavorite"
+                       {{#if activityId}}data-activity-id="{{ activityId }}"{{/if}}>
+                  <span class="fhcs-body fhcs-favorite-name">{{ title }}</span>
+                  {{#if equipped}}<svg class="fhcs-icon fhcs-state" viewBox="0 0 24 24" role="img" aria-label="{{ stateLabel }}"><path d="M5 12l5 5 9-10"/></svg>{{/if}}
+                  {{#if prepared}}<svg class="fhcs-icon fhcs-state fhcs-state-fill" viewBox="0 0 24 24" role="img" aria-label="{{ stateLabel }}"><path d="M6 3h12v18l-6-4-6 4z"/></svg>{{/if}}
+               </button>
+               <span class="fhcs-label fhcs-muted fhcs-favorite-detail">{{ subtitle }}</span>
+               <span class="fhcs-body fhcs-favorite-uses">{{ uses }}</span>
+            </li>
+            {{/each}}
+         </ul>
+      </div>
+      {{else}}
+      <p class="fhcs-body fhcs-muted fhcs-empty">{{ text.noFavorites }}</p>
+      {{/each}}
+   </div>
+   {{/with}}
+</section>

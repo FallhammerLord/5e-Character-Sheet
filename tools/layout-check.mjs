@@ -124,7 +124,9 @@ function findProblems()
       const cs = getComputedStyle(el);
       if (cs.visibility === 'hidden') { continue; }
       let bg = backdrop(el);
-      const shape = el.parentElement?.querySelector(':scope > svg :is(polygon, path)');
+      // A drawing behind the text (positioned under it), like a die's face or the AC shield, is its backdrop.
+      const drawing = [...(el.parentElement?.children ?? [])].find((n) => n.tagName === 'svg' && getComputedStyle(n).position === 'absolute');
+      const shape = drawing?.querySelector(':scope :is(polygon, path)');
       if (shape) { bg = over(parse(getComputedStyle(shape).fill), bg); }
       const fg = parse(cs.color);
       const seen = over({ ...fg, a: fg.a * opacity(el) }, bg);

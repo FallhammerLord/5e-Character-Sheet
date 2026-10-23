@@ -163,6 +163,20 @@ export function registerQuenchTests(quench)
             await flip();
          });
 
+         it('rolls a skill from the Attributes tab, and toggles passives and folds groups for this player', async function ()
+         {
+            const [skill] = await clickReaches('.fhcs-attributes [data-key="prc"] [data-action="roll"]', 'dnd5e.preRollSkill');
+            assert.strictEqual(skill.skill, 'prc');
+            const before = game.user.getFlag(MODULE_ID, 'passives') ?? 'all';
+            sheet.element.querySelector('.fhcs-attributes [data-action="fhcsTogglePassives"]').click();
+            for (let waited = 0; (game.user.getFlag(MODULE_ID, 'passives') ?? 'all') === before && waited < HOOK_WAIT_MS; waited += 50)
+            {
+               await new Promise((resolve) => { setTimeout(resolve, 50); });
+            }
+            assert.notStrictEqual(game.user.getFlag(MODULE_ID, 'passives'), before, 'the passive toggle switched');
+            await game.user.setFlag(MODULE_ID, 'passives', before);
+         });
+
          it('starts a long rest from the sheet', async function ()
          {
             const [rester, config] = await clickReaches('[data-action="rest"][data-type="long"]', 'dnd5e.preLongRest');

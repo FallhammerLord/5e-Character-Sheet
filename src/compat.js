@@ -102,6 +102,82 @@ export async function headerFacts(sheet, context, moduleId, emphasis)
    };
 }
 
+/** dnd5e's label keys for each trait on the Attributes tab (config.mjs `DND5E.traits`, plus senses and languages). */
+const TRAIT_TITLES = { senses: 'FHCS.Attributes.Senses', languages: 'FHCS.Attributes.Languages' };
+
+/** @returns {string} An HTML subtitle as plain text: dnd5e joins its parts with `&bull;`. */
+const plainSubtitle = (html) => String(html ?? '').replace(/\s*&bull;\s*/g, ' \u00b7 ').replace(/<[^>]*>/g, '').trim();
+
+/**
+ * Plain facts for the Attributes tab (src/sheet/attributes.js), from dnd5e's prepared data and the sheet's own
+ * helpers (`_prepareSenses`, `_prepareTraits`, `_prepareSkillsTools`, `_prepareFavorites`;
+ * base-actor-sheet.mjs:541, 662; character-sheet.mjs:627).
+ */
+export async function attributesFacts(sheet, context, { passives, folded })
+{
+   const actor = sheet.actor;
+   const config = CONFIG.DND5E;
+   const skills = Object.entries(actor.system.skills ?? {})
+      .filter(([key]) => key in config.skills)
+      .map(([key, skill]) => ({
+         key, label: game.i18n.localize(config.skills[key].label),
+         abbr: config.abilities[skill.ability]?.abbreviation ?? skill.ability,
+         total: skill.total ?? skill.mod ?? 0, passive: skill.passive ?? '', prof: skill.value ?? skill.proficient ?? 0
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang));
+
+   const prepared = sheet._prepareTraits(context);
+   const title = (key) => game.i18n.localize(TRAIT_TITLES[key] ?? config.traits?.[key]?.labels?.title ?? key);
+   const traits = [
+      { key: 'senses', title: title('senses'), values: sheet._prepareSenses(context).map((s) => [s.label, s.value].filter(Boolean).join(' ')) },
+      ...['languages', 'di', 'dr', 'dv', 'dm', 'ci', 'weapon', 'armor'].map((key) => ({
+         key, title: title(key), values: (prepared[key] ?? []).map((v) => [v.label, v.value].filter(Boolean).join(' '))
+      })),
+      { key: 'tool', title: title('tool'), values: sheet._prepareSkillsTools(context, 'tools').map((t) => t.label) }
+   ];
+
+   const favorites = [];
+   const resources = [];
+   for (const f of await sheet._prepareFavorites(context))
+   {
+      if (f.type === 'resource')
+      {
+         resources.push({ id: f.id, title: f.title, value: f.resource.value, max: f.resource.max });
+         continue;
+      }
+      const item = f.itemId ? actor.items.get(f.itemId) : null;
+      let group = 'other';
+      let state = null;
+      if (f.type === 'effect') { group = 'effects'; }
+      else if (f.type === 'skill' || f.type === 'tool') { group = 'skills'; }
+      else if (item?.type === 'spell')
+      {
+         group = 'spell';
+         if ((item.system.prepared ?? 0) >= 1) { state = 'prepared'; }
+      }
+      else if (item?.type === 'feat') { group = 'features'; }
+      else if (item && 'quantity' in item.system)
+      {
+         group = 'inventory';
+         if (item.system.equipped) { state = 'equipped'; }
+      }
+      favorites.push({
+         id: f.id, type: f.type, title: f.title, subtitle: plainSubtitle(f.subtitle), img: f.img,
+         uses: f.uses?.max ? { value: f.uses.value, max: f.uses.max } : null, quantity: Number(f.quantity) || 0,
+         itemId: f.itemId ?? '', activityId: f.activityId ?? '', effectId: f.effectId ?? '', key: f.key ?? '',
+         rollableClass: f.rollableClass ?? '', group, level: item?.type === 'spell' ? item.system.level : null, state
+      });
+   }
+
+   const slots = {};
+   for (let level = 1; level <= 9; level++)
+   {
+      const slot = actor.system.spells?.[`spell${level}`];
+      if (slot?.max) { slots[level] = { value: slot.value ?? 0, max: slot.max }; }
+   }
+   return { skills, traits, favorites, resources, slots, editing: sheet.isEditMode, passives, folded };
+}
+
 /**
  * After dnd5e's advancement finishes (`dnd5e.advancementManagerComplete`), records the order of class levels: the
  * recorded order, brought up to date by `reconcile` (src/sheet/header.js levelOrder).

@@ -30,6 +30,7 @@ Portrait, name, class and level, HP and temp HP, AC, initiative, speed, proficie
 Classic layout: skills and saves column; resources; favorites; traits (senses, languages, proficiencies, resistances).
 
 - [ ] Our own frame: dnd5e's look classes removed, sidebar dropped, tab row across the top with the lock (in code 2026-10-24)
+- [ ] Attributes tab: skills with proficiency marks and the passive toggle, traits, favorites grouped and folding, resources, slot pips (in code 2026-10-24)
 - [x] Mockup approved with answers (2026-10-24): half proficiency mark, passive toggle, folding favorite groups; death saves move to the header (shown at 0 HP)
 
 ## Phase 3: Inventory

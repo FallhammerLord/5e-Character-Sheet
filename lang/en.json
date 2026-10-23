@@ -122,6 +122,38 @@
       "Spellbook": "Spellbook",
       "Unlock": "Unlock to edit",
       "Lock": "Lock the sheet"
+    },
+    "Attributes": {
+      "Skills": "Skills",
+      "Passive": "Passive",
+      "PassiveKey": "Show key passives only",
+      "PassiveAll": "Show every passive",
+      "SkillLabel": "{skill} check {mod}, passive {passive}, {prof}",
+      "Prof": {
+        "none": "not proficient",
+        "half": "half proficient",
+        "full": "proficient",
+        "expert": "expertise"
+      },
+      "Favorites": "Favorites",
+      "NoFavorites": "Nothing pinned yet. Favorite an item, spell or feature to keep it here.",
+      "Group": {
+        "inventory": "Inventory",
+        "features": "Features",
+        "cantrips": "Cantrips",
+        "spellLevel": "Spell level {level}",
+        "effects": "Effects",
+        "skills": "Skills and tools",
+        "other": "Other"
+      },
+      "SlotLabel": "Spell slot {n} of level {level}",
+      "State": {
+        "equipped": "Equipped",
+        "prepared": "Prepared"
+      },
+      "ResourceLabel": "{title} {value} of {max}",
+      "Senses": "Senses",
+      "Languages": "Languages"
     }
   }
 }

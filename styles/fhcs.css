@@ -1212,3 +1212,240 @@
 }
 
 .fhcs-sheet .fhcs-prof.fhcs-on { background: currentColor; }
+
+/* ---------- Attributes tab (SCOPE §4.3) ---------- */
+
+.fhcs-sheet .fhcs-attributes.active
+{
+   display: grid;
+   grid-template-columns: 240px minmax(0, 1fr);
+   align-items: start;
+   gap: var(--fhcs-s2);
+}
+
+.fhcs-sheet .fhcs-attributes ul,
+.fhcs-sheet .fhcs-attributes dl
+{
+   margin: 0;
+   padding: 0;
+   list-style: none;
+}
+
+.fhcs-sheet :is(.fhcs-attributes-side, .fhcs-attributes-main)
+{
+   display: flex;
+   flex-direction: column;
+   gap: var(--fhcs-s2);
+   min-width: 0;
+}
+
+.fhcs-sheet .fhcs-panel-head,
+.fhcs-sheet .fhcs-group-head
+{
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s2);
+   min-height: var(--fhcs-control);
+   padding: 0 var(--fhcs-s1);
+   border-bottom: 1px solid var(--fhcs-line);
+}
+
+.fhcs-sheet .fhcs-panel-head > .fhcs-label:first-child { flex: 1; }
+
+.fhcs-sheet .fhcs-passive-toggle
+{
+   width: auto;
+   padding: 0 var(--fhcs-s2);
+}
+
+.fhcs-sheet .fhcs-passive-toggle[aria-pressed="false"] { border-style: dashed; }
+
+/* Skills: each row one roll button; the proficiency mark carries proficiency, not bold text. */
+.fhcs-sheet .fhcs-skill
+{
+   display: grid;
+   grid-template-columns: 12px minmax(0, 1fr) 28px 30px 22px;
+   align-items: center;
+   gap: var(--fhcs-s1);
+   width: 100%;
+   min-height: var(--fhcs-control);
+   margin: 0;
+   padding: 0 var(--fhcs-s1);
+   border: 0;
+   border-radius: var(--fhcs-radius);
+   background: none;
+   color: inherit;
+   font-family: inherit;
+   text-align: left;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-skills > li:nth-child(odd) .fhcs-skill { background: var(--fhcs-fill); }
+.fhcs-sheet .fhcs-skill:hover { box-shadow: inset 0 0 0 1px var(--fhcs-line); }
+.fhcs-sheet .fhcs-skill-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fhcs-sheet :is(.fhcs-skill-mod, .fhcs-skill-passive) { text-align: right; }
+
+.fhcs-sheet .fhcs-prof-mark
+{
+   width: 10px;
+   height: 10px;
+   border: 1.5px solid currentColor;
+   border-radius: 50%;
+}
+
+.fhcs-sheet .fhcs-prof-half { background: linear-gradient(90deg, currentColor 50%, transparent 50%); }
+.fhcs-sheet .fhcs-prof-full { background: currentColor; }
+
+.fhcs-sheet .fhcs-prof-expert
+{
+   background: currentColor;
+   box-shadow: 0 0 0 2px var(--fhcs-surface), 0 0 0 3.5px currentColor;
+}
+
+/* Traits: a label over its values. */
+.fhcs-sheet .fhcs-traits
+{
+   display: flex;
+   flex-direction: column;
+   gap: var(--fhcs-s2);
+   padding-top: var(--fhcs-s2);
+   border-top: 1px solid var(--fhcs-line);
+}
+
+.fhcs-sheet .fhcs-trait
+{
+   display: flex;
+   flex-direction: column;
+   gap: 2px;
+   padding: 0 var(--fhcs-s1);
+}
+
+.fhcs-sheet .fhcs-trait dd { margin: 0; }
+
+/* Resources: counters above the favorites. */
+.fhcs-sheet .fhcs-resources
+{
+   display: flex;
+   flex-wrap: wrap;
+   gap: var(--fhcs-s2);
+}
+
+.fhcs-sheet .fhcs-resource
+{
+   display: flex;
+   align-items: baseline;
+   gap: var(--fhcs-s2);
+   padding: var(--fhcs-s1) var(--fhcs-s2);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+}
+
+/* Favorite groups: a fold button, then the spell slots, outside the button so a slot click never folds. */
+.fhcs-sheet .fhcs-group-toggle
+{
+   display: flex;
+   flex: 1;
+   align-items: center;
+   gap: var(--fhcs-s1);
+   min-height: var(--fhcs-control);
+   margin: 0;
+   padding: 0;
+   border: 0;
+   background: none;
+   color: inherit;
+   font-family: inherit;
+   text-align: left;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-group-toggle[aria-expanded="true"] .fhcs-caret { transform: rotate(90deg); }
+
+.fhcs-sheet .fhcs-slots
+{
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s1);
+}
+
+.fhcs-sheet .fhcs-slot
+{
+   width: 24px;
+   height: 24px;
+   margin: 0;
+   padding: 0;
+   border: 2px dashed var(--fhcs-muted);
+   border-radius: 50%;
+   background: none;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-slot.fhcs-on
+{
+   border: 2px solid var(--fhcs-die-ink);
+   background: var(--fhcs-die-ink);
+}
+
+/* Favorite rows. Equipped and prepared: a tint, a left edge and an icon, never color alone. */
+.fhcs-sheet .fhcs-favorite
+{
+   display: grid;
+   grid-template-columns: 24px minmax(0, 1fr) minmax(0, max-content) 44px;
+   align-items: center;
+   gap: var(--fhcs-s2);
+   min-height: 32px;
+   padding: 0 var(--fhcs-s1);
+   border-bottom: 1px solid var(--fhcs-line-soft);
+}
+
+.fhcs-sheet .fhcs-favorite.fhcs-equipped
+{
+   background: color-mix(in srgb, var(--fhcs-success) 12%, transparent);
+   box-shadow: inset 3px 0 0 var(--fhcs-success);
+}
+
+.fhcs-sheet .fhcs-favorite.fhcs-prepared
+{
+   background: color-mix(in srgb, var(--fhcs-adv) 12%, transparent);
+   box-shadow: inset 3px 0 0 var(--fhcs-adv);
+}
+
+.fhcs-sheet .fhcs-favorite-img
+{
+   width: 24px;
+   height: 24px;
+   border: 0;
+   border-radius: 4px;
+   object-fit: cover;
+}
+
+.fhcs-sheet .fhcs-favorite-use
+{
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s1);
+   min-width: 0;
+   min-height: var(--fhcs-control);
+   margin: 0;
+   padding: 0;
+   border: 0;
+   background: none;
+   color: inherit;
+   font-family: inherit;
+   text-align: left;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-favorite-name,
+.fhcs-sheet .fhcs-favorite-detail
+{
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+}
+
+.fhcs-sheet .fhcs-favorite-uses { text-align: right; white-space: nowrap; }
+.fhcs-sheet .fhcs-state { flex: none; width: 14px; height: 14px; stroke-width: 2.6; }
+.fhcs-sheet .fhcs-equipped .fhcs-state { color: var(--fhcs-success); }
+.fhcs-sheet .fhcs-prepared .fhcs-state { color: var(--fhcs-adv); }
+.fhcs-sheet .fhcs-state-fill { fill: currentColor; stroke: none; }
+.fhcs-sheet .fhcs-empty { margin: 0; padding: var(--fhcs-s2); }
