@@ -5,6 +5,7 @@ What's verified, what's waiting. Read when picking up work; CLAUDE.md holds only
 ## Verified in Foundry by the user
 
 - Track R basic tests pass after updating the installed copy to this branch (2026-10-24, user: "works on basic tests as expected").
+- Track R in play (2026-10-24, user's screenshots and reports): attack and damage bands with every die shown; late advantage and disadvantage by click order, the newest die in the slot; Roll again and the Critical switch keep their state and their places; earlier rolls scroll in their own box; open panels stay open on re-render; dark mode with a white default die; delayed tooltips cleared by a click; three text styles and compact panels ("very professional now").
 - The module registers: "Fallhammer Character Sheet" appears in a character's Sheet configuration (2026-10-23).
 
 ## Verified offline

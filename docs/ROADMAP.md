@@ -51,14 +51,14 @@ Runs alongside the sheet phases; works whatever sheet a player uses (client sett
 
 - ~~Outcome line on dnd5e's cards~~ (2026-10-23): built, then superseded by the one-card design (SCOPE §6.5); its wording code feeds the bands
 - [x] Mockup of the one card (attack with a rider save, Fireball, skill check, GM request, d20 row states) approved by the user (2026-10-23, "serviceable for now")
-- [ ] Card frame on usage cards: portrait, title, folding description, dnd5e's buttons as full-width bands (in code 2026-10-23; waits on the user)
-- [ ] d20 band: attack rolls drawn in the card, two d20s, natural and hit or miss in words, dice math on click (in code 2026-10-23; waits on the user)
-- [ ] Damage band: drawn in the card, crits double without asking, dice math on click (in code 2026-10-23; waits on the user)
+- [x] Card frame on usage cards: portrait, title, folding description, dnd5e's buttons as full-width bands (verified 2026-10-24)
+- [x] d20 band: attack rolls drawn in the card, two d20s, natural and hit or miss in words, dice math on click (verified 2026-10-24)
+- [x] Damage band: drawn in the card, crits double without asking, dice math on click (verified 2026-10-24)
 - [ ] Save / check band: roll for selected tokens, one row per token with its result in words (in code 2026-10-23; waits on the user)
 - [ ] Apply: dnd5e's damage and effect trays in "selected" mode, labelled, at least 24px (in code 2026-10-23; waits on the user)
 - [ ] Settings: roll attack on use, roll damage on use, always two d20s (world, on by default) (in code 2026-10-23; waits on the user)
 - [ ] No roll pop-ups (SCOPE §6.4): roll dialogs skipped; dnd5e's spellcasting and activity chooser windows stay (in code 2026-10-23, world setting; Shift brings a dialog back; waits on the user)
-- [ ] Late adds: advantage, disadvantage, + bonus (a number or a die) on any roll, shown as its own term (in code 2026-10-23; waits on the user)
+- [x] Late adds: advantage, disadvantage, + bonus (a number or a die) on any roll, shown as its own term (verified 2026-10-24)
 - [ ] Standalone rolls (sheet checks, saves, death saves, GM requests) in the same frame (in code 2026-10-23; waits on the user)
 - [ ] Compatibility: step aside cleanly when RSReforged is active
 
