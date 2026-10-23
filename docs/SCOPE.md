@@ -91,13 +91,11 @@ The user's rule (2026-10-23): the chat card holds everything; nobody holds a key
 - **Roll dialogs:** every roll fires the generic `dnd5e.preRoll` hook first (`dice/basic-roll.mjs`); setting `dialog.configure = false` there skips the dialog for all rolls. Advantage moves to the card (late advantage), so Alt and Ctrl are never needed.
 - **Damage on the same card:** Roll damage adds the damage to the attack's card instead of posting a new one; a critical hit doubles the dice without asking. Apply buttons sit under it.
 - **Saves on the same card:** Roll save for selected lists each token's result on the card that asked, with success or failure against the DC in words; concentration requests and their saves the same.
-- **Activity dialog** (`_requiresConfigurationDialog`, `documents/activity/mixin.mjs`): it opens to start concentration, choose consumption, or upcast. Use the defaults and skip it; consumption is shown on the card with Undo.
-- **Open — upcasting:** casting at a higher level needs the level before the roll. Options: level buttons on the sheet's spell row, or cast at the lowest level and offer "Cast at level N" buttons on the card that re-roll the scaled effect.
-- **Open — situational bonuses** (a one-off +2 the dialog used to take): a small "+ bonus" field on the card that adds to the total, or leave it to active effects.
+- **Activity dialogs stay** (user, 2026-10-23): the spellcasting window (slot level, concentration, consumption; `_requiresConfigurationDialog`, `documents/activity/mixin.mjs`) and the chooser for items with several activities are expected. We don't skip them.
+- **Late bonuses on the card** (user, 2026-10-23): a "+ bonus" control on any roll on the card adds a flat number or a die roll (a late Bless d4, a Bardic Inspiration d8) to that roll's total. The added part shows as its own term, so everyone can see what changed. Same for damage rolls.
 
 ## 7. Open questions
 
 - Shared themes with the quest log, or Light and Dark first?
 - Which sheet-changing modules matter at the user's table?
 - Does the "Now" strip live in the header, a tab, or both?
-- Upcasting and situational bonuses without dialogs (§6.4).
