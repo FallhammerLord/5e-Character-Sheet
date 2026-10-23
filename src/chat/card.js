@@ -63,8 +63,11 @@ export function cardParts(buttons, localize)
    return { bands, others };
 }
 
-/** Notes under a band's dice math: earlier rolls from the same band. */
-const earlierNote = (earlier, format) => (earlier.length ? [format('FHCS.Card.Earlier', { totals: earlier.join(', ') })] : []);
+/** Notes under a band's dice math: each earlier roll from the same band, with its own dice shown. */
+const earlierNote = (earlier, format) => earlier.map((math) => format('FHCS.Card.Earlier', { math }));
+
+/** One earlier roll's dice math, as a line: a d20 roll's sum, or each damage roll's. */
+const earlierMath = (facts) => (Array.isArray(facts.math) ? facts.math.map((m) => m.result).join(' · ') : `${facts.math} = ${facts.total}`);
 
 /** Notes for bonuses added late, each as its own term. */
 const bonusNotes = (bonuses, format) => bonuses.map((b) => format('FHCS.Card.Added', { formula: b.formula, total: b.total }));
@@ -95,7 +98,7 @@ function lateSlots(facts, row, format)
  * What a rolled d20 band shows: the total, the d20 row, the outcome in words, and (when opened) the dice math.
  *
  * @param {object} facts       From compat.rollFacts, for the latest roll.
- * @param {number[]} earlier   Totals of earlier rolls from the same band, oldest first.
+ * @param {string[]} earlier   Earlier rolls from the same band, oldest first, as dice math.
  * @param {Function} format    (key, data) => localized text.
  */
 export function d20Band(facts, earlier, format)
@@ -134,7 +137,7 @@ export function d20Band(facts, earlier, format)
  * roll's dice math and a way to roll it again as a critical or not.
  *
  * @param {object} facts       From compat.damageFacts, for the latest roll.
- * @param {number[]} earlier   Totals of earlier damage rolls from the card, oldest first.
+ * @param {string[]} earlier   Earlier damage rolls from the card, oldest first, as dice math.
  * @param {Function} format    (key, data) => localized text.
  * @param {object} [options]
  * @param {boolean} [options.canCrit]  The card has an attack, so damage can be a critical.
@@ -308,7 +311,7 @@ export function makeUsageMessageData(Base)
             if (!source) { continue; }
             const rolls = rollsFrom(this.parent, source.types);
             const facts = rolls.length ? source.facts(rolls.at(-1)) : null;
-            const earlier = rolls.slice(0, -1).map((m) => source.facts(m)?.total).filter((t) => t !== undefined);
+            const earlier = rolls.slice(0, -1).map((m) => source.facts(m)).filter(Boolean).map(earlierMath);
             if (facts) { band.rolled = source.draw(facts, earlier, format, { canCrit }); }
             else if (rolls.length) { band.text = localize('FHCS.Card.HiddenRoll'); }
             if (facts && (band.kind === 'damage')) { band.damageId = facts.messageId; }

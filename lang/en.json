@@ -58,7 +58,7 @@
       "DieCounts": "{value} counts",
       "DieDropped": "{value} dropped",
       "Spare": "Next d20 ready: {value}",
-      "Earlier": "Earlier rolls: {totals}",
+      "Earlier": "Earlier: {math}",
       "RollAgain": "Roll again",
       "HiddenRoll": "Rolled (hidden)",
       "CriticalDoubled": "Critical: dice doubled",

@@ -48,7 +48,7 @@ const rolledAttack = (facts, earlier = [], damageFacts = null) =>
 {
    const context = card({}, ATTACK);
    context.fhcs.bands[0].rolled = { ...d20Band(facts, earlier, format), open: true };
-   if (damageFacts) { context.fhcs.bands[1].rolled = { ...damageBand(damageFacts, [9], format, { canCrit: true }), open: true }; }
+   if (damageFacts) { context.fhcs.bands[1].rolled = { ...damageBand(damageFacts, ['(3 + 1) + 5 = 9'], format, { canCrit: true }), open: true }; }
    return context;
 };
 
@@ -129,7 +129,7 @@ export const CASES = [
    },
    { name: 'card-request', template: 'chat/request-card', frame: 'chat', context: request() },
    { name: 'card-fireball-saves', template: 'chat/usage-card', frame: 'chat', context: fireball() },
-   { name: 'card-attack-crit', template: 'chat/usage-card', frame: 'chat', context: rolledAttack(attack(), [14, 9], damage()) },
+   { name: 'card-attack-crit', template: 'chat/usage-card', frame: 'chat', context: rolledAttack(attack(), ['6 + 5 + 3 = 14', '1 + 5 + 3 = 9'], damage()) },
    {
       name: 'card-damage-mixed',
       template: 'chat/usage-card',
