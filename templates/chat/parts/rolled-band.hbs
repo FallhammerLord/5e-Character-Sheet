@@ -9,21 +9,26 @@
          <span class="fhcs-band-parts">{{#each rolled.parts}}<span>{{ text }}</span>{{/each}}</span>
          {{/if}}
       </span>
-      {{#if rolled.words.length}}
-      <span class="fhcs-band-words{{#if rolled.verdict}} fhcs-verdict-{{ rolled.verdict }}{{/if}}">{{#each rolled.words}}<span>{{ this }}</span>{{/each}}</span>
-      {{/if}}
+      {{!-- Always present and two lines tall, so a band keeps its height from one roll to the next. --}}
+      <span class="fhcs-band-words fhcs-band-words-fixed{{#if rolled.verdict}} fhcs-verdict-{{ rolled.verdict }}{{/if}}">{{#each rolled.words}}<span>{{ this }}</span>{{/each}}</span>
    </summary>
    <div class="fhcs-band-body">
       {{#each rolled.mathLines}}<p class="fhcs-band-math">{{ formula }}<br><strong>{{ result }}</strong></p>{{/each}}
-      {{#each rolled.notes}}<p class="fhcs-band-note">{{ this }}</p>{{/each}}
-      {{!-- Buttons sit above the history, so more rolls never push them down. --}}
+      {{!-- Buttons sit right under the math (a fixed number of lines per item); notes and history go below them,
+           so they never push the buttons. --}}
       {{> "modules/fhcs/templates/chat/parts/bonus.hbs" rolled }}
       {{#if @root.fhcs.canAct}}
-      <div class="fhcs-card-actions">
-         {{#if action}}<button type="button" class="fhcs-button" data-action="{{ action }}" data-index="{{ index }}">{{ rolled.againLabel }}</button>{{/if}}
-         {{#each rolled.extra}}<button type="button" class="fhcs-button" data-fhcs-action="{{ action }}">{{ label }}</button>{{/each}}
+      {{!-- Two fixed columns on every band: Roll again left, the critical switch right (an empty cell if none). --}}
+      <div class="fhcs-band-controls">
+         {{#if action}}<button type="button" class="fhcs-button" data-action="{{ action }}" data-index="{{ index }}">{{ rolled.againLabel }}</button>{{else}}<span></span>{{/if}}
+         {{#each rolled.extra}}
+         <button type="button" class="fhcs-button fhcs-switch" data-fhcs-action="{{ action }}" aria-pressed="{{#if pressed}}true{{else}}false{{/if}}" aria-label="{{ title }}" data-tooltip="{{ title }}"><span class="fhcs-switch-box" aria-hidden="true">{{#if pressed}}✓{{/if}}</span>{{ label }}</button>
+         {{else}}
+         <span></span>
+         {{/each}}
       </div>
       {{/if}}
+      {{#each rolled.notes}}<p class="fhcs-band-note">{{ this }}</p>{{/each}}
       {{#if rolled.history.length}}
       <div class="fhcs-history" role="region" tabindex="0" aria-label="{{ rolled.historyLabel }}">
          {{#each rolled.history}}<p class="fhcs-band-note">{{ this }}</p>{{/each}}

@@ -148,13 +148,16 @@ export function damageBand(facts, earlier, format, { canCrit = false } = {})
    const words = [];
    if (facts.critical) { words.push(format('FHCS.Card.CriticalDoubled', {})); }
    if (facts.onSave) { words.push(format('FHCS.Card.OnSave', { rule: facts.onSave })); }
-   const extra = [];
-   if (canCrit || facts.critical)
-   {
-      extra.push(facts.critical
-         ? { action: 'damageNormal', label: format('FHCS.Card.RollNormal', {}) }
-         : { action: 'damageCritical', label: format('FHCS.Card.RollCritical', {}) });
-   }
+   // One switch with a fixed label, checked while this damage is a critical; clicking re-rolls it the other way.
+   const extra = (canCrit || facts.critical)
+      ? [{
+         action: facts.critical ? 'damageNormal' : 'damageCritical',
+         label: format('FHCS.Card.Critical', {}),
+         pressed: facts.critical,
+         title: format(facts.critical ? 'FHCS.Card.RollNormal' : 'FHCS.Card.RollCritical', {})
+      }]
+      : [];
+
    return {
       total: facts.total,
       critical: facts.critical,

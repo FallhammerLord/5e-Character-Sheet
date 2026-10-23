@@ -63,8 +63,8 @@
       "HiddenRoll": "Rolled (hidden)",
       "CriticalDoubled": "Critical: dice doubled",
       "OnSave": "On a save: {rule}",
-      "RollNormal": "Roll as normal",
-      "RollCritical": "Roll as critical",
+      "RollNormal": "Roll again as normal damage",
+      "RollCritical": "Roll again as a critical hit",
       "RollForSelected": "Rolls for selected tokens",
       "Resist": "Legendary Resistance",
       "Apply": "Apply",
@@ -82,7 +82,8 @@
       "Waiting": "waiting",
       "RollShort": "Roll",
       "Dropped": "Rerolled or dropped: {dice}",
-      "History": "Earlier rolls"
+      "History": "Earlier rolls",
+      "Critical": "Critical"
     }
   }
 }
