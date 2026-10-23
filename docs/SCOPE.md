@@ -38,7 +38,8 @@ Header decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrdDsbn
 - **Portrait frame 160 wide, up to 240 tall:** round, square and tall art all fit; the header grows with tall art and nothing else moves. HP, its bar and Temp sit under the frame.
 - **Corner chips on the frame:** exhaustion, inspiration, rest, hit dice.
 - **Ability emphasis is a per-player choice** (client setting): modifier large with the score small (our default), or Classic's large score.
-- **Leveling follows dnd5e's `levelingMode` world setting** (the GM's choice; we add no setting of our own). XP modes show the usual XP bar. Milestone mode (`noxp`) shows a fold-out tray of the milestones the character has collected in place of the bar.
+- **Leveling follows dnd5e's `levelingMode` world setting** (the GM's choice; we add no setting of our own). XP modes show the usual XP bar. Milestone mode (`noxp`) puts a Level button where the bar was; it folds out a tray of 20 pips (4 rows of 5). Each class level fills the next pip with that class's icon, in the order the levels were gained; empty pips show levels not reached. A pip fills when the player levels up through dnd5e, after its advancement finishes. Nothing to add by hand.
+  - To research: dnd5e stores levels per class, not their order. We record the order in an actor flag at each level-up; characters from before that fill class by class, original class first. Icons: the class item's own image, so any source's classes work.
 - **Pinned strip** when scrolled (§4.5): portrait thumbnail, name, HP and bar, AC, conditions, inspiration.
 - At 560px the AC, Init and ability columns wrap into two rows of four.
 
