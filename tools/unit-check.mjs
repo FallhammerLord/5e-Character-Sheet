@@ -5,7 +5,7 @@
 import { deepStrictEqual } from 'node:assert';
 import { describeRoll } from '../src/chat/outcome.js';
 import { cardParts, damageBand, saveRow } from '../src/chat/card.js';
-import { d20Row } from '../src/chat/d20.js';
+import { countingDie, d20Row, modeForSides } from '../src/chat/d20.js';
 import { format, localize } from './templates.mjs';
 
 const facts = (over) => ({
@@ -98,6 +98,22 @@ for (const [name, results, mode, sides, expected] of ROW_CASES)
    if (got !== expected) { problems.push(`d20 row, ${name}: got "${got}", expected "${expected}"`); }
 }
 
+// Late adds: which die counts once dice sit on either side, and the mode dnd5e records.
+const KEEP_CASES = [
+   ['no extra dice', [12], [], 0, 0],
+   ['advantage takes the higher', [12, 15], ['adv'], 1, 1],
+   ['advantage keeps the primary when it is higher', [18, 3], ['adv'], 0, 1],
+   ['disadvantage takes the lower', [12, 4], ['dis'], 1, -1],
+   ['Elven Accuracy: highest of three', [12, 15, 18], ['adv', 'adv'], 2, 1],
+   ['both sides cancel: primary counts', [12, 19, 2], ['adv', 'dis'], 0, 0],
+   ['a tie goes to the primary', [15, 15], ['adv'], 0, 1]
+];
+for (const [name, values, sides, keep, mode] of KEEP_CASES)
+{
+   const got = [countingDie(values, sides), modeForSides(sides)];
+   if (got[0] !== keep || got[1] !== mode) { problems.push(`late adds, ${name}: got die ${got[0]}, mode ${got[1]}; expected die ${keep}, mode ${mode}`); }
+}
+
 // Damage band: words, totals by type, and the critical switch.
 const dmg = (over) => ({ healing: false, critical: false, total: 12, parts: [{ type: 'fire', label: 'Fire', total: 12 }], math: [],
    onSave: '', ...over });
@@ -138,4 +154,4 @@ for (const [name, input, expected] of SAVE_CASES)
 
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
 console.log(`${CASES.length} outcome lines, ${PART_CASES.length} card layouts, ${ROW_CASES.length} d20 rows, `
-   + `${DAMAGE_CASES.length} damage bands and ${SAVE_CASES.length} save rows read as expected.`);
+   + `${DAMAGE_CASES.length} damage bands, ${SAVE_CASES.length} save rows and ${KEEP_CASES.length} late adds read as expected.`);

@@ -58,7 +58,7 @@ Runs alongside the sheet phases; works whatever sheet a player uses (client sett
 - [ ] Apply: dnd5e's damage and effect trays in "selected" mode, labelled, at least 24px (in code 2026-10-23; waits on the user)
 - [ ] Settings: roll attack on use, roll damage on use, always two d20s (world, on by default) (in code 2026-10-23; waits on the user)
 - [ ] No roll pop-ups (SCOPE §6.4): roll dialogs skipped; dnd5e's spellcasting and activity chooser windows stay (in code 2026-10-23, world setting; Shift brings a dialog back; waits on the user)
-- [ ] Late adds: advantage, disadvantage, + bonus (a number or a die) on any roll, shown as its own term
+- [ ] Late adds: advantage, disadvantage, + bonus (a number or a die) on any roll, shown as its own term (in code 2026-10-23; waits on the user)
 - [ ] Standalone rolls (sheet checks, saves, death saves, GM requests) in the same frame
 - [ ] Compatibility: step aside cleanly when RSReforged is active
 

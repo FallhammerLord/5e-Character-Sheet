@@ -1,8 +1,9 @@
 /**
  * The only place for version-sensitive Foundry and dnd5e APIs. When dnd5e or Foundry moves something, fix it here.
- * Checked against dnd5e 6.0.6 (module/applications/actor/character-sheet.mjs, dnd5e.mjs, documents/chat-message.mjs,
+ * Checked against dnd5e 6.0.6 and Foundry 14 rolls (`Roll#_evaluateTotal`, `Roll#resetFormula`, `Roll.fromData`) (module/applications/actor/character-sheet.mjs, dnd5e.mjs, documents/chat-message.mjs,
  * data/chat-message/, dice/d20-roll.mjs). Chat facts: docs/research/dnd5e-6.0-chat.md.
  */
+import { countingDie, modeForSides } from './chat/d20.js';
 
 /** dnd5e's own character sheet, which ours extends so every mechanic keeps working. Set by dnd5e before init. */
 export function systemCharacterSheet()
@@ -93,8 +94,16 @@ export function rollFacts(message)
       spare: roll.options.fhcs?.spare ?? null,
       formula: roll.formula,
       math: roll.result,
-      canResist: Boolean(system.canResist)
+      canResist: Boolean(system.canResist),
+      canEdit: canEdit(message),
+      bonuses: roll.options.fhcs?.bonuses ?? []
    };
+}
+
+/** Whether this user may change a roll message: its author or the GM (Foundry's rule for updating messages). */
+export function canEdit(message)
+{
+   return Boolean(message.isAuthor || game.user.isGM);
 }
 
 /** Whether a save or check message answers a card's save or check button (by skill, tool or ability). */
@@ -148,6 +157,8 @@ export function damageFacts(message)
    const onSave = message.system?.onSave;
    return {
       messageId: message.id,
+      canEdit: canEdit(message),
+      bonuses: rolls.flatMap((r) => r.options.fhcs?.bonuses ?? []),
       healing: message.type === 'healing',
       critical: rolls.some((r) => r.isCritical),
       total: rolls.reduce((sum, r) => sum + Math.max(0, r.total), 0),
@@ -216,4 +227,100 @@ export function isD20Roll(roll)
 {
    const D20Roll = CONFIG.Dice.D20Roll;
    return Boolean(D20Roll) && (roll instanceof D20Roll);
+}
+
+/** One d20 rolled now, with Dice So Nice's animation when it is active. */
+async function freshD20()
+{
+   const roll = await new Roll('1d20').evaluate();
+   await game.dice3d?.showForRoll?.(roll, game.user, true);
+   return roll.total;
+}
+
+/** A roll's copy to change, and the message update that saves it in place of the original. */
+function editable(message, index)
+{
+   const roll = message.rolls?.[index];
+   if (!roll) { return null; }
+   const copy = roll.constructor.fromData(roll.toJSON());
+   copy.options.fhcs = { ...copy.options.fhcs };
+   const save = () =>
+   {
+      copy._total = copy._evaluateTotal();
+      copy.resetFormula();
+      return message.update({ rolls: message.rolls.map((r, i) => (i === index ? copy : r)) });
+   };
+   return { copy, save };
+}
+
+/**
+ * Late advantage or disadvantage (SCOPE §6.6): adds a d20 on one side of a d20 roll, keeps every die already there,
+ * recomputes which die counts, and saves the roll in place. The first die added is the spare rolled in advance.
+ *
+ * @param {ChatMessage} message   A check, save or attack message.
+ * @param {'adv'|'dis'} side
+ */
+export async function addD20(message, side)
+{
+   if (!isD20Roll(message.rolls?.[0]) || !canEdit(message)) { return; }
+   const { copy, save } = editable(message, 0);
+   const d20 = copy.d20;
+   const live = d20.results.filter((r) => !r.rerolled);
+   const mode = copy.options.advantageMode ?? 0;
+   const sides = copy.options.fhcs.sides ?? live.slice(1).map(() => (mode === -1 ? 'dis' : 'adv'));
+   const value = copy.options.fhcs.spare ?? await freshD20();
+   const added = { result: value, active: true };
+   d20.results.push(added);
+   const all = [...live, added];
+   sides.push(side);
+   const keep = countingDie(all.map((r) => r.result), sides);
+   all.forEach((r, i) => { r.active = i === keep; r.discarded = i !== keep; });
+   d20.modifiers = d20.modifiers.filter((m) => !/^(adv|dis|kh|kl)/i.test(m));
+   copy.options.advantageMode = modeForSides(sides);
+   d20.options.advantageMode = copy.options.advantageMode;
+   copy.options.fhcs.sides = sides;
+   copy.options.fhcs.spare = null;
+   await save();
+}
+
+/**
+ * A late bonus or penalty (SCOPE §6.4): rolls a number or dice formula ("2", "1d4", "-1d4") and adds it to a roll as
+ * its own term, then saves the roll in place.
+ *
+ * @param {ChatMessage} message
+ * @param {string} formula
+ * @param {number} [index]   Which of the message's rolls (damage messages may hold several).
+ * @returns {Promise<boolean>} False when the formula isn't a roll.
+ */
+export async function addBonus(message, formula, index = 0)
+{
+   const text = formula.trim();
+   if (!text || !Roll.validate(text) || !canEdit(message)) { return false; }
+   const target = editable(message, index);
+   if (!target) { return false; }
+   const bonus = await new Roll(text, target.copy.data).evaluate();
+   if (!bonus.isDeterministic) { await game.dice3d?.showForRoll?.(bonus, game.user, true); }
+   const terms = bonus.terms;
+   if (!(terms[0] instanceof foundry.dice.terms.OperatorTerm))
+   {
+      target.copy.terms.push(new foundry.dice.terms.OperatorTerm({ operator: '+' }));
+   }
+   target.copy.terms.push(...terms);
+   target.copy.options.fhcs.bonuses = [...(target.copy.options.fhcs.bonuses ?? []), { formula: bonus.formula, total: bonus.total }];
+   await target.save();
+   return true;
+}
+
+/**
+ * Re-renders the usage card a roll belongs to, on every client, when the roll changes in place. dnd5e refreshes the
+ * card only when a roll's `system` data changes (`ChatMessage5e#_onUpdate`); late adds change its rolls.
+ *
+ * @param {ChatMessage} message
+ */
+export async function refreshCard(message)
+{
+   const origin = usageOrigin(message);
+   if (!origin) { return; }
+   await origin.system?.onDescendentRefresh?.(message);
+   ui.chat?.updateMessage(origin);
 }

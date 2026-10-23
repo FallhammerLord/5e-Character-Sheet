@@ -580,3 +580,66 @@
 {
    font-weight: bold;
 }
+
+/* Late adds: slots either side of the d20 row, and the bonus field. */
+.fhcs-chat .fhcs-slot
+{
+   width: auto;
+   height: auto;
+   min-height: 32px;
+   margin: 0;
+   padding: 0.125rem 0.5rem;
+   border: 2px dashed currentColor;
+   border-radius: 6px;
+   background: transparent;
+   font: inherit;
+   font-size: var(--fhcs-text-small);
+   font-weight: bold;
+   cursor: pointer;
+}
+
+.fhcs-chat .fhcs-slot-small
+{
+   min-width: 28px;
+   min-height: 28px;
+   padding: 0;
+   border-radius: 50%;
+}
+
+.fhcs-chat .fhcs-slot-dis
+{
+   color: var(--fhcs-dis);
+}
+
+.fhcs-chat .fhcs-slot-adv
+{
+   color: var(--fhcs-adv);
+}
+
+.fhcs-chat .fhcs-slot:focus-visible
+{
+   outline: 2px solid currentColor;
+   outline-offset: 2px;
+}
+
+.fhcs-chat .fhcs-bonus
+{
+   display: flex;
+   justify-content: center;
+   gap: 0.375rem;
+}
+
+.fhcs-chat .fhcs-bonus-input
+{
+   width: 6rem;
+   min-width: 0;
+   height: auto;
+   min-height: 32px;
+   padding: 0 0.375rem;
+   border: 1px solid var(--fhcs-line);
+   border-radius: 6px;
+   background: transparent;
+   color: inherit;
+   font: inherit;
+   text-align: center;
+}

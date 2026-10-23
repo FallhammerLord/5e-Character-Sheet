@@ -4,7 +4,8 @@ import { makeCharacterSheet } from './apps/CharacterSheet.js';
 import { registerQuenchTests } from './tests/quench.js';
 import { registerSettings } from './settings.js';
 import { makeUsageMessageData } from './chat/card.js';
-import { addSpareD20, damageAfterAttack, damageAfterUse, foldIntoCard, rollOnUse, skipRollDialog } from './chat/rolls.js';
+import { addSpareD20, damageAfterAttack, damageAfterUse, foldIntoCard, refreshOnRollChange, rollOnUse, skipRollDialog }
+   from './chat/rolls.js';
 
 Hooks.once('init', () =>
 {
@@ -27,6 +28,7 @@ Hooks.once('init', () =>
 // One card per action: rolls made from a card draw in its bands; d20 rolls carry a spare die.
 Hooks.on('dnd5e.renderChatMessage', foldIntoCard);
 Hooks.on('dnd5e.postRollConfiguration', addSpareD20);
+Hooks.on('updateChatMessage', refreshOnRollChange);
 // Roll on use and no roll dialogs (world settings).
 Hooks.on('dnd5e.preUseActivity', rollOnUse);
 Hooks.on('dnd5e.postUseActivity', damageAfterUse);

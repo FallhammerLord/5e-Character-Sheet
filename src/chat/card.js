@@ -8,8 +8,8 @@
  * `effect-application`) work inside our markup. Slices 2–8 fill the bands with results.
  */
 import { MODULE_ID } from '../constants.js';
-import { actorArtwork, answersButton, canApplyDamage, damageFacts, openTrays, preferSelected, rollCardDamage, rollFacts,
-   rollsFrom } from '../compat.js';
+import { actorArtwork, addBonus, addD20, answersButton, canApplyDamage, damageFacts, openTrays, preferSelected,
+   rollCardDamage, rollFacts, rollsFrom } from '../compat.js';
 import { describeRoll } from './outcome.js';
 import { d20Row, dieClasses } from './d20.js';
 
@@ -61,6 +61,29 @@ export function cardParts(buttons, localize)
 /** Notes under a band's dice math: earlier rolls from the same band. */
 const earlierNote = (earlier, format) => (earlier.length ? [format('FHCS.Card.Earlier', { totals: earlier.join(', ') })] : []);
 
+/** Notes for bonuses added late, each as its own term. */
+const bonusNotes = (bonuses, format) => bonuses.map((b) => format('FHCS.Card.Added', { formula: b.formula, total: b.total }));
+
+/** The late "+ Bonus" field, for whoever may change the roll. */
+const bonusField = (facts, format) => (facts.canEdit
+   ? { label: format('FHCS.Card.AddBonus', {}), placeholder: format('FHCS.Card.BonusPlaceholder', {}),
+      aria: format('FHCS.Card.BonusAria', {}) }
+   : null);
+
+/** The late advantage and disadvantage slots either side of the d20 row: a word while empty, "+" once dice are there. */
+function lateSlots(facts, row, format)
+{
+   if (!facts.canEdit) { return null; }
+   const slot = (side, dice) => ({
+      action: side === 'dis' ? 'lateDisadvantage' : 'lateAdvantage',
+      side,
+      small: dice.length > 0,
+      label: dice.length ? '+' : format(side === 'dis' ? 'FHCS.Card.Disadvantage' : 'FHCS.Card.Advantage', {}),
+      aria: format(side === 'dis' ? 'FHCS.Card.AddDisadvantage' : 'FHCS.Card.AddAdvantage', {})
+   });
+   return { left: slot('dis', row.left), right: slot('adv', row.right) };
+}
+
 /**
  * What a rolled d20 band shows: the total, the d20 row, the outcome in words, and (when opened) the dice math.
  *
@@ -85,8 +108,15 @@ export function d20Band(facts, earlier, format)
          dice: all.map((d) => format(d.counts ? 'FHCS.Card.DieCounts' : 'FHCS.Card.DieDropped', { value: d.value }))
             .join(', ')
       }),
+      rollId: facts.messageId,
+      slots: lateSlots(facts, row, format),
+      bonus: bonusField(facts, format),
       mathLines: [{ formula: facts.formula, result: `${facts.math} = ${facts.total}` }],
-      notes: [...(facts.spare ? [format('FHCS.Card.Spare', { value: facts.spare })] : []), ...earlierNote(earlier, format)],
+      notes: [
+         ...bonusNotes(facts.bonuses ?? [], format),
+         ...(facts.spare ? [format('FHCS.Card.Spare', { value: facts.spare })] : []),
+         ...earlierNote(earlier, format)
+      ],
       againLabel: format('FHCS.Card.RollAgain', {}),
       extra: []
    };
@@ -124,8 +154,10 @@ export function damageBand(facts, earlier, format, { canCrit = false } = {})
       parts: facts.parts.length === 1
          ? (facts.parts[0].label ? [{ text: facts.parts[0].label }] : [])
          : facts.parts.map((p) => ({ text: p.label ? `${p.total} ${p.label}` : `${p.total}` })),
+      rollId: facts.messageId,
+      bonus: bonusField(facts, format),
       mathLines: facts.math.map((m) => ({ formula: m.label ? `${m.formula} (${m.label})` : m.formula, result: m.result })),
-      notes: earlierNote(earlier, format),
+      notes: [...bonusNotes(facts.bonuses ?? [], format), ...earlierNote(earlier, format)],
       againLabel: format('FHCS.Card.RollAgain', {}),
       extra
    };
@@ -150,6 +182,10 @@ export function saveRow(facts, format)
       words: verdict ? band.words.slice(1) : band.words,
       row: band.row,
       diceLabel: band.diceLabel,
+      rollId: band.rollId,
+      slots: band.slots,
+      bonus: band.bonus,
+      notes: band.notes,
       mathLines: band.mathLines,
       canResist: facts.canResist,
       resistLabel: format('FHCS.Card.Resist', {})
@@ -249,12 +285,25 @@ export function makeUsageMessageData(Base)
          {
             button.addEventListener('click', (event) => this.#onCardAction(event, button));
          }
+         // Enter in a bonus field adds the bonus.
+         for (const input of element.querySelectorAll('.fhcs-bonus-input'))
+         {
+            input.addEventListener('keydown', (event) =>
+            {
+               if (event.key !== 'Enter') { return; }
+               event.preventDefault();
+               input.closest('.fhcs-bonus')?.querySelector('[data-fhcs-action="addBonus"]')?.click();
+            });
+         }
       }
 
       /** Our own card buttons (dnd5e's have `data-action` and go through dnd5e). */
       async #onCardAction(event, button)
       {
+         // Buttons can sit inside a band's <summary>; a click there must not also fold the band.
          event.preventDefault();
+         event.stopPropagation();
+         const roll = game.messages.get(button.dataset.rollId);
          button.disabled = true;
          try
          {
@@ -262,6 +311,17 @@ export function makeUsageMessageData(Base)
             {
                case 'damageNormal': await rollCardDamage(this.parent, { event, isCritical: false }); break;
                case 'damageCritical': await rollCardDamage(this.parent, { event, isCritical: true }); break;
+               case 'lateAdvantage': if (roll) { await addD20(roll, 'adv'); } break;
+               case 'lateDisadvantage': if (roll) { await addD20(roll, 'dis'); } break;
+               case 'addBonus':
+               {
+                  const input = button.closest('.fhcs-bonus')?.querySelector('input');
+                  if (roll && input?.value.trim() && !(await addBonus(roll, input.value)))
+                  {
+                     ui.notifications?.warn(game.i18n.format('FHCS.Card.BonusInvalid', { formula: input.value }));
+                  }
+                  break;
+               }
             }
          }
          finally { button.disabled = false; }

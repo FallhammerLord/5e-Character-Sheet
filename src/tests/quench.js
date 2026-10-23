@@ -1,5 +1,5 @@
 import { MODULE_ID, SHEET_ID, SYSTEM_ACTIONS } from '../constants.js';
-import { systemCharacterSheet } from '../compat.js';
+import { addBonus, addD20, systemCharacterSheet } from '../compat.js';
 
 /** How long a click may take to reach dnd5e's hook before a test fails. */
 const HOOK_WAIT_MS = 3000;
@@ -283,6 +283,44 @@ export function registerQuenchTests(quench)
             finally
             {
                await game.settings.set(MODULE_ID, 'rollDamageOnUse', false);
+               for (const message of usage.getAssociatedRolls()) { await message.delete(); }
+               await usage.delete();
+            }
+         });
+
+         it('adds late advantage, disadvantage and a bonus to an attack, in place', async function ()
+         {
+            const results = await activity.use({ subsequentActions: false, consume: false }, { configure: false },
+               { rollMode: 'selfroll' });
+            const usage = results?.message;
+            try
+            {
+               await activity.rollAttack({}, { configure: false },
+                  { rollMode: 'selfroll', data: { system: { origin: usage.id } } });
+               const attack = () => usage.getAssociatedRolls('attack').at(-1);
+               const first = attack().rolls[0];
+               const primary = first.d20.results[0].result;
+               const bonus = first.total - first.d20.total;
+               const spare = first.options.fhcs?.spare;
+
+               await addD20(attack(), 'adv');
+               let roll = attack().rolls[0];
+               const advDie = roll.d20.results.at(-1).result;
+               if (spare) { assert.strictEqual(advDie, spare, 'the spare d20 is used first'); }
+               assert.strictEqual(roll.options.advantageMode, 1);
+               assert.strictEqual(roll.total, Math.max(primary, advDie) + bonus, 'higher die counts');
+
+               await addD20(attack(), 'dis');
+               roll = attack().rolls[0];
+               assert.strictEqual(roll.options.advantageMode, 0, 'both sides cancel');
+               assert.strictEqual(roll.total, primary + bonus, 'primary counts');
+               assert.lengthOf(roll.d20.results, 3, 'no die erased');
+
+               assert.isTrue(await addBonus(attack(), '2'));
+               assert.strictEqual(attack().rolls[0].total, primary + bonus + 2, 'bonus added as its own term');
+            }
+            finally
+            {
                for (const message of usage.getAssociatedRolls()) { await message.delete(); }
                await usage.delete();
             }

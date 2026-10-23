@@ -65,7 +65,16 @@
       "RollForSelected": "Rolls for selected tokens",
       "Resist": "Legendary Resistance",
       "Apply": "Apply",
-      "ApplyNote": "To selected tokens. Damage halves for each token that saved, if the spell says so."
+      "ApplyNote": "To selected tokens. Damage halves for each token that saved, if the spell says so.",
+      "Disadvantage": "Disadv.",
+      "Advantage": "Adv.",
+      "AddDisadvantage": "Add a disadvantage die",
+      "AddAdvantage": "Add an advantage die",
+      "AddBonus": "+ Bonus",
+      "BonusPlaceholder": "1d4 or 2",
+      "BonusAria": "Bonus to add",
+      "Added": "Added {formula}: {total}",
+      "BonusInvalid": "Not a roll: {formula}"
     }
   }
 }

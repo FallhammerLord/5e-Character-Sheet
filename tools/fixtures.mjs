@@ -33,13 +33,14 @@ const attack = (over = {}) => ({
    kind: 'attack', who: 'Kira', what: 'Longsword', total: 28, natural: 20, target: null, showResult: true,
    success: null, isCritical: true, targets: [{ name: 'Goblin Boss', isMiss: false }],
    dice: [{ result: 20, active: true }], advantageMode: 0, sides: [], spare: 7,
-   formula: '1d20 + 5 + 3', math: '20 + 5 + 3', ...over
+   formula: '1d20 + 5 + 3', math: '20 + 5 + 3', messageId: 'a1', canEdit: true, bonuses: [], ...over
 });
 
 /** Facts for a damage roll, as compat.damageFacts returns them, with overrides. */
 const damage = (over = {}) => ({
    healing: false, critical: true, total: 16, parts: [{ type: 'slashing', label: 'Slashing', total: 16 }],
-   math: [{ formula: '2d8 + 5', result: '6 + 5 + 5 = 16', label: 'Slashing' }], onSave: '', ...over
+   math: [{ formula: '2d8 + 5', result: '6 + 5 + 5 = 16', label: 'Slashing' }], onSave: '', messageId: 'd1', canEdit: true,
+   bonuses: [{ formula: '1d4', total: 3 }], ...over
 });
 
 /** The attack card with its attack band (and optionally its damage band) rolled and open. */
@@ -55,7 +56,7 @@ const rolledAttack = (facts, earlier = [], damageFacts = null) =>
 const save = (who, total, natural, success, over = {}) => ({
    kind: 'save', who, what: 'Dexterity Saving Throw', total, natural, target: 15, showResult: true, success,
    isCritical: false, targets: [], dice: [{ result: natural, active: true }], advantageMode: 0, sides: [], spare: 11,
-   formula: '1d20 + 2', math: `${natural} + 2`, canResist: false, messageId: who, ...over
+   formula: '1d20 + 2', math: `${natural} + 2`, canResist: false, messageId: who, canEdit: true, bonuses: [], ...over
 });
 
 /** Fireball with three saves in, one of them a monster that can still use Legendary Resistance. */
@@ -67,7 +68,8 @@ const fireball = () =>
    band.rows = [
       saveRow(save('Goblin', 9, 7, false), format),
       saveRow(save('Bugbear', 17, 15, true), format),
-      saveRow(save('Adult Red Dragon of the Smoking Peaks', 4, 1, false, { canResist: true }), format)
+      { ...saveRow(save('Adult Red Dragon of the Smoking Peaks', 4, 1, false, { canResist: true, sides: ['dis'], spare: null,
+         dice: [{ result: 3, active: false, discarded: true }, { result: 1, active: true }] }), format), open: true }
    ];
    context.fhcs.bands[1].rolled = damageBand({ healing: false, critical: false, total: 28, parts: [{ type: 'fire', label: 'Fire', total: 28 }],
       math: [{ formula: '8d6', result: '6 + 5 + 4 + 3 + 2 + 4 + 1 + 3 = 28', label: 'Fire' }], onSave: 'Half Damage' }, [], format);

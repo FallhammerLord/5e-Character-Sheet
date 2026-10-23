@@ -11,7 +11,7 @@
  * - No roll dialogs (SCOPE §6.4); holding dnd5e's skip-dialog key brings the dialog back.
  */
 import { MODULE_ID } from '../constants.js';
-import { d20Now, isD20Roll, rollCardDamage, skipKeyHeld, usageOrigin } from '../compat.js';
+import { d20Now, isD20Roll, refreshCard, rollCardDamage, skipKeyHeld, usageOrigin } from '../compat.js';
 
 const setting = (key) => game.settings.get(MODULE_ID, key);
 
@@ -95,4 +95,15 @@ export function skipRollDialog(config, dialog)
 {
    if (!setting('noRollDialogs')) { return; }
    dialog.configure ??= skipKeyHeld(config.event);
+}
+
+/**
+ * `updateChatMessage` (every client): a roll changed in place by a late add re-renders the card that draws it.
+ *
+ * @param {ChatMessage} message
+ * @param {object} changed
+ */
+export function refreshOnRollChange(message, changed)
+{
+   if (('rolls' in changed) && FOLDED_TYPES.has(message.type)) { refreshCard(message); }
 }

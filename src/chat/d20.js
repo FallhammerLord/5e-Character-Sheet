@@ -48,4 +48,34 @@ export function dieClasses(die)
    ].filter(Boolean).join(' ');
 }
 
+/**
+ * Which die counts once dice sit on both sides (SCOPE §6.6): advantage dice alone, the highest of them and the
+ * primary; disadvantage dice alone, the lowest; both sides, they cancel and the primary counts. Ties go to the
+ * primary, then the earlier die.
+ *
+ * @param {number[]} values   The primary die, then each extra die, in the order rolled.
+ * @param {string[]} sides    'adv' or 'dis' for each extra die.
+ * @returns {number} Index into values.
+ */
+export function countingDie(values, sides)
+{
+   const adv = [];
+   const dis = [];
+   sides.forEach((side, i) => (side === 'dis' ? dis : adv).push(i + 1));
+   if ((adv.length && dis.length) || (!adv.length && !dis.length)) { return 0; }
+   const pool = [0, ...(adv.length ? adv : dis)];
+   const best = (adv.length ? Math.max : Math.min)(...pool.map((i) => values[i]));
+   return pool.find((i) => values[i] === best);
+}
+
+/** The advantage mode dnd5e should record once dice sit on these sides. */
+export function modeForSides(sides)
+{
+   const adv = sides.includes('adv');
+   const dis = sides.includes('dis');
+   if (adv && !dis) { return ADVANTAGE; }
+   if (dis && !adv) { return DISADVANTAGE; }
+   return 0;
+}
+
 export { ADVANTAGE, DISADVANTAGE };

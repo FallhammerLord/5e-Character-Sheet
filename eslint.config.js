@@ -22,7 +22,8 @@ export default [
             Item: 'readonly',
             fromUuid: 'readonly',
             fromUuidSync: 'readonly',
-            ChatMessage: 'readonly'
+            ChatMessage: 'readonly',
+            Roll: 'readonly'
          }
       }
    },
