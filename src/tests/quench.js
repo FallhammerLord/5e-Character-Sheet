@@ -129,6 +129,11 @@ export function registerQuenchTests(quench)
             done = changed('system.attributes.exhaustion');
             sheet.element.querySelector('.fhcs-header [data-prop="system.attributes.exhaustion"] [data-n="2"]').click();
             await done;
+            // dnd5e reads the level from an exhaustion effect it creates after the update (attributes.mjs:451).
+            for (let waited = 0; actor.system.attributes.exhaustion !== 2 && waited < HOOK_WAIT_MS; waited += 50)
+            {
+               await new Promise((resolve) => { setTimeout(resolve, 50); });
+            }
             assert.strictEqual(actor.system.attributes.exhaustion, 2);
          });
 
@@ -202,7 +207,8 @@ export function registerQuenchTests(quench)
             await item.createActivity('attack', {}, { renderSheet: false });
             await sheet.render();
             const [activity] = await clickReaches(`[data-item-id="${item.id}"] [data-action="use"]`, 'dnd5e.preUseActivity');
-            assert.strictEqual(activity.item, item);
+            // dnd5e uses a copy of the item (activity/mixin.mjs:229), so compare IDs.
+            assert.strictEqual(activity.item.id, item.id);
          });
       });
    }, { displayName: 'Fallhammer Character Sheet: core' });
@@ -279,22 +285,33 @@ export function registerQuenchTests(quench)
 
          it('rolls the attack when the band is clicked', async function ()
          {
-            const { html } = await renderCard();
-            const band = html.querySelector('.fhcs-band[data-action="rollAttack"]');
-            const reached = new Promise((resolve, reject) =>
+            // dnd5e's card clicks find the message in game.messages, so this card is posted privately and deleted.
+            const results = await activity.use({ subsequentActions: false, consume: false }, { configure: false },
+               { rollMode: 'selfroll' });
+            const usage = results?.message;
+            assert.ok(usage?.id, 'usage card posted');
+            let id = null;
+            let timer = null;
+            try
             {
-               const timer = setTimeout(() => { Hooks.off('dnd5e.preRollAttackV2', id); reject(new Error('never reached dnd5e.preRollAttackV2')); }, 3000);
-               const id = Hooks.on('dnd5e.preRollAttackV2', (config) =>
+               const html = await usage.renderHTML();
+               const band = html.querySelector('.fhcs-band[data-action="rollAttack"]');
+               assert.ok(band, 'attack band');
+               const reached = new Promise((resolve, reject) =>
                {
-                  clearTimeout(timer);
-                  Hooks.off('dnd5e.preRollAttackV2', id);
-                  resolve(config);
-                  return false;
+                  timer = setTimeout(() => reject(new Error('never reached dnd5e.preRollAttackV2')), HOOK_WAIT_MS);
+                  id = Hooks.on('dnd5e.preRollAttackV2', (config) => { resolve(config); return false; });
                });
-            });
-            band.dispatchEvent(new PointerEvent('click', { bubbles: true, cancelable: true, button: 0 }));
-            const config = await reached;
-            assert.ok(config, 'dnd5e started an attack roll');
+               band.dispatchEvent(new PointerEvent('click', { bubbles: true, cancelable: true, button: 0 }));
+               assert.ok(await reached, 'dnd5e started an attack roll');
+            }
+            finally
+            {
+               // Always unhook, so a failure here can't cancel the next test's attack.
+               clearTimeout(timer);
+               if (id !== null) { Hooks.off('dnd5e.preRollAttackV2', id); }
+               await usage.delete();
+            }
          });
 
          it('draws the attack in the card and hides the attack\'s own card', async function ()

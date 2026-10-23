@@ -875,6 +875,7 @@
 {
    display: flex;
    flex: none;
+   justify-content: flex-start;
    align-items: center;
    gap: var(--fhcs-s1);
    padding: 0 var(--fhcs-s2);
@@ -883,6 +884,7 @@
 
 .fhcs-sheet .fhcs-tab
 {
+   flex: none;
    min-height: var(--fhcs-control);
    margin: 0;
    padding: var(--fhcs-s1);

@@ -167,6 +167,12 @@ function findProblems()
       issues.push(`${styles.size} text styles (3 allowed): ${[...styles].map(([k, v]) => `${k} (${v})`).join('; ')}`);
    }
 
+   // Foundry's tab action finds a tab button only as a child of `.tabs`; anywhere else the click does nothing.
+   for (const tab of app.querySelectorAll('[data-action="tab"]'))
+   {
+      if (!tab.parentElement?.matches('.tabs')) { issues.push(`tab "${tab.dataset.tab}" is not a direct child of .tabs; Foundry won't switch to it`); }
+   }
+
    // Foundry's form and editor styles collapse inside a size container (quest log lesson).
    for (const field of app.querySelectorAll('input, textarea, select, prose-mirror'))
    {
@@ -186,6 +192,7 @@ const SELF_TEST = [
    { id: 'self-fits', expect: false, body: '<p style="width:200px">Fits easily.</p>' },
    { id: 'self-wide', expect: true, body: '<div style="width:100px"><span style="display:inline-block;width:300px">Too wide</span></div>' },
    { id: 'self-past-edge', expect: true, body: '<div style="width:2000px">Past the edge</div>' },
+   { id: 'self-tab', expect: true, body: '<nav><button type="button" data-action="tab" data-tab="a">A</button></nav>' },
    { id: 'self-container', expect: true, body: '<div style="container-type:inline-size"><input type="text"></div>' },
    { id: 'self-styles', expect: true, body: '<div class="fhcs-chat"><p style="font-size:10px">a</p><p style="font-size:11px">b</p><p style="font-size:12px">c</p><p style="font-size:13px">d</p></div>' },
    { id: 'self-contrast', expect: true, body: '<p style="color:#bbb">Too faint to read</p>' },
