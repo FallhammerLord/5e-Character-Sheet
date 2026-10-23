@@ -38,6 +38,8 @@
    --fhcs-die-on-ink: #fff;
    /* The sheet's chips, AC shield and filled pips use the die's ink; trays open on the surface. */
    --fhcs-surface: #f4f1ea;
+   /* The sheet's own text color, so nothing behind it decides how it reads. */
+   --fhcs-ink: #191813;
 }
 
 .theme-dark .fhcs-sheet,
@@ -53,6 +55,7 @@
    --fhcs-die-ink: #f4f1ea;
    --fhcs-die-on-ink: #191813;
    --fhcs-surface: #26252b;
+   --fhcs-ink: #e8e6e3;
 }
 
 /* ---------- The three text styles ---------- */
@@ -749,6 +752,94 @@
 {
    min-width: var(--fhcs-control);
    min-height: var(--fhcs-control);
+}
+
+/* ---------- Sheet frame ---------- */
+
+/* Our own surface and ink: dnd5e's sheet styles never reach this window (its classes are removed). The header and
+   tab row stay put; the tab bodies scroll under them. */
+.fhcs-sheet .window-content
+{
+   display: flex;
+   flex-direction: column;
+   padding: 0;
+   overflow: hidden;
+   background: var(--fhcs-surface);
+   color: var(--fhcs-ink);
+   font-family: var(--font-body, 'Roboto', sans-serif);
+}
+
+.fhcs-sheet :is(.sheet-body, .main-content)
+{
+   display: flex;
+   flex: 1;
+   flex-direction: column;
+   min-width: 0;
+   min-height: 0;
+}
+
+.fhcs-sheet .tab-body
+{
+   position: relative;
+   flex: 1;
+   min-height: 0;
+}
+
+.fhcs-sheet .tab-body > .tab
+{
+   height: 100%;
+   padding: var(--fhcs-s2);
+   overflow-y: auto;
+}
+
+.fhcs-sheet .tab[data-group="primary"]:not(.active) { display: none; }
+
+/* dnd5e's play/edit switch in the window header; the lock in our tab row does the same. */
+.fhcs-sheet .window-header .mode-slider { display: none; }
+
+/* ---------- Tab row (SCOPE §4.2) ---------- */
+
+.fhcs-sheet .fhcs-tabs
+{
+   display: flex;
+   flex: none;
+   align-items: center;
+   gap: var(--fhcs-s1);
+   padding: 0 var(--fhcs-s2);
+   border-bottom: 1px solid var(--fhcs-line-soft);
+}
+
+.fhcs-sheet .fhcs-tab
+{
+   min-height: var(--fhcs-control);
+   margin: 0;
+   padding: var(--fhcs-s1);
+   border: 0;
+   border-bottom: 2px solid transparent;
+   border-radius: 0;
+   background: none;
+   color: inherit;
+   font-family: inherit;
+   white-space: nowrap;
+   cursor: pointer;
+}
+
+/* The open tab: an underline, so it isn't told by color alone. */
+.fhcs-sheet .fhcs-tab.active { border-bottom-color: currentColor; }
+
+.fhcs-sheet .fhcs-tabs .fhcs-lock
+{
+   flex: none;
+   width: var(--fhcs-control);
+   margin-left: auto;
+   padding: 0;
+}
+
+.fhcs-sheet .fhcs-tabs .fhcs-lock[aria-pressed="true"]
+{
+   border-color: var(--fhcs-die-ink);
+   background: var(--fhcs-die-ink);
+   color: var(--fhcs-die-on-ink);
 }
 
 /* ---------- Sheet header (SCOPE §4.1) ---------- */

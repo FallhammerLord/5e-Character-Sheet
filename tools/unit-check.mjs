@@ -7,7 +7,7 @@ import { describeRoll } from '../src/chat/outcome.js';
 import { cardParts, damageBand, saveRow } from '../src/chat/card.js';
 import { countingDie, d20Row, modeForSides } from '../src/chat/d20.js';
 import { diceMath } from '../src/chat/math.js';
-import { headerMinWidth, levelOrder, levelTrack, signed } from '../src/sheet/header.js';
+import { headerMinWidth, levelOrder, levelTrack, signed, tabRow } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
 const facts = (over) => ({
@@ -200,6 +200,19 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
 {
    if (signed(n) !== text) { problems.push(`signed(${n}) is ${signed(n)}, not ${text}`); }
 }
+// Tab row: Classic's order and names; Special Traits only in edit mode.
+{
+   const dnd5eTabs = Object.fromEntries(['details', 'inventory', 'features', 'spells', 'effects', 'specialTraits']
+      .map((id) => [id, { id, label: id, active: id === 'inventory' }]));
+   const ids = (editing) => tabRow(dnd5eTabs, { canEdit: true, editing }, localize).tabs.map((t) => t.id).join();
+   const play = ids(false);
+   const edit = ids(true);
+   if (play !== 'details,inventory,spells,features,effects') { problems.push(`tab row in play: ${play}`); }
+   if (edit !== 'details,inventory,spells,features,effects,specialTraits') { problems.push(`tab row in edit mode: ${edit}`); }
+   const names = tabRow(dnd5eTabs, { canEdit: true, editing: false }, localize).tabs.map((t) => t.label);
+   if (names[0] !== 'Attributes' || names[2] !== 'Spellbook') { problems.push(`tab names: ${names.join()}`); }
+}
+
 // Each extra ability (honor, sanity) widens the minimum by one column and its gap.
 if (headerMinWidth(7) - headerMinWidth(6) !== 56) { problems.push('the sheet minimum does not grow by one ability column'); }
 

@@ -5,7 +5,7 @@
  * A case: { name, template: 'path/without-hbs', context: {...}, frame?: 'sheet' | 'chat', theme?: 'light' }
  */
 import { cardParts, d20Band, damageBand, saveRow } from '../src/chat/card.js';
-import { headerView } from '../src/sheet/header.js';
+import { headerView, tabRow } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
 /** A usage card's context as FHCSUsageMessageData#_prepareContext builds it, with overrides. */
@@ -133,7 +133,14 @@ const MULTICLASS = {
    leveling: 'noxp'
 };
 
+/** dnd5e's tabs as `_getTabs` gives them, dnd5e's order and labels. */
+const DND5E_TABS = Object.fromEntries(['details', 'inventory', 'features', 'spells', 'effects', 'biography', 'bastion', 'specialTraits']
+   .map((id, i) => [id, { id, label: ['Details', 'Inventory', 'Features', 'Spells', 'Effects', 'Biography', 'Bastion', 'Special Traits'][i], active: id === 'details' }]));
+const tabs = (mode) => ({ fhcsTabs: tabRow(DND5E_TABS, mode, localize) });
+
 export const CASES = [
+   { name: 'tabs', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }) },
+   { name: 'tabs-editing', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: true }) },
    { name: 'header', template: 'sheet/header', context: header() },
    { name: 'header-tall-art', template: 'sheet/header', context: header({ portrait: { src: TALL, isVideo: false } }) },
    { name: 'header-score-first', template: 'sheet/header', context: header({ emphasis: 'score', inspiration: true, exhaustion: { value: 2, max: 6 } }) },

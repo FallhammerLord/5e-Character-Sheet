@@ -115,6 +115,13 @@
       "SaveLabel": "{ability} save {mod}",
       "SaveProficient": "{ability} save {mod}, proficient",
       "InitLabel": "Roll initiative {mod}"
+    },
+    "Tabs": {
+      "Label": "Sheet tabs",
+      "Attributes": "Attributes",
+      "Spellbook": "Spellbook",
+      "Unlock": "Unlock to edit",
+      "Lock": "Lock the sheet"
     }
   }
 }

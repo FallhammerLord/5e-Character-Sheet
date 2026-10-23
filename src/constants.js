@@ -10,7 +10,7 @@ export const SHEET_ID = `${MODULE_ID}.${SHEET_CLASS_NAME}`;
  * fail if dnd5e drops one. See docs/research/dnd5e-6.0-sheet.md.
  */
 export const SYSTEM_ACTIONS = [
-   'rest', 'restoreTransformation', 'roll', 'showArtwork', 'showConfiguration', 'togglePip', 'toggleSidebar',
+   'changeMode', 'rest', 'restoreTransformation', 'roll', 'showArtwork', 'showConfiguration', 'togglePip', 'toggleSidebar',
    'deleteFavorite', 'deleteOccupant', 'findItem', 'setSpellcastingAbility', 'toggleDeathTray', 'toggleInspiration',
    'useFacility', 'useFavorite'
 ];

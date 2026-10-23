@@ -1,0 +1,18 @@
+{{!-- Classic's tab row across the top (SCOPE §4.2), with the sheet lock at its right end. Foundry's `tab` action
+      switches tabs; dnd5e's `changeMode` switches play and edit. --}}
+<nav class="fhcs-tabs" data-group="primary" aria-label="{{ fhcsTabs.label }}">
+   {{#each fhcsTabs.tabs}}
+   <button type="button" class="fhcs-tab fhcs-body{{#if active}} active{{/if}}" data-action="tab" data-group="primary"
+           data-tab="{{ id }}">{{ label }}</button>
+   {{/each}}
+   {{#if fhcsTabs.canEdit}}
+   <button type="button" class="fhcs-button fhcs-lock" data-action="changeMode" aria-pressed="{{#if fhcsTabs.editing}}true{{else}}false{{/if}}"
+           aria-label="{{ fhcsTabs.lockLabel }}" data-fhcs-tip="{{ fhcsTabs.lockLabel }}">
+      {{#if fhcsTabs.editing}}
+      <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>
+      {{else}}
+      <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+      {{/if}}
+   </button>
+   {{/if}}
+</nav>

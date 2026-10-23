@@ -16,9 +16,16 @@ class SystemCharacterSheet
    static PARTS = {
       header: { template: 'systems/dnd5e/templates/actors/character-header.hbs' },
       sidebar: { container: { classes: ['main-content'], id: 'main' }, template: 'systems/dnd5e/templates/actors/character-sidebar.hbs' },
+      details: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/character-details.hbs' },
       abilityScores: { template: 'systems/dnd5e/templates/actors/character-ability-scores.hbs' },
-      tabs: { id: 'tabs', template: 'systems/dnd5e/templates/shared/sidebar-tabs.hbs' }
+      warnings: { template: 'systems/dnd5e/templates/shared/sheet-warnings-dialog.hbs' },
+      tabs: { id: 'tabs', classes: ['tabs-right'], template: 'systems/dnd5e/templates/shared/sidebar-tabs.hbs' }
    };
+   // Foundry joins every class's DEFAULT_OPTIONS; this is what dnd5e's chain gives a character sheet.
+   _initializeApplicationOptions()
+   {
+      return { classes: ['dnd5e2', 'sheet', 'actor', 'standard-form', 'hidden-title', 'character', 'vertical-tabs', 'fhcs-sheet'] };
+   }
 }
 
 globalThis.Hooks = { on: (name, fn) => { hooks[name] = fn; }, once: (name, fn) => { hooks[name] = fn; } };
@@ -106,15 +113,22 @@ else
    if (sheet.name !== SHEET_CLASS_NAME) { problems.push(`sheet class is named ${sheet.name}, not ${SHEET_CLASS_NAME}`); }
    if (options?.types?.join() !== 'character') { problems.push('sheet is not limited to characters'); }
    if (options?.makeDefault) { problems.push('sheet must not make itself the default'); }
-   // Our header replaces dnd5e's header and ability scores; every other part stays dnd5e's, in order.
+   // Our header and tab row come first, in place of dnd5e's; its ability scores and sidebar are gone; its tab bodies stay.
    const parts = sheet.PARTS ?? {};
-   if (Object.keys(parts).join() !== 'header,sidebar,tabs') { problems.push(`sheet parts are ${Object.keys(parts).join()}, not header,sidebar,tabs`); }
+   const expected = 'header,tabs,details,warnings';
+   if (Object.keys(parts).join() !== expected) { problems.push(`sheet parts are ${Object.keys(parts).join()}, not ${expected}`); }
+   if (parts.tabs?.classes) { problems.push('our tab row still carries dnd5e\'s tab classes'); }
+   // None of dnd5e's look reaches our window.
+   const classes = sheet.prototype._initializeApplicationOptions.call(Object.create(sheet.prototype), {}).classes;
+   const leaked = classes.filter((name) => ['dnd5e2', 'vertical-tabs', 'hidden-title'].includes(name));
+   if (leaked.length) { problems.push(`dnd5e's look classes reach our window: ${leaked.join(', ')}`); }
+   if (!classes.includes('fhcs-sheet') || !classes.includes('character')) { problems.push('our window lost fhcs-sheet or character'); }
    for (const part of Object.values(parts).filter((p) => p.template.startsWith('modules/fhcs/')))
    {
       if (!existsSync(new URL(`../${part.template.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`sheet part template ${part.template} is missing`); }
    }
-   if (!parts.header?.template.startsWith('modules/fhcs/')) { problems.push('the header part is still dnd5e\'s'); }
-   if (parts.sidebar?.container?.id !== 'main') { problems.push('dnd5e\'s sidebar part lost its container'); }
+   for (const id of ['header', 'tabs']) { if (!parts[id]?.template.startsWith('modules/fhcs/')) { problems.push(`the ${id} part is still dnd5e's`); } }
+   if (parts.details?.container?.id !== 'tabs') { problems.push('dnd5e\'s tab bodies lost their container'); }
 }
 if (typeof hooks['dnd5e.advancementManagerComplete'] !== 'function') { problems.push('level order is not hooked to dnd5e.advancementManagerComplete'); }
 

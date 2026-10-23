@@ -39,6 +39,12 @@ Base sheet `querySelector` targets: `.tab-body`, `.main-content`, `.sidebar-coll
 
 Our templates must keep these class names, or override the methods that use them in `compat.js`-guarded code.
 
+## Window classes and look (checked 2026-10-24)
+
+The window's classes join every class's `DEFAULT_OPTIONS.classes`: `dnd5e2` (application-v2-mixin.mjs:27), `actor standard-form hidden-title` (base-actor-sheet.mjs:82), `character vertical-tabs` (character-sheet.mjs:33). dnd5e's sheet LESS (`less/v2/*.less`) is scoped under `.dnd5e2`, so removing `dnd5e2` removes its sheet look; no module code checks for `dnd5e2`, `vertical-tabs` or `hidden-title` on the window. dnd5e's custom elements (`dnd5e-inventory` and others) are styled under `.dnd5e2` too, so on our sheet we style them ourselves.
+
+At first render `BaseActorSheet#_onFirstRender` (base-actor-sheet.mjs:1107) wraps the tab bodies: `.sheet-body > .main-content > .tab-body > section.tab`. dnd5e's play/edit switch is a `slide-toggle.mode-slider` with `data-action="changeMode"` added to the window header (application-v2-mixin.mjs:204); `changeMode` updates the first `[data-action="changeMode"]` and re-renders.
+
 ## Context data
 
 `_prepareContext` (base, `base-actor-sheet.mjs:216`) builds what every part shares: `actor`, `system`, `source` (the raw data in edit mode, prepared data in play), `labels` (actor labels plus damage types), `fields` (the schema, for form inputs), `limited`, `modernRules` (2024 rules), `rollableClass` (`"rollable"` when editable), `user`, `config`. It also prepares the items (`_prepareItems`) and caches concentration. The character version adds `abilityRows` and `spellbook` (`_prepareSpellbook`).

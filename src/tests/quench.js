@@ -74,6 +74,12 @@ export function registerQuenchTests(quench)
             assert.notStrictEqual(sheet.constructor, Base);
             assert.isTrue(sheet.element.classList.contains('fhcs-sheet'));
             assert.isTrue(sheet.element.classList.contains('character'));
+            // dnd5e's sheet styles key on these; none may reach our window.
+            for (const name of ['dnd5e2', 'vertical-tabs', 'hidden-title'])
+            {
+               assert.isFalse(sheet.element.classList.contains(name), `our window carries dnd5e's ${name}`);
+            }
+            assert.notOk(sheet.element.querySelector('.sidebar'), 'dnd5e\'s sidebar is gone');
          });
 
          it('keeps every dnd5e sheet action', function ()
@@ -133,6 +139,28 @@ export function registerQuenchTests(quench)
             await new Promise((resolve) => { setTimeout(resolve, 500); });
             assert.deepEqual(actor.getFlag(MODULE_ID, 'levelOrder'), ['fhcs-cleric', 'fhcs-cleric']);
             await cleric.delete();
+         });
+
+         it('switches tabs from our tab row, and play and edit from its lock', async function ()
+         {
+            sheet.element.querySelector('.fhcs-tabs [data-tab="inventory"]').click();
+            assert.strictEqual(sheet.tabGroups.primary, 'inventory');
+            assert.isTrue(sheet.element.querySelector('.tab[data-tab="inventory"]').classList.contains('active'));
+            sheet.element.querySelector('.fhcs-tabs [data-tab="details"]').click();
+            assert.strictEqual(sheet.tabGroups.primary, 'details');
+            // The lock: each click switches mode and the sheet redraws with the lock's new state.
+            const flip = async () =>
+            {
+               const was = sheet.isEditMode;
+               sheet.element.querySelector('.fhcs-tabs [data-action="changeMode"]').click();
+               for (let waited = 0; sheet.isEditMode === was && waited < HOOK_WAIT_MS; waited += 50)
+               {
+                  await new Promise((resolve) => { setTimeout(resolve, 50); });
+               }
+               assert.notStrictEqual(sheet.isEditMode, was, 'the lock switched play and edit');
+            };
+            await flip();
+            await flip();
          });
 
          it('starts a long rest from the sheet', async function ()

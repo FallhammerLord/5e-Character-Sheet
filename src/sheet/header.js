@@ -147,3 +147,29 @@ export function headerView(facts, { format, localize })
       }
    };
 }
+
+/** Tabs shown only in edit mode. */
+export const EDIT_ONLY_TABS = ['specialTraits'];
+
+/** Classic's tab order; tabs dnd5e adds that aren't listed follow in dnd5e's order. */
+export const TAB_ORDER = ['details', 'inventory', 'spells', 'features', 'effects', 'biography', 'bastion', 'specialTraits'];
+
+/**
+ * The tab row (SCOPE §4.2): dnd5e's tabs in Classic's order, with our names where Classic's differ.
+ * @param {object} tabs   dnd5e's `context.tabs`, by tab ID.
+ * @param {{canEdit: boolean, editing: boolean}} mode
+ */
+export function tabRow(tabs, { canEdit, editing }, localize)
+{
+   const names = { details: 'FHCS.Tabs.Attributes', spells: 'FHCS.Tabs.Spellbook' };
+   const rank = (id) => { const i = TAB_ORDER.indexOf(id); return i < 0 ? TAB_ORDER.length : i; };
+   return {
+      label: localize('FHCS.Tabs.Label'),
+      // Special Traits is settings, not play: like the gear icons, it shows only in edit mode (SCOPE §4.5).
+      tabs: Object.values(tabs).filter((t) => editing || !EDIT_ONLY_TABS.includes(t.id) || t.active)
+         .sort((a, b) => rank(a.id) - rank(b.id)).map((t) => ({ id: t.id, active: !!t.active, label: localize(names[t.id] ?? t.label) })),
+      canEdit,
+      editing,
+      lockLabel: localize(editing ? 'FHCS.Tabs.Lock' : 'FHCS.Tabs.Unlock')
+   };
+}
