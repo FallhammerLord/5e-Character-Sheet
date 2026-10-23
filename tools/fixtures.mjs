@@ -200,6 +200,7 @@ export const CASES = [
       context: header({ ...MULTICLASS, name: 'Kira Ashvale of the Long Road, Keeper of the Ember Gate' })
    },
    { name: 'header-exhaustion-open', template: 'sheet/header', open: ['exhaustion'], context: header({ exhaustion: { value: 3, max: 6 } }) },
+   { name: 'header-dying', template: 'sheet/header', context: header({ hp: { value: 0, max: 87, temp: 0 }, death: { success: 1, failure: 2 } }) },
    { name: 'header-rest-open', template: 'sheet/header', open: ['rest'], context: header() },
    {
       name: 'card-attack-full-side',

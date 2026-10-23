@@ -90,6 +90,7 @@ export async function headerFacts(sheet, context, moduleId, emphasis)
       hp: { value: attributes.hp.value ?? 0, max: attributes.hp.effectiveMax ?? attributes.hp.max ?? 0,
          temp: attributes.hp.temp ?? 0 },
       inspiration: attributes.inspiration,
+      death: { success: attributes.death?.success ?? 0, failure: attributes.death?.failure ?? 0 },
       exhaustion: { value: attributes.exhaustion ?? 0, max: config.conditionTypes?.exhaustion?.levels ?? 6 },
       hd: { value: attributes.hd?.value ?? 0, max: attributes.hd?.max ?? 0 },
       showRests: game.user.isGM || (actor.isOwner && game.settings.get('dnd5e', 'allowRests')),

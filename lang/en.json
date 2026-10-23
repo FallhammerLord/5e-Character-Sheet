@@ -114,7 +114,10 @@
       "CheckLabel": "{ability} check {mod}",
       "SaveLabel": "{ability} save {mod}",
       "SaveProficient": "{ability} save {mod}, proficient",
-      "InitLabel": "Roll initiative {mod}"
+      "InitLabel": "Roll initiative {mod}",
+      "DeathRoll": "Roll a death save",
+      "DeathSuccess": "Death save success {n}",
+      "DeathFailure": "Death save failure {n}"
     },
     "Tabs": {
       "Label": "Sheet tabs",

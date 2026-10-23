@@ -114,6 +114,12 @@ export function headerView(facts, { format, localize })
       ac: facts.ac ?? '—',
       init: signed(facts.init),
       inspiration: !!facts.inspiration,
+      // Death saves only at 0 HP (user, 2026-10-24): three successes, the roll, three failures.
+      death: hp.value <= 0 && facts.death ? {
+         rollLabel: localize('FHCS.Header.DeathRoll'),
+         success: [1, 2, 3].map((n) => ({ n, filled: facts.death.success >= n, label: format('FHCS.Header.DeathSuccess', { n }) })),
+         failure: [1, 2, 3].map((n) => ({ n, filled: facts.death.failure >= n, label: format('FHCS.Header.DeathFailure', { n }) }))
+      } : null,
       exhaustion: {
          value: facts.exhaustion.value,
          label: format('FHCS.Header.Exhaustion', { n: facts.exhaustion.value }),

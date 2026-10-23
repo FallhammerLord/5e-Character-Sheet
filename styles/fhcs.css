@@ -1213,6 +1213,67 @@
 
 .fhcs-sheet .fhcs-prof.fhcs-on { background: currentColor; }
 
+/* Death saves, only at 0 HP: successes in green with a tick, failures in red with a cross, so color isn't alone. */
+/* Successes over failures, the roll beside both. */
+.fhcs-sheet .fhcs-death
+{
+   display: grid;
+   grid-template-columns: auto auto;
+   grid-template-rows: auto auto;
+   align-items: center;
+   justify-content: space-between;
+   gap: var(--fhcs-s1);
+}
+
+.fhcs-sheet .fhcs-death-success { grid-area: 1 / 1; }
+.fhcs-sheet .fhcs-death-failure { grid-area: 2 / 1; }
+.fhcs-sheet .fhcs-death > .fhcs-chip { grid-area: 1 / 2 / 3 / 3; }
+/* Empty pips already show their side's color. */
+.fhcs-sheet .fhcs-death-success .fhcs-death-pip { border-color: var(--fhcs-success); }
+.fhcs-sheet .fhcs-death-failure .fhcs-death-pip { border-color: var(--fhcs-failure); }
+
+.fhcs-sheet .fhcs-death-pips
+{
+   display: flex;
+   gap: var(--fhcs-s1);
+}
+
+.fhcs-sheet .fhcs-death-pip
+{
+   width: 24px;
+   height: 24px;
+   margin: 0;
+   padding: 0;
+   border: 2px dashed var(--fhcs-muted);
+   border-radius: 50%;
+   background: none;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-death-success .fhcs-death-pip.fhcs-on { border-style: solid; background: var(--fhcs-success); }
+.fhcs-sheet .fhcs-death-failure .fhcs-death-pip.fhcs-on { border-style: solid; background: var(--fhcs-failure); }
+
+/* The tick and cross in the theme's on-ink, so they read on the filled pip in both themes. */
+.fhcs-sheet .fhcs-death-pip.fhcs-on::after
+{
+   content: '';
+   display: block;
+   width: 100%;
+   height: 100%;
+   background: var(--fhcs-die-on-ink);
+   mask: center / 14px no-repeat;
+}
+
+.fhcs-sheet .fhcs-death-success .fhcs-death-pip.fhcs-on::after
+{
+   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5'%3E%3Cpath d='M5 12l5 5 9-10'/%3E%3C/svg%3E");
+}
+
+.fhcs-sheet .fhcs-death-failure .fhcs-death-pip.fhcs-on::after
+{
+   mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3.5'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E");
+}
+
 /* ---------- Attributes tab (SCOPE §4.3) ---------- */
 
 .fhcs-sheet .fhcs-attributes.active

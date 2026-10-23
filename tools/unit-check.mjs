@@ -8,7 +8,7 @@ import { cardParts, damageBand, saveRow } from '../src/chat/card.js';
 import { countingDie, d20Row, modeForSides } from '../src/chat/d20.js';
 import { diceMath } from '../src/chat/math.js';
 import { attributesView } from '../src/sheet/attributes.js';
-import { headerMinWidth, levelOrder, levelTrack, signed, tabRow } from '../src/sheet/header.js';
+import { headerMinWidth, headerView, levelOrder, levelTrack, signed, tabRow } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
 const facts = (over) => ({
@@ -239,6 +239,19 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    catch { problems.push(`attributes: got ${JSON.stringify(got)}, expected ${JSON.stringify(expected)}`); }
    const editing = attributesView({ ...facts, editing: true }, { format, localize });
    if (editing.traits.map((t) => t.text).join() !== 'Common,\u2014') { problems.push('edit mode does not list empty traits'); }
+}
+
+// Death saves show only at 0 HP.
+{
+   const base = { name: 'K', portrait: {}, classes: [], levelOrder: [], level: 1, leveling: 'xp', xp: null, origin: [],
+      speed: '', prof: 2, ac: 10, init: 0, inspiration: false, exhaustion: { value: 0, max: 6 }, hd: { value: 1, max: 1 },
+      showRests: false, restTypes: [], abilities: [], death: { success: 2, failure: 1 } };
+   const up = headerView({ ...base, hp: { value: 5, max: 10, temp: 0 } }, { format, localize });
+   const down = headerView({ ...base, hp: { value: 0, max: 10, temp: 0 } }, { format, localize });
+   if (up.death) { problems.push('death saves show above 0 HP'); }
+   const marks = down.death ? [down.death.success.map((p) => p.filled), down.death.failure.map((p) => p.filled)] : null;
+   try { deepStrictEqual(marks, [[true, true, false], [true, false, false]]); }
+   catch { problems.push(`death saves at 0 HP: ${JSON.stringify(marks)}`); }
 }
 
 // Each extra ability (honor, sanity) widens the minimum by one column and its gap.

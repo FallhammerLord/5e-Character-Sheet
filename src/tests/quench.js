@@ -177,6 +177,18 @@ export function registerQuenchTests(quench)
             await game.user.setFlag(MODULE_ID, 'passives', before);
          });
 
+         it('shows death saves in the header at 0 HP, and rolls one from there', async function ()
+         {
+            // A new test character may already be at 0 HP (no class, no max), so this only checks the 0 HP side.
+            const hp = actor.system.attributes.hp.value;
+            await actor.update({ 'system.attributes.hp.value': 0 });
+            await sheet.render();
+            assert.ok(sheet.element.querySelector('.fhcs-header .fhcs-death'), 'death saves show at 0 HP');
+            await clickReaches('.fhcs-header [data-type="deathSave"]', 'dnd5e.preRollDeathSave');
+            await actor.update({ 'system.attributes.hp.value': hp });
+            await sheet.render();
+         });
+
          it('starts a long rest from the sheet', async function ()
          {
             const [rester, config] = await clickReaches('[data-action="rest"][data-type="long"]', 'dnd5e.preLongRest');
