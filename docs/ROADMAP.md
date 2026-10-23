@@ -61,7 +61,7 @@ Optional "Now" strip: action, bonus action, reaction and movement, with spent on
 
 Themes shared with the quest log. Compatibility with modules that change the sheet (Midi-QOL, DAE). Screenshots, GitHub release.
 
-## Track R: Rolls and chat cards (alongside the sheet phases)
+## Track R: Rolls and chat cards (done; verified 2026-10-24)
 
 Runs alongside the sheet phases; works whatever sheet a player uses (client setting, on by default). Built on dnd5e's `dnd5e.renderChatMessage` hook and its roll hooks, never replacing its roll pipeline. SCOPE §6.
 
@@ -70,12 +70,12 @@ Runs alongside the sheet phases; works whatever sheet a player uses (client sett
 - [x] Card frame on usage cards: portrait, title, folding description, dnd5e's buttons as full-width bands (verified 2026-10-24)
 - [x] d20 band: attack rolls drawn in the card, two d20s, natural and hit or miss in words, dice math on click (verified 2026-10-24)
 - [x] Damage band: drawn in the card, crits double without asking, dice math on click (verified 2026-10-24)
-- [ ] Save / check band: roll for selected tokens, one row per token with its result in words (in code 2026-10-23; Quench passes 2026-10-24, play check waits)
-- [ ] Apply: dnd5e's damage and effect trays in "selected" mode, labelled, at least 24px (in code 2026-10-23; Quench passes 2026-10-24, play check waits)
-- [ ] Settings: roll attack on use, roll damage on use, always two d20s (world, on by default) (in code 2026-10-23; Quench passes 2026-10-24, play check waits)
-- [ ] No roll pop-ups (SCOPE §6.4): roll dialogs skipped; dnd5e's spellcasting and activity chooser windows stay (in code 2026-10-23, world setting; Shift brings a dialog back; Quench passes 2026-10-24, play check waits)
+- [x] Save / check band: roll for selected tokens, one row per token with its result in words (verified 2026-10-24)
+- [x] Apply: dnd5e's damage and effect trays in "selected" mode, labelled, at least 24px (verified 2026-10-24)
+- [x] Settings: roll attack on use, roll damage on use, always two d20s (world, on by default) (verified 2026-10-24)
+- [x] No roll pop-ups (SCOPE §6.4): roll dialogs skipped; dnd5e's spellcasting and activity chooser windows stay (verified 2026-10-24)
 - [x] Late adds: advantage, disadvantage, + bonus (a number or a die) on any roll, shown as its own term (verified 2026-10-24)
-- [ ] Standalone rolls (sheet checks, saves, death saves, GM requests) in the same frame (in code 2026-10-23; Quench passes 2026-10-24, play check waits)
+- [x] Standalone rolls (sheet checks, saves, death saves, GM requests) in the same frame (verified 2026-10-24)
 - ~~Compatibility: step aside when RSReforged is active~~ dropped (user, 2026-10-24): this replaces Ready Set Roll at the table; no RSR alongside it
 
 ## Mechanical parity checklist
