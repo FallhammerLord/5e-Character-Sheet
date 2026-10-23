@@ -244,17 +244,24 @@ const BAND_ROLLS = {
  */
 const folds = new Map();
 
+/** Elements whose listeners are bound, so a render that keeps them doesn't bind them twice. */
+const bound = new WeakSet();
+
 /**
  * Restores open panels after a render and records each toggle.
  *
- * @param {HTMLElement} element   The rendered message, carrying its `data-message-id`.
+ * @param {HTMLElement} element   The rendered message, carrying its `data-message-id`, or a sheet.
+ * @param {string} [scope]   What the panels belong to; a message by default.
  */
-export function keepFolds(element)
+export function keepFolds(element, scope = element.dataset.messageId)
 {
-   const messageId = element.dataset.messageId;
+   const messageId = scope;
    if (!messageId) { return; }
    for (const panel of element.querySelectorAll('details[data-fold-key]'))
    {
+      // A sheet re-renders one part at a time; panels left in place are bound already.
+      if (bound.has(panel)) { continue; }
+      bound.add(panel);
       const key = `${messageId}|${panel.dataset.foldKey}`;
       if (folds.has(key)) { panel.open = folds.get(key); }
       panel.addEventListener('toggle', () => folds.set(key, panel.open));
@@ -268,12 +275,14 @@ const TIP_DELAY_MS = 1500;
  * Our buttons' tooltips (`data-fhcs-tip`): shown only after the pointer rests for TIP_DELAY_MS, above the button, and
  * cleared at once by a click. Foundry's own tooltips appear on hover and covered the dice a click had just added.
  *
- * @param {HTMLElement} element   The rendered message.
+ * @param {HTMLElement} element   The rendered message or sheet.
  */
-function delayTips(element)
+export function delayTips(element)
 {
    for (const target of element.querySelectorAll('[data-fhcs-tip]'))
    {
+      if (bound.has(target)) { continue; }
+      bound.add(target);
       let timer = null;
       const cancel = () => { clearTimeout(timer); timer = null; };
       target.addEventListener('pointerenter', () =>

@@ -46,6 +46,86 @@ export async function actorArtwork(actor)
    return (art && !art.isVideo ? art.src : actor.img) ?? '';
 }
 
+/** The module flag holding the order class levels were gained in, one class identifier per level. */
+const LEVEL_ORDER_FLAG = 'levelOrder';
+
+/**
+ * Plain facts for the sheet header (src/sheet/header.js), from dnd5e's prepared data and the sheet's own helpers
+ * (`_preparePortrait`, `_prepareAbilities`; character-sheet.mjs:478, base-actor-sheet.mjs:445, 502).
+ */
+export async function headerFacts(sheet, context, moduleId, emphasis)
+{
+   const actor = sheet.actor;
+   const { attributes, details, traits, abilities } = actor.system;
+   const config = CONFIG.DND5E;
+   const classes = Object.entries(actor.classes ?? {}).map(([id, item]) => ({
+      id, name: item.name, levels: item.system.levels, img: item.img, subclass: item.subclass?.name ?? ''
+   }));
+   const named = (value) => (typeof value === 'string' ? value : value?.name) ?? '';
+   const speeds = attributes.movement?.speeds ?? {};
+   const walk = speeds.walk ?? Math.max(0, ...Object.values(speeds).filter(Number.isFinite));
+   const units = attributes.movement?.units ?? config.defaultUnits?.length?.imperial ?? 'ft';
+   const xp = details.xp ?? {};
+   return {
+      name: actor.name,
+      portrait: await sheet._preparePortrait(context),
+      editable: sheet.isEditable,
+      classes,
+      levelOrder: actor.getFlag(moduleId, LEVEL_ORDER_FLAG) ?? [],
+      originalClass: actor.items.get(details.originalClass)?.identifier ?? '',
+      level: details.level,
+      leveling: game.settings.get('dnd5e', 'levelingMode'),
+      xp: { value: xp.value ?? 0, max: Number.isFinite(xp.max) ? xp.max : xp.value ?? 0, pct: xp.pct ?? 0,
+         valueLabel: (xp.value ?? 0).toLocaleString(game.i18n.lang),
+         maxLabel: Number.isFinite(xp.max) ? xp.max.toLocaleString(game.i18n.lang) : '\u2014' },
+      origin: [
+         config.actorSizes?.[traits.size]?.label ?? traits.size,
+         details.type?.label ?? config.creatureTypes?.[details.type?.value]?.label ?? '',
+         named(details.race), named(details.background), details.alignment
+      ],
+      speed: `${walk} ${config.movementUnits?.[units]?.abbreviation ?? units}`,
+      prof: attributes.prof,
+      ac: attributes.ac?.value,
+      init: attributes.init?.total ?? attributes.init?.mod ?? 0,
+      hp: { value: attributes.hp.value ?? 0, max: attributes.hp.effectiveMax ?? attributes.hp.max ?? 0,
+         temp: attributes.hp.temp ?? 0 },
+      inspiration: attributes.inspiration,
+      exhaustion: { value: attributes.exhaustion ?? 0, max: config.conditionTypes?.exhaustion?.levels ?? 6 },
+      hd: { value: attributes.hd?.value ?? 0, max: attributes.hd?.max ?? 0 },
+      showRests: game.user.isGM || (actor.isOwner && game.settings.get('dnd5e', 'allowRests')),
+      restTypes: Object.entries(config.restTypes ?? {}).map(([key, rest]) => ({ key, label: game.i18n.localize(rest.label) })),
+      emphasis,
+      abilities: sheet._prepareAbilities(context).map((a) => ({
+         key: a.key, abbr: a.abbr, label: a.label, value: a.value, mod: a.mod,
+         save: a.save?.value ?? abilities[a.key]?.save?.value ?? a.mod, proficient: a.proficient ?? 0
+      }))
+   };
+}
+
+/**
+ * After dnd5e's advancement finishes (`dnd5e.advancementManagerComplete`), records the order of class levels: the
+ * recorded order, brought up to date by `reconcile` (src/sheet/header.js levelOrder).
+ */
+export async function recordLevelOrder(manager, moduleId, reconcile)
+{
+   const actor = manager?.actor;
+   if (!actor?.isOwner || actor.type !== 'character') { return; }
+   const classes = Object.entries(actor.classes ?? {}).map(([id, item]) => ({ id, levels: item.system.levels }));
+   const recorded = actor.getFlag(moduleId, LEVEL_ORDER_FLAG) ?? [];
+   const original = actor.items.get(actor.system.details.originalClass)?.identifier ?? '';
+   const order = reconcile(recorded, classes, original);
+   if (order.join() !== recorded.join()) { await actor.setFlag(moduleId, LEVEL_ORDER_FLAG, order); }
+}
+
+/** Re-renders every open sheet of ours, after a client setting it reads changes. */
+export function rerenderSheets(className)
+{
+   for (const app of foundry.applications.instances?.values() ?? [])
+   {
+      if (app.constructor.name === className) { app.render(); }
+   }
+}
+
 /** Registers template parts as Handlebars partials named by their paths, so card templates can include them. */
 export function preloadTemplates(paths)
 {

@@ -41,7 +41,8 @@ Header decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrdDsbn
 - **Leveling follows dnd5e's `levelingMode` world setting** (the GM's choice; we add no setting of our own). XP modes show the usual XP bar. Milestone mode (`noxp`) puts a Level button where the bar was; it folds out a tray of 20 pips (4 rows of 5). Each class level fills the next pip with that class's icon, in the order the levels were gained; empty pips show levels not reached. A pip fills when the player levels up through dnd5e, after its advancement finishes. Nothing to add by hand.
   - To research: dnd5e stores levels per class, not their order. We record the order in an actor flag at each level-up; characters from before that fill class by class, original class first. Icons: the class item's own image, so any source's classes work.
 - **Pinned strip** when scrolled (§4.5): portrait thumbnail, name, HP and bar, AC, conditions, inspiration.
-- At 560px the AC, Init and ability columns wrap into two rows of four.
+- **The ability row never wraps** (user, 2026-10-24): AC, Init and the abilities stay in one row; columns stretch between 52 and 88px, and the sheet stops shrinking at the width that row needs (644px with six abilities; `headerMinWidth`). Text sizes stay the three styles; only the columns scale.
+- Saves show as a proficiency dot and the modifier, without the word "Save": at the default width a column is about 62px, too narrow for "Save +10". The button's tooltip and label name it.
 
 ### 4.2 Tabs
 

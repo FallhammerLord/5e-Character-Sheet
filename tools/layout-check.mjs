@@ -7,6 +7,7 @@
  * Every run starts with a self-test: a known-good page must pass and known-bad pages must fail, so an empty or
  * broken check can't pass silently.
  */
+import { headerMinWidth } from '../src/sheet/header.js';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { chromium } from 'playwright';
 import { template } from './templates.mjs';
@@ -18,7 +19,8 @@ mkdirSync(out, { recursive: true });
 
 // Classic Tidy opens at 740 wide (SCOPE §4); dnd5e's own sheet at 800. Foundry's chat sidebar is about 300 wide;
 // players drag it narrower or wider, and pop messages out.
-const WIDTHS = { sheet: [560, 650, 740, 900], chat: [240, 300, 380] };
+// The sheet never goes narrower than its ability row needs (headerMinWidth).
+const WIDTHS = { sheet: [headerMinWidth(6), 740, 900], chat: [240, 300, 380] };
 const HEIGHT = 810;
 // Every stylesheet module.json loads, in its order.
 const css = JSON.parse(readFileSync(`${root}module.json`, 'utf8')).styles
@@ -53,6 +55,7 @@ const page = (html) => `<!doctype html><html><head><meta charset="utf-8">
 function findProblems()
 {
    const issues = [];
+   const POPOVER = '.fhcs-tray';
    const app = document.querySelector('.application');
    const edge = app.getBoundingClientRect().right;
    for (const el of app.querySelectorAll('.window-content *'))
@@ -79,10 +82,15 @@ function findProblems()
          }
       }
       const clipsOnPurpose = cs.textOverflow === 'ellipsis' || ['auto', 'scroll', 'hidden'].includes(cs.overflowX);
-      if (!clipsOnPurpose && el.scrollWidth > el.clientWidth + 1 && el.clientWidth > 0
-         && !['INPUT', 'SELECT', 'TEXTAREA'].includes(el.tagName))
+      // A fold-out tray opens over the layout on purpose; measure what holds one without it (the tray's own
+      // contents are still measured, and still may not pass the window's edge).
+      const trays = el.closest(POPOVER) ? [] : [...el.querySelectorAll(POPOVER)];
+      trays.forEach((t) => { t.style.display = 'none'; });
+      const wider = el.scrollWidth - el.clientWidth;
+      trays.forEach((t) => { t.style.display = ''; });
+      if (!clipsOnPurpose && wider > 1 && el.clientWidth > 0 && !['INPUT', 'SELECT', 'TEXTAREA'].includes(el.tagName))
       {
-         issues.push(`content wider than box by ${el.scrollWidth - el.clientWidth}px: ${label}`);
+         issues.push(`content wider than box by ${wider}px: ${label}`);
       }
    }
    // Contrast: each piece of text against what it is drawn on (a die's number against the die's fill).
@@ -116,7 +124,7 @@ function findProblems()
       const cs = getComputedStyle(el);
       if (cs.visibility === 'hidden') { continue; }
       let bg = backdrop(el);
-      const shape = el.parentElement?.querySelector(':scope > svg polygon');
+      const shape = el.parentElement?.querySelector(':scope > svg :is(polygon, path)');
       if (shape) { bg = over(parse(getComputedStyle(shape).fill), bg); }
       const fg = parse(cs.color);
       const seen = over({ ...fg, a: fg.a * opacity(el) }, bg);
@@ -129,8 +137,9 @@ function findProblems()
 
    // Three text styles, no more (user, 2026-10-24): size, weight and capitals of every piece of text in our parts.
    const styles = new Map();
-   for (const el of app.querySelectorAll(':is(.fhcs-chat, .fhcs-sheet) *'))
+   for (const el of app.querySelectorAll('.window-content *'))
    {
+      if (!el.closest('.fhcs-chat, .fhcs-sheet')) { continue; }
       if (el.ownerSVGElement || el.closest('[aria-hidden="true"], [hidden]') || !el.getClientRects().length) { continue; }
       const own = [...el.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent).join('').trim();
       if (!own) { continue; }
@@ -165,6 +174,8 @@ const SELF_TEST = [
    { id: 'self-container', expect: true, body: '<div style="container-type:inline-size"><input type="text"></div>' },
    { id: 'self-styles', expect: true, body: '<div class="fhcs-chat"><p style="font-size:10px">a</p><p style="font-size:11px">b</p><p style="font-size:12px">c</p><p style="font-size:13px">d</p></div>' },
    { id: 'self-contrast', expect: true, body: '<p style="color:#bbb">Too faint to read</p>' },
+   { id: 'self-tray', expect: false, body: '<div style="position:relative;width:40px"><div class="fhcs-tray" style="position:absolute;width:200px">A tray</div></div>' },
+   { id: 'self-shape-contrast', expect: true, body: '<span style="position:relative;display:grid;color:#333"><svg style="position:absolute" width="40" height="40"><path d="M0 0h40v40H0z" fill="#222"/></svg><span>16</span></span>' },
    { id: 'self-overlap', expect: true, body: '<div style="display:grid;grid-template-columns:40px 1fr"><span style="justify-self:start;white-space:nowrap">Runs into the next</span><span>x</span></div>' }
 ];
 
@@ -191,7 +202,9 @@ for (const t of SELF_TEST)
 let checked = 0;
 for (const c of CASES)
 {
-   const body = template(c.template)(c.context);
+   // `open` lists folded panels to draw open, by their data-fold-key.
+   const body = (c.open ?? []).reduce((html, key) => html.replace(`data-fold-key="${key}"`, `data-fold-key="${key}" open`),
+      template(c.template)(c.context));
    const kind = c.frame ?? 'sheet';
    for (const theme of c.theme ? [c.theme] : Object.keys(THEMES))
    {

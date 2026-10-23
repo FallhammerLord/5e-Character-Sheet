@@ -19,6 +19,12 @@ Every phase ends with the user testing in their own v14 world. A phase is done w
 
 Portrait, name, class and level, HP and temp HP, AC, initiative, speed, proficiency, inspiration, exhaustion, ability row with saves. Every roll works. Play mode only.
 
+- [x] Mockup approved (2026-10-24): https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf
+- [ ] Header part: portrait 160 × up to 240 with corner chips (exhaustion, inspiration, rest, hit dice); HP with dnd5e's click-to-edit meter, Temp; name, XP or the milestone track, level; class, origin, speed, proficiency; AC, Init and abilities in one row (in code 2026-10-24; waits on the user)
+- [ ] Ability emphasis, a client setting: modifier large (default) or score large (in code 2026-10-24)
+- [ ] Milestone track (dnd5e's leveling mode "no XP"): 20 pips filled with class images in the order gained, recorded after advancement (in code 2026-10-24)
+- [ ] Pinned strip on scroll (SCOPE §4.5)
+
 ## Phase 2: Attributes tab
 
 Classic layout: skills and saves column; resources; favorites; traits (senses, languages, proficiencies, resistances).

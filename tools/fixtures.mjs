@@ -5,6 +5,7 @@
  * A case: { name, template: 'path/without-hbs', context: {...}, frame?: 'sheet' | 'chat', theme?: 'light' }
  */
 import { cardParts, d20Band, damageBand, saveRow } from '../src/chat/card.js';
+import { headerView } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
 /** A usage card's context as FHCSUsageMessageData#_prepareContext builds it, with overrides. */
@@ -99,7 +100,49 @@ const request = () => ({
    }
 });
 
+/** Sample art as data URIs: round token art, and a tall portrait. */
+const art = (w, h, shape) => `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">${shape}</svg>`)}`;
+const ROUND = art(300, 300, '<circle cx="150" cy="150" r="146" fill="#8f7d55"/><circle cx="150" cy="115" r="48" fill="#d9ccae"/>');
+const TALL = art(300, 450, '<rect width="300" height="450" fill="#8f7d55"/><circle cx="150" cy="150" r="56" fill="#d9ccae"/>');
+const CLASS_ICON = (fill) => art(64, 64, `<circle cx="32" cy="32" r="32" fill="${fill}"/>`);
+
+/** A header's facts as compat.headerFacts gathers them, with overrides. */
+const headerFacts = (over = {}) => ({
+   name: 'Kira Ashvale',
+   portrait: { src: ROUND, isVideo: false, action: 'editImage', path: 'img', type: 'image' },
+   classes: [{ id: 'cleric', name: 'Cleric', levels: 12, img: CLASS_ICON('#c9a227'), subclass: 'Life Domain' }],
+   levelOrder: [], originalClass: 'cleric', level: 12, leveling: 'xp',
+   xp: { value: 6500, max: 14000, pct: 46, valueLabel: '6,500', maxLabel: '14,000' },
+   origin: ['Medium', 'Humanoid', 'Dragonborn', 'Acolyte', 'Chaotic Good'], speed: '30 ft',
+   prof: 4, ac: 16, init: 0, hp: { value: 87, max: 87, temp: 0 }, inspiration: false,
+   exhaustion: { value: 0, max: 6 }, hd: { value: 12, max: 12 }, showRests: true,
+   restTypes: [{ key: 'short', label: 'Short Rest' }, { key: 'long', label: 'Long Rest' }], emphasis: 'modifier',
+   abilities: [['str', 18, 4, 4, 0], ['dex', 10, 0, 0, 0], ['con', 14, 2, 2, 0], ['int', 8, -1, -1, 0],
+      ['wis', 20, 5, 9, 1], ['cha', 9, -1, 3, 1]].map(([key, value, mod, save, proficient]) => ({
+      key, abbr: key[0].toUpperCase() + key.slice(1), label: key, value, mod, save, proficient
+   })),
+   ...over
+});
+const header = (over) => ({ editable: false, rollableClass: 'rollable', fhcs: headerView(headerFacts(over), { format, localize }) });
+const MULTICLASS = {
+   classes: [
+      { id: 'cleric', name: 'Cleric', levels: 9, img: CLASS_ICON('#c9a227'), subclass: 'Life Domain' },
+      { id: 'fighter', name: 'Fighter', levels: 3, img: CLASS_ICON('#7a2e2e'), subclass: '' }
+   ],
+   levelOrder: ['cleric', 'fighter', 'fighter', 'cleric', 'cleric', 'cleric', 'cleric', 'cleric', 'cleric', 'fighter'],
+   leveling: 'noxp'
+};
+
 export const CASES = [
+   { name: 'header', template: 'sheet/header', context: header() },
+   { name: 'header-tall-art', template: 'sheet/header', context: header({ portrait: { src: TALL, isVideo: false } }) },
+   { name: 'header-score-first', template: 'sheet/header', context: header({ emphasis: 'score', inspiration: true, exhaustion: { value: 2, max: 6 } }) },
+   {
+      name: 'header-milestones', template: 'sheet/header', open: ['milestones'],
+      context: header({ ...MULTICLASS, name: 'Kira Ashvale of the Long Road, Keeper of the Ember Gate' })
+   },
+   { name: 'header-exhaustion-open', template: 'sheet/header', open: ['exhaustion'], context: header({ exhaustion: { value: 3, max: 6 } }) },
+   { name: 'header-rest-open', template: 'sheet/header', open: ['rest'], context: header() },
    {
       name: 'card-attack-full-side',
       template: 'chat/usage-card',

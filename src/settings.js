@@ -1,4 +1,5 @@
-import { MODULE_ID } from './constants.js';
+import { MODULE_ID, SHEET_CLASS_NAME } from './constants.js';
+import { rerenderSheets } from './compat.js';
 
 /** Our settings. Client ones each player chooses; world ones the GM sets for the table. */
 export function registerSettings()
@@ -11,6 +12,21 @@ export function registerSettings()
       type: Boolean,
       default: true,
       requiresReload: true
+   });
+
+   // What the header shows large in each ability column (user, 2026-10-24: each player's choice).
+   game.settings.register(MODULE_ID, 'abilityEmphasis', {
+      name: 'FHCS.Settings.AbilityEmphasis.Name',
+      hint: 'FHCS.Settings.AbilityEmphasis.Hint',
+      scope: 'client',
+      config: true,
+      type: String,
+      choices: {
+         modifier: 'FHCS.Settings.AbilityEmphasis.Modifier',
+         score: 'FHCS.Settings.AbilityEmphasis.Score'
+      },
+      default: 'modifier',
+      onChange: () => rerenderSheets(SHEET_CLASS_NAME)
    });
 
    // World: the table plays by one rule.

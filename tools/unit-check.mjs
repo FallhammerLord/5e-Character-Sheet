@@ -7,6 +7,7 @@ import { describeRoll } from '../src/chat/outcome.js';
 import { cardParts, damageBand, saveRow } from '../src/chat/card.js';
 import { countingDie, d20Row, modeForSides } from '../src/chat/d20.js';
 import { diceMath } from '../src/chat/math.js';
+import { headerMinWidth, levelOrder, levelTrack, signed } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
 const facts = (over) => ({
@@ -173,7 +174,36 @@ for (const [name, terms, sum, dropped] of MATH_CASES)
    catch { problems.push(`dice math, ${name}: got ${JSON.stringify(got)}, expected ${JSON.stringify({ sum, dropped })}`); }
 }
 
+// Milestone track: class levels in the order gained; unrecorded levels follow, original class first.
+const cls = (id, levels) => ({ id, name: id, levels, img: `${id}.svg` });
+const ORDER_CASES = [
+   ['recorded order kept', ['c', 'f', 'f', 'c'], [cls('c', 2), cls('f', 2)], 'c', ['c', 'f', 'f', 'c']],
+   ['nothing recorded: original class first', [], [cls('f', 3), cls('c', 9)], 'c', [...Array(9).fill('c'), 'f', 'f', 'f']],
+   ['a new level appended', ['c', 'f'], [cls('c', 2), cls('f', 1)], 'c', ['c', 'f', 'c']],
+   ['a level removed drops its latest entry', ['c', 'f', 'c', 'f'], [cls('c', 2), cls('f', 1)], 'c', ['c', 'f', 'c']],
+   ['a class removed', ['c', 'w', 'c'], [cls('c', 2)], 'c', ['c', 'c']]
+];
+for (const [name, order, classes, original, expected] of ORDER_CASES)
+{
+   const got = levelOrder(order, classes, original);
+   try { deepStrictEqual(got, expected); }
+   catch { problems.push(`level order, ${name}: got ${JSON.stringify(got)}, expected ${JSON.stringify(expected)}`); }
+}
+{
+   const track = levelTrack([cls('c', 2), cls('f', 1)], ['c', 'f', 'c'], 'c', format);
+   const got = { pips: track.pips.length, filled: track.pips.filter((p) => p.filled).map((p) => p.img), third: track.pips[2].label, fourth: track.pips[3].label };
+   const expected = { pips: 20, filled: ['c.svg', 'f.svg', 'c.svg'], third: 'Level 3: c 2', fourth: 'Level 4: not reached' };
+   try { deepStrictEqual(got, expected); }
+   catch { problems.push(`milestone track: got ${JSON.stringify(got)}, expected ${JSON.stringify(expected)}`); }
+}
+for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
+{
+   if (signed(n) !== text) { problems.push(`signed(${n}) is ${signed(n)}, not ${text}`); }
+}
+// Each extra ability (honor, sanity) widens the minimum by one column and its gap.
+if (headerMinWidth(7) - headerMinWidth(6) !== 56) { problems.push('the sheet minimum does not grow by one ability column'); }
+
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
 console.log(`${CASES.length} outcome lines, ${PART_CASES.length} card layouts, ${ROW_CASES.length} d20 rows, `
    + `${DAMAGE_CASES.length} damage bands, ${SAVE_CASES.length} save rows, ${KEEP_CASES.length} late adds and `
-   + `${MATH_CASES.length} dice sums read as expected.`);
+   + `${MATH_CASES.length} dice sums read as expected; ${ORDER_CASES.length} level orders and the milestone track hold.`);

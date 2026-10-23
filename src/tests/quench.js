@@ -89,6 +89,52 @@ export function registerQuenchTests(quench)
             assert.strictEqual(config.ability, 'str');
          });
 
+         it('draws our header in place of dnd5e\'s header and ability scores', function ()
+         {
+            assert.ok(sheet.element.querySelector('.fhcs-header'), 'our header is on the sheet');
+            assert.notOk(sheet.element.querySelector('.ability-scores'), 'dnd5e\'s ability scores are gone');
+            assert.lengthOf(sheet.element.querySelectorAll('.fhcs-header .fhcs-ability[data-ability]'),
+               Object.keys(CONFIG.DND5E.abilities).length, 'one column per ability');
+         });
+
+         it('rolls checks, saves and initiative from the header', async function ()
+         {
+            const [check] = await clickReaches('.fhcs-header [data-ability="dex"] .ability-check', 'dnd5e.preRollAbilityCheck');
+            assert.strictEqual(check.ability, 'dex');
+            const [save] = await clickReaches('.fhcs-header [data-ability="wis"] .saving-throw', 'dnd5e.preRollSavingThrow');
+            assert.strictEqual(save.ability, 'wis');
+            await clickReaches('.fhcs-header [data-type="initiative"]', 'dnd5e.preRollInitiativeDialog');
+         });
+
+         it('toggles inspiration and sets exhaustion from the portrait chips', async function ()
+         {
+            const before = !!actor.system.attributes.inspiration;
+            const changed = (path) => new Promise((resolve) =>
+            {
+               const id = Hooks.on('updateActor', (doc, change) =>
+               {
+                  if (doc === actor && foundry.utils.hasProperty(change, path)) { Hooks.off('updateActor', id); resolve(); }
+               });
+            });
+            let done = changed('system.attributes.inspiration');
+            sheet.element.querySelector('.fhcs-header [data-action="toggleInspiration"]').click();
+            await done;
+            assert.strictEqual(!!actor.system.attributes.inspiration, !before);
+            done = changed('system.attributes.exhaustion');
+            sheet.element.querySelector('.fhcs-header [data-prop="system.attributes.exhaustion"] [data-n="2"]').click();
+            await done;
+            assert.strictEqual(actor.system.attributes.exhaustion, 2);
+         });
+
+         it('records the order class levels were gained when advancement finishes', async function ()
+         {
+            const [cleric] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test cleric', type: 'class', system: { identifier: 'fhcs-cleric', levels: 2 } }]);
+            Hooks.callAll('dnd5e.advancementManagerComplete', { actor });
+            await new Promise((resolve) => { setTimeout(resolve, 500); });
+            assert.deepEqual(actor.getFlag(MODULE_ID, 'levelOrder'), ['fhcs-cleric', 'fhcs-cleric']);
+            await cleric.delete();
+         });
+
          it('starts a long rest from the sheet', async function ()
          {
             const [rester, config] = await clickReaches('[data-action="rest"][data-type="long"]', 'dnd5e.preLongRest');

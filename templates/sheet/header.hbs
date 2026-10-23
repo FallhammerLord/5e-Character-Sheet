@@ -1,0 +1,136 @@
+<header class="fhcs-header">
+   {{#with fhcs}}
+   <div class="fhcs-header-side">
+      <div class="fhcs-portrait">
+         {{#with portrait}}
+         {{#if isVideo}}
+         <video class="fhcs-portrait-art" src="{{ src }}" autoplay muted disablepictureinpicture loop playsinline
+                {{#if @root.editable}}data-action="{{ action }}"{{else}}data-action="showArtwork"{{/if}}
+                {{#if @root.editable}}{{#if path}}data-edit="{{ path }}" data-type="{{ type }}"{{/if}}{{/if}}></video>
+         {{else}}
+         <img class="fhcs-portrait-art" src="{{ src }}" alt="{{ ../name }}"
+              {{#if @root.editable}}data-action="{{ action }}"{{else}}data-action="showArtwork"{{/if}}
+              {{#if @root.editable}}{{#if path}}data-edit="{{ path }}" data-type="{{ type }}"{{/if}}{{/if}}>
+         {{/if}}
+         {{/with}}
+
+         {{!-- Corner chips (user, 2026-10-24). A chip with more than one choice folds out a small tray. --}}
+         <details class="fhcs-fold fhcs-corner-tl" data-fold-key="exhaustion">
+            <summary class="fhcs-chip fhcs-label" aria-label="{{ exhaustion.label }}" data-fhcs-tip="{{ exhaustion.label }}">
+               <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 15h8M8.5 9.5h2M13.5 9.5h2"/></svg>{{ exhaustion.value }}
+            </summary>
+            <div class="fhcs-tray fhcs-tray-row" data-prop="system.attributes.exhaustion">
+               {{#each exhaustion.pips}}
+               <button type="button" class="fhcs-chip fhcs-label{{#if filled}} fhcs-on{{/if}}" data-action="togglePip" data-n="{{ n }}"
+                       aria-pressed="{{#if filled}}true{{else}}false{{/if}}" aria-label="{{ label }}">{{ n }}</button>
+               {{/each}}
+            </div>
+         </details>
+
+         <button type="button" class="fhcs-chip fhcs-corner-tr{{#if inspiration}} fhcs-on{{/if}}" data-action="toggleInspiration"
+                 aria-pressed="{{#if inspiration}}true{{else}}false{{/if}}" aria-label="{{ text.inspiration }}"
+                 data-fhcs-tip="{{ text.inspiration }}">
+            <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>
+         </button>
+
+         {{#if rests.length}}
+         <details class="fhcs-fold fhcs-corner-bl" data-fold-key="rest">
+            <summary class="fhcs-chip" aria-label="{{ text.rest }}" data-fhcs-tip="{{ text.rest }}">
+               <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18V8M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.6"/></svg>
+            </summary>
+            <div class="fhcs-tray">
+               {{#each rests}}
+               <button type="button" class="fhcs-button fhcs-body" data-action="rest" data-type="{{ key }}">{{ label }}</button>
+               {{/each}}
+            </div>
+         </details>
+         {{/if}}
+
+         <span class="fhcs-chip fhcs-chip-static fhcs-label fhcs-corner-br" role="img" aria-label="{{ hd.label }}">{{ hd.text }}</span>
+      </div>
+
+      {{!-- dnd5e's meter markup: a click on it shows the input (base-actor-sheet.mjs #toggleMeter). --}}
+      <div class="fhcs-hp meter">
+         <div class="fhcs-hp-meter" role="meter" aria-valuemin="0" aria-valuenow="{{ hp.value }}" aria-valuemax="{{ hp.max }}"
+              aria-label="{{ hp.label }}">
+            <span class="label fhcs-hp-line"><span class="fhcs-label fhcs-muted">{{ text.hp }}</span><span class="fhcs-display">{{ hp.text }}</span></span>
+            <input type="text" class="fhcs-input fhcs-display" name="system.attributes.hp.value" data-dtype="Number"
+                   data-max="{{ hp.max }}" value="{{ hp.value }}" placeholder="0" hidden>
+         </div>
+      </div>
+      <div class="fhcs-bar" aria-hidden="true"><span style="width: {{ hp.pct }}%"></span></div>
+      <label class="fhcs-temp">
+         <span class="fhcs-body fhcs-muted">{{ text.temp }}</span>
+         <input type="text" class="fhcs-input fhcs-body" name="system.attributes.hp.temp" data-dtype="Number"
+                value="{{ hp.temp }}" placeholder="0">
+      </label>
+   </div>
+
+   <div class="fhcs-header-main">
+      <div class="fhcs-header-row">
+         <span class="fhcs-display fhcs-name">{{ name }}</span>
+         {{#if xp}}
+         <div class="fhcs-xp">
+            <div class="fhcs-bar" role="meter" aria-valuemin="0" aria-valuenow="{{ xp.value }}" aria-valuemax="{{ xp.max }}"
+                 aria-label="{{ xp.text }}"><span style="width: {{ xp.pct }}%"></span></div>
+            <span class="fhcs-body fhcs-muted">{{ xp.text }}</span>
+         </div>
+         <span class="fhcs-pill fhcs-label">{{ level }}</span>
+         {{/if}}
+         {{#if milestones}}
+         <details class="fhcs-fold fhcs-level" data-fold-key="milestones">
+            <summary class="fhcs-pill fhcs-label" aria-label="{{ milestones.label }}">{{ level }}
+               <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="fhcs-tray fhcs-track">
+               <div class="fhcs-track-head"><span class="fhcs-label">{{ text.milestones }}</span><span class="fhcs-label fhcs-muted">{{ milestones.filled }} / {{ milestones.total }}</span></div>
+               <div class="fhcs-track-pips">
+                  {{#each milestones.pips}}
+                  <span class="fhcs-pip{{#if filled}} fhcs-on{{/if}}" role="img" aria-label="{{ label }}">{{#if img}}<img src="{{ img }}" alt="">{{/if}}</span>
+                  {{/each}}
+               </div>
+               <div class="fhcs-track-key">
+                  {{#each milestones.key}}
+                  <span class="fhcs-body"><img src="{{ img }}" alt="">{{ text }}</span>
+                  {{/each}}
+               </div>
+            </div>
+         </details>
+         {{/if}}
+      </div>
+      <span class="fhcs-body fhcs-line">{{ classLine }}</span>
+      <div class="fhcs-header-row">
+         <span class="fhcs-label fhcs-muted fhcs-line">{{ origin }}{{#if origin}} · {{/if}}{{ speed }}</span>
+         <span class="fhcs-label fhcs-nowrap">{{ text.proficiency }} {{ prof }}</span>
+      </div>
+
+      {{!-- One row, never wrapped (user, 2026-10-24): columns grow and shrink between limits; the sheet has a minimum width. --}}
+      <div class="fhcs-abilities{{#if scoreFirst}} fhcs-score-first{{/if}}">
+         <div class="fhcs-ability">
+            <span class="fhcs-label fhcs-muted">{{ text.ac }}</span>
+            <span class="fhcs-shield" data-attribution="attributes.ac" data-attribution-caption="DND5E.ArmorClass">
+               <svg viewBox="0 0 40 46" aria-hidden="true"><path d="M20 2l16 6v13c0 11-7 18-16 23C11 39 4 32 4 21V8z"/></svg>
+               <span class="fhcs-display">{{ ac }}</span>
+            </span>
+         </div>
+         <div class="fhcs-ability">
+            <span class="fhcs-label fhcs-muted">{{ text.init }}</span>
+            <button type="button" class="fhcs-button fhcs-display {{ @root.rollableClass }}" data-action="roll" data-type="initiative"
+                    aria-label="{{ text.initLabel }}">{{ init }}</button>
+         </div>
+         {{#each abilities}}
+         <div class="fhcs-ability" data-ability="{{ key }}">
+            <span class="fhcs-label fhcs-muted">{{ abbr }}</span>
+            <button type="button" class="fhcs-button fhcs-display ability-check {{ @root.rollableClass }}" data-action="roll"
+                    data-type="ability" aria-label="{{ checkLabel }}">{{#if ../scoreFirst}}{{ score }}{{else}}{{ mod }}{{/if}}</button>
+            <button type="button" class="fhcs-button fhcs-body saving-throw {{ @root.rollableClass }}" data-action="roll"
+                    data-type="ability" aria-label="{{ saveLabel }}" data-fhcs-tip="{{ saveLabel }}">
+               <span class="fhcs-prof{{#if proficient}} fhcs-on{{/if}}" aria-hidden="true"></span>{{ save }}
+            </button>
+            <span class="fhcs-label fhcs-muted">{{#if ../scoreFirst}}{{ mod }}{{else}}{{ score }}{{/if}}</span>
+         </div>
+         {{/each}}
+      </div>
+   </div>
+   {{/with}}
+</header>

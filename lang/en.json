@@ -21,6 +21,12 @@
       "NoRollDialogs": {
         "Name": "No roll dialogs",
         "Hint": "Rolls go straight to the card, without the roll configuration window. Hold the skip-dialog key (Shift) to get the window back. Spellcasting and activity choices still ask."
+      },
+      "AbilityEmphasis": {
+        "Name": "Ability emphasis",
+        "Hint": "What the sheet header shows large in each ability column: the modifier you roll with, or the score.",
+        "Modifier": "Modifier large, score small",
+        "Score": "Score large, modifier small"
       }
     },
     "Chat": {
@@ -84,6 +90,31 @@
       "Dropped": "Rerolled or dropped: {dice}",
       "History": "Earlier rolls",
       "Critical": "Critical"
+    },
+    "Header": {
+      "HP": "HP",
+      "Temp": "Temp",
+      "AC": "AC",
+      "Init": "Init",
+      "Proficiency": "Proficiency",
+      "Save": "Save",
+      "Level": "Level {level}",
+      "XP": "{value} / {max} XP",
+      "Milestones": "Milestones",
+      "ShowMilestones": "{level}: show milestones",
+      "LevelPip": "Level {n}: {name} {level}",
+      "LevelEmpty": "Level {n}: not reached",
+      "HPLabel": "Hit points {value} of {max}; click to change",
+      "Exhaustion": "Exhaustion {n}",
+      "ExhaustionLevel": "Exhaustion level {n}",
+      "HD": "HD {n}",
+      "HDLabel": "Hit dice {value} of {max}",
+      "Inspiration": "Inspiration",
+      "Rest": "Rest",
+      "CheckLabel": "{ability} check {mod}",
+      "SaveLabel": "{ability} save {mod}",
+      "SaveProficient": "{ability} save {mod}, proficient",
+      "InitLabel": "Roll initiative {mod}"
     }
   }
 }

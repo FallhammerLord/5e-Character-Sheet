@@ -36,6 +36,8 @@
    /* The default die, and the number on any filled die. */
    --fhcs-die-ink: #191813;
    --fhcs-die-on-ink: #fff;
+   /* The sheet's chips, AC shield and filled pips use the die's ink; trays open on the surface. */
+   --fhcs-surface: #f4f1ea;
 }
 
 .theme-dark .fhcs-sheet,
@@ -50,11 +52,13 @@
    --fhcs-dis: #ff8a80;
    --fhcs-die-ink: #f4f1ea;
    --fhcs-die-on-ink: #191813;
+   --fhcs-surface: #26252b;
 }
 
 /* ---------- The three text styles ---------- */
 
-/* Display: titles, totals, die values, the + and − signs. */
+/* Display: titles, totals, die values, the + and − signs; on the sheet, names and the numbers you roll. */
+.fhcs-sheet .fhcs-display,
 .fhcs-chat :is(.fhcs-card-title, .fhcs-band-total, .fhcs-row-total, .fhcs-die-value, .fhcs-slot-sign)
 {
    font-size: var(--fhcs-display-size);
@@ -66,6 +70,7 @@
 }
 
 /* Body: everything read as text. */
+.fhcs-sheet .fhcs-body,
 .fhcs-chat .fhcs-card,
 .fhcs-chat :is(.fhcs-band-text, .fhcs-band-prompt, .fhcs-band-words, .fhcs-band-parts, .fhcs-band-math, .fhcs-band-note,
    .fhcs-button, .fhcs-bonus-input, .fhcs-row-who, .fhcs-row-verdict, .fhcs-card-description, .fhcs-card-flavor,
@@ -78,7 +83,8 @@
    letter-spacing: normal;
 }
 
-/* Label: band headings, panel titles, the actor line, tags, the badge on a die. */
+/* Label: band headings, panel titles, the actor line, tags, the badge on a die; on the sheet, field names and chips. */
+.fhcs-sheet .fhcs-label,
 .fhcs-chat :is(.fhcs-band-heading, .fhcs-card-line, .fhcs-card-details > summary, .fhcs-card-tags, .fhcs-slot-badge)
 {
    font-size: var(--fhcs-label-size);
@@ -744,3 +750,374 @@
    min-width: var(--fhcs-control);
    min-height: var(--fhcs-control);
 }
+
+/* ---------- Sheet header (SCOPE §4.1) ---------- */
+
+.fhcs-sheet .fhcs-header
+{
+   display: flex;
+   gap: var(--fhcs-s2);
+   padding: var(--fhcs-s2);
+   min-width: 0;
+   border-bottom: 1px solid var(--fhcs-line-soft);
+}
+
+.fhcs-sheet .fhcs-header-side
+{
+   display: flex;
+   flex: none;
+   flex-direction: column;
+   gap: var(--fhcs-s1);
+   width: 160px;
+}
+
+.fhcs-sheet .fhcs-header-main
+{
+   display: flex;
+   flex: 1;
+   flex-direction: column;
+   gap: var(--fhcs-s1);
+   min-width: 0;
+}
+
+.fhcs-sheet .fhcs-header-row
+{
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s2);
+   min-width: 0;
+}
+
+.fhcs-sheet .fhcs-name
+{
+   flex: 1;
+   min-width: 0;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+}
+
+.fhcs-sheet .fhcs-line
+{
+   min-width: 0;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+}
+
+.fhcs-sheet .fhcs-header-row .fhcs-line { flex: 1; }
+.fhcs-sheet .fhcs-nowrap { white-space: nowrap; }
+/* dnd5e shows and hides the HP field and its label with `hidden`; our display rules must not undo it. */
+.fhcs-sheet .fhcs-header [hidden] { display: none; }
+.fhcs-sheet .fhcs-muted { color: var(--fhcs-muted); }
+
+.fhcs-sheet .fhcs-icon
+{
+   width: 16px;
+   height: 16px;
+   fill: none;
+   stroke: currentColor;
+   stroke-width: 2;
+}
+
+/* Portrait: 160 wide, 160 to 240 tall, so round, square and tall art all fit (user, 2026-10-24). */
+.fhcs-sheet .fhcs-portrait
+{
+   position: relative;
+   width: 160px;
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-fill);
+}
+
+.fhcs-sheet .fhcs-portrait-art
+{
+   display: block;
+   width: 100%;
+   height: auto;
+   min-height: 158px;
+   max-height: 238px;
+   border: 0;
+   border-radius: var(--fhcs-radius);
+   object-fit: cover;
+   object-position: top;
+   cursor: pointer;
+}
+
+/* Chips: solid, the size of a control, on the portrait's corners. */
+.fhcs-sheet .fhcs-chip
+{
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   gap: var(--fhcs-s1);
+   min-width: var(--fhcs-control);
+   height: var(--fhcs-control);
+   margin: 0;
+   padding: 0 var(--fhcs-s1);
+   border: 1px solid var(--fhcs-die-ink);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-die-ink);
+   color: var(--fhcs-die-on-ink);
+   font-family: inherit;
+   list-style: none;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-chip::-webkit-details-marker { display: none; }
+.fhcs-sheet .fhcs-chip-static { cursor: default; }
+.fhcs-sheet .fhcs-chip.fhcs-on .fhcs-icon { fill: currentColor; }
+
+.fhcs-sheet :is(.fhcs-corner-tl, .fhcs-corner-tr, .fhcs-corner-bl, .fhcs-corner-br) { position: absolute; }
+.fhcs-sheet .fhcs-corner-tl { top: var(--fhcs-s1); left: var(--fhcs-s1); }
+.fhcs-sheet .fhcs-corner-tr { top: var(--fhcs-s1); right: var(--fhcs-s1); }
+.fhcs-sheet .fhcs-corner-bl { bottom: var(--fhcs-s1); left: var(--fhcs-s1); }
+.fhcs-sheet .fhcs-corner-br { bottom: var(--fhcs-s1); right: var(--fhcs-s1); }
+
+/* A fold-out tray: opens beside its chip, over what's below. */
+.fhcs-sheet .fhcs-fold { z-index: 2; }
+
+.fhcs-sheet .fhcs-tray
+{
+   position: absolute;
+   top: calc(100% + var(--fhcs-s1));
+   left: 0;
+   display: flex;
+   flex-direction: column;
+   gap: var(--fhcs-s1);
+   padding: var(--fhcs-s1);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-surface);
+   box-shadow: 0 4px 12px rgb(0 0 0 / 25%);
+}
+
+.fhcs-sheet .fhcs-corner-bl .fhcs-tray { top: auto; bottom: calc(100% + var(--fhcs-s1)); }
+.fhcs-sheet .fhcs-tray-row { flex-direction: row; }
+
+/* An unfilled exhaustion level: outlined, not solid. */
+.fhcs-sheet .fhcs-tray .fhcs-chip:not(.fhcs-on)
+{
+   background: transparent;
+   color: inherit;
+   border-color: var(--fhcs-line);
+}
+
+/* Buttons and fields. */
+.fhcs-sheet .fhcs-button,
+.fhcs-sheet .fhcs-input
+{
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   gap: var(--fhcs-s1);
+   width: 100%;
+   height: auto;
+   min-height: var(--fhcs-control);
+   margin: 0;
+   padding: 0 var(--fhcs-s1);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-fill);
+   color: inherit;
+   font-family: inherit;
+   white-space: nowrap;
+}
+
+.fhcs-sheet .fhcs-button { cursor: pointer; }
+.fhcs-sheet .fhcs-input { background: transparent; text-align: right; }
+.fhcs-sheet .fhcs-input::placeholder { color: var(--fhcs-muted); opacity: 1; }
+
+/* Hit points: dnd5e's meter markup, our look. */
+.fhcs-sheet .fhcs-hp,
+.fhcs-sheet .fhcs-hp-meter
+{
+   height: auto;
+   margin: 0;
+   padding: 0;
+   border: 0;
+   background: none;
+   box-shadow: none;
+}
+
+.fhcs-sheet .fhcs-hp-meter { cursor: text; }
+
+.fhcs-sheet .fhcs-hp-line
+{
+   display: flex;
+   align-items: baseline;
+   justify-content: space-between;
+   gap: var(--fhcs-s1);
+   min-height: var(--fhcs-control);
+}
+
+.fhcs-sheet .fhcs-bar
+{
+   height: 4px;
+   border-radius: 2px;
+   background: var(--fhcs-line-soft);
+   overflow: hidden;
+}
+
+.fhcs-sheet .fhcs-bar > span
+{
+   display: block;
+   height: 100%;
+   border-radius: 2px;
+   background: var(--fhcs-success);
+}
+
+.fhcs-sheet .fhcs-xp .fhcs-bar > span { background: currentColor; }
+
+.fhcs-sheet .fhcs-temp
+{
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   gap: var(--fhcs-s2);
+}
+
+.fhcs-sheet .fhcs-temp .fhcs-input { width: 4rem; }
+
+/* XP, or the level pill with its milestone track. */
+.fhcs-sheet .fhcs-xp
+{
+   display: flex;
+   flex: none;
+   flex-direction: column;
+   gap: var(--fhcs-s1);
+   width: 8.5rem;
+   text-align: right;
+}
+
+.fhcs-sheet .fhcs-pill
+{
+   display: inline-flex;
+   flex: none;
+   align-items: center;
+   gap: var(--fhcs-s1);
+   min-height: var(--fhcs-control);
+   padding: 0 var(--fhcs-s2);
+   border: 1px solid currentColor;
+   border-radius: var(--fhcs-radius);
+   white-space: nowrap;
+   list-style: none;
+}
+
+.fhcs-sheet .fhcs-pill::-webkit-details-marker { display: none; }
+.fhcs-sheet summary.fhcs-pill { cursor: pointer; }
+.fhcs-sheet .fhcs-level { position: relative; }
+.fhcs-sheet .fhcs-level[open] .fhcs-caret { transform: rotate(180deg); }
+.fhcs-sheet .fhcs-level .fhcs-tray { left: auto; right: 0; }
+
+/* Milestones: 4 rows of 5 pips, filled in the order levels were gained (user, 2026-10-24). */
+.fhcs-sheet .fhcs-track { gap: var(--fhcs-s2); padding: var(--fhcs-s2); }
+
+.fhcs-sheet .fhcs-track-head
+{
+   display: flex;
+   justify-content: space-between;
+   gap: var(--fhcs-s2);
+}
+
+.fhcs-sheet .fhcs-track-pips
+{
+   display: grid;
+   grid-template-columns: repeat(5, var(--fhcs-control));
+   gap: var(--fhcs-s2);
+}
+
+.fhcs-sheet .fhcs-pip
+{
+   display: block;
+   width: var(--fhcs-control);
+   height: var(--fhcs-control);
+   border: 2px dashed var(--fhcs-muted);
+   border-radius: 50%;
+   overflow: hidden;
+}
+
+.fhcs-sheet .fhcs-pip.fhcs-on
+{
+   border: 2px solid var(--fhcs-die-ink);
+   background: var(--fhcs-die-ink);
+}
+
+.fhcs-sheet .fhcs-pip img,
+.fhcs-sheet .fhcs-track-key img
+{
+   display: block;
+   width: 100%;
+   height: 100%;
+   border: 0;
+   object-fit: cover;
+}
+
+.fhcs-sheet .fhcs-track-key
+{
+   display: flex;
+   flex-wrap: wrap;
+   gap: var(--fhcs-s1) var(--fhcs-s2);
+}
+
+.fhcs-sheet .fhcs-track-key > span
+{
+   display: inline-flex;
+   align-items: center;
+   gap: var(--fhcs-s1);
+}
+
+.fhcs-sheet .fhcs-track-key img { width: 16px; height: 16px; border-radius: 50%; }
+
+/* Abilities: one row that never wraps (user, 2026-10-24). Columns stretch between 52 and 88px; below that the
+   sheet stops shrinking (headerMinWidth, src/sheet/header.js). */
+.fhcs-sheet .fhcs-abilities
+{
+   display: grid;
+   grid-auto-columns: minmax(52px, 88px);
+   grid-auto-flow: column;
+   gap: var(--fhcs-s1);
+   margin-top: var(--fhcs-s1);
+}
+
+.fhcs-sheet .fhcs-ability
+{
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   gap: var(--fhcs-s1);
+   min-width: 0;
+}
+
+.fhcs-sheet .fhcs-shield
+{
+   position: relative;
+   display: grid;
+   place-items: center;
+   width: 40px;
+   height: 46px;
+   color: var(--fhcs-die-on-ink);
+}
+
+.fhcs-sheet .fhcs-shield svg
+{
+   position: absolute;
+   inset: 0;
+   width: 100%;
+   height: 100%;
+   fill: var(--fhcs-die-ink);
+}
+
+.fhcs-sheet .fhcs-shield > span { position: relative; }
+
+/* Save proficiency: a filled dot when proficient, an outline when not. */
+.fhcs-sheet .fhcs-prof
+{
+   flex: none;
+   width: 8px;
+   height: 8px;
+   border: 1.5px solid currentColor;
+   border-radius: 50%;
+}
+
+.fhcs-sheet .fhcs-prof.fhcs-on { background: currentColor; }

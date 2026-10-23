@@ -16,7 +16,7 @@ This file holds rules only. Plan: `docs/ROADMAP.md`. Decisions: `docs/SCOPE.md`.
 npm run check   # lint + load + unit. Hooks run it before every git push; CI runs it on push.
 npm run load    # loads the module with Foundry and dnd5e mocked, checks the sheet registration, chat hook, settings and manifest files
 npm run unit    # pure functions offline (roll outcomes, usage card bands)
-npm run layout  # renders templates (cases in tools/fixtures.mjs) in light and dark themes at sheet widths 560–900 or chat widths 240–380;
+npm run layout  # renders templates (cases in tools/fixtures.mjs) in light and dark themes at sheet widths 644 (the minimum)–900 or chat widths 240–380;
                 # fails on overflow, overlapping siblings, text below WCAG contrast or a fourth text style; self-tests first
                 # set CHROMIUM_PATH (here: /opt/pw-browsers/chromium)
 # In Foundry: install Quench, open it as GM, run "Fallhammer Character Sheet: core" and "…: chat cards". It opens our sheet on a

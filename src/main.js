@@ -1,5 +1,7 @@
 import { MODULE_ID } from './constants.js';
-import { extendChatModel, preloadTemplates, quietPosts, registerCharacterSheet, systemCharacterSheet } from './compat.js';
+import { extendChatModel, preloadTemplates, quietPosts, recordLevelOrder, registerCharacterSheet,
+   systemCharacterSheet } from './compat.js';
+import { levelOrder } from './sheet/header.js';
 import { makeCharacterSheet } from './apps/CharacterSheet.js';
 import { registerQuenchTests } from './tests/quench.js';
 import { registerSettings } from './settings.js';
@@ -41,6 +43,9 @@ Hooks.on('dnd5e.preUseActivity', rollOnUse);
 Hooks.on('dnd5e.postUseActivity', damageAfterUse);
 Hooks.on('dnd5e.postRollAttack', damageAfterAttack);
 Hooks.on('dnd5e.preRoll', skipRollDialog);
+
+// The milestone track: record the order class levels are gained, once dnd5e's advancement finishes.
+Hooks.on('dnd5e.advancementManagerComplete', (manager) => recordLevelOrder(manager, MODULE_ID, levelOrder));
 
 // In-world tests, only when the Quench module is active (src/tests/quench.js).
 Hooks.on('quenchReady', registerQuenchTests);

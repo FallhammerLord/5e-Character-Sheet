@@ -13,6 +13,12 @@ const settings = [];
 class SystemCharacterSheet
 {
    static DEFAULT_OPTIONS = { classes: ['character'] };
+   static PARTS = {
+      header: { template: 'systems/dnd5e/templates/actors/character-header.hbs' },
+      sidebar: { container: { classes: ['main-content'], id: 'main' }, template: 'systems/dnd5e/templates/actors/character-sidebar.hbs' },
+      abilityScores: { template: 'systems/dnd5e/templates/actors/character-ability-scores.hbs' },
+      tabs: { id: 'tabs', template: 'systems/dnd5e/templates/shared/sidebar-tabs.hbs' }
+   };
 }
 
 globalThis.Hooks = { on: (name, fn) => { hooks[name] = fn; }, once: (name, fn) => { hooks[name] = fn; } };
@@ -100,7 +106,17 @@ else
    if (sheet.name !== SHEET_CLASS_NAME) { problems.push(`sheet class is named ${sheet.name}, not ${SHEET_CLASS_NAME}`); }
    if (options?.types?.join() !== 'character') { problems.push('sheet is not limited to characters'); }
    if (options?.makeDefault) { problems.push('sheet must not make itself the default'); }
+   // Our header replaces dnd5e's header and ability scores; every other part stays dnd5e's, in order.
+   const parts = sheet.PARTS ?? {};
+   if (Object.keys(parts).join() !== 'header,sidebar,tabs') { problems.push(`sheet parts are ${Object.keys(parts).join()}, not header,sidebar,tabs`); }
+   for (const part of Object.values(parts).filter((p) => p.template.startsWith('modules/fhcs/')))
+   {
+      if (!existsSync(new URL(`../${part.template.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`sheet part template ${part.template} is missing`); }
+   }
+   if (!parts.header?.template.startsWith('modules/fhcs/')) { problems.push('the header part is still dnd5e\'s'); }
+   if (parts.sidebar?.container?.id !== 'main') { problems.push('dnd5e\'s sidebar part lost its container'); }
 }
+if (typeof hooks['dnd5e.advancementManagerComplete'] !== 'function') { problems.push('level order is not hooked to dnd5e.advancementManagerComplete'); }
 
 // Everything the manifest names exists, and every label key the code uses is in lang/en.json.
 const root = new URL('../', import.meta.url);
