@@ -2,9 +2,9 @@
   "FHCS": {
     "SheetLabel": "Fallhammer Character Sheet",
     "Settings": {
-      "ClearCards": {
-        "Name": "Clear chat cards",
-        "Hint": "Start every d20 roll card with its outcome in words: who rolled what, the total, success or failure against the DC, and a natural 1 or 20."
+      "Cards": {
+        "Name": "One card per action",
+        "Hint": "Draw each item use as one chat card: portrait, title, folded description, and a full-width band for each roll. Turn off to keep dnd5e's cards."
       }
     },
     "Chat": {
@@ -14,6 +14,25 @@
       "CriticalHit": "Critical hit",
       "Hits": "Hits {names}",
       "Misses": "Misses {names}"
+    },
+    "Card": {
+      "Description": "Description",
+      "Band": {
+        "rollAttack": "Attack",
+        "rollSave": "Save",
+        "rollCheck": "Check",
+        "rollDamage": "Damage",
+        "rollHealing": "Healing",
+        "rollFormula": "Roll"
+      },
+      "Roll": {
+        "rollAttack": "Roll attack",
+        "rollSave": "Roll save",
+        "rollCheck": "Roll check",
+        "rollDamage": "Roll damage",
+        "rollHealing": "Roll healing",
+        "rollFormula": "Roll"
+      }
     }
   }
 }

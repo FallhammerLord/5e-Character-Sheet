@@ -1,6 +1,7 @@
 /**
  * Loads the whole module graph in Node with Foundry and dnd5e mocked, runs the init hook, and checks the sheet was
- * registered as a subclass of dnd5e's character sheet, the chat hook is in place and settings are registered. One bad import stops the entire module in Foundry, and ESLint
+ * registered as a subclass of dnd5e's character sheet, dnd5e's usage card model is extended and settings are
+ * registered. One bad import stops the entire module in Foundry, and ESLint
  * doesn't check that imports exist.
  * Usage: npm run load
  */
@@ -24,6 +25,8 @@ globalThis.game = {
    settings: { register: (scope, key, config) => settings.push({ scope, key, config }) }
 };
 globalThis.dnd5e = { applications: { actor: { CharacterActorSheet: SystemCharacterSheet } } };
+class SystemUsageMessageData {}
+globalThis.CONFIG = { ChatMessage: { dataModels: { usage: SystemUsageMessageData } } };
 
 const problems = [];
 try
@@ -31,7 +34,8 @@ try
    await import(new URL('../src/main.js', import.meta.url));
    hooks.init?.();
    if (typeof hooks.quenchReady !== 'function') { problems.push('Quench tests are not hooked to quenchReady'); }
-   if (typeof hooks['dnd5e.renderChatMessage'] !== 'function') { problems.push('chat cards are not hooked to dnd5e.renderChatMessage'); }
+   const usage = globalThis.CONFIG.ChatMessage.dataModels.usage;
+   if (!(usage.prototype instanceof SystemUsageMessageData)) { problems.push('usage chat cards do not extend dnd5e\'s usage model'); }
 }
 catch (err)
 {
@@ -72,4 +76,4 @@ for (const { scope, key, config } of settings)
 }
 
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
-console.log('Module graph loads; the sheet registers as a dnd5e character sheet; chat cards and settings are hooked; manifest files exist.');
+console.log('Module graph loads; the sheet registers as a dnd5e character sheet; usage cards and settings are wired; manifest files exist.');

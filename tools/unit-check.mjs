@@ -1,10 +1,11 @@
 /**
- * Checks our pure functions offline: what each chat card's outcome line says for a given roll.
+ * Checks our pure functions offline: what a roll's outcome says, and how a usage card splits dnd5e's buttons.
  * Usage: npm run unit (also part of npm run check)
  */
 import { deepStrictEqual } from 'node:assert';
 import { describeRoll } from '../src/chat/outcome.js';
-import { format } from './templates.mjs';
+import { cardParts } from '../src/chat/card.js';
+import { format, localize } from './templates.mjs';
 
 const facts = (over) => ({
    kind: 'save', who: 'Kira', what: 'Wisdom Saving Throw', total: 14, natural: 11, target: 15,
@@ -37,5 +38,43 @@ for (const [name, input, expected] of CASES)
    catch { problems.push(`${name}: got ${JSON.stringify({ verdict, details })}, expected ${JSON.stringify(expected)}`); }
 }
 
+// Usage card: which of dnd5e's buttons become bands, in dnd5e's order, and what each says.
+const PART_CASES = [
+   [
+      'attack: two bands',
+      [{ action: 'rollAttack', index: 0, label: 'DND5E.Attack' }, { action: 'rollDamage', index: 1, label: 'DND5E.Damage' }],
+      { bands: ['attack:Attack:Roll attack:0', 'damage:Damage:Roll damage:1'], others: [] }
+   ],
+   [
+      'save keeps its own words; other actions stay buttons',
+      [
+         { action: 'rollSave', index: 0, label: 'DC 15 Dexterity Saving Throw' },
+         { action: 'rollDamage', index: 1, label: 'DND5E.Damage' },
+         { action: 'placeTemplate', index: 2, label: 'Place Template' }
+      ],
+      { bands: ['save:Save:DC 15 Dexterity Saving Throw:0', 'damage:Damage:Roll damage:1'], others: ['placeTemplate:2'] }
+   ],
+   [
+      'hidden buttons are left out',
+      [{ action: 'rollAttack', index: 0, label: 'DND5E.Attack', hidden: true }, { action: 'consumeResource', index: 1, label: 'x', hidden: true }],
+      { bands: [], others: [] }
+   ],
+   [
+      'healing is a damage band',
+      [{ action: 'rollHealing', index: 0, label: 'DND5E.Healing' }],
+      { bands: ['damage:Healing:Roll healing:0'], others: [] }
+   ]
+];
+for (const [name, buttons, expected] of PART_CASES)
+{
+   const { bands, others } = cardParts(buttons, localize);
+   const got = {
+      bands: bands.map((b) => `${b.kind}:${b.heading}:${b.text}:${b.index}`),
+      others: others.map((o) => `${o.action}:${o.index}`)
+   };
+   try { deepStrictEqual(got, expected); }
+   catch { problems.push(`${name}: got ${JSON.stringify(got)}, expected ${JSON.stringify(expected)}`); }
+}
+
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
-console.log(`${CASES.length} outcome lines read as expected.`);
+console.log(`${CASES.length} outcome lines and ${PART_CASES.length} card layouts read as expected.`);

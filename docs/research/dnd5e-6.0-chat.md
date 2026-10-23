@@ -44,3 +44,12 @@ So SCOPE §6.4's "saves on the same card" exists already; our work there is word
 ## Settings that shape cards
 
 `chatCardSummary` (client), `autoCollapseChatTrays` (client: always, never, older, manual), `autoCollapseItemCards` (client), `challengeVisibility` (world, hidden: all, player, none), `attackRollVisibility` (world), `allowPlayerDamageTray`, `allowPlayerEffectsTray`.
+
+## Usage card buttons (checked for the card frame, 2026-10-23)
+
+- Each activity lists its chat buttons in `_usageChatButtons` (stored on the message as `system.buttons`): attack `rollAttack`, `rollDamage`; save `rollSave` (one per ability, `canGroup`, dataset `{ dc, ability }`), `rollDamage`; check `rollCheck`; damage `rollDamage`; heal `rollHealing`; utility `rollFormula`; any activity `placeTemplate`, `consumeResource`, `refundResource`.
+- `UsageMessageData#_prepareButtons` resolves `hidden` (visibility `all` / `creator` / `gm`) and the label for the viewer.
+- A click on any `[data-action]` in the message runs `metadata.actions[action]` (`showDocument`, `toggleDescription`, `use`) or else `activity.onChatAction(event, target, message)`, which reads `target.dataset.action` and, for saves, `message.system.getButton(target)` by `data-index`. So a band needs only `data-action` and `data-index`.
+- `recorded-targets`, `effect-application` and `damage-application` find their message through `closest("[data-message-id]")`; they work inside any markup.
+- `CONFIG.ChatMessage.dataModels` is set in dnd5e's init; swapping `usage` for a subclass in our init (later) applies to every message, since the world's messages are built after init. The subclass keeps `metadata`, schema and migrations; we override `template` and extend `_prepareContext`.
+- `activity.use(usage, dialog, { create: false })` returns the message data without posting; `usage.subsequentActions: false` skips the automatic follow-up roll. **dnd5e already rolls the attack after an attack activity is used** (`AttackActivity#_triggerSubsequentActions`), and a damage activity's damage likewise.

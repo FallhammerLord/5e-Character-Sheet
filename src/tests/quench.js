@@ -1,6 +1,5 @@
 import { MODULE_ID, SHEET_ID, SYSTEM_ACTIONS } from '../constants.js';
 import { systemCharacterSheet } from '../compat.js';
-import { decorateMessage } from '../chat/outcome.js';
 
 /** How long a click may take to reach dnd5e's hook before a test fails. */
 const HOOK_WAIT_MS = 3000;
@@ -108,44 +107,71 @@ export function registerQuenchTests(quench)
       });
    }, { displayName: 'Fallhammer Character Sheet: core' });
 
-   // Chat cards: renders dnd5e check messages in memory (never posted to chat) and reads our outcome line.
+   // Chat cards: uses an item without posting (dnd5e returns the message data), renders it in memory, and clicks it.
    quench.registerBatch(`${MODULE_ID}.chat`, (context) =>
    {
-      const { describe, it, assert } = context;
+      const { describe, it, assert, before, after } = context;
+      let actor = null;
+      let activity = null;
 
-      /** Renders an unsaved check message with a fixed d20 against a DC and returns our outcome line's text. */
-      const outcomeFor = async (evaluate, target) =>
+      /** A usage card for the test weapon, rendered but never posted, and its element. */
+      const renderCard = async () =>
       {
-         const roll = await new CONFIG.Dice.D20Roll('1d20', {}, { target }).evaluate(evaluate);
-         const message = new ChatMessage.implementation({
-            type: 'check',
-            flavor: 'Strength Check',
-            speaker: { alias: 'FHCS test' },
-            rolls: [roll.toJSON()],
-            system: { ability: 'str' }
-         });
-         const html = await message.renderHTML();
-         await decorateMessage(message, html);
-         const lines = html.querySelectorAll('.fhcs-outcome');
-         assert.lengthOf(lines, 1, 'exactly one outcome line');
-         return lines[0].textContent.replace(/\s+/g, ' ').trim();
+         const results = await activity.use({ subsequentActions: false, consume: false }, { configure: false },
+            { create: false });
+         const message = new ChatMessage.implementation(results.message);
+         return { message, html: await message.renderHTML() };
       };
 
-      describe('Clear chat cards', function ()
+      describe('One card per action', function ()
       {
-         it('says failure, the DC and a natural 20', async function ()
+         before(async function ()
          {
-            const text = await outcomeFor({ maximize: true }, 21);
-            assert.include(text, 'Strength Check');
-            assert.include(text, 'Failure vs DC 21');
-            assert.include(text, 'Natural 20');
+            if (!game.user.isGM) { this.skip(); }
+            actor = await Actor.implementation.create({ name: 'FHCS test (safe to delete)', type: 'character' });
+            const [item] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test sword', type: 'weapon' }]);
+            activity = await item.createActivity('attack', {}, { renderSheet: false });
+            activity ??= item.system.activities.contents[0];
          });
 
-         it('says success and a natural 1', async function ()
+         after(async function ()
          {
-            const text = await outcomeFor({ minimize: true }, 1);
-            assert.include(text, 'Success vs DC 1');
-            assert.include(text, 'Natural 1');
+            await actor?.delete();
+         });
+
+         it('draws usage cards with our model', function ()
+         {
+            assert.strictEqual(CONFIG.ChatMessage.dataModels.usage.name, 'FHCSUsageMessageData');
+         });
+
+         it('has a header, and an attack band carrying dnd5e\'s action', async function ()
+         {
+            const { html } = await renderCard();
+            assert.ok(html.querySelector('.fhcs-card-header'), 'card header');
+            assert.include(html.querySelector('.fhcs-card-title')?.textContent ?? '', 'FHCS test sword');
+            const band = html.querySelector('.fhcs-band[data-action="rollAttack"]');
+            assert.ok(band, 'attack band');
+            assert.isTrue(html.classList.contains('fhcs-chat'));
+         });
+
+         it('rolls the attack when the band is clicked', async function ()
+         {
+            const { html } = await renderCard();
+            const band = html.querySelector('.fhcs-band[data-action="rollAttack"]');
+            const reached = new Promise((resolve, reject) =>
+            {
+               const timer = setTimeout(() => { Hooks.off('dnd5e.preRollAttackV2', id); reject(new Error('never reached dnd5e.preRollAttackV2')); }, 3000);
+               const id = Hooks.on('dnd5e.preRollAttackV2', (config) =>
+               {
+                  clearTimeout(timer);
+                  Hooks.off('dnd5e.preRollAttackV2', id);
+                  resolve(config);
+                  return false;
+               });
+            });
+            band.dispatchEvent(new PointerEvent('click', { bubbles: true, cancelable: true, button: 0 }));
+            const config = await reached;
+            assert.ok(config, 'dnd5e started an attack roll');
          });
       });
    }, { displayName: 'Fallhammer Character Sheet: chat cards' });

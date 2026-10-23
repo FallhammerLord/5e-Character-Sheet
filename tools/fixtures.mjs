@@ -4,38 +4,42 @@
  *
  * A case: { name, template: 'path/without-hbs', context: {...}, frame?: 'sheet' | 'chat', theme?: 'light' }
  */
-import { describeRoll } from '../src/chat/outcome.js';
-import { format } from './templates.mjs';
+import { cardParts } from '../src/chat/card.js';
+import { localize } from './templates.mjs';
 
-/** Facts as compat.rollFacts returns them, with overrides. */
-const facts = (over) => ({
-   kind: 'save', who: 'Kira', what: 'Intelligence Saving Throw', total: 14, natural: 11, target: 15,
-   showResult: true, success: false, isCritical: false, targets: [], ...over
+/** A usage card's context as FHCSUsageMessageData#_prepareContext builds it, with overrides. */
+const card = (over = {}, buttons = []) => ({
+   fhcs: {
+      portrait: '', actorName: 'Kira', title: 'Longsword', itemUuid: 'Actor.x.Item.y', subtitle: 'Attack · Melee',
+      flavor: '', description: '<p>A versatile blade.</p>', supplements: [], tags: ['Versatile', 'Proficient'],
+      hasDetails: true, ...cardParts(buttons, localize), ...over
+   }
 });
 
+const ATTACK = [
+   { action: 'rollAttack', index: 0, label: 'DND5E.Attack' },
+   { action: 'rollDamage', index: 1, label: 'DND5E.Damage' }
+];
+const FIREBALL = [
+   { action: 'rollSave', index: 0, label: 'DC 15 Dexterity Saving Throw' },
+   { action: 'rollDamage', index: 1, label: 'DND5E.Damage' },
+   { action: 'placeTemplate', index: 2, label: 'Place Template' },
+   { action: 'consumeResource', index: 3, label: 'Consume Resource' },
+   { action: 'refundResource', index: 4, label: 'Refund Resource' }
+];
+
 export const CASES = [
-   { name: 'chat-save-failure', template: 'chat/outcome', frame: 'chat', context: describeRoll(facts({ natural: 20 }), format) },
+   { name: 'card-attack', template: 'chat/usage-card', frame: 'chat', context: card({}, ATTACK) },
+   { name: 'card-fireball', template: 'chat/usage-card', frame: 'chat', context: card({ title: 'Fireball', subtitle: '3rd-level evocation' }, FIREBALL) },
    {
-      name: 'chat-long-names',
-      template: 'chat/outcome',
+      name: 'card-long-names',
+      template: 'chat/usage-card',
       frame: 'chat',
-      context: describeRoll(facts({
-         who: 'Bartholomew Thistlewood-Ashcombe the Unreasonably Named',
-         what: 'Constitution Saving Throw (Disadvantage)',
-         total: 1, natural: 1, target: 10, success: false
-      }), format)
+      context: card({
+         actorName: 'Bartholomew Thistlewood-Ashcombe the Unreasonably Named',
+         title: 'Supercalifragilisticexpialidocious Greatsword of the Northern Wastes',
+         subtitle: 'Attack · Melee · Heavy · Two-Handed · Topple'
+      }, [{ action: 'rollSave', index: 0, label: 'DC 18 Constitution Saving Throw (Topple, or knocked Prone)' }, ...ATTACK])
    },
-   {
-      name: 'chat-attack-targets',
-      template: 'chat/outcome',
-      frame: 'chat',
-      context: describeRoll(facts({
-         kind: 'attack', what: 'Longsword', total: 23, natural: 20, target: null, success: null, isCritical: true,
-         targets: [
-            { name: 'Goblin Boss', isMiss: false }, { name: 'Hobgoblin Captain', isMiss: false },
-            { name: 'Bugbear', isMiss: true }, { name: 'Supercalifragilisticexpialidocious', isMiss: true }
-         ]
-      }), format)
-   },
-   { name: 'chat-no-dc', template: 'chat/outcome', frame: 'chat', context: describeRoll(facts({ target: null, success: null }), format) }
+   { name: 'card-no-details', template: 'chat/usage-card', frame: 'chat', context: card({ hasDetails: false }, []) }
 ];

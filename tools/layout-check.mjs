@@ -59,6 +59,19 @@ function findProblems()
       if (!r.width) { continue; }
       const label = `${el.tagName.toLowerCase()}.${[...el.classList].join('.')} "${(el.textContent || el.value || '').trim().slice(0, 30)}"`;
       if (r.right > edge + 1) { issues.push(`past window edge by ${Math.round(r.right - edge)}px: ${label}`); continue; }
+      // Siblings drawn on top of each other (a grid item wider than its track runs into the next one).
+      if (cs.position !== 'absolute' && cs.position !== 'fixed')
+      {
+         for (let next = el.nextElementSibling; next; next = next.nextElementSibling)
+         {
+            const ns = getComputedStyle(next);
+            if (ns.display === 'none' || ns.position === 'absolute' || ns.position === 'fixed') { continue; }
+            const n = next.getBoundingClientRect();
+            const across = Math.min(r.right, n.right) - Math.max(r.left, n.left);
+            const down = Math.min(r.bottom, n.bottom) - Math.max(r.top, n.top);
+            if ((across > 1) && (down > 1)) { issues.push(`overlaps its next sibling by ${Math.round(across)}px: ${label}`); }
+         }
+      }
       const clipsOnPurpose = cs.textOverflow === 'ellipsis' || ['auto', 'scroll', 'hidden'].includes(cs.overflowX);
       if (!clipsOnPurpose && el.scrollWidth > el.clientWidth + 1 && el.clientWidth > 0
          && !['INPUT', 'SELECT', 'TEXTAREA'].includes(el.tagName))
@@ -85,7 +98,8 @@ const SELF_TEST = [
    { id: 'self-fits', expect: false, body: '<p style="width:200px">Fits easily.</p>' },
    { id: 'self-wide', expect: true, body: '<div style="width:100px"><span style="display:inline-block;width:300px">Too wide</span></div>' },
    { id: 'self-past-edge', expect: true, body: '<div style="width:2000px">Past the edge</div>' },
-   { id: 'self-container', expect: true, body: '<div style="container-type:inline-size"><input type="text"></div>' }
+   { id: 'self-container', expect: true, body: '<div style="container-type:inline-size"><input type="text"></div>' },
+   { id: 'self-overlap', expect: true, body: '<div style="display:grid;grid-template-columns:40px 1fr"><span style="justify-self:start;white-space:nowrap">Runs into the next</span><span>x</span></div>' }
 ];
 
 const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});

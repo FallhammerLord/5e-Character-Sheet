@@ -1,0 +1,51 @@
+<div class="fhcs-card">
+   <header class="fhcs-card-header">
+      {{#if fhcs.portrait}}<img class="fhcs-card-portrait" src="{{ fhcs.portrait }}" alt="{{ fhcs.actorName }}">{{/if}}
+      <div class="fhcs-card-titles">
+         {{#if fhcs.actorName}}<span class="fhcs-card-actor">{{ fhcs.actorName }}</span>{{/if}}
+         <button type="button" class="fhcs-card-title" data-action="showDocument" data-uuid="{{ fhcs.itemUuid }}">{{ fhcs.title }}</button>
+         {{#if fhcs.subtitle}}<span class="fhcs-card-subtitle">{{{ fhcs.subtitle }}}</span>{{/if}}
+      </div>
+   </header>
+
+   {{#if fhcs.hasDetails}}
+   <details class="fhcs-card-details">
+      <summary>{{ localize "FHCS.Card.Description" }}</summary>
+      {{#if fhcs.flavor}}<div class="fhcs-card-flavor">{{{ fhcs.flavor }}}</div>{{/if}}
+      {{#if fhcs.description}}<div class="fhcs-card-description">{{{ fhcs.description }}}</div>{{/if}}
+      {{#each fhcs.supplements}}<p class="fhcs-card-supplement"><strong>{{ label }}</strong> {{ detail }}</p>{{/each}}
+      {{#if fhcs.tags.length}}
+      <ul class="fhcs-card-tags">{{#each fhcs.tags}}<li>{{ this }}</li>{{/each}}</ul>
+      {{/if}}
+   </details>
+   {{/if}}
+
+   {{#each fhcs.bands}}
+   <button type="button" class="fhcs-band fhcs-band-{{ kind }}" data-action="{{ action }}" data-index="{{ index }}">
+      <span class="fhcs-band-top"><span class="fhcs-band-heading">{{ heading }}</span><span class="fhcs-band-end"></span></span>
+      <span class="fhcs-band-text">{{ text }}</span>
+   </button>
+   {{/each}}
+
+   {{#if fhcs.others.length}}
+   <div class="fhcs-card-actions">
+      {{#each fhcs.others}}
+      <button type="button" class="fhcs-button" data-action="{{ action }}" data-index="{{ index }}">{{ label }}</button>
+      {{/each}}
+   </div>
+   {{/if}}
+
+   {{#if showTargets}}<recorded-targets></recorded-targets>{{/if}}
+</div>
+
+{{#each summaries}}
+<div class="card-summary" data-message-id="{{ id }}" data-target-uuid="{{ token.uuid }}">{{{ html }}}</div>
+{{/each}}
+
+{{#if effects.length}}
+<effect-application class="dnd5e2">
+   {{#each effects}}
+   <option value="{{ uuid }}"></option>
+   {{/each}}
+</effect-application>
+{{/if}}

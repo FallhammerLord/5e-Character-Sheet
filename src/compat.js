@@ -20,6 +20,30 @@ export function registerCharacterSheet(sheetClass, label)
    });
 }
 
+/**
+ * Swaps dnd5e's data model for one chat message type with our subclass of it. Runs at init, after dnd5e's init set
+ * CONFIG.ChatMessage.dataModels and before the world's messages are built.
+ *
+ * @param {string} type        Message type, e.g. 'usage'.
+ * @param {Function} extend    (dnd5e's model class) => our subclass.
+ * @returns {boolean} Whether dnd5e had that type.
+ */
+export function extendChatModel(type, extend)
+{
+   const models = CONFIG.ChatMessage?.dataModels;
+   if (!models?.[type]) { return false; }
+   models[type] = extend(models[type]);
+   return true;
+}
+
+/** The actor's portrait for a chat card (dnd5e's choice of token or actor art), or ''. */
+export async function actorArtwork(actor)
+{
+   if (!actor) { return ''; }
+   const art = await actor.getPreferredArtwork?.();
+   return (art && !art.isVideo ? art.src : actor.img) ?? '';
+}
+
 /** Renders one of our templates by its Foundry path. */
 export function renderTemplate(path, data)
 {

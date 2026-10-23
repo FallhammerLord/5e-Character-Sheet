@@ -1,13 +1,18 @@
 import { MODULE_ID } from './constants.js';
-import { registerCharacterSheet, systemCharacterSheet } from './compat.js';
+import { extendChatModel, registerCharacterSheet, systemCharacterSheet } from './compat.js';
 import { makeCharacterSheet } from './apps/CharacterSheet.js';
 import { registerQuenchTests } from './tests/quench.js';
 import { registerSettings } from './settings.js';
-import { decorateMessage } from './chat/outcome.js';
+import { makeUsageMessageData } from './chat/card.js';
 
 Hooks.once('init', () =>
 {
    registerSettings();
+   // One card per action (Track R): runs for every dnd5e usage card, whatever sheet the player uses.
+   if (!extendChatModel('usage', makeUsageMessageData))
+   {
+      console.error(`${MODULE_ID} | dnd5e's usage chat cards were not found; chat cards keep dnd5e's layout.`);
+   }
    const Base = systemCharacterSheet();
    if (!Base)
    {
@@ -16,12 +21,6 @@ Hooks.once('init', () =>
    }
    registerCharacterSheet(makeCharacterSheet(Base), 'FHCS.SheetLabel');
    console.log(`${MODULE_ID} | Character sheet registered (dnd5e ${game.system?.version}).`);
-});
-
-// Clear chat cards (Track R): runs for every dnd5e message, whatever sheet the player uses.
-Hooks.on('dnd5e.renderChatMessage', (message, html) =>
-{
-   if (game.settings.get(MODULE_ID, 'clearCards')) { decorateMessage(message, html); }
 });
 
 // In-world tests, only when the Quench module is active (src/tests/quench.js).

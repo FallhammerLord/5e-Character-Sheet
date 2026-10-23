@@ -1,15 +1,8 @@
 /**
- * Clear chat cards (Track R, SCOPE §6): every d20 card opens with its outcome in words. First line: who, what and
- * the total ("Kira · Intelligence Saving Throw · 14"); second line: the verdict against a known DC and the natural
- * die ("Failure vs DC 15 · Natural 20"). Saves summarized on the card that asked get the same line.
- *
- * describeRoll is pure, so tools/unit-check.mjs and the layout fixtures use it offline; dnd5e is read only through
- * compat.rollFacts.
+ * A roll's outcome in words (Track R, SCOPE §6.5): the verdict against a known DC, the natural die, a critical hit,
+ * hits and misses. The d20 and save bands use it. Pure, so tools/unit-check.mjs runs it offline; dnd5e is read only
+ * through compat.rollFacts.
  */
-import { MODULE_ID } from '../constants.js';
-import { renderTemplate, rollFacts } from '../compat.js';
-
-export const OUTCOME_TEMPLATE = `modules/${MODULE_ID}/templates/chat/outcome.hbs`;
 
 /**
  * Turns the facts of one roll into the outcome line's context.
@@ -35,29 +28,4 @@ export function describeRoll(facts, format)
    if (names(true)) { details.push(format('FHCS.Chat.Misses', { names: names(true) })); }
 
    return { who: facts.who, what: facts.what, total: facts.total, verdict, details };
-}
-
-/**
- * Adds the outcome line to a rendered message, and to each roll summarized inside it. Safe to call twice.
- *
- * @param {ChatMessage} message  The dnd5e chat message.
- * @param {HTMLElement} html     Its rendered element, from `dnd5e.renderChatMessage`.
- */
-export async function decorateMessage(message, html)
-{
-   html.classList.add('fhcs-chat');
-   const places = [[message, html.querySelector('.message-content')]];
-   for (const summary of html.querySelectorAll('.card-summary[data-message-id]'))
-   {
-      places.push([game.messages.get(summary.dataset.messageId), summary]);
-   }
-
-   const format = (key, data) => game.i18n.format(key, data);
-   for (const [source, box] of places)
-   {
-      const facts = source && box ? rollFacts(source) : null;
-      if (!facts) { continue; }
-      const markup = await renderTemplate(OUTCOME_TEMPLATE, describeRoll(facts, format));
-      if (!box.querySelector(':scope > .fhcs-outcome')) { box.insertAdjacentHTML('afterbegin', markup); }
-   }
 }
