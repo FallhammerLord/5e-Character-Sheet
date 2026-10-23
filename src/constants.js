@@ -1,2 +1,16 @@
 export const MODULE_ID = 'fhcs';
 export const MODULE_PATH = `modules/${MODULE_ID}`;
+
+/** Our sheet class's name; Foundry files the sheet under `${scope}.${class name}`. */
+export const SHEET_CLASS_NAME = 'FHCSCharacterSheet';
+export const SHEET_ID = `${MODULE_ID}.${SHEET_CLASS_NAME}`;
+
+/**
+ * dnd5e 6.0's character sheet actions (`DEFAULT_OPTIONS.actions`), which our markup relies on. The Quench tests
+ * fail if dnd5e drops one. See docs/research/dnd5e-6.0-sheet.md.
+ */
+export const SYSTEM_ACTIONS = [
+   'rest', 'restoreTransformation', 'roll', 'showArtwork', 'showConfiguration', 'togglePip', 'toggleSidebar',
+   'deleteFavorite', 'deleteOccupant', 'findItem', 'setSpellcastingAbility', 'toggleDeathTray', 'toggleInspiration',
+   'useFacility', 'useFavorite'
+];

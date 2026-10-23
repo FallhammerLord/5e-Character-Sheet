@@ -1,4 +1,5 @@
-# Runs the offline checks on every push and pull request: lint, and module load with Foundry and dnd5e mocked.
+# Runs the offline checks on every push and pull request: lint and module load with Foundry and dnd5e mocked;
+# and the layout check, which renders our templates in Chromium at several widths and fails on overflow.
 name: Check
 
 on:
@@ -20,6 +21,26 @@ jobs:
           cache: npm
 
       - name: Check
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
         run: |
           npm ci
           npm run check
+
+  layout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: |
+          npm ci
+          npx playwright install --with-deps chromium
+
+      - name: Layout
+        run: npm run layout

@@ -26,6 +26,7 @@ try
 {
    await import(new URL('../src/main.js', import.meta.url));
    hooks.init?.();
+   if (typeof hooks.quenchReady !== 'function') { problems.push('Quench tests are not hooked to quenchReady'); }
 }
 catch (err)
 {
@@ -40,6 +41,9 @@ else
    if (documentClass !== globalThis.Actor) { problems.push('sheet is not registered for Actor'); }
    if (scope !== 'fhcs') { problems.push(`sheet registered under "${scope}", not "fhcs"`); }
    if (!(sheet.prototype instanceof SystemCharacterSheet)) { problems.push('sheet does not extend dnd5e\'s character sheet'); }
+   // Foundry files a sheet under scope.className; worlds store that ID, and the Quench tests open it by it.
+   const { SHEET_CLASS_NAME } = await import('../src/constants.js');
+   if (sheet.name !== SHEET_CLASS_NAME) { problems.push(`sheet class is named ${sheet.name}, not ${SHEET_CLASS_NAME}`); }
    if (options?.types?.join() !== 'character') { problems.push('sheet is not limited to characters'); }
    if (options?.makeDefault) { problems.push('sheet must not make itself the default'); }
 }

@@ -1,6 +1,7 @@
 import { MODULE_ID } from './constants.js';
 import { registerCharacterSheet, systemCharacterSheet } from './compat.js';
 import { makeCharacterSheet } from './apps/CharacterSheet.js';
+import { registerQuenchTests } from './tests/quench.js';
 
 Hooks.once('init', () =>
 {
@@ -13,3 +14,6 @@ Hooks.once('init', () =>
    registerCharacterSheet(makeCharacterSheet(Base), 'FHCS.SheetLabel');
    console.log(`${MODULE_ID} | Character sheet registered (dnd5e ${game.system?.version}).`);
 });
+
+// In-world tests, only when the Quench module is active (src/tests/quench.js).
+Hooks.on('quenchReady', registerQuenchTests);

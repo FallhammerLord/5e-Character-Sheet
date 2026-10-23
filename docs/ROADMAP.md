@@ -4,16 +4,16 @@ Goal: Tidy 5e's classic layout, maintained, with the ADHD-friendly rules from ou
 
 Every phase ends with the user testing in their own v14 world. A phase is done when it's verified there, not when the code lands.
 
-## Phase 0: Foundations (in progress)
+## Phase 0: Foundations (done in code 2026-10-23; Quench run waits on the user)
 
 - [x] Module scaffold: manifest, sheet registered beside dnd5e's (not the default), `compat.js`, load check with dnd5e mocked
 - [x] Claude Code hooks: install on session start, lint on edit, check before push
 - [x] CI: `npm run check` on push
 - [x] Layout spec from Tidy Classic's screenshots and source → `docs/SCOPE.md` §4
-- [ ] Finish `docs/research/dnd5e-6.0-sheet.md`: context data, listeners, favorites
+- [x] Finish `docs/research/dnd5e-6.0-sheet.md`: context data, listeners, favorites
 - [x] Read Tidy Classic's source: it rebuilds mechanics on `ActorSheetV2`; we extend dnd5e instead
-- [ ] Layout check (Playwright, many widths, fails on overflow), as in the quest log
-- [ ] Quench in-world tests: open, roll, use an item, rest, on a temporary actor
+- [x] Layout check (Playwright, four widths, fails on overflow, self-tests each run); CI runs it
+- [x] Quench in-world tests: opens as ours, keeps every dnd5e action, ability roll, long rest, item use (clicks stop at dnd5e's pre-hooks)
 
 ## Phase 1: Header and abilities (read-only)
 

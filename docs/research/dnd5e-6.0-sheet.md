@@ -39,12 +39,44 @@ Base sheet `querySelector` targets: `.tab-body`, `.main-content`, `.sidebar-coll
 
 Our templates must keep these class names, or override the methods that use them in `compat.js`-guarded code.
 
-## Still to read (Phase 0)
+## Context data
 
-- `_prepareContext` and each `_prepare*Context`: what data each part gets.
-- `_onRender` and `_attachPartListeners`: listeners bound to specific markup.
-- How Favorites are stored (`system.favorites`) and used.
-- How Tidy's Quadrone sheet handles favorites, pins and the tab selection.
+`_prepareContext` (base, `base-actor-sheet.mjs:216`) builds what every part shares: `actor`, `system`, `source` (the raw data in edit mode, prepared data in play), `labels` (actor labels plus damage types), `fields` (the schema, for form inputs), `limited`, `modernRules` (2024 rules), `rollableClass` (`"rollable"` when editable), `user`, `config`. It also prepares the items (`_prepareItems`) and caches concentration. The character version adds `abilityRows` and `spellbook` (`_prepareSpellbook`).
+
+`_preparePartContext(partId, …)` then adds each part's data, one method per part: `abilityScores`, `bastion`, `biography`, `details`, `effects`, `features`, `header`, `inventory`, `renown`, `sidebar`, `specialTraits`, `spells`. **Our parts can reuse these by giving them the same IDs**, or call the methods directly from a part with a new ID.
+
+Useful pieces for Phase 1:
+- Header (`character-sheet.mjs:484`): `labels.class` ("Cleric 12 / Fighter 2", highest first), `epicBoonsEarned`, `showExperience` (the `levelingMode` setting isn't `noxp`), `showRests` (GM, or owner when `allowRests` is on). Limited actors get only `portrait`.
+- Portrait: `_preparePortrait(context)`.
+- Abilities, skills, senses, traits: `_prepareAbilities`, `_prepareSkillsTools(context, "skills")`, `_prepareSenses`, `_prepareTraits`.
+
+## Listeners bound to markup
+
+Most behavior goes through `data-action` (above). The rest is bound in `_onRender` to specific markup; keep it, or that feature silently stops:
+
+- `[data-attribution]`, `[data-reference-tooltip]`: rich tooltips (`_applyTooltips`).
+- `.sidebar-collapsed` on the window: toggled from a user flag.
+- When editable: `.level-selector` (class level change); text inputs with `data-dtype="Number"` or `inputmode="numeric"` (`+5` / `-3` delta input); `.meter > [role="meter"]:has(> input)` (click a meter to edit it, blur to close).
+- Character only: `_renderAttunement` and `_renderSpellbook` run after render unless the actor is Limited.
+
+Actions read their target from nearby data attributes:
+- `roll` does nothing unless the clicked element has the class `rollable` (templates use `{{ @root.rollableClass }}`, set only when editable). An ability roll is a save if the element also has `saving-throw`, else a check.
+- `roll`: `data-type` = `ability` (with `[data-ability]`), `deathSave`, `initiative`, `skill` / `tool` (with `[data-key]`), and more.
+- `rest`: `data-type` = `short` or `long` → `actor.initiateRest`.
+- `togglePip`: `[data-n]` and `[data-prop]` (the actor property to set). Pips for spell slots, hit dice, death saves can use this directly.
+- `deleteFavorite`: `[data-favorite-id]`.
+
+## Favorites
+
+Stored on the actor as `system.favorites`: an array of `{ id, type, sort }`, where `id` is a relative UUID and `type` is `item`, `effect`, `activity`, `skill`, `tool`, `slots` or `facility`. Change them only through `actor.system.addFavorite(...)` / `removeFavorite(id)` (`data/actor/character.mjs:323–363`). `_prepareFavorites` (`character-sheet.mjs:633`) turns them into display rows and puts legacy resources (`system.resources`) first. Hidden items and inactive dependent effects are skipped.
+
+This is where Classic's "pins" go: same list, so favorites made on our sheet show on dnd5e's and Tidy's, and the other way round.
+
+## Templates
+
+dnd5e's templates use its own Handlebars helpers (`dnd5e-icon`, `dnd5e-formatModifier`, `dnd5e-numberFormat`, and others, `module/utils.mjs:1358`). They exist in Foundry but not in our offline layout check. **Our templates use only core helpers**; compute display values in our context methods (the quest log rule).
+
+dnd5e's CSS is built from LESS at release (`dnd5e.css` isn't in the repository), so the layout check can't load it. Our styles must stand on their own inside `.fhcs-sheet`.
 
 ## How Tidy did it (checked 2026-10-23)
 

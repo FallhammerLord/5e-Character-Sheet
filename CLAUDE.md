@@ -15,6 +15,10 @@ This file holds rules only. Plan: `docs/ROADMAP.md`. Decisions: `docs/SCOPE.md`.
 ```sh
 npm run check   # lint + load. Hooks run it before every git push; CI runs it on push.
 npm run load    # loads the module with Foundry and dnd5e mocked, checks the sheet registration and manifest files
+npm run layout  # renders templates (cases in tools/fixtures.mjs) at 560–900px, fails on overflow; self-tests first
+                # set CHROMIUM_PATH (here: /opt/pw-browsers/chromium)
+# In Foundry: install Quench, open it as GM, run "Fallhammer Character Sheet: core". It opens our sheet on a
+# temporary character and clicks a roll, a rest and an item use, stopping each at dnd5e's pre-hook.
 ```
 
 Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies install on session start; each edited JS file is linted; `git push` is blocked until `npm run check` passes.
@@ -23,6 +27,10 @@ Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies insta
 
 - **Extend dnd5e, don't rebuild it.** Our sheet subclasses `CharacterActorSheet`, built at init by `makeCharacterSheet(Base)` (a module can't import the system by path). dnd5e keeps every mechanic; we own layout, templates and CSS.
 - **Keep dnd5e's hooks into the markup:** `data-action` names and the class names its code looks for (listed in the research note). Rename one and a mechanic silently stops.
+- **Rolls need `rollable`:** dnd5e's `roll` action ignores an element without that class; use `{{ @root.rollableClass }}`.
+- **Templates use only core Handlebars helpers;** compute display values in our context methods. dnd5e's helpers don't exist in the layout check.
+- **New template part → a case in `tools/fixtures.mjs`,** and a Quench click test if it holds an action.
+- **`SYSTEM_ACTIONS`** (`src/constants.js`) lists the dnd5e actions our markup relies on; Quench fails if dnd5e drops one. Keep it in step with the research note.
 - **Prefer dnd5e's custom elements** (`dnd5e-inventory`, `dnd5e-effects`, and others) over rebuilt lists: they bring context menus, drag and filters.
 - **`src/compat.js`** is the only place for version-sensitive Foundry and dnd5e APIs.
 - **Imports:** one missing import stops the whole module in Foundry; ESLint won't see it. `npm run load` catches it.
