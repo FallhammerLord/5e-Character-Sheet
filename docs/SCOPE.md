@@ -16,7 +16,7 @@ The user's table: players used to Tidy 5e's classic layout. Private use for now 
 - **Characters only** to start; NPCs and vehicles keep dnd5e's sheets.
 - **Offered beside dnd5e's sheet**, never forced as the default.
 - **Replaces Ready Set Roll; private use for now** (user, 2026-10-24): no compatibility layer for RSR or its forks; the module is for the user's table, public release later if ever.
-- **Track R (rolls and chat cards) before Phase 1** (2026-10-23, user deferred to our call): it's used by every player and the GM every session whatever sheet they use, it's mostly presentation over dnd5e's own buttons, and it ends the table's reliance on an experimental Ready Set Roll fork. The sheet header follows.
+- **Track R (rolls and chat cards) went first** (2026-10-23, user deferred to our call): it's used by every player and the GM every session whatever sheet they use, and it ends the table's reliance on an experimental Ready Set Roll fork. Done and verified 2026-10-24; the sheet phases lead from here, in ROADMAP order.
 
 ## 4. Layout
 

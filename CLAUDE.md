@@ -2,7 +2,7 @@
 
 A Foundry VTT **v14** character sheet module for dnd5e 6.x (ID `fhcs`, CSS prefix `fhcs-`), in the classic Tidy 5e layout with our ADHD-friendly rules. Plain ES modules, no build step. Sister project: `fallhammer_quest_log` (same conventions; attach it only when comparing).
 
-This file holds rules only. Plan: `docs/ROADMAP.md`. Decisions: `docs/SCOPE.md`. What's verified or waiting: `docs/STATUS.md`. dnd5e internals: `docs/research/dnd5e-6.0-sheet.md` (sheet), `docs/research/dnd5e-6.0-chat.md` (chat cards and rolls).
+This file holds rules only. Plan: `docs/ROADMAP.md`. Decisions: `docs/SCOPE.md`. What's verified or waiting: `docs/STATUS.md`. How finished parts work: `docs/BUILT.md`. dnd5e internals: `docs/research/dnd5e-6.0-sheet.md` (sheet), `docs/research/dnd5e-6.0-chat.md` (chat cards and rolls).
 
 ## Working with the user
 
