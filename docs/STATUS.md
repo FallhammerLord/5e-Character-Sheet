@@ -4,6 +4,7 @@ What's verified, what's waiting. Read when picking up work; CLAUDE.md holds only
 
 ## Verified in Foundry by the user
 
+- Tabs switch by hand, and both Quench batches pass (2026-10-24, user, after the second round's fixes). The user calls the styling "a right mess"; screenshots requested.
 - Our header and frame render in the user's v14 world, dark theme, with none of dnd5e's sheet look (2026-10-24, user's screenshot): portrait chips, HP, XP and level, origin line, AC, Init and the ability row. Fixes from that round: death save pips were oval (Foundry's button min-height; now reset, and the layout check imitates it and fails on a round control that isn't square), three successes cleared the pips (dnd5e's reset; now kept until HP rises above 0, which clears both rows: `src/sheet/death.js`), skill rows too tall (now 24px), death saves made the header much taller (now drawn over the greyed portrait), the title bar looked separate (now a slim strip in the sheet's colors, title hidden), and an `Item5e` "type: may not be undefined" error, most likely dnd5e's add button, unstyled once dnd5e's look was gone and creating an item with no type on the Attributes tab (now shown only on Inventory, Features, Spells and Effects, as dnd5e does).
 
 - Track R basic tests pass after updating the installed copy to this branch (2026-10-24, user: "works on basic tests as expected").
@@ -31,7 +32,7 @@ What's verified, what's waiting. Read when picking up work; CLAUDE.md holds only
 
 ## In code, not yet verified
 
-- **Second Quench round fixes (2026-10-24).** User's run: 6 of 26 failed; by hand, tabs didn't switch, pips worked after a refresh. Tabs: our row lacked Foundry's `tabs` class, so its `tab` action never found the button; the row now has it, and the layout check fails on any tab button outside `.tabs` (seen failing on all 90). Test fixes: item use compares IDs (dnd5e uses a copy of the item); exhaustion waits for dnd5e's exhaustion effect; the band click test posts its card privately (dnd5e's card clicks look the message up in `game.messages`) and always unhooks, which also caused the next test's failure. Waiting on the user: tabs switch by hand; both Quench batches pass.
+- **Second Quench round fixes (2026-10-24).** User's run: 6 of 26 failed; by hand, tabs didn't switch, pips worked after a refresh. Tabs: our row lacked Foundry's `tabs` class, so its `tab` action never found the button; the row now has it, and the layout check fails on any tab button outside `.tabs` (seen failing on all 90). Test fixes: item use compares IDs (dnd5e uses a copy of the item); exhaustion waits for dnd5e's exhaustion effect; the band click test posts its card privately (dnd5e's card clicks look the message up in `game.messages`) and always unhooks, which also caused the next test's failure. Verified 2026-10-24.
 
 - **Phase 2c, death saves in the header (2026-10-24).** At 0 HP the header shows three success and three failure pips (dnd5e's `togglePip` on `system.attributes.death.success` / `.failure`) and a roll button (`roll`, `data-type="deathSave"`). Successes green with a tick, failures red with a cross; empty pips dashed in their side's color. Offline: unit (shown only at 0 HP), layout (`header-dying`). Quench: one more core test.
 
