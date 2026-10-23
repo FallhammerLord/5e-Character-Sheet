@@ -368,62 +368,67 @@ export async function refreshCard(message)
    ui.chat?.updateMessage(origin);
 }
 
+/** How long after posting a card the log keeps following it down as its rolls fill in. */
+const FOLLOW_MS = 8000;
+
 /**
- * Keeps the chat log where the player wants it (user, 2026-10-24).
+ * Keeps the chat log where the player wants it (user, 2026-10-24). Checked against Foundry 14's ChatLog
+ * (`postOne(message, { notify, scroll })`: scroll true always scrolls, false never, omitted is Foundry's own choice;
+ * `updateMessage`, `scrollBottom`).
  *
- * - Quiet posts: Foundry scrolls the log to the bottom when the user's own message posts. A roll drawn inside a card
- *   higher up the log is posted hidden, so the log jumped away from the card being used. Such rolls now post with no
- *   scroll and no notification (ChatLog#postOne; ChatLog#scrollBottom is skipped while one renders).
- * - Follow a growing card: a new card fills in after it posts (its attack and damage fold in), so the first scroll
- *   stopped short. When a card re-renders (ChatLog#updateMessage) and the log was at the bottom just before, it
- *   scrolls to the bottom again; a player reading further up isn't moved.
+ * - A roll drawn inside a card (folded) posts with no scroll and no notification: re-rolling on a card higher up
+ *   the log doesn't move the log.
+ * - A new card this player makes always scrolls the log to the bottom, then follows it down for a few seconds while
+ *   its attack and damage fold in and it grows. Scrolling, clicking or typing in the log ends the follow at once.
  *
  * Logs and leaves chat alone if Foundry renames these methods.
  *
- * @param {Function} isQuiet   (message) => true to post without scrolling.
+ * @param {Function} isQuiet   (message) => true for a folded roll.
  * @returns {boolean} Whether the chat log was wrapped.
  */
 export function quietPosts(isQuiet)
 {
    const proto = ui.chat?.constructor?.prototype;
-   if (!proto || (typeof proto.postOne !== 'function') || (typeof proto.scrollBottom !== 'function'))
+   if (!proto || !['postOne', 'scrollBottom', 'updateMessage'].every((m) => typeof proto[m] === 'function'))
    {
-      console.warn('fhcs | ChatLog#postOne or #scrollBottom not found; rolls folded into cards may scroll the chat log.');
+      console.warn('fhcs | ChatLog#postOne, #scrollBottom or #updateMessage not found; the chat log scrolls as Foundry decides.');
       return false;
    }
    if (proto.postOne.fhcsQuiet) { return true; }
-   const { postOne, scrollBottom, updateMessage } = proto;
-   let quiet = 0;
+   const { postOne, updateMessage } = proto;
+   const follow = { id: null, until: 0 };
+   const stopFollowing = () => { follow.id = null; };
+
    proto.postOne = async function (message, options = {})
    {
-      if (!isQuiet(message)) { return postOne.call(this, message, options); }
-      quiet++;
-      try { return await postOne.call(this, message, { ...options, notify: false }); }
-      finally { quiet--; }
+      if (isQuiet(message)) { return postOne.call(this, message, { ...options, notify: false, scroll: false }); }
+      if (!message.isAuthor) { return postOne.call(this, message, options); }
+      watchForPlayer(this, stopFollowing);
+      Object.assign(follow, { id: message.id, until: Date.now() + FOLLOW_MS });
+      return postOne.call(this, message, { ...options, scroll: true });
    };
    proto.postOne.fhcsQuiet = true;
-   proto.scrollBottom = function (...args)
+
+   proto.updateMessage = async function (message, ...rest)
    {
-      return quiet > 0 ? Promise.resolve() : scrollBottom.apply(this, args);
-   };
-   if (typeof updateMessage === 'function')
-   {
-      proto.updateMessage = async function (...args)
+      const result = await updateMessage.call(this, message, ...rest);
+      if (message?.id && (message.id === follow.id) && (Date.now() < follow.until))
       {
-         const wasAtBottom = atBottom(this);
-         const result = await updateMessage.apply(this, args);
-         if (wasAtBottom) { await scrollBottom.call(this, { waitImages: true }); }
-         return result;
-      };
-   }
+         await this.scrollBottom({ waitImages: true });
+      }
+      return result;
+   };
    return true;
 }
 
-/** Whether a chat log is scrolled to (within a few pixels of) its bottom. */
-function atBottom(log)
+/** Ends a follow the moment the player scrolls, clicks or types in the chat log themselves. */
+function watchForPlayer(log, stop)
 {
-   if (typeof log.isAtBottom === 'boolean') { return log.isAtBottom; }
-   const scroller = log.element?.querySelector?.('.chat-scroll, #chat-log, ol.chat-log');
-   if (!scroller) { return false; }
-   return (scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight) < 20;
+   const element = log.element;
+   if (!element || element.dataset.fhcsWatched) { return; }
+   element.dataset.fhcsWatched = 'true';
+   for (const type of ['wheel', 'touchmove', 'pointerdown', 'keydown'])
+   {
+      element.addEventListener(type, stop, { passive: true, capture: true });
+   }
 }

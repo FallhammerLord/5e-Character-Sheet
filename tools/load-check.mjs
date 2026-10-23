@@ -29,12 +29,11 @@ globalThis.game = {
    settings: { register: (scope, key, config) => settings.push({ scope, key, config }), get: () => true },
    messages: { get: () => null }
 };
-// A chat log that scrolls to the bottom whenever a message posts, as Foundry's does for the user's own messages.
+// A chat log like Foundry 14's: postOne scrolls to the bottom unless told `scroll: false`.
 class FakeChatLog
 {
    scrolled = 0;
-   isAtBottom = true;
-   async postOne(message, options = {}) { this.notify = options.notify; await this.scrollBottom(); }
+   async postOne(message, options = {}) { this.notify = options.notify; if (options.scroll !== false) { await this.scrollBottom(); } }
    async scrollBottom() { this.scrolled++; }
    async updateMessage() {}
 }
@@ -58,18 +57,20 @@ try
    if (typeof hooks.ready !== 'function') { problems.push('quiet chat posts are not hooked to ready'); }
    else
    {
-      // A roll folded into its usage card posts without scrolling or notifying; anything else still scrolls.
+      // A roll folded into its usage card posts without scrolling or notifying.
       hooks.ready();
-      await chatLog.postOne({ type: 'attack', system: { origin: { type: 'usage', content: '' } } }, { notify: true });
+      const folded = { id: 'r1', isAuthor: true, type: 'attack', system: { origin: { type: 'usage', content: '' } } };
+      await chatLog.postOne(folded, { notify: true });
       if (chatLog.scrolled !== 0 || chatLog.notify !== false) { problems.push('a folded roll still scrolls the chat log'); }
-      await chatLog.postOne({ type: 'base', system: {} }, { notify: true });
-      if (chatLog.scrolled !== 1) { problems.push('quiet posting stopped other messages from scrolling'); }
-      // A card that grows while the log is at the bottom follows it down; a player scrolled up isn't moved.
-      await chatLog.updateMessage({});
-      if (chatLog.scrolled !== 2) { problems.push('a card growing at the bottom of the log does not follow it down'); }
-      chatLog.isAtBottom = false;
-      await chatLog.updateMessage({});
-      if (chatLog.scrolled !== 2) { problems.push('a card re-rendering moved a player who was reading further up'); }
+      // The player's own new card scrolls, and its redraws follow it down while it fills in.
+      const card = { id: 'c1', isAuthor: true, type: 'usage', system: {} };
+      await chatLog.postOne(card, {});
+      if (chatLog.scrolled !== 1) { problems.push('a new card does not scroll the chat log'); }
+      await chatLog.updateMessage(card);
+      if (chatLog.scrolled !== 2) { problems.push('a new card filling in does not keep the log at the bottom'); }
+      // Another message redrawing doesn't move the log.
+      await chatLog.updateMessage({ id: 'old' });
+      if (chatLog.scrolled !== 2) { problems.push('an older card redrawing moved the chat log'); }
    }
    for (const name of ['dnd5e.renderChatMessage', 'dnd5e.postRollConfiguration', 'updateChatMessage', 'dnd5e.preRoll'])
    {
