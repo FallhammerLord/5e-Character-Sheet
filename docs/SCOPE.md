@@ -15,6 +15,7 @@ The user's table first: players used to Tidy 5e's classic layout. Public release
 - **Extend, don't rebuild** (2026-10-22): subclass `CharacterActorSheet`; reuse dnd5e's custom elements (`dnd5e-inventory` and others) where they fit.
 - **Characters only** to start; NPCs and vehicles keep dnd5e's sheets.
 - **Offered beside dnd5e's sheet**, never forced as the default.
+- **Track R (rolls and chat cards) before Phase 1** (2026-10-23, user deferred to our call): it's used by every player and the GM every session whatever sheet they use, it's mostly presentation over dnd5e's own buttons, and it ends the table's reliance on an experimental Ready Set Roll fork. The sheet header follows.
 
 ## 4. Layout
 
@@ -67,22 +68,24 @@ The roll type ("Intelligence Saving Throw") is the faintest text; the natural di
 
 Ready Set Roll for D&D5e (MangoFVTT) is verified only to Foundry 13; issues report it broken on v14 (April 2026). A community fork, RSReforged, carries it on; its dnd5e 6 release (6.0.0) is labelled experimental, and several forks disagree on which is canonical. Same story as Forien's Quest Log and Tidy Classic.
 
-What it does, from its documentation and our knowledge (to confirm against the RSReforged source before building):
-- Quick rolls: skip the roll dialog; Shift / Ctrl (or similar) for advantage / disadvantage.
-- Both d20s shown on advantage and disadvantage.
-- Change advantage after the roll (retroactive).
-- One card per item use: attack and damage together, damage rolled on the card.
-- Critical damage rolled on demand from the card.
-- Apply damage, healing and temp HP from each damage roll.
+What the table uses (user, 2026-10-23), and where dnd5e 6.0 already has it (checked in its source):
 
-Our ADHD take: advantage and disadvantage as visible buttons, not hidden keys; one card per use; outcome first.
+| Need | dnd5e 6.0 | Our work |
+|---|---|---|
+| Quick roll with advantage or disadvantage | Yes: Shift skips the dialog, Alt advantage, Ctrl disadvantage (`module/settings.mjs`, rebindable) | Make it visible: say the keys in the tips panel; consider Adv / Dis buttons on the sheet |
+| Late advantage or disadvantage on the card | **No** | **Build it:** Advantage / Disadvantage buttons on a d20 card roll one more d20 and update the same card, both dice shown, the dropped one struck through |
+| Roll damage button | Yes: `rollDamage` on activity cards | Label and size it |
+| Roll save for selected | Yes: `rollSave` button; the targets tray switches between selected and targeted tokens (`recorded-targets.mjs`) | Label it, open the tray by default, say "selected" or "targeted" in words |
+| Apply damage or effects to selected | Yes: damage and effect application trays, same selected / targeted switch | Unhide them (today behind a `>` chevron), labelled buttons at least 24px |
 
-**Open: which of these does the table use?** Build only those; the rest waits until someone misses it.
+So Track R is mostly presentation over dnd5e's own buttons; late advantage is the one new mechanic.
+
+### 6.3 Table feel
+
+The user's principle (2026-10-23): keep a pencil-and-paper feel. A card should read like what someone says at the table, and actions stay in the players' and GM's hands. Show the dice; never auto-apply damage, saves or effects; every step is a button someone chooses to press.
 
 ## 7. Open questions
 
 - Shared themes with the quest log, or Light and Dark first?
 - Which sheet-changing modules matter at the user's table?
 - Does the "Now" strip live in the header, a tab, or both?
-- Track R (rolls and chat cards) before or after Phase 1?
-- Which Ready Set Roll features does the table use (§6.2)?

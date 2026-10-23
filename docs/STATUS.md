@@ -14,4 +14,4 @@ Nothing yet.
 ## Next session
 
 1. Confirm the hooks fire: the session start installs dependencies; editing a JS file lints it; `git push` runs `npm run check` first.
-2. Phase 1, header: SCOPE §4.1 and `docs/reference/tidy-classic-attributes.png`. Replace dnd5e's `header` part with ours (same part ID, so `_prepareHeaderContext` still feeds it), add a layout case, and extend Quench with the header's rolls and pips.
+2. Track R first (SCOPE §6): read dnd5e's chat card templates (`templates/chat/`) and `chat-message.mjs`, then build clear cards and late advantage. Then Phase 1, header: SCOPE §4.1 and `docs/reference/tidy-classic-attributes.png`. Replace dnd5e's `header` part with ours (same part ID, so `_prepareHeaderContext` still feeds it), add a layout case, and extend Quench with the header's rolls and pips.

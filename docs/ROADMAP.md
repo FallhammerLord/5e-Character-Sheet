@@ -45,12 +45,14 @@ Optional "Now" strip: action, bonus action, reaction and movement, with spent on
 
 Themes shared with the quest log. Compatibility with modules that change the sheet (Midi-QOL, DAE). Screenshots, GitHub release.
 
-## Track R: Rolls and chat cards (order against Phase 1 undecided)
+## Track R: Rolls and chat cards (before Phase 1)
 
 Runs alongside the sheet phases; works whatever sheet a player uses (client setting, on by default). Built on dnd5e's `dnd5e.renderChatMessage` hook and its roll hooks, never replacing its roll pipeline. SCOPE §6.
 
 - [ ] Clear chat cards: outcome first in one line (who · what · total), success or failure in words vs a known DC, natural 1 and 20 in words, labelled buttons at least 24px, tags folded, rolls in a row from one speaker grouped
-- [ ] Ready Set Roll needs, subset to be chosen with the user (SCOPE §6.2)
+- [ ] Late advantage and disadvantage on d20 cards (the one new mechanic; SCOPE §6.2)
+- [ ] dnd5e's own Roll damage, Roll save and Apply buttons: labelled, at least 24px, target trays open with "selected" or "targeted" in words
+- [ ] Quick-roll keys (Shift, Alt, Ctrl) explained in a tips panel
 - [ ] Compatibility: step aside cleanly when RSReforged is active
 
 ## Mechanical parity checklist
