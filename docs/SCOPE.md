@@ -103,7 +103,7 @@ Top to bottom, each part only when the action has it:
 1. **Header:** the acting actor's portrait, large; the action's title (item name, activity under it).
 2. **Description:** folded; click to unfold.
 3. **d20 band**, full width: the total, both d20s (the dropped one struck through), natural 1 or 20 and hit or miss in words. Click to open the dice math and late adds: Advantage, Disadvantage, + Bonus.
-4. **Damage band**, full width: the total by damage type. Click to open the dice math. A critical hit doubles the dice without asking; "Roll as normal" undoes it.
+4. **Damage band**, full width: the total by damage type. Click to open the dice math, every die shown ("(3 + 2) + 0 = 5", never "5 + 0"; user 2026-10-24) and any die rerolled or dropped named. A critical hit doubles the dice without asking; "Roll as normal" undoes it.
 5. **Save / check band**, full width: "Dexterity save, DC 15" and a button to roll for selected tokens; one row per token with its result in words, filling in as rolls arrive. On-hit riders (a Topple save, an opposed check) sit here inside the attack's card.
 6. **Apply:** damage and attached effects through dnd5e's own trays, labelled, at least 24px.
 

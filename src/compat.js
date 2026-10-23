@@ -4,6 +4,7 @@
  * data/chat-message/, dice/d20-roll.mjs). Chat facts: docs/research/dnd5e-6.0-chat.md.
  */
 import { countingDie, MAX_PER_SIDE, modeForSides } from './chat/d20.js';
+import { diceMath } from './chat/math.js';
 
 /** dnd5e's own character sheet, which ours extends so every mechanic keeps working. Set by dnd5e before init. */
 export function systemCharacterSheet()
@@ -99,7 +100,7 @@ export function rollFacts(message)
       sides: roll.options.fhcs?.sides ?? [],
       spare: roll.options.fhcs?.spare ?? null,
       formula: roll.formula,
-      math: roll.result,
+      math: diceMath(mathTerms(roll)).sum,
       canResist: Boolean(system.canResist),
       canEdit: canEdit(message),
       bonuses: roll.options.fhcs?.bonuses ?? []
@@ -169,11 +170,36 @@ export function damageFacts(message)
       critical: rolls.some((r) => r.isCritical),
       total: rolls.reduce((sum, r) => sum + Math.max(0, r.total), 0),
       parts: [...parts].map(([type, total]) => ({ type, label: label(type), total })),
-      math: rolls.map((r) => ({ formula: r.formula, result: `${r.result} = ${r.total}`, label: label(r.options.type) })),
+      math: rolls.map((r) =>
+      {
+         const { sum, dropped } = diceMath(mathTerms(r));
+         return { formula: r.formula, result: `${sum} = ${r.total}`, label: label(r.options.type), dropped };
+      }),
       onSave: onSave
          ? game.i18n.localize(`DND5E.SAVE.FIELDS.damage.onSave.${onSave[0].toUpperCase()}${onSave.slice(1)}`)
          : ''
    };
+}
+
+/**
+ * A Foundry roll's terms as the plain terms chat/math.js writes out: every die's value and whether it counts.
+ *
+ * @param {Roll} roll
+ * @returns {object[]}
+ */
+export function mathTerms(roll)
+{
+   const { DiceTerm, OperatorTerm, ParentheticalTerm } = foundry.dice.terms;
+   return roll.terms.map((term) =>
+   {
+      if (term instanceof OperatorTerm) { return { op: term.operator }; }
+      if (term instanceof DiceTerm)
+      {
+         return { dice: term.results.map((r) => ({ value: r.result, counts: (r.active !== false) && !r.discarded })) };
+      }
+      if ((term instanceof ParentheticalTerm) && term.roll) { return { group: mathTerms(term.roll) }; }
+      return { value: term.total ?? term.expression };
+   });
 }
 
 /**

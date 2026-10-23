@@ -164,7 +164,12 @@ export function damageBand(facts, earlier, format, { canCrit = false } = {})
       rollId: facts.messageId,
       bonus: bonusField(facts, format),
       mathLines: facts.math.map((m) => ({ formula: m.label ? `${m.formula} (${m.label})` : m.formula, result: m.result })),
-      notes: [...bonusNotes(facts.bonuses ?? [], format), ...earlierNote(earlier, format)],
+      notes: [
+         ...facts.math.filter((m) => m.dropped?.length)
+            .map((m) => format('FHCS.Card.Dropped', { dice: m.dropped.join(', ') })),
+         ...bonusNotes(facts.bonuses ?? [], format),
+         ...earlierNote(earlier, format)
+      ],
       againLabel: format('FHCS.Card.RollAgain', {}),
       extra
    };

@@ -80,7 +80,8 @@
       "BonusInvalid": "Not a roll: {formula}",
       "Done": "Done",
       "Waiting": "waiting",
-      "RollShort": "Roll"
+      "RollShort": "Roll",
+      "Dropped": "Rerolled or dropped: {dice}"
     }
   }
 }

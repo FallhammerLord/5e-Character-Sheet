@@ -39,7 +39,7 @@ const attack = (over = {}) => ({
 /** Facts for a damage roll, as compat.damageFacts returns them, with overrides. */
 const damage = (over = {}) => ({
    healing: false, critical: true, total: 16, parts: [{ type: 'slashing', label: 'Slashing', total: 16 }],
-   math: [{ formula: '2d8 + 5', result: '6 + 5 + 5 = 16', label: 'Slashing' }], onSave: '', messageId: 'd1', canEdit: true,
+   math: [{ formula: '2d8 + 5', result: '(6 + 5) + 5 = 16', label: 'Slashing', dropped: [1] }], onSave: '', messageId: 'd1', canEdit: true,
    bonuses: [{ formula: '1d4', total: 3 }], ...over
 });
 
@@ -72,7 +72,7 @@ const fireball = () =>
          dice: [{ result: 3, active: false, discarded: true }, { result: 1, active: true }] }), format), open: true }
    ];
    context.fhcs.bands[1].rolled = damageBand({ healing: false, critical: false, total: 28, parts: [{ type: 'fire', label: 'Fire', total: 28 }],
-      math: [{ formula: '8d6', result: '6 + 5 + 4 + 3 + 2 + 4 + 1 + 3 = 28', label: 'Fire' }], onSave: 'Half Damage' }, [], format);
+      math: [{ formula: '8d6', result: '(6 + 5 + 4 + 3 + 2 + 4 + 1 + 3) = 28', label: 'Fire' }], onSave: 'Half Damage' }, [], format);
    context.fhcs.apply = { damageId: 'd1', heading: localize('FHCS.Card.Apply'), note: localize('FHCS.Card.ApplyNote') };
    return context;
 };
@@ -138,8 +138,8 @@ export const CASES = [
          critical: false, total: 31,
          parts: [{ type: 'slashing', label: 'Slashing', total: 12 }, { type: 'radiant', label: 'Radiant', total: 9 },
             { type: 'necrotic', label: 'Necrotic', total: 10 }],
-         math: [{ formula: '1d8 + 5', result: '7 + 5 = 12', label: 'Slashing' }, { formula: '2d8', result: '4 + 5 = 9', label: 'Radiant' },
-            { formula: '3d6', result: '2 + 3 + 5 = 10', label: 'Necrotic' }],
+         math: [{ formula: '1d8 + 5', result: '7 + 5 = 12', label: 'Slashing' }, { formula: '2d8', result: '(4 + 5) = 9', label: 'Radiant' },
+            { formula: '3d6', result: '(2 + 3 + 5) = 10', label: 'Necrotic' }],
          onSave: 'Half Damage'
       }))
    },

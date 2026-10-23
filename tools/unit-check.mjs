@@ -6,6 +6,7 @@ import { deepStrictEqual } from 'node:assert';
 import { describeRoll } from '../src/chat/outcome.js';
 import { cardParts, damageBand, saveRow } from '../src/chat/card.js';
 import { countingDie, d20Row, modeForSides } from '../src/chat/d20.js';
+import { diceMath } from '../src/chat/math.js';
 import { format, localize } from './templates.mjs';
 
 const facts = (over) => ({
@@ -155,6 +156,24 @@ for (const [name, input, expected] of SAVE_CASES)
    catch { problems.push(`save row, ${name}: got ${JSON.stringify({ verdict, verdictWord, words })}, expected ${JSON.stringify(expected)}`); }
 }
 
+// Dice math: every die shown, never a dice term collapsed to its total.
+const die = (value, counts = true) => ({ value, counts });
+const MATH_CASES = [
+   ['2d8 + 0 shows both dice', [{ dice: [die(3), die(2)] }, { op: '+' }, { value: 0 }], '(3 + 2) + 0', []],
+   ['one die needs no brackets', [{ dice: [die(7)] }, { op: '+' }, { value: 5 }], '7 + 5', []],
+   ['advantage: the counting d20 only', [{ dice: [die(12, false), die(15)] }, { op: '+' }, { value: 5 }], '15 + 5', [12]],
+   ['a rerolled 1 is listed, not added', [{ dice: [die(1, false), die(6), die(4)] }], '(6 + 4)', [1]],
+   ['a penalty die', [{ dice: [die(14)] }, { op: '+' }, { value: 3 }, { op: '-' }, { dice: [die(2)] }], '14 + 3 - 2', []],
+   ['a bracketed group', [{ group: [{ dice: [die(4), die(5)] }, { op: '+' }, { value: 2 }] }, { op: '*' }, { value: 2 }], '((4 + 5) + 2) * 2', []]
+];
+for (const [name, terms, sum, dropped] of MATH_CASES)
+{
+   const got = diceMath(terms);
+   try { deepStrictEqual(got, { sum, dropped }); }
+   catch { problems.push(`dice math, ${name}: got ${JSON.stringify(got)}, expected ${JSON.stringify({ sum, dropped })}`); }
+}
+
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
 console.log(`${CASES.length} outcome lines, ${PART_CASES.length} card layouts, ${ROW_CASES.length} d20 rows, `
-   + `${DAMAGE_CASES.length} damage bands, ${SAVE_CASES.length} save rows and ${KEEP_CASES.length} late adds read as expected.`);
+   + `${DAMAGE_CASES.length} damage bands, ${SAVE_CASES.length} save rows, ${KEEP_CASES.length} late adds and `
+   + `${MATH_CASES.length} dice sums read as expected.`);
