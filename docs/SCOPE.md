@@ -57,13 +57,13 @@ Keep the layout players know; fix what costs attention:
 
 From the quest log and Initiative: three text sizes; buttons at least 24px; tooltips two to four words, details in a tips panel; play and edit modes; one main action per area; plain words, no blame or counters; reduced motion; colors only through tokens.
 
-## 7. Rolls and chat cards
+## 6. Rolls and chat cards
 
-### 7.1 What's wrong with dnd5e 6.0's cards (user's screenshot, 2026-10-23)
+### 6.1 What's wrong with dnd5e 6.0's cards (user's screenshot, 2026-10-23)
 
 The roll type ("Intelligence Saving Throw") is the faintest text; the natural die is a small grey circle; success or failure is never written; a concentration request and its save are separate cards; Apply damage hides behind a `>` chevron; dice, play and undo are about 16px unlabelled icons; item tags outweigh the item name; every card repeats speaker, time and ⋮.
 
-### 7.2 Ready Set Roll (to recapitulate)
+### 6.2 Ready Set Roll (to recapitulate)
 
 Ready Set Roll for D&D5e (MangoFVTT) is verified only to Foundry 13; issues report it broken on v14 (April 2026). A community fork, RSReforged, carries it on; its dnd5e 6 release (6.0.0) is labelled experimental, and several forks disagree on which is canonical. Same story as Forien's Quest Log and Tidy Classic.
 
@@ -79,10 +79,10 @@ Our ADHD take: advantage and disadvantage as visible buttons, not hidden keys; o
 
 **Open: which of these does the table use?** Build only those; the rest waits until someone misses it.
 
-## 6. Open questions
+## 7. Open questions
 
 - Shared themes with the quest log, or Light and Dark first?
 - Which sheet-changing modules matter at the user's table?
 - Does the "Now" strip live in the header, a tab, or both?
 - Track R (rolls and chat cards) before or after Phase 1?
-- Which Ready Set Roll features does the table use (§7.2)?
+- Which Ready Set Roll features does the table use (§6.2)?

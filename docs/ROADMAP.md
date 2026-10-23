@@ -47,10 +47,10 @@ Themes shared with the quest log. Compatibility with modules that change the she
 
 ## Track R: Rolls and chat cards (order against Phase 1 undecided)
 
-Runs alongside the sheet phases; works whatever sheet a player uses (client setting, on by default). Built on dnd5e's `dnd5e.renderChatMessage` hook and its roll hooks, never replacing its roll pipeline. SCOPE §7.
+Runs alongside the sheet phases; works whatever sheet a player uses (client setting, on by default). Built on dnd5e's `dnd5e.renderChatMessage` hook and its roll hooks, never replacing its roll pipeline. SCOPE §6.
 
 - [ ] Clear chat cards: outcome first in one line (who · what · total), success or failure in words vs a known DC, natural 1 and 20 in words, labelled buttons at least 24px, tags folded, rolls in a row from one speaker grouped
-- [ ] Ready Set Roll needs, subset to be chosen with the user (SCOPE §7.2)
+- [ ] Ready Set Roll needs, subset to be chosen with the user (SCOPE §6.2)
 - [ ] Compatibility: step aside cleanly when RSReforged is active
 
 ## Mechanical parity checklist
