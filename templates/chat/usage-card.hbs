@@ -96,6 +96,28 @@
    {{/if}}
    {{/each}}
 
+   {{#if showTargets}}<recorded-targets></recorded-targets>{{/if}}
+
+   {{#if fhcs.apply}}
+   <section class="fhcs-apply">
+      <h4 class="fhcs-band-heading">{{ fhcs.apply.heading }}</h4>
+      <p class="fhcs-band-note">{{ fhcs.apply.note }}</p>
+      {{#if fhcs.apply.damageId}}
+      {{!-- dnd5e's tray reads its damage, and each token's save, from the nearest message id: the damage roll. --}}
+      <div class="fhcs-apply-damage" data-message-id="{{ fhcs.apply.damageId }}">
+         <damage-application class="dnd5e2" open></damage-application>
+      </div>
+      {{/if}}
+      {{#if effects.length}}
+      <effect-application class="dnd5e2" open>
+         {{#each effects}}
+         <option value="{{ uuid }}"></option>
+         {{/each}}
+      </effect-application>
+      {{/if}}
+   </section>
+   {{/if}}
+
    {{#if fhcs.others.length}}
    <div class="fhcs-card-actions">
       {{#each fhcs.others}}
@@ -103,18 +125,8 @@
       {{/each}}
    </div>
    {{/if}}
-
-   {{#if showTargets}}<recorded-targets></recorded-targets>{{/if}}
 </div>
 
 {{#each summaries}}
 <div class="card-summary" data-message-id="{{ id }}" data-target-uuid="{{ token.uuid }}">{{{ html }}}</div>
 {{/each}}
-
-{{#if effects.length}}
-<effect-application class="dnd5e2">
-   {{#each effects}}
-   <option value="{{ uuid }}"></option>
-   {{/each}}
-</effect-application>
-{{/if}}

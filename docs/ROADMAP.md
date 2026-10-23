@@ -55,7 +55,7 @@ Runs alongside the sheet phases; works whatever sheet a player uses (client sett
 - [ ] d20 band: attack rolls drawn in the card, two d20s, natural and hit or miss in words, dice math on click (in code 2026-10-23; waits on the user)
 - [ ] Damage band: drawn in the card, crits double without asking, dice math on click (in code 2026-10-23; waits on the user)
 - [ ] Save / check band: roll for selected tokens, one row per token with its result in words (in code 2026-10-23; waits on the user)
-- [ ] Apply: dnd5e's damage and effect trays in "selected" mode, labelled, at least 24px
+- [ ] Apply: dnd5e's damage and effect trays in "selected" mode, labelled, at least 24px (in code 2026-10-23; waits on the user)
 - [ ] Settings: roll attack on use, roll damage on use, always two d20s (world, on by default)
 - [ ] No roll pop-ups (SCOPE §6.4): roll dialogs skipped; dnd5e's spellcasting and activity chooser windows stay
 - [ ] Late adds: advantage, disadvantage, + bonus (a number or a die) on any roll, shown as its own term

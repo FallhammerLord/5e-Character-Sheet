@@ -544,3 +544,39 @@
 {
    color: var(--fhcs-failure);
 }
+
+/* Apply: dnd5e's own trays, unfolded, with controls at least 24px (SCOPE §5) and labelled. */
+.fhcs-chat .fhcs-apply
+{
+   display: flex;
+   flex-direction: column;
+   gap: 0.375rem;
+   padding: 0.375rem 0.625rem 0.5rem;
+   border: 1px solid var(--fhcs-line);
+   border-radius: 6px;
+   text-align: center;
+}
+
+.fhcs-chat .fhcs-apply > h4
+{
+   margin: 0;
+   border: 0;
+   text-align: left;
+}
+
+.fhcs-chat .fhcs-apply .fhcs-band-note
+{
+   margin: 0;
+   font-size: var(--fhcs-text-small);
+}
+
+.fhcs-chat .fhcs-apply :is(button, .multiplier-button, .apply-button)
+{
+   min-height: 28px;
+   min-width: 28px;
+}
+
+.fhcs-chat .fhcs-apply .apply-button
+{
+   font-weight: bold;
+}

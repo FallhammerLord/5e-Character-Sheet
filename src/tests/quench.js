@@ -222,6 +222,9 @@ export function registerQuenchTests(quench)
                let band = html.querySelector('.fhcs-band-rolled.fhcs-band-damage');
                assert.ok(band, 'rolled damage band');
                assert.strictEqual(Number(band.querySelector('.fhcs-band-total').textContent), damage()[0].rolls[0].total);
+               const tray = html.querySelector(`.fhcs-apply-damage[data-message-id="${damage()[0].id}"] damage-application`);
+               assert.ok(tray, 'apply-damage tray bound to the damage roll');
+               assert.isTrue(tray.hasAttribute('open'), 'apply tray unfolded');
 
                // "Roll as critical" sits in the band and rolls the damage again, doubled.
                const button = band.querySelector('[data-fhcs-action="damageCritical"]');

@@ -71,6 +71,7 @@ const fireball = () =>
    ];
    context.fhcs.bands[1].rolled = damageBand({ healing: false, critical: false, total: 28, parts: [{ type: 'fire', label: 'Fire', total: 28 }],
       math: [{ formula: '8d6', result: '6 + 5 + 4 + 3 + 2 + 4 + 1 + 3 = 28', label: 'Fire' }], onSave: 'Half Damage' }, [], format);
+   context.fhcs.apply = { damageId: 'd1', heading: localize('FHCS.Card.Apply'), note: localize('FHCS.Card.ApplyNote') };
    return context;
 };
 

@@ -8,8 +8,8 @@
  * `effect-application`) work inside our markup. Slices 2–8 fill the bands with results.
  */
 import { MODULE_ID } from '../constants.js';
-import { actorArtwork, answersButton, damageFacts, preferSelected, rollDamageAgain, rollFacts, rollsFrom }
-   from '../compat.js';
+import { actorArtwork, answersButton, canApplyDamage, damageFacts, openTrays, preferSelected, rollDamageAgain, rollFacts,
+   rollsFrom } from '../compat.js';
 import { describeRoll } from './outcome.js';
 import { d20Row, dieClasses } from './d20.js';
 
@@ -209,7 +209,10 @@ export function makeUsageMessageData(Base)
             const earlier = rolls.slice(0, -1).map((m) => source.facts(m)?.total).filter((t) => t !== undefined);
             if (facts) { band.rolled = source.draw(facts, earlier, format, { canCrit }); }
             else if (rolls.length) { band.text = localize('FHCS.Card.HiddenRoll'); }
+            if (facts && (band.kind === 'damage')) { band.damageId = facts.messageId; }
          }
+         // Apply: dnd5e's damage tray for the latest damage roll, and its effects tray (SCOPE §6.5).
+         const damageId = canApplyDamage() ? bands.find((b) => b.damageId)?.damageId : null;
          const tags = Object.values(context.rows ?? {}).flatMap((row) => row.entries ?? []).map((e) => e.label);
          context.fhcs = {
             portrait: await actorArtwork(actor),
@@ -226,7 +229,10 @@ export function makeUsageMessageData(Base)
             bands,
             others,
             // A card's author uses its rolls; the GM uses every card (SCOPE §6.6).
-            canAct: this.parent.isAuthor || game.user.isGM
+            canAct: this.parent.isAuthor || game.user.isGM,
+            apply: (damageId || context.effects?.length)
+               ? { damageId, heading: localize('FHCS.Card.Apply'), note: localize('FHCS.Card.ApplyNote') }
+               : null
          };
          return context;
       }
@@ -238,6 +244,7 @@ export function makeUsageMessageData(Base)
          if (options.summary || !useCard(this)) { return; }
          element.classList.add('fhcs-chat', 'fhcs-card-message');
          preferSelected(this.parent);
+         openTrays(element);
          for (const button of element.querySelectorAll('[data-fhcs-action]'))
          {
             button.addEventListener('click', (event) => this.#onCardAction(event, button));

@@ -105,6 +105,18 @@ export function answersButton(message, match)
    return [skill, tool, ability].includes(match);
 }
 
+/** Whether this user may use dnd5e's apply-damage tray (the GM, or players when the world allows it). */
+export function canApplyDamage()
+{
+   return game.user.isGM || Boolean(game.settings.get('dnd5e', 'allowPlayerDamageTray'));
+}
+
+/** dnd5e's chat trays (apply damage, apply effects) inside an element, opened: SCOPE §6.5 keeps them unfolded. */
+export function openTrays(element)
+{
+   for (const tray of element.querySelectorAll('damage-application, effect-application')) { tray.open = true; }
+}
+
 /**
  * Points a card's "roll for" buttons at selected tokens (SCOPE §6.6): dnd5e's save and check buttons roll for
  * `message.system.evaluatedTargets`, which follows the message's targeting mode; its default is the player's targets.

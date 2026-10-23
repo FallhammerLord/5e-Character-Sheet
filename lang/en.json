@@ -51,7 +51,9 @@
       "RollNormal": "Roll as normal",
       "RollCritical": "Roll as critical",
       "RollForSelected": "Rolls for selected tokens",
-      "Resist": "Legendary Resistance"
+      "Resist": "Legendary Resistance",
+      "Apply": "Apply",
+      "ApplyNote": "To selected tokens. Damage halves for each token that saved, if the spell says so."
     }
   }
 }
