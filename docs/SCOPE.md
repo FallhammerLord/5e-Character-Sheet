@@ -112,7 +112,9 @@ The same frame serves every roll: a skill check from the sheet is header plus d2
 ### 6.6 Settings, selection and targets (user, 2026-10-23)
 
 - **Roll on use:** using an item rolls its attack and its damage into the card at once. Each is a world setting, on by default; off makes it a button in its band.
-- **Always roll two d20s:** world setting, on by default. The second die is on the card from the start, so late advantage or disadvantage picks between dice already rolled.
+- **Always roll two d20s:** world setting, on by default. The next d20 is rolled in advance; the first side die added uses it, later ones roll fresh.
+- **The d20 row** (user, 2026-10-23): the primary die in the center; disadvantage dice to its left (red outline), advantage dice to its right (blue outline, colorblind-safe against the red). A side slot adds a die and never clears the other side, so Elven Accuracy (two advantage dice) and advantage-plus-disadvantage (they cancel; the primary counts) both work. The die that counts is filled; the rest are struck through.
+- **Who can click:** a card's author uses its rolls, late adds and saves; the GM uses every card. Foundry lets a player control and change only what they own, so a player's Apply reaches their own tokens (healing themselves); damage to enemies is the GM's click.
 - **Selected tokens, not targets.** Player targeting is too unreliable to drive anything. Apply buttons and "roll for" buttons act on selected tokens: in practice the GM's selection. A player's targets may show as information (the hit or miss against each); nothing happens automatically because of them. dnd5e's trays open in "selected" mode, said in words.
 
 ## 7. Open questions
