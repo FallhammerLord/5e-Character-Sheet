@@ -107,6 +107,8 @@ Top to bottom, each part only when the action has it:
 5. **Save / check band**, full width: "Dexterity save, DC 15" and a button to roll for selected tokens; one row per token with its result in words, filling in as rolls arrive. On-hit riders (a Topple save, an opposed check) sit here inside the attack's card.
 6. **Apply:** damage and attached effects through dnd5e's own trays, labelled, at least 24px.
 
+Buttons and band contents are centered (user, 2026-10-23); a band's label sits left and its open/closed arrow right, at fixed widths so the center stays true.
+
 The same frame serves every roll: a skill check from the sheet is header plus d20 band; a GM request is header plus the check band. The card updates in place when a later roll arrives.
 
 ### 6.6 Settings, selection and targets (user, 2026-10-23)
