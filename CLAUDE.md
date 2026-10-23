@@ -9,6 +9,7 @@ This file holds rules only. Plan: `docs/ROADMAP.md`. Decisions: `docs/SCOPE.md`.
 - The user has dyslexia: keep replies concise, plain, and forward-stated.
 - Nothing here runs inside Foundry. The user tests in their v14 world and reports back with screenshots; ask for console errors (F12) when something breaks. Say what was verified and what wasn't.
 - **Keep `docs/ROADMAP.md` and `docs/STATUS.md` current, every slice, in the same commit as the work.** Ticked items may stay as history; nothing may describe a state that's no longer true (a "waits on the user" that's verified, a "next" that's done, a heading that names an old order). Before ending a session, reread both and fix what's drifted; the next chat trusts them.
+- **One chat at a time.** Two chats editing the docs drift apart. At session start, check `git log origin/main` against your branch; if your branch is behind `main`, move onto `main` before reading STATUS.
 - `main` is the default branch, so a new chat starts from it. Each chat works on its own `claude/…` branch; sandbox there freely. `main` moves only when the user is satisfied: ask in chat first, then push the branch tip with `git push origin <branch>:main` (fast-forward only, never force). That push always raises a permission prompt (`.claude/settings.json`), so the user approves each one. Commit and push after each coherent slice. Don't open a PR unless asked.
 
 ## Commands
