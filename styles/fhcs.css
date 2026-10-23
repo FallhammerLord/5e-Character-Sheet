@@ -304,21 +304,38 @@
 }
 
 /* The d20 row: equal side columns keep the primary die centered. */
-.fhcs-chat .fhcs-d20-row
+.fhcs-chat .fhcs-d20
+{
+   display: flex;
+   flex-direction: column;
+   gap: 0.25rem;
+   width: 100%;
+}
+
+/* The − slot, the primary die and the + slot: three fixed places, the slots right beside the die. */
+.fhcs-chat .fhcs-d20-row,
+.fhcs-chat .fhcs-d20-tray
 {
    display: grid;
-   grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-   align-items: center;
+   grid-template-columns: minmax(0, 1fr) var(--fhcs-die-size) minmax(0, 1fr);
+   align-items: start;
    gap: 0.375rem;
    width: 100%;
 }
 
+.fhcs-chat .fhcs-d20-cell,
 .fhcs-chat .fhcs-d20-side
 {
    display: flex;
    flex-wrap: wrap;
    gap: 0.25rem;
    min-width: 0;
+}
+
+/* The tray keeps one die's height even while empty. */
+.fhcs-chat .fhcs-d20-tray
+{
+   min-height: var(--fhcs-die-size);
 }
 
 .fhcs-chat .fhcs-d20-left
@@ -329,6 +346,11 @@
 .fhcs-chat .fhcs-d20-right
 {
    justify-content: flex-start;
+}
+
+.fhcs-chat .fhcs-slot-spent
+{
+   visibility: hidden;
 }
 
 .fhcs-chat
@@ -615,20 +637,50 @@
 /* Apply: dnd5e's own trays, unfolded, with controls at least 24px (SCOPE §5) and labelled. */
 .fhcs-chat .fhcs-apply
 {
-   display: flex;
-   flex-direction: column;
-   gap: 0.375rem;
-   padding: 0.375rem 0.625rem 0.5rem;
    border: 1px solid var(--fhcs-line);
    border-radius: 6px;
    text-align: center;
 }
 
-.fhcs-chat .fhcs-apply > h4
+.fhcs-chat .fhcs-apply-summary
 {
-   margin: 0;
-   border: 0;
-   text-align: left;
+   display: flex;
+   align-items: center;
+   justify-content: space-between;
+   min-height: 32px;
+   padding: 0 0.625rem;
+   list-style: none;
+   cursor: pointer;
+}
+
+.fhcs-chat .fhcs-apply-summary::-webkit-details-marker
+{
+   display: none;
+}
+
+.fhcs-chat .fhcs-apply-summary:focus-visible
+{
+   outline: 2px solid currentColor;
+   outline-offset: -2px;
+}
+
+.fhcs-chat .fhcs-apply .fhcs-band-end::after
+{
+   content: '▸';
+}
+
+.fhcs-chat .fhcs-apply[open] .fhcs-band-end::after
+{
+   content: '▾';
+}
+
+.fhcs-chat .fhcs-apply-body
+{
+   display: flex;
+   flex-direction: column;
+   gap: 0.375rem;
+   padding: 0.375rem 0.625rem 0.5rem;
+   border-top: 1px solid var(--fhcs-line-soft);
 }
 
 .fhcs-chat .fhcs-apply .fhcs-band-note

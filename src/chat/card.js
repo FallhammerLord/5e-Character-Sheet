@@ -80,12 +80,13 @@ const bonusField = (facts, format) => (facts.canEdit
 
 /**
  * The late advantage and disadvantage slots either side of the d20 row: a dashed d20 marked + or −, the same size as
- * the dice, until that side holds five dice. The words go to screen readers and the tooltip.
+ * the dice; a side holding five dice keeps an empty space instead, so nothing moves. The words go to screen readers
+ * and the tooltip.
  */
 function lateSlots(facts, row, format)
 {
    if (!facts.canEdit) { return null; }
-   const slot = (side, dice) => (dice.length >= MAX_PER_SIDE ? null : {
+   const slot = (side, dice) => (dice.length >= MAX_PER_SIDE ? { full: true } : {
       action: side === 'dis' ? 'lateDisadvantage' : 'lateAdvantage',
       side,
       sign: side === 'dis' ? '−' : '+',
@@ -120,6 +121,8 @@ export function d20Band(facts, earlier, format)
       }),
       rollId: facts.messageId,
       slots: lateSlots(facts, row, format),
+      // The tray under the d20 row is there whenever dice can be added, so the first die added moves nothing.
+      tray: Boolean(facts.canEdit || row.left.length || row.right.length),
       bonus: bonusField(facts, format),
       mathLines: [{ formula: facts.formula, result: `${facts.math} = ${facts.total}` }],
       notes: [
@@ -206,6 +209,7 @@ export function saveRow(facts, format)
       diceLabel: band.diceLabel,
       rollId: band.rollId,
       slots: band.slots,
+      tray: band.tray,
       bonus: band.bonus,
       notes: band.notes,
       mathLines: band.mathLines,

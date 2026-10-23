@@ -379,7 +379,8 @@ const FOLLOW_MS = 8000;
  * - A roll drawn inside a card (folded) posts with no scroll and no notification: re-rolling on a card higher up
  *   the log doesn't move the log.
  * - A new card this player makes always scrolls the log to the bottom, then follows it down for a few seconds while
- *   its attack and damage fold in and it grows. Scrolling, clicking or typing in the log ends the follow at once.
+ *   its attack and damage fold in and it grows (each redraw, and any change in its size). Scrolling, clicking or
+ *   typing in the log ends the follow at once.
  *
  * Logs and leaves chat alone if Foundry renames these methods.
  *
@@ -396,8 +397,19 @@ export function quietPosts(isQuiet)
    }
    if (proto.postOne.fhcsQuiet) { return true; }
    const { postOne, updateMessage } = proto;
-   const follow = { id: null, until: 0 };
-   const stopFollowing = () => { follow.id = null; };
+   const follow = { id: null, until: 0, observer: null };
+   const following = (id) => Boolean(id) && (id === follow.id) && (Date.now() < follow.until);
+   const stopFollowing = () => { follow.id = null; follow.observer?.disconnect(); follow.observer = null; };
+   // A card keeps growing after it is placed (dnd5e builds its trays' lists, images load); watch its size while
+   // following and scroll again each time it changes.
+   const watchCard = (log, id) =>
+   {
+      follow.observer?.disconnect();
+      const card = log.element?.querySelector?.(`[data-message-id="${id}"]`);
+      if (!card || (typeof ResizeObserver !== 'function')) { return; }
+      follow.observer = new ResizeObserver(() => { if (following(id)) { log.scrollBottom(); } else { stopFollowing(); } });
+      follow.observer.observe(card);
+   };
 
    proto.postOne = async function (message, options = {})
    {
@@ -405,15 +417,18 @@ export function quietPosts(isQuiet)
       if (!message.isAuthor) { return postOne.call(this, message, options); }
       watchForPlayer(this, stopFollowing);
       Object.assign(follow, { id: message.id, until: Date.now() + FOLLOW_MS });
-      return postOne.call(this, message, { ...options, scroll: true });
+      const result = await postOne.call(this, message, { ...options, scroll: true });
+      watchCard(this, message.id);
+      return result;
    };
    proto.postOne.fhcsQuiet = true;
 
    proto.updateMessage = async function (message, ...rest)
    {
       const result = await updateMessage.call(this, message, ...rest);
-      if (message?.id && (message.id === follow.id) && (Date.now() < follow.until))
+      if (following(message?.id))
       {
+         watchCard(this, message.id);
          await this.scrollBottom({ waitImages: true });
       }
       return result;

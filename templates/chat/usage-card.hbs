@@ -60,23 +60,26 @@
    {{#if showTargets}}<recorded-targets></recorded-targets>{{/if}}
 
    {{#if fhcs.apply}}
-   <section class="fhcs-apply">
-      <h4 class="fhcs-band-heading">{{ fhcs.apply.heading }}</h4>
-      <p class="fhcs-band-note">{{ fhcs.apply.note }}</p>
-      {{#if fhcs.apply.damageId}}
-      {{!-- dnd5e's tray reads its damage, and each token's save, from the nearest message id: the damage roll. --}}
-      <div class="fhcs-apply-damage" data-message-id="{{ fhcs.apply.damageId }}">
-         <damage-application class="dnd5e2" open></damage-application>
+   {{!-- Folded until opened (user, 2026-10-24); the trays inside are unfolded. --}}
+   <details class="fhcs-apply" data-fold-key="apply">
+      <summary class="fhcs-apply-summary"><span class="fhcs-band-heading">{{ fhcs.apply.heading }}</span><span class="fhcs-band-end" aria-hidden="true"></span></summary>
+      <div class="fhcs-apply-body">
+         <p class="fhcs-band-note">{{ fhcs.apply.note }}</p>
+         {{#if fhcs.apply.damageId}}
+         {{!-- dnd5e's tray reads its damage, and each token's save, from the nearest message id: the damage roll. --}}
+         <div class="fhcs-apply-damage" data-message-id="{{ fhcs.apply.damageId }}">
+            <damage-application class="dnd5e2" open></damage-application>
+         </div>
+         {{/if}}
+         {{#if effects.length}}
+         <effect-application class="dnd5e2" open>
+            {{#each effects}}
+            <option value="{{ uuid }}"></option>
+            {{/each}}
+         </effect-application>
+         {{/if}}
       </div>
-      {{/if}}
-      {{#if effects.length}}
-      <effect-application class="dnd5e2" open>
-         {{#each effects}}
-         <option value="{{ uuid }}"></option>
-         {{/each}}
-      </effect-application>
-      {{/if}}
-   </section>
+   </details>
    {{/if}}
 
    {{#if fhcs.others.length}}
