@@ -43,7 +43,11 @@
       "Spare": "Next d20 ready: {value}",
       "Earlier": "Earlier rolls: {totals}",
       "RollAgain": "Roll again",
-      "HiddenRoll": "Rolled (hidden)"
+      "HiddenRoll": "Rolled (hidden)",
+      "CriticalDoubled": "Critical: dice doubled",
+      "OnSave": "On a save: {rule}",
+      "RollNormal": "Roll as normal",
+      "RollCritical": "Roll as critical"
     }
   }
 }

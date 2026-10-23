@@ -8,7 +8,7 @@
  * `effect-application`) work inside our markup. Slices 2–8 fill the bands with results.
  */
 import { MODULE_ID } from '../constants.js';
-import { actorArtwork, rollFacts, rollsFrom } from '../compat.js';
+import { actorArtwork, damageFacts, rollDamageAgain, rollFacts, rollsFrom } from '../compat.js';
 import { describeRoll } from './outcome.js';
 import { d20Row, dieClasses } from './d20.js';
 
@@ -54,6 +54,9 @@ export function cardParts(buttons, localize)
    return { bands, others };
 }
 
+/** Notes under a band's dice math: earlier rolls from the same band. */
+const earlierNote = (earlier, format) => (earlier.length ? [format('FHCS.Card.Earlier', { totals: earlier.join(', ') })] : []);
+
 /**
  * What a rolled d20 band shows: the total, the d20 row, the outcome in words, and (when opened) the dice math.
  *
@@ -78,16 +81,54 @@ export function d20Band(facts, earlier, format)
          dice: all.map((d) => format(d.counts ? 'FHCS.Card.DieCounts' : 'FHCS.Card.DieDropped', { value: d.value }))
             .join(', ')
       }),
-      formula: facts.formula,
-      math: `${facts.math} = ${facts.total}`,
-      spareText: facts.spare ? format('FHCS.Card.Spare', { value: facts.spare }) : '',
-      earlierText: earlier.length ? format('FHCS.Card.Earlier', { totals: earlier.join(', ') }) : '',
-      againLabel: format('FHCS.Card.RollAgain', {})
+      mathLines: [{ formula: facts.formula, result: `${facts.math} = ${facts.total}` }],
+      notes: [...(facts.spare ? [format('FHCS.Card.Spare', { value: facts.spare })] : []), ...earlierNote(earlier, format)],
+      againLabel: format('FHCS.Card.RollAgain', {}),
+      extra: []
    };
 }
 
-/** Roll message types drawn inside their usage card's bands, by band kind. */
-const BAND_ROLLS = { attack: 'attack' };
+/**
+ * What a rolled damage band shows: the total, the total by damage type, a critical in words, and (when opened) each
+ * roll's dice math and a way to roll it again as a critical or not.
+ *
+ * @param {object} facts       From compat.damageFacts, for the latest roll.
+ * @param {number[]} earlier   Totals of earlier damage rolls from the card, oldest first.
+ * @param {Function} format    (key, data) => localized text.
+ * @param {object} [options]
+ * @param {boolean} [options.canCrit]  The card has an attack, so damage can be a critical.
+ */
+export function damageBand(facts, earlier, format, { canCrit = false } = {})
+{
+   const words = [];
+   if (facts.critical) { words.push(format('FHCS.Card.CriticalDoubled', {})); }
+   if (facts.onSave) { words.push(format('FHCS.Card.OnSave', { rule: facts.onSave })); }
+   const extra = [];
+   if (canCrit || facts.critical)
+   {
+      extra.push(facts.critical
+         ? { action: 'damageNormal', label: format('FHCS.Card.RollNormal', {}) }
+         : { action: 'damageCritical', label: format('FHCS.Card.RollCritical', {}) });
+   }
+   return {
+      total: facts.total,
+      critical: facts.critical,
+      verdict: null,
+      words,
+      row: null,
+      parts: facts.parts.map((p) => ({ text: p.label ? `${p.total} ${p.label}` : `${p.total}` })),
+      mathLines: facts.math.map((m) => ({ formula: m.label ? `${m.formula} (${m.label})` : m.formula, result: m.result })),
+      notes: earlierNote(earlier, format),
+      againLabel: format('FHCS.Card.RollAgain', {}),
+      extra
+   };
+}
+
+/** Roll messages drawn inside each kind of band: their types, how to read them, how to draw them. */
+const BAND_ROLLS = {
+   attack: { types: ['attack'], facts: rollFacts, draw: d20Band },
+   damage: { types: ['damage', 'healing'], facts: damageFacts, draw: damageBand }
+};
 
 /** Whether a message draws as our card: the setting is on and dnd5e didn't fall back to legacy HTML content. */
 const useCard = (system) => game.settings.get(MODULE_ID, 'cards') && !system.parent.content;
@@ -118,13 +159,15 @@ export function makeUsageMessageData(Base)
          const item = context.item ?? {};
          const format = (key, data) => game.i18n.format(key, data);
          const { bands, others } = cardParts(context.buttons ?? [], localize);
+         const canCrit = bands.some((b) => b.kind === 'attack');
          for (const band of bands)
          {
-            const type = BAND_ROLLS[band.kind];
-            if (!type) { continue; }
-            const rolls = rollsFrom(this.parent, type);
-            const facts = rolls.length ? rollFacts(rolls.at(-1)) : null;
-            if (facts) { band.rolled = d20Band(facts, rolls.slice(0, -1).map((m) => m.rolls[0]?.total), format); }
+            const source = BAND_ROLLS[band.kind];
+            if (!source) { continue; }
+            const rolls = rollsFrom(this.parent, source.types);
+            const facts = rolls.length ? source.facts(rolls.at(-1)) : null;
+            const earlier = rolls.slice(0, -1).map((m) => source.facts(m)?.total).filter((t) => t !== undefined);
+            if (facts) { band.rolled = source.draw(facts, earlier, format, { canCrit }); }
             else if (rolls.length) { band.text = localize('FHCS.Card.HiddenRoll'); }
          }
          const tags = Object.values(context.rows ?? {}).flatMap((row) => row.entries ?? []).map((e) => e.label);
@@ -141,7 +184,9 @@ export function makeUsageMessageData(Base)
             hasDetails: Boolean(context.description || context.activity?.chatFlavor || tags.length
                || context.supplements?.length),
             bands,
-            others
+            others,
+            // A card's author uses its rolls; the GM uses every card (SCOPE §6.6).
+            canAct: this.parent.isAuthor || game.user.isGM
          };
          return context;
       }
@@ -150,7 +195,28 @@ export function makeUsageMessageData(Base)
       _onRender(element, options = {})
       {
          super._onRender(element, options);
-         if (!options.summary && useCard(this)) { element.classList.add('fhcs-chat', 'fhcs-card-message'); }
+         if (options.summary || !useCard(this)) { return; }
+         element.classList.add('fhcs-chat', 'fhcs-card-message');
+         for (const button of element.querySelectorAll('[data-fhcs-action]'))
+         {
+            button.addEventListener('click', (event) => this.#onCardAction(event, button));
+         }
+      }
+
+      /** Our own card buttons (dnd5e's have `data-action` and go through dnd5e). */
+      async #onCardAction(event, button)
+      {
+         event.preventDefault();
+         button.disabled = true;
+         try
+         {
+            switch (button.dataset.fhcsAction)
+            {
+               case 'damageNormal': await rollDamageAgain(this.parent, event, false); break;
+               case 'damageCritical': await rollDamageAgain(this.parent, event, true); break;
+            }
+         }
+         finally { button.disabled = false; }
       }
    };
 }

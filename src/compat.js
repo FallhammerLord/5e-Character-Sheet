@@ -97,15 +97,69 @@ export function rollFacts(message)
 }
 
 /**
- * Roll messages of one type made from a usage card's buttons, oldest first, that this user may see.
+ * The facts our damage band needs from a dnd5e damage or healing message, or null (none, or not visible).
+ *
+ * @param {ChatMessage} message
+ * @returns {object|null} See chat/card.js damageBand.
+ */
+export function damageFacts(message)
+{
+   const DamageRoll = CONFIG.Dice.DamageRoll;
+   const rolls = (message.rolls ?? []).filter((r) => DamageRoll && (r instanceof DamageRoll) && r._evaluated);
+   if (!rolls.length || !message.isContentVisible) { return null; }
+   const types = { ...CONFIG.DND5E.damageTypes, ...CONFIG.DND5E.healingTypes };
+   const label = (type) => game.i18n.localize(types[type]?.label ?? '');
+   const parts = new Map();
+   for (const roll of rolls)
+   {
+      const type = roll.options.type ?? '';
+      parts.set(type, (parts.get(type) ?? 0) + Math.max(0, roll.total));
+   }
+   const onSave = message.system?.onSave;
+   return {
+      messageId: message.id,
+      healing: message.type === 'healing',
+      critical: rolls.some((r) => r.isCritical),
+      total: rolls.reduce((sum, r) => sum + Math.max(0, r.total), 0),
+      parts: [...parts].map(([type, total]) => ({ type, label: label(type), total })),
+      math: rolls.map((r) => ({ formula: r.formula, result: `${r.result} = ${r.total}`, label: label(r.options.type) })),
+      onSave: onSave
+         ? game.i18n.localize(`DND5E.SAVE.FIELDS.damage.onSave.${onSave[0].toUpperCase()}${onSave.slice(1)}`)
+         : ''
+   };
+}
+
+/**
+ * Roll messages of the given types made from a usage card's buttons, oldest first, that this user may see.
  *
  * @param {ChatMessage} usage   The usage card's message.
- * @param {string} type         'attack', 'damage', 'save', 'check'.
+ * @param {string[]} types      'attack', 'damage', 'healing', 'save', 'check'.
  */
-export function rollsFrom(usage, type)
+export function rollsFrom(usage, types)
 {
    if (!usage.id) { return []; }
-   return (usage.getAssociatedRolls?.(type) ?? []).filter((m) => m.visible);
+   return types.flatMap((type) => usage.getAssociatedRolls?.(type) ?? [])
+      .filter((m) => m.visible)
+      .sort((a, b) => a.timestamp - b.timestamp);
+}
+
+/**
+ * Rolls a card's damage again, as a critical or not, the way dnd5e's Damage button does (last attack's ability,
+ * ammunition and mode; the card's scaling and targets), without the damage dialog. The click's event links the roll
+ * to the card (`system.origin`).
+ *
+ * @param {ChatMessage} usage
+ * @param {Event} event
+ * @param {boolean} isCritical
+ */
+export async function rollDamageAgain(usage, event, isCritical)
+{
+   const activity = usage.getAssociatedActivity?.({ scaled: true });
+   if (!activity?.rollDamage) { return; }
+   const lastAttack = usage.getAssociatedRolls('attack').at(-1);
+   const { ability, ammunitionItem: ammunition, mode: attackMode } = lastAttack?.system ?? {};
+   await activity.rollDamage({ event, ability, ammunition, attackMode, isCritical }, { configure: false },
+      { data: { system: { targets: usage.system.targets } } });
 }
 
 /** The usage card a roll message was made from, if it is one. */

@@ -4,7 +4,7 @@
  *
  * A case: { name, template: 'path/without-hbs', context: {...}, frame?: 'sheet' | 'chat', theme?: 'light' }
  */
-import { cardParts, d20Band } from '../src/chat/card.js';
+import { cardParts, d20Band, damageBand } from '../src/chat/card.js';
 import { format, localize } from './templates.mjs';
 
 /** A usage card's context as FHCSUsageMessageData#_prepareContext builds it, with overrides. */
@@ -12,7 +12,7 @@ const card = (over = {}, buttons = []) => ({
    fhcs: {
       portrait: '', actorName: 'Kira', title: 'Longsword', itemUuid: 'Actor.x.Item.y', subtitle: 'Attack · Melee',
       flavor: '', description: '<p>A versatile blade.</p>', supplements: [], tags: ['Versatile', 'Proficient'],
-      hasDetails: true, ...cardParts(buttons, localize), ...over
+      hasDetails: true, canAct: true, ...cardParts(buttons, localize), ...over
    }
 });
 
@@ -36,16 +36,36 @@ const attack = (over = {}) => ({
    formula: '1d20 + 5 + 3', math: '20 + 5 + 3', ...over
 });
 
-/** The attack card with its attack band rolled. */
-const rolledAttack = (facts, earlier = []) =>
+/** Facts for a damage roll, as compat.damageFacts returns them, with overrides. */
+const damage = (over = {}) => ({
+   healing: false, critical: true, total: 16, parts: [{ type: 'slashing', label: 'Slashing', total: 16 }],
+   math: [{ formula: '2d8 + 5', result: '6 + 5 + 5 = 16', label: 'Slashing' }], onSave: '', ...over
+});
+
+/** The attack card with its attack band (and optionally its damage band) rolled and open. */
+const rolledAttack = (facts, earlier = [], damageFacts = null) =>
 {
    const context = card({}, ATTACK);
    context.fhcs.bands[0].rolled = { ...d20Band(facts, earlier, format), open: true };
+   if (damageFacts) { context.fhcs.bands[1].rolled = { ...damageBand(damageFacts, [9], format, { canCrit: true }), open: true }; }
    return context;
 };
 
 export const CASES = [
-   { name: 'card-attack-crit', template: 'chat/usage-card', frame: 'chat', context: rolledAttack(attack(), [14, 9]) },
+   { name: 'card-attack-crit', template: 'chat/usage-card', frame: 'chat', context: rolledAttack(attack(), [14, 9], damage()) },
+   {
+      name: 'card-damage-mixed',
+      template: 'chat/usage-card',
+      frame: 'chat',
+      context: rolledAttack(attack({ isCritical: false, total: 17, natural: 9, dice: [{ result: 9, active: true }], math: '9 + 5 + 3' }), [], damage({
+         critical: false, total: 31,
+         parts: [{ type: 'slashing', label: 'Slashing', total: 12 }, { type: 'radiant', label: 'Radiant', total: 9 },
+            { type: 'necrotic', label: 'Necrotic', total: 10 }],
+         math: [{ formula: '1d8 + 5', result: '7 + 5 = 12', label: 'Slashing' }, { formula: '2d8', result: '4 + 5 = 9', label: 'Radiant' },
+            { formula: '3d6', result: '2 + 3 + 5 = 10', label: 'Necrotic' }],
+         onSave: 'Half Damage'
+      }))
+   },
    {
       name: 'card-attack-elven',
       template: 'chat/usage-card',

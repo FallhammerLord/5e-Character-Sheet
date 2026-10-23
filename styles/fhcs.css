@@ -291,6 +291,15 @@
    line-height: 1;
 }
 
+.fhcs-chat .fhcs-band-parts
+{
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+   column-gap: 0.75rem;
+   font-weight: bold;
+}
+
 /* The d20 row: equal side columns keep the primary die centered. */
 .fhcs-chat .fhcs-d20-row
 {

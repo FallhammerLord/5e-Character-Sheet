@@ -129,7 +129,11 @@ export function registerQuenchTests(quench)
          {
             if (!game.user.isGM) { this.skip(); }
             actor = await Actor.implementation.create({ name: 'FHCS test (safe to delete)', type: 'character' });
-            const [item] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test sword', type: 'weapon' }]);
+            const [item] = await actor.createEmbeddedDocuments('Item', [{
+               name: 'FHCS test sword',
+               type: 'weapon',
+               system: { damage: { base: { number: 1, denomination: 8, types: ['slashing'] } } }
+            }]);
             activity = await item.createActivity('attack', {}, { renderSheet: false });
             activity ??= item.system.activities.contents[0];
          });
@@ -198,6 +202,44 @@ export function registerQuenchTests(quench)
             finally
             {
                await attack?.delete();
+               await usage.delete();
+            }
+         });
+
+         it('draws damage in the card, and rolls it again as a critical', async function ()
+         {
+            const results = await activity.use({ subsequentActions: false, consume: false }, { configure: false },
+               { rollMode: 'selfroll' });
+            const usage = results?.message;
+            const damage = () => usage.getAssociatedRolls('damage');
+            try
+            {
+               await activity.rollDamage({ isCritical: false }, { configure: false },
+                  { rollMode: 'selfroll', data: { system: { origin: usage.id } } });
+               assert.lengthOf(damage(), 1, 'damage message posted');
+               assert.isTrue((await damage()[0].renderHTML()).hidden, 'damage card hidden');
+               let html = await usage.renderHTML();
+               let band = html.querySelector('.fhcs-band-rolled.fhcs-band-damage');
+               assert.ok(band, 'rolled damage band');
+               assert.strictEqual(Number(band.querySelector('.fhcs-band-total').textContent), damage()[0].rolls[0].total);
+
+               // "Roll as critical" sits in the band and rolls the damage again, doubled.
+               const button = band.querySelector('[data-fhcs-action="damageCritical"]');
+               assert.ok(button, 'roll as critical offered');
+               button.click();
+               for (let waited = 0; (damage().length < 2) && (waited < 3000); waited += 100)
+               {
+                  await new Promise((resolve) => { setTimeout(resolve, 100); });
+               }
+               assert.lengthOf(damage(), 2, 'second damage message posted');
+               assert.isTrue(damage().at(-1).rolls[0].isCritical, 'second roll is a critical');
+               html = await usage.renderHTML();
+               band = html.querySelector('.fhcs-band-rolled.fhcs-band-damage');
+               assert.ok(band.querySelector('[data-fhcs-action="damageNormal"]'), 'now offers roll as normal');
+            }
+            finally
+            {
+               for (const message of damage()) { await message.delete(); }
                await usage.delete();
             }
          });

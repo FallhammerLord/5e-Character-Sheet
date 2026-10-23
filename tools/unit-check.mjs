@@ -4,7 +4,7 @@
  */
 import { deepStrictEqual } from 'node:assert';
 import { describeRoll } from '../src/chat/outcome.js';
-import { cardParts } from '../src/chat/card.js';
+import { cardParts, damageBand } from '../src/chat/card.js';
 import { d20Row } from '../src/chat/d20.js';
 import { format, localize } from './templates.mjs';
 
@@ -98,5 +98,22 @@ for (const [name, results, mode, sides, expected] of ROW_CASES)
    if (got !== expected) { problems.push(`d20 row, ${name}: got "${got}", expected "${expected}"`); }
 }
 
+// Damage band: words, totals by type, and the critical switch.
+const dmg = (over) => ({ healing: false, critical: false, total: 12, parts: [{ type: 'fire', label: 'Fire', total: 12 }], math: [],
+   onSave: '', ...over });
+const DAMAGE_CASES = [
+   ['plain, no attack on the card', dmg({}), {}, { words: [], parts: ['12 Fire'], extra: [] }],
+   ['plain, card has an attack', dmg({}), { canCrit: true }, { words: [], parts: ['12 Fire'], extra: ['damageCritical'] }],
+   ['critical', dmg({ critical: true }), { canCrit: true }, { words: ['Critical: dice doubled'], parts: ['12 Fire'], extra: ['damageNormal'] }],
+   ['half on a save', dmg({ onSave: 'Half Damage' }), {}, { words: ['On a save: Half Damage'], parts: ['12 Fire'], extra: [] }]
+];
+for (const [name, facts, options, expected] of DAMAGE_CASES)
+{
+   const band = damageBand(facts, [], format, options);
+   const got = { words: band.words, parts: band.parts.map((p) => p.text), extra: band.extra.map((e) => e.action) };
+   try { deepStrictEqual(got, expected); }
+   catch { problems.push(`damage band, ${name}: got ${JSON.stringify(got)}, expected ${JSON.stringify(expected)}`); }
+}
+
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
-console.log(`${CASES.length} outcome lines, ${PART_CASES.length} card layouts and ${ROW_CASES.length} d20 rows read as expected.`);
+console.log(`${CASES.length} outcome lines, ${PART_CASES.length} card layouts, ${ROW_CASES.length} d20 rows and ${DAMAGE_CASES.length} damage bands read as expected.`);

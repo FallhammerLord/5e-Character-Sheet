@@ -27,23 +27,30 @@
          <span class="fhcs-band-top"><span class="fhcs-band-heading">{{ heading }}</span><span class="fhcs-band-end" aria-hidden="true"></span></span>
          <span class="fhcs-band-result">
             <strong class="fhcs-band-total">{{ rolled.total }}</strong>
+            {{#if rolled.row}}
             <span class="fhcs-d20-row" role="group" aria-label="{{ rolled.diceLabel }}">
                <span class="fhcs-d20-side fhcs-d20-left">{{#each rolled.row.left}}<span class="{{ classes }}">{{ value }}</span>{{/each}}</span>
                {{#with rolled.row.center}}<span class="{{ classes }}">{{ value }}</span>{{/with}}
                <span class="fhcs-d20-side fhcs-d20-right">{{#each rolled.row.right}}<span class="{{ classes }}">{{ value }}</span>{{/each}}</span>
             </span>
+            {{/if}}
+            {{#if rolled.parts.length}}
+            <span class="fhcs-band-parts">{{#each rolled.parts}}<span>{{ text }}</span>{{/each}}</span>
+            {{/if}}
          </span>
          {{#if rolled.words.length}}
          <span class="fhcs-band-words{{#if rolled.verdict}} fhcs-verdict-{{ rolled.verdict }}{{/if}}">{{#each rolled.words}}<span>{{ this }}</span>{{/each}}</span>
          {{/if}}
       </summary>
       <div class="fhcs-band-body">
-         <p class="fhcs-band-math">{{ rolled.formula }}<br><strong>{{ rolled.math }}</strong></p>
-         {{#if rolled.spareText}}<p class="fhcs-band-note">{{ rolled.spareText }}</p>{{/if}}
-         {{#if rolled.earlierText}}<p class="fhcs-band-note">{{ rolled.earlierText }}</p>{{/if}}
+         {{#each rolled.mathLines}}<p class="fhcs-band-math">{{ formula }}<br><strong>{{ result }}</strong></p>{{/each}}
+         {{#each rolled.notes}}<p class="fhcs-band-note">{{ this }}</p>{{/each}}
+         {{#if @root.fhcs.canAct}}
          <div class="fhcs-card-actions">
             <button type="button" class="fhcs-button" data-action="{{ action }}" data-index="{{ index }}">{{ rolled.againLabel }}</button>
+            {{#each rolled.extra}}<button type="button" class="fhcs-button" data-fhcs-action="{{ action }}">{{ label }}</button>{{/each}}
          </div>
+         {{/if}}
       </div>
    </details>
    {{else}}
