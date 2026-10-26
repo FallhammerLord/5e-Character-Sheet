@@ -18,6 +18,7 @@ class SystemCharacterSheet
       sidebar: { container: { classes: ['main-content'], id: 'main' }, template: 'systems/dnd5e/templates/actors/character-sidebar.hbs' },
       details: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/character-details.hbs' },
       inventory: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/character-inventory.hbs', scrollable: [''] },
+      spells: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/creature-spells.hbs', scrollable: [''] },
       abilityScores: { template: 'systems/dnd5e/templates/actors/character-ability-scores.hbs' },
       warnings: { template: 'systems/dnd5e/templates/shared/sheet-warnings-dialog.hbs' },
       tabs: { id: 'tabs', classes: ['tabs-right'], template: 'systems/dnd5e/templates/shared/sidebar-tabs.hbs' }
@@ -116,7 +117,7 @@ else
    if (options?.makeDefault) { problems.push('sheet must not make itself the default'); }
    // Our header and tab row come first, in place of dnd5e's; its ability scores and sidebar are gone; its tab bodies stay.
    const parts = sheet.PARTS ?? {};
-   const expected = 'header,tabs,details,inventory,warnings';
+   const expected = 'header,tabs,details,inventory,spells,warnings';
    if (Object.keys(parts).join() !== expected) { problems.push(`sheet parts are ${Object.keys(parts).join()}, not ${expected}`); }
    if (parts.tabs?.classes) { problems.push('our tab row still carries dnd5e\'s tab classes'); }
    // None of dnd5e's look reaches our window.
@@ -136,6 +137,20 @@ else
    // The row partial is included by the tab and by every container; Foundry won't find it unless the part loads it.
    for (const path of parts.inventory?.templates ?? []) { if (!existsSync(new URL(`../${path.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`inventory partial ${path} is missing`); } }
    if (!parts.inventory?.templates?.some((p) => p.endsWith('/item-row.hbs'))) { problems.push('the inventory part does not load its row partial'); }
+   if (!parts.spells?.template.startsWith('modules/fhcs/')) { problems.push('the spells part is still dnd5e\'s'); }
+   if (parts.spells?.scrollable?.join() !== '.fhcs-items') { problems.push('the spells part does not keep its list\'s scroll'); }
+   // Partials included by a tab must load with its part: each list tab's rows and the shared search bar.
+   for (const [id, row] of [['inventory', 'item-row'], ['spells', 'spell-row']])
+   {
+      for (const name of [row, 'list-bar'])
+      {
+         if (!parts[id]?.templates?.some((p) => p.endsWith(`/${name}.hbs`))) { problems.push(`the ${id} part does not load ${name}.hbs`); }
+      }
+      for (const path of parts[id]?.templates ?? []) { if (!existsSync(new URL(`../${path.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`${id} partial ${path} is missing`); } }
+   }
+   // dnd5e adds slot pips into spell headings ours draw themselves; our filters (Can cast, components) join dnd5e's.
+   if (!Object.hasOwn(sheet.prototype, '_renderSpellbook')) { problems.push('dnd5e\'s spell slot pips are not replaced'); }
+   if (!Object.hasOwn(sheet.prototype, '_filterItem')) { problems.push('our spell filters are not added to dnd5e\'s'); }
    // dnd5e adds its attunement counter into markup ours lacks; without our override every render throws.
    if (!Object.hasOwn(sheet.prototype, '_renderAttunement')) { problems.push('dnd5e\'s attunement counter is not replaced'); }
 }

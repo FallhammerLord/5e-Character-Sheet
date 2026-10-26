@@ -5,6 +5,7 @@
  */
 import { countingDie, MAX_PER_SIDE, modeForSides } from './chat/d20.js';
 import { diceMath } from './chat/math.js';
+import { canCast, spellKind } from './sheet/spellbook.js';
 
 /** dnd5e's own character sheet, which ours extends so every mechanic keeps working. Set by dnd5e before init. */
 export function systemCharacterSheet()
@@ -149,12 +150,17 @@ export async function attributesFacts(sheet, context, { passives, folded })
       const item = f.itemId ? actor.items.get(f.itemId) : null;
       let group = 'other';
       let state = null;
+      let kind = null;
       if (f.type === 'effect') { group = 'effects'; }
       else if (f.type === 'skill' || f.type === 'tool') { group = 'skills'; }
       else if (item?.type === 'spell')
       {
          group = 'spell';
-         if ((item.system.prepared ?? 0) >= 1) { state = 'prepared'; }
+         // The Spellbook's preparation kinds (SCOPE §4.7): the book and the kind's color, on Attributes too.
+         // Innate and at-will spells have no book to show, so they stay plain here rather than marked by color alone.
+         kind = spellKind(spellFacts(actor, item));
+         if (['innate', 'atwill'].includes(kind)) { kind = null; }
+         if (kind) { state = 'prepared'; }
       }
       else if (item?.type === 'feat') { group = 'features'; }
       else if (item && 'quantity' in item.system)
@@ -166,7 +172,7 @@ export async function attributesFacts(sheet, context, { passives, folded })
          id: f.id, type: f.type, title: f.title, subtitle: plainSubtitle(f.subtitle), img: f.img,
          uses: f.uses?.max ? { value: f.uses.value, max: f.uses.max } : null, quantity: Number(f.quantity) || 0,
          itemId: f.itemId ?? '', activityId: f.activityId ?? '', effectId: f.effectId ?? '', key: f.key ?? '',
-         rollableClass: f.rollableClass ?? '', group, level: item?.type === 'spell' ? item.system.level : null, state
+         rollableClass: f.rollableClass ?? '', group, level: item?.type === 'spell' ? item.system.level : null, state, kind
       });
    }
 
@@ -292,6 +298,7 @@ export async function inventoryFacts(sheet, context, { columns, openContainers }
       columns,
       openContainers,
       editing: sheet.isEditMode,
+      activeFilters: listFilters(sheet, 'inventory'),
       filters: (controls.filters ?? []).map((f) => ({ key: f.key, group: f.group ?? '', label: game.i18n.localize(f.label) })),
       sorting: (controls.sorting ?? []).map((s) => ({ key: s.key, icon: s.dataset?.icon ?? '', label: game.i18n.localize(s.label) })),
       currency: Object.entries(context.currency ?? {}).map(([key, value]) => ({
@@ -306,6 +313,198 @@ export async function inventoryFacts(sheet, context, { columns, openContainers }
          sourceMax: actor.system._source?.attributes?.attunement?.max ?? actor.system.attributes?.attunement?.max ?? 0
       },
       encumbrance
+   };
+}
+
+/** @returns {string[]} The filters set on one of the sheet's lists (dnd5e keeps them on the sheet, item-list-controls.mjs:198). */
+export function listFilters(sheet, list)
+{
+   return [...(sheet._filters?.[list]?.properties ?? [])];
+}
+
+/**
+ * Turns one of dnd5e's list filters on or off, as its filter menu does (filter-menu.mjs:15): an included or excluded
+ * key is cleared, otherwise it is included. Then the list is filtered again.
+ * @param {HTMLElement} controls  The list's `item-list-controls` element.
+ */
+export function toggleListFilter(controls, key)
+{
+   const properties = controls?.state?.properties;
+   if (!properties) { return; }
+   const active = properties.has(key) || properties.has(`!${key}`);
+   properties.delete(key);
+   properties.delete(`!${key}`);
+   if (!active) { properties.add(key); }
+   controls._applyFilters();
+}
+
+/**
+ * Calls `onChange` with the filter set after every pass of dnd5e's list filter, whether our pinned buttons or its
+ * own menu started it, so the pins show the menu's changes too.
+ */
+export function watchListFilters(controls, onChange)
+{
+   if (!controls || controls.fhcsWatched || typeof controls._applyFilters !== 'function') { return; }
+   controls.fhcsWatched = true;
+   const apply = controls._applyFilters.bind(controls);
+   controls._applyFilters = () =>
+   {
+      apply();
+      onChange([...(controls.state?.properties ?? [])]);
+   };
+}
+
+/** @returns {{level: number, value: number}[]} Every spell slot pool with its level and the slots left. */
+function slotPools(actor)
+{
+   return Object.entries(actor.system.spells ?? {})
+      .filter(([, slot]) => (slot?.max ?? 0) > 0 || (slot?.value ?? 0) > 0)
+      .map(([key, slot]) => ({ level: slot.level ?? (Number(key.replace(/\D/g, '')) || 0), value: slot.value ?? 0 }));
+}
+
+/** Plain facts about one spell, for its row and for our filters. */
+function spellFacts(actor, item)
+{
+   const sys = item.system;
+   const uses = sys.uses?.max ? { value: sys.uses.value ?? 0, max: sys.uses.max } : null;
+   return {
+      level: sys.level ?? 0,
+      method: sys.method,
+      prepares: !!sys.canPrepare,
+      prepared: sys.prepared ?? 0,
+      linked: !!sys.linkedActivity?.item || !!item.getFlag?.('dnd5e', 'cachedFor'),
+      ritual: !!sys.properties?.has('ritual'),
+      concentration: !!sys.properties?.has('concentration'),
+      uses
+   };
+}
+
+/**
+ * Our extra Spellbook filters (SCOPE §4.7), for the sheet's `_filterItem`: Can cast and the components. Returns
+ * false to hide the item, undefined to leave it to dnd5e's own filters.
+ */
+export function passesExtraFilters(actor, item, filters, keys)
+{
+   if (item.type !== 'spell') { return undefined; }
+   const included = new Set();
+   const excluded = new Set();
+   for (const f of filters ?? [])
+   {
+      const key = f[0] === '!' ? f.slice(1) : f;
+      if (!keys.includes(key)) { continue; }
+      (f[0] === '!' ? excluded : included).add(key);
+   }
+   if (!included.size && !excluded.size) { return undefined; }
+   const has = (key) => (key === 'canCast' ? canCast(spellFacts(actor, item), slotPools(actor)) : !!item.system.properties?.has(key));
+   for (const key of included) { if (!has(key)) { return false; } }
+   for (const key of excluded) { if (has(key)) { return false; } }
+   return undefined;
+}
+
+/** Ends one concentration (dnd5e's `endConcentration`, actor.mjs:1130), which also removes what it holds up. */
+export function endConcentration(actor, effectId)
+{
+   const effect = actor.effects.get(effectId);
+   return effect ? actor.endConcentration(effect) : null;
+}
+
+/** @returns {string} A distance or other range label, as dnd5e's spell row shows it (base-actor-sheet.mjs:946). */
+function rangeLabel(ctx, item)
+{
+   if (ctx.range?.distance) { return `${ctx.range.value ?? ''} ${game.i18n.localize(ctx.range.unit ?? '')}`.trim(); }
+   return item.labels?.range ?? '';
+}
+
+/**
+ * Plain facts for the Spellbook tab (src/sheet/spellbook.js), from what dnd5e's `_prepareSpellbook` and
+ * `_prepareSpellsContext` put on the context (base-actor-sheet.mjs:411, 570; character-sheet.mjs:590), its spell
+ * row context (`_prepareItemSpell`, :921) and the actor's concentration (actor.mjs:247).
+ */
+export async function spellbookFacts(sheet, context, { columns })
+{
+   const actor = sheet.actor;
+   const config = CONFIG.DND5E;
+   const ctxs = context.itemContext ?? {};
+   const favorites = new Set((actor.system.favorites ?? []).filter((f) => f.type === 'item').map((f) => f.id));
+
+   const sections = [];
+   for (const section of Object.values(context.spellbook ?? {}))
+   {
+      const level = section.dataset?.level ?? null;
+      const slot = section.usesSlots ? foundry.utils.getProperty(actor.system.spells, section.slot) : null;
+      const items = [];
+      for (const item of [...section.items].sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)))
+      {
+         const ctx = ctxs[item.id] ?? {};
+         const facts = spellFacts(actor, item);
+         items.push({
+            ...facts,
+            id: item.id,
+            uuid: item.uuid,
+            name: item.name,
+            img: item.img,
+            // dnd5e's subtitle is the granting item and the components (base-actor-sheet.mjs:990); components have a column.
+            sub: String(ctx.subtitle ?? '').split('\u2022').map((part) => part.trim())
+               .filter((part) => part && part !== item.labels?.components?.vsm).join(' \u00b7 '),
+            favorite: favorites.has(item.getRelativeUUID?.(actor) ?? `.Item.${item.id}`),
+            expanded: !!ctx.isExpanded,
+            summary: ctx.isExpanded && ctx.expanded ? await renderTemplate(ITEM_SUMMARY, ctx.expanded) : '',
+            components: item.labels?.components?.vsm ?? '',
+            // Words, not dnd5e's abbreviations ("1BA"): read at a glance (SCOPE §4.5).
+            time: item.labels?.activation ?? ctx.activation ?? '',
+            range: rangeLabel(ctx, item),
+            school: game.i18n.localize(config.spellSchools?.[item.system.school]?.label ?? ''),
+            target: item.labels?.target ?? '',
+            uses: ctx.uses?.hasUses ? { value: ctx.uses.value ?? 0, max: ctx.uses.max, prop: ctx.uses.prop } : null
+         });
+      }
+      sections.push({
+         id: section.slot,
+         method: section.dataset?.method ?? section.id,
+         level: level === null || level === '' ? null : Number(level),
+         label: game.i18n.localize(section.label),
+         slots: slot ? { value: slot.value ?? 0, max: slot.override ?? slot.max ?? 0 } : null,
+         items
+      });
+   }
+
+   const concentration = { save: actor.system.attributes?.concentration?.save ?? 0, spells: [] };
+   for (const effect of actor.concentration?.effects ?? [])
+   {
+      const data = effect.getFlag('dnd5e', 'item');
+      const item = data?.id ? actor.items.get(data.id) : null;
+      const spellLevel = data?.data?.system?.level ?? item?.system.level;
+      concentration.spells.push({
+         effectId: effect.id,
+         itemId: item?.id ?? '',
+         name: item?.name ?? effect.name,
+         img: item?.img ?? effect.img,
+         sub: spellLevel ? (config.spellLevels?.[spellLevel] ? game.i18n.localize(config.spellLevels[spellLevel]) : '') : ''
+      });
+   }
+
+   const controls = context.listControls ?? {};
+   const extra = [
+      { key: 'canCast', group: 'property', label: 'FHCS.Filter.canCast' },
+      ...['vocal', 'somatic', 'material'].map((key) => ({ key, group: 'components', label: config.itemProperties?.[key]?.label ?? key }))
+   ];
+   return {
+      classes: (context.spellcasting ?? []).map((k) => ({
+         label: k.label,
+         abbr: game.i18n.localize(config.abilities?.[k.ability?.ability]?.abbreviation ?? k.ability?.ability ?? ''),
+         mod: k.ability?.mod ?? 0,
+         attack: k.attack ?? 0,
+         save: k.save ?? '',
+         prepared: { value: k.preparation?.value ?? 0, max: k.preparation?.max ?? 0 },
+         primary: !!k.primary
+      })),
+      concentration,
+      sections,
+      columns,
+      editing: sheet.isEditMode,
+      activeFilters: listFilters(sheet, 'spells'),
+      filters: [...(controls.filters ?? []), ...extra].map((f) => ({ key: f.key, group: f.group ?? '', label: game.i18n.localize(f.label) })),
+      sorting: (controls.sorting ?? []).map((s) => ({ key: s.key, icon: s.dataset?.icon ?? '', label: game.i18n.localize(s.label) }))
    };
 }
 

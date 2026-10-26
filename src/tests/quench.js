@@ -311,6 +311,87 @@ export function registerQuenchTests(quench)
             sheet.element.querySelector('.fhcs-tabs [data-action="changeMode"]').click();
             await until(() => !sheet.isEditMode, 'back to play mode');
          });
+
+         it('lists spells by section and prepares them from the book', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 4);
+            const [open, always, cantrip] = await actor.createEmbeddedDocuments('Item', [
+               { name: 'FHCS test bolt', type: 'spell', system: { level: 1, method: 'spell', prepared: 0 } },
+               { name: 'FHCS test ward', type: 'spell', system: { level: 1, method: 'spell', prepared: 2 } },
+               { name: 'FHCS test spark', type: 'spell', system: { level: 0, method: 'spell' } }
+            ]);
+            const row = (spell) => sheet.element.querySelector(`.fhcs-spellbook [data-item-id="${spell.id}"]`);
+            await until(() => row(open) && row(always) && row(cantrip), 'the three spells have rows on our Spellbook tab');
+            assert.ok(row(open).closest('.items-section')?.contains(row(always)), 'both level 1 spells share a section');
+            assert.notOk(row(cantrip).querySelector('[data-action="prepare"]'), 'a cantrip has no prepare mark');
+            assert.strictEqual(row(always).querySelector('[data-action="prepare"]')?.getAttribute('aria-disabled'), 'true',
+               'always prepared can\'t be clicked');
+            row(open).querySelector('[data-action="prepare"]').click();
+            await until(() => open.system.prepared === 1, 'the book prepared the spell');
+            await until(() => row(open)?.classList.contains('fhcs-kind-prepared'), 'the row took the prepared color');
+            row(always).querySelector('[data-action="prepare"]').click();
+            await new Promise((resolve) => { setTimeout(resolve, 300); });
+            assert.strictEqual(always.system.prepared, 2, 'a click on always prepared changes nothing');
+            await actor.deleteEmbeddedDocuments('Item', [open.id, always.id, cantrip.id]);
+         });
+
+         it('filters spells from a pinned button and shows the pin pressed', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 3);
+            const [ready, idle] = await actor.createEmbeddedDocuments('Item', [
+               { name: 'FHCS test ready', type: 'spell', system: { level: 1, method: 'spell', prepared: 1 } },
+               { name: 'FHCS test idle', type: 'spell', system: { level: 1, method: 'spell', prepared: 0 } }
+            ]);
+            const row = (spell) => sheet.element.querySelector(`.fhcs-spellbook [data-item-id="${spell.id}"]`);
+            const pin = () => sheet.element.querySelector('.fhcs-spellbook [data-action="fhcsPinFilter"][data-filter="prepared"]');
+            await until(() => row(ready) && row(idle) && pin(), 'both spells and the Prepared pin are drawn');
+            pin().click();
+            await until(() => row(idle).hidden && !row(ready).hidden, 'the Prepared pin hides the unprepared spell');
+            assert.strictEqual(pin().getAttribute('aria-pressed'), 'true', 'the pin shows it is on');
+            pin().click();
+            await until(() => !row(idle).hidden, 'a second click shows it again');
+            assert.strictEqual(pin().getAttribute('aria-pressed'), 'false', 'the pin shows it is off');
+            await actor.deleteEmbeddedDocuments('Item', [ready.id, idle.id]);
+         });
+
+         it('shows the spell held in concentration, rolls its save and ends it', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 4);
+            const [spell] = await actor.createEmbeddedDocuments('Item', [
+               { name: 'FHCS test guardians', type: 'spell', system: { level: 3, method: 'spell', prepared: 1, properties: ['concentration'] } }
+            ]);
+            const bar = () => sheet.element.querySelector('.fhcs-spellbook .fhcs-concentration');
+            assert.notOk(bar()?.classList.contains('fhcs-on'), 'the bar starts idle');
+            const [effect] = await actor.createEmbeddedDocuments('ActiveEffect', [{
+               name: 'Concentrating', img: spell.img, statuses: [CONFIG.specialStatusEffects.CONCENTRATING],
+               flags: { dnd5e: { item: { id: spell.id } } }
+            }]);
+            await until(() => bar()?.querySelector(`[data-item-id="${spell.id}"]`), 'the bar names the spell');
+            assert.isTrue(bar().classList.contains('fhcs-on'), 'the bar shows concentration is on');
+            await clickReaches('.fhcs-spellbook .fhcs-concentration [data-action="roll"]', 'dnd5e.preRollConcentration');
+            bar().querySelector(`[data-action="fhcsEndConcentration"][data-effect-id="${effect.id}"]`).click();
+            await until(() => !actor.effects.get(effect.id), 'End removes the concentration effect');
+            await until(() => !bar()?.classList.contains('fhcs-on'), 'the bar goes idle');
+            await spell.delete();
+         });
+
+         it('shows and hides Spellbook columns from edit mode', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 4);
+            const before = game.settings.get(MODULE_ID, 'spellColumns');
+            const [spell] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test light', type: 'spell', system: { level: 0 } }]);
+            sheet.element.querySelector('.fhcs-tabs [data-action="changeMode"]').click();
+            await until(() => sheet.isEditMode && sheet.element.querySelector('[data-action="fhcsToggleColumn"][data-list="spells"]'),
+               'edit mode shows the Spellbook column menu');
+            const school = () => !!sheet.element.querySelector('.fhcs-spellbook .fhcs-item-head .fhcs-col-school');
+            const had = school();
+            sheet.element.querySelector('[data-action="fhcsToggleColumn"][data-list="spells"][data-column="school"]').click();
+            await until(() => school() !== had, 'the school column switched');
+            await game.settings.set(MODULE_ID, 'spellColumns', before);
+            sheet.element.querySelector('.fhcs-tabs [data-action="changeMode"]').click();
+            await until(() => !sheet.isEditMode, 'back to play mode');
+            await spell.delete();
+         });
       });
    }, { displayName: 'Fallhammer Character Sheet: core' });
 

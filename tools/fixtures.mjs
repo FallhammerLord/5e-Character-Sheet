@@ -8,6 +8,7 @@ import { cardParts, d20Band, damageBand, saveRow } from '../src/chat/card.js';
 import { headerView, tabRow } from '../src/sheet/header.js';
 import { attributesView } from '../src/sheet/attributes.js';
 import { inventoryView } from '../src/sheet/inventory.js';
+import { spellbookView } from '../src/sheet/spellbook.js';
 import { format, localize } from './templates.mjs';
 
 /** A usage card's context as FHCSUsageMessageData#_prepareContext builds it, with overrides. */
@@ -170,10 +171,10 @@ const attributesFacts = (over = {}) => ({
       fav('Mace', 'inventory', { subtitle: 'Melee Weapon Attack', state: 'equipped' }),
       fav('Shield', 'inventory', { state: 'equipped' }),
       fav('Torch', 'inventory', { uses: { value: 1, max: 1 }, quantity: 3 }),
-      fav('Bless', 'spell', { level: 1, subtitle: 'V S M \u00b7 1 Action', state: 'prepared' }),
-      fav('Healing Word', 'spell', { level: 1, subtitle: 'V \u00b7 1 Bonus Action', state: 'prepared' }),
+      fav('Bless', 'spell', { level: 1, subtitle: 'V S M \u00b7 1 Action', state: 'prepared', kind: 'prepared' }),
+      fav('Healing Word', 'spell', { level: 1, subtitle: 'V \u00b7 1 Bonus Action', state: 'prepared', kind: 'always' }),
       fav('Detect Magic', 'spell', { level: 1, subtitle: 'V S \u00b7 1 Action' }),
-      fav('Counterspell', 'spell', { level: 3, subtitle: 'S \u00b7 1 Reaction', state: 'prepared' }),
+      fav('Counterspell', 'spell', { level: 3, subtitle: 'S \u00b7 1 Reaction', state: 'prepared', kind: 'pact' }),
       fav('Sacred Flame', 'spell', { level: 0, subtitle: 'V S \u00b7 1 Action' }),
       fav('Channel Divinity: Preserve Life', 'features', { subtitle: '1 Action \u00b7 Short Rest', uses: { value: 1, max: 2 } })
    ],
@@ -238,7 +239,75 @@ const inventory = (over) => ({
 });
 const ALL_COLUMNS = { weight: true, uses: true, usage: true, quantity: true, equipped: true, attuned: true };
 
+/** One spell's facts as compat.spellbookFacts gathers them, with overrides. */
+const spell = (name, fill, over = {}) => ({
+   id: name.replace(/\W/g, ''), uuid: `Actor.x.Item.${name}`, name, img: ICON(fill), sub: '', level: 1, method: 'spell',
+   prepares: true, prepared: 1, linked: false, ritual: false, concentration: false, components: 'V, S', time: '1 Action',
+   range: '60 ft', school: 'Evocation', target: '1 creature', uses: null, favorite: false, expanded: false, summary: '', ...over
+});
+const level = (n, items, slots) => ({ id: `spell${n}`, method: 'spell', level: n, label: n ? `Level ${n}` : 'Cantrips',
+   slots: slots ? { value: slots[0], max: slots[1] } : null, items });
+const spellbookFacts = (over = {}) => ({
+   classes: [{ label: 'Cleric Spellcasting', abbr: 'WIS', mod: 4, attack: 8, save: 16, prepared: { value: 11, max: 14 }, primary: true }],
+   concentration: { save: 5, spells: [{ effectId: 'e1', itemId: 'SpiritGuardians', name: 'Spirit Guardians', img: ICON('#c9a227'), sub: '3rd Level' }] },
+   sections: [
+      level(0, [
+         spell('Guidance', '#b8a46a', { level: 0, concentration: true, range: 'Touch' }),
+         spell('Sacred Flame', '#c9732a', { level: 0 })
+      ]),
+      level(1, [
+         spell('Bless', '#c9a227', { concentration: true, components: 'V, S, M', range: '30 ft', favorite: true }),
+         spell('Healing Word', '#3a9a7a', { components: 'V', time: '1 Bonus Action', favorite: true }),
+         spell('Shield of Faith', '#5a7ab8', { prepared: 2, concentration: true, time: '1 Bonus Action', sub: 'Life Domain' }),
+         spell('Detect Magic', '#7a5ab8', { prepared: 0, concentration: true, ritual: true, range: 'Self', expanded: true,
+            summary: '<div class="item-summary"><p>For the duration, you sense the presence of magic within 30 feet of you.</p></div>' })
+      ], [3, 4]),
+      level(3, [
+         spell('Spirit Guardians', '#c9a227', { level: 3, concentration: true, components: 'V, S, M', range: 'Self', favorite: true }),
+         spell('Dispel Magic of the Grand Unweaving Circle', '#7a5ab8', { level: 3, prepared: 0, range: '120 ft' })
+      ], [1, 3]),
+      { id: 'pact', method: 'pact', level: 2, label: 'Pact Magic', slots: { value: 1, max: 2 }, items: [
+         spell('Hex', '#5a2a6a', { method: 'pact', concentration: true, time: '1 Bonus Action', range: '90 ft' }),
+         spell('Armor of Agathys', '#4a8ab8', { method: 'pact', prepared: 0, range: 'Self' })
+      ] },
+      { id: 'innate', method: 'innate', level: null, label: 'Innate Spellcasting', slots: null, items: [
+         spell('Misty Step', '#5a7ab8', { method: 'innate', prepares: false, prepared: 0, level: 2, components: 'V', time: '1 Bonus Action',
+            range: 'Self', sub: 'Fey Touched', uses: { value: 1, max: 1, prop: 'system.uses.spent' } })
+      ] },
+      { id: 'atwill', method: 'atwill', level: null, label: 'At-Will', slots: null, items: [
+         spell('Detect Magic', '#7a5ab8', { id: 'DetectMagic2', method: 'atwill', prepares: false, prepared: 0, concentration: true, range: 'Self', sub: 'Invocation' })
+      ] }
+   ],
+   columns: {},
+   editing: false,
+   activeFilters: ['prepared'],
+   filters: [{ key: 'action', group: 'activation', label: 'Action' }, { key: 'prepared', group: 'property', label: 'Prepared' }],
+   sorting: [{ key: 'a', icon: 'fa-solid fa-arrow-down-a-z', label: 'Alphabetical' }],
+   ...over
+});
+const spellbook = (over) => ({
+   tab: { id: 'spells', group: 'primary', cssClass: 'active' }, rollableClass: 'rollable',
+   fhcsSpellbook: spellbookView(spellbookFacts(over), { format, localize })
+});
+const ALL_SPELL_COLUMNS = { components: true, concentration: true, time: true, range: true, school: true, target: true };
+const MULTICLASS_CASTER = [
+   { label: 'Cleric Spellcasting', abbr: 'WIS', mod: 4, attack: 7, save: 15, prepared: { value: 8, max: 9 }, primary: true },
+   { label: 'Warlock Spellcasting', abbr: 'CHA', mod: 2, attack: 5, save: 13, prepared: { value: 4, max: 4 }, primary: false }
+];
+
 export const CASES = [
+   { name: 'spellbook', template: 'sheet/spellbook', context: spellbook() },
+   { name: 'spellbook-multiclass-idle', template: 'sheet/spellbook', context: spellbook({ classes: MULTICLASS_CASTER, concentration: { save: -1, spells: [] } }) },
+   { name: 'spellbook-editing', template: 'sheet/spellbook', open: ['spells-columns'], context: spellbook({ editing: true, columns: ALL_SPELL_COLUMNS }) },
+   { name: 'spellbook-few-columns', template: 'sheet/spellbook', context: spellbook({ columns: { components: false, concentration: false, time: false, range: false } }) },
+   {
+      name: 'spellbook-two-concentrations', template: 'sheet/spellbook',
+      context: spellbook({ concentration: { save: 5, spells: [
+         { effectId: 'e1', itemId: 'SpiritGuardians', name: 'Spirit Guardians', img: ICON('#c9a227'), sub: '3rd Level' },
+         { effectId: 'e2', itemId: '', name: 'Concentrating on Something Long Without Its Spell', img: ICON('#5a2a6a'), sub: '' }
+      ] } })
+   },
+   { name: 'spellbook-empty', template: 'sheet/spellbook', context: spellbook({ classes: [], sections: [], concentration: { save: 2, spells: [] } }) },
    { name: 'inventory', template: 'sheet/inventory', context: inventory() },
    { name: 'inventory-all-columns', template: 'sheet/inventory', context: inventory({ columns: ALL_COLUMNS }) },
    { name: 'inventory-editing', template: 'sheet/inventory', open: ['inventory-columns'], context: inventory({ editing: true, columns: ALL_COLUMNS }) },

@@ -1,0 +1,90 @@
+{{!-- The Spellbook tab (SCOPE §4.7): one card per casting class, the concentration bar, then the spells by section
+      on dnd5e's own inventory element, as on Inventory (inventory.hbs). It takes dnd5e's "spells" part ID. --}}
+<section class="tab fhcs-list-tab fhcs-spellbook {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
+   {{#with fhcsSpellbook}}
+   <div class="fhcs-casting">
+      {{#if classes.length}}
+      <div class="fhcs-casting-classes">
+         {{#each classes}}
+         <div class="fhcs-casting-class">
+            <span class="fhcs-label fhcs-casting-name">{{ label }}</span>
+            <span class="fhcs-stat"><span class="fhcs-label fhcs-muted">{{ abbr }}</span><span class="fhcs-display">{{ mod }}</span></span>
+            <span class="fhcs-stat"><span class="fhcs-label fhcs-muted">{{ ../text.attack }}</span><span class="fhcs-display">{{ attack }}</span></span>
+            <span class="fhcs-stat"><span class="fhcs-label fhcs-muted">{{ ../text.save }}</span><span class="fhcs-display">{{ save }}</span></span>
+            <span class="fhcs-stat" role="group" aria-label="{{ preparedLabel }}"><span class="fhcs-label fhcs-muted">{{ ../text.prepared }}</span><span class="fhcs-display">{{ prepared }}</span></span>
+         </div>
+         {{/each}}
+      </div>
+      {{/if}}
+      {{!-- What the character is concentrating on, always in this place (user, 2026-10-26). The save rolls through
+            dnd5e's roll action, which reads the ability from [data-ability]. --}}
+      <div class="fhcs-concentration{{#if concentration.on}} fhcs-on{{/if}}" data-ability="concentration">
+         <span class="fhcs-label fhcs-conc-mark" role="img" aria-label="{{ text.concentration }}">C</span>
+         {{#each concentration.spells}}
+         <span class="fhcs-conc-spell" data-effect-id="{{ effectId }}">
+            <img class="fhcs-conc-img" src="{{ img }}" alt="">
+            <button type="button" class="fhcs-conc-open" data-action="fhcsOpenConcentration" data-item-id="{{ itemId }}"
+                    aria-label="{{ openLabel }}"{{#unless itemId}} disabled{{/unless}}>
+               <span class="fhcs-body fhcs-conc-name">{{ name }}</span>
+               {{#if sub}}<span class="fhcs-label fhcs-muted">{{ sub }}</span>{{/if}}
+            </button>
+            <button type="button" class="fhcs-button fhcs-body fhcs-conc-end" data-action="fhcsEndConcentration"
+                    data-effect-id="{{ effectId }}" aria-label="{{ endLabel }}">{{ ../text.end }}</button>
+         </span>
+         {{else}}
+         <span class="fhcs-body fhcs-conc-none">{{ text.none }}</span>
+         {{/each}}
+         <button type="button" class="fhcs-button fhcs-body fhcs-conc-save {{ @root.rollableClass }}" data-action="roll"
+                 data-type="ability" aria-label="{{ concentration.saveLabel }}"><span class="fhcs-label">{{ text.conSave }}</span>{{ concentration.save }}</button>
+      </div>
+   </div>
+
+   <dnd5e-inventory class="inventory-element fhcs-list-element">
+      {{> "modules/fhcs/templates/sheet/list-bar.hbs" list="spells" }}
+
+      <section class="items-list spells-list fhcs-items" data-item-list="spells">
+         {{#each sections}}
+         <div class="items-section fhcs-section" data-fhcs-section="{{ id }}" data-level="{{ level }}" data-method="{{ method }}">
+            <div class="items-header fhcs-item-head">
+               <span class="fhcs-col-img" aria-hidden="true"></span>
+               <span class="fhcs-col-name fhcs-spell-head">
+                  <span class="fhcs-label">{{ label }}</span>
+                  {{#if slots}}
+                  <span class="fhcs-slots" data-prop="{{ slots.prop }}">
+                     {{#each slots.pips}}
+                     <button type="button" class="fhcs-slot{{#if filled}} fhcs-on{{/if}}{{#if temp}} fhcs-temp{{/if}}" data-action="togglePip"
+                             data-n="{{ n }}" aria-pressed="{{#if filled}}true{{else}}false{{/if}}" aria-label="{{ label }}"></button>
+                     {{/each}}
+                     <span class="fhcs-body">{{ slots.text }}</span>
+                  </span>
+                  {{/if}}
+               </span>
+               {{#if ../columns.components}}<span class="fhcs-label fhcs-muted fhcs-col-components">{{ ../text.head.components }}</span>{{/if}}
+               {{#if ../columns.concentration}}<span class="fhcs-label fhcs-muted fhcs-col-conc" role="img" aria-label="{{ ../text.head.concentration }}">C</span>{{/if}}
+               {{#if ../columns.time}}<span class="fhcs-label fhcs-muted fhcs-col-time">{{ ../text.head.time }}</span>{{/if}}
+               {{#if ../columns.range}}<span class="fhcs-label fhcs-muted fhcs-col-range">{{ ../text.head.range }}</span>{{/if}}
+               {{#if ../columns.school}}<span class="fhcs-label fhcs-muted fhcs-col-school">{{ ../text.head.school }}</span>{{/if}}
+               {{#if ../columns.target}}<span class="fhcs-label fhcs-muted fhcs-col-target">{{ ../text.head.target }}</span>{{/if}}
+               {{#if showUses}}<span class="fhcs-label fhcs-muted fhcs-col-uses">{{ ../text.uses }}</span>{{/if}}
+               <span class="fhcs-col-toggle" role="img" aria-label="{{ ../text.prep }}"></span>
+               {{#if ../editing}}
+               <span class="fhcs-col-edit">
+                  {{#if slots}}
+                  <button type="button" class="fhcs-toggle" data-action="showConfiguration" data-config="spellSlots"
+                          aria-label="{{ ../text.slotsConfig }}" data-fhcs-tip="{{ ../text.slotsConfig }}">
+                     <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg>
+                  </button>
+                  {{/if}}
+               </span>
+               {{/if}}
+            </div>
+            <ol class="item-list fhcs-item-list">
+               {{#each items}}{{> "modules/fhcs/templates/sheet/spell-row.hbs" showUses=../showUses }}{{/each}}
+            </ol>
+         </div>
+         {{/each}}
+         {{#if empty}}<p class="fhcs-body fhcs-muted fhcs-empty">{{ text.empty }}</p>{{/if}}
+      </section>
+   </dnd5e-inventory>
+   {{/with}}
+</section>

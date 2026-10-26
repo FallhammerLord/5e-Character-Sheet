@@ -10,6 +10,8 @@ import { diceMath } from '../src/chat/math.js';
 import { attributesView } from '../src/sheet/attributes.js';
 import { healUpdates, keepStable } from '../src/sheet/death.js';
 import { columnChoice, inventoryView } from '../src/sheet/inventory.js';
+import { canCast, prepState, spellbookView, spellColumnChoice, spellKind } from '../src/sheet/spellbook.js';
+import { pinView } from '../src/sheet/lists.js';
 import { headerMinWidth, headerView, levelOrder, levelTrack, signed, tabRow } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
@@ -306,10 +308,68 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    if (inventoryView({ ...base, editing: true }, { format, localize }).columnToggles.length !== 6) { problems.push('the column menu is missing in edit mode'); }
 }
 
+// Spellbook (SCOPE §4.7): preparation states and kinds, Can cast, section order, slot pips, the concentration mark.
+{
+   const s = (over) => ({ level: 1, method: 'spell', prepares: true, prepared: 1, linked: false, ritual: false, uses: null, ...over });
+   const states = [s(), s({ prepared: 0 }), s({ prepared: 2 }), s({ level: 0 }), s({ method: 'innate', prepares: false }),
+      s({ linked: true }), s({ method: 'pact' })];
+   const shape = states.map((x) => `${prepState(x)}/${spellKind(x)}`);
+   try
+   {
+      deepStrictEqual(shape, ['prepared/prepared', 'unprepared/null', 'always/always', 'null/null', 'null/innate',
+         'null/null', 'prepared/pact']);
+   }
+   catch { problems.push(`spell states and kinds: ${JSON.stringify(shape)}`); }
+
+   const slots = [{ level: 1, value: 0 }, { level: 2, value: 1 }];
+   const cast = [
+      canCast(s(), slots), // a level 1 spell can use the level 2 slot
+      canCast(s({ level: 3 }), slots), // no slot that high
+      canCast(s({ prepared: 0 }), slots), // not prepared
+      canCast(s({ prepared: 0, ritual: true, level: 9 }), []), // not prepared, but a ritual still needs preparing
+      canCast(s({ ritual: true, level: 9 }), []), // prepared ritual: cast as a ritual without a slot
+      canCast(s({ level: 0, prepared: 0 }), []), // cantrip
+      canCast(s({ method: 'innate', prepares: false, uses: { value: 0, max: 1 } }), slots), // innate, used up
+      canCast(s({ method: 'atwill', prepares: false, level: 4 }), [])
+   ];
+   try { deepStrictEqual(cast, [true, false, false, false, true, true, false, true]); }
+   catch { problems.push(`can cast: ${JSON.stringify(cast)}`); }
+
+   try { deepStrictEqual(spellColumnChoice({ school: true, time: false, gone: 1 }), { components: true, concentration: true, time: false, range: true, school: true, target: false }); }
+   catch { problems.push(`spell columns: ${JSON.stringify(spellColumnChoice({ school: true, time: false }))}`); }
+
+   const pins = pinView(['action', 'bonus', 'prepared'], ['action', '!prepared'], localize).map((p) => p.pressed);
+   try { deepStrictEqual(pins, ['true', 'false', 'mixed']); }
+   catch { problems.push(`pinned filters: ${JSON.stringify(pins)}`); }
+
+   const row = (name, over) => ({ ...s(), id: name, uuid: name, name, img: '', concentration: false, ...over });
+   const view = spellbookView({
+      classes: [{ label: 'Cleric', abbr: 'WIS', mod: 4, attack: 8, save: 16, prepared: { value: 5, max: 0 } }],
+      concentration: { save: -1, spells: [{ effectId: 'e', itemId: 'Bless', name: 'Bless', img: '' }] },
+      sections: [
+         { id: 'innate', method: 'innate', level: null, label: 'Innate', slots: null, items: [row('Step', { method: 'innate', prepares: false, uses: { value: 1, max: 1 } })] },
+         { id: 'pact', method: 'pact', level: 2, label: 'Pact', slots: { value: 1, max: 2 }, items: [row('Hex', { method: 'pact' })] },
+         { id: 'spell1', method: 'spell', level: 1, label: 'Level 1', slots: { value: 3, max: 2 }, items: [row('Bless', { concentration: true })] },
+         { id: 'spell0', method: 'spell', level: 0, label: 'Cantrips', slots: null, items: [row('Light', { level: 0 })] },
+         { id: 'spell5', method: 'spell', level: 5, label: 'Level 5', slots: { value: 0, max: 1 }, items: [] }
+      ]
+   }, { format, localize });
+   const order = view.sections.map((x) => x.id).join();
+   if (order !== 'spell0,spell1,pact,innate') { problems.push(`spell sections in order ${order}`); }
+   const level1 = view.sections[1];
+   const pips = level1.slots.pips.map((p) => `${p.filled ? 1 : 0}${p.temp ? 't' : ''}`).join();
+   if (pips !== '1,1,1t' || level1.slots.prop !== 'system.spells.spell1.value') { problems.push(`slot pips: ${pips} on ${level1.slots.prop}`); }
+   if (!level1.items[0].conc?.holding) { problems.push('the spell held in concentration is not marked'); }
+   if (view.sections[2].slots.pips[0].label !== 'Pact slot 1') { problems.push(`pact slot label: ${view.sections[2].slots.pips[0].label}`); }
+   if (!view.sections[3].showUses || view.sections[0].showUses) { problems.push('the uses column shows in the wrong sections'); }
+   if (view.sections[0].items[0].prep) { problems.push('a cantrip shows a prepare mark'); }
+   if (view.classes[0].prepared !== '5' || view.concentration.save !== '-1' || !view.concentration.on) { problems.push(`casting strip: ${JSON.stringify([view.classes[0].prepared, view.concentration])}`); }
+}
+
 // Each extra ability (honor, sanity) widens the minimum by one column and its gap.
 if (headerMinWidth(7) - headerMinWidth(6) !== 56) { problems.push('the sheet minimum does not grow by one ability column'); }
 
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
 console.log(`${CASES.length} outcome lines, ${PART_CASES.length} card layouts, ${ROW_CASES.length} d20 rows, `
    + `${DAMAGE_CASES.length} damage bands, ${SAVE_CASES.length} save rows, ${KEEP_CASES.length} late adds and `
-   + `${MATH_CASES.length} dice sums read as expected; ${ORDER_CASES.length} level orders, the milestone track and the inventory view hold.`);
+   + `${MATH_CASES.length} dice sums read as expected; ${ORDER_CASES.length} level orders, the milestone track, the inventory and the spellbook views hold.`);

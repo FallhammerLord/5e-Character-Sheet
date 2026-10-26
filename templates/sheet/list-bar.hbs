@@ -1,0 +1,38 @@
+{{!-- The search bar of a list tab (Inventory, Spellbook): dnd5e's list controls (search, filter menu, sort), the
+      filters pinned beside them (fhcsPinFilter turns one of dnd5e's filters on or off), and in edit mode the
+      Columns menu. Takes `list` (dnd5e's list name, "inventory" or "spells") from the include. --}}
+<div class="fhcs-list-bar">
+   <item-list-controls for="{{ list }}" collection="items" label="{{ text.search }}">
+      {{#if filters.length}}
+      <datalist data-list="filters">
+         {{#each filters}}<option value="{{ key }}" data-group="{{ group }}">{{ label }}</option>{{/each}}
+      </datalist>
+      {{/if}}
+      {{#if sorting.length}}
+      <datalist data-list="sort">
+         {{#each sorting}}<option value="{{ key }}" data-icon="{{ icon }}">{{ label }}</option>{{/each}}
+      </datalist>
+      {{/if}}
+   </item-list-controls>
+   {{#if pins.length}}
+   <span class="fhcs-pins" role="group" aria-label="{{ text.search }}">
+      {{#each pins}}
+      <button type="button" class="fhcs-button fhcs-body fhcs-pin" data-action="fhcsPinFilter" data-filter="{{ key }}"
+              aria-pressed="{{ pressed }}">{{ label }}</button>
+      {{/each}}
+   </span>
+   {{/if}}
+   {{#if columnToggles.length}}
+   <details class="fhcs-fold fhcs-columns" data-fold-key="{{ list }}-columns">
+      <summary class="fhcs-button fhcs-label">{{ text.columns }}</summary>
+      <div class="fhcs-tray fhcs-columns-tray">
+         {{#each columnToggles}}
+         <button type="button" class="fhcs-button fhcs-body fhcs-column-toggle" data-action="fhcsToggleColumn"
+                 data-list="{{ ../list }}" data-column="{{ key }}" aria-pressed="{{#if pressed}}true{{else}}false{{/if}}">
+            <svg class="fhcs-icon fhcs-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>{{ label }}
+         </button>
+         {{/each}}
+      </div>
+   </details>
+   {{/if}}
+</div>

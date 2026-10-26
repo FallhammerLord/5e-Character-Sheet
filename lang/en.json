@@ -31,6 +31,10 @@
       "InventoryColumns": {
         "Name": "Inventory columns",
         "Hint": "Which columns the Inventory tab shows. Change them from the tab's Columns menu in edit mode."
+      },
+      "SpellColumns": {
+        "Name": "Spellbook columns",
+        "Hint": "Which columns the Spellbook tab shows. Change them from the tab's Columns menu in edit mode."
       }
     },
     "Chat": {
@@ -192,6 +196,57 @@
       "Carried": "Carried",
       "CarriedLabel": "Carrying {value} of {max} {units}",
       "ContentsLabel": "Show or hide what's in {name} ({count})"
+    },
+    "Filter": {
+      "action": "Action",
+      "bonus": "Bonus",
+      "reaction": "Reaction",
+      "concentration": "Conc.",
+      "prepared": "Prepared",
+      "equipped": "Equipped",
+      "canCast": "Can cast"
+    },
+    "Spellbook": {
+      "Search": "Search spells",
+      "Column": {
+        "components": "Comp.",
+        "concentration": "Concentration",
+        "time": "Time",
+        "range": "Range",
+        "school": "School",
+        "target": "Target"
+      },
+      "Attack": "Attack",
+      "SaveDC": "Save DC",
+      "Prepared": "Prepared",
+      "PreparedOf": "{value} of {max} spells prepared",
+      "PreparedCount": "{value} spells prepared",
+      "Concentration": "Concentration",
+      "Holding": "Concentrating on this now",
+      "NotConcentrating": "Not concentrating",
+      "ConSave": "Con save",
+      "End": "End",
+      "SaveLabel": "Roll a concentration save, {mod}",
+      "OpenLabel": "Open {name}",
+      "EndLabel": "End concentration on {name}",
+      "CastLabel": "Cast {name}",
+      "Favorite": "Favorite",
+      "Ritual": "Ritual",
+      "State": {
+        "prepared": "Prepared",
+        "unprepared": "Not prepared",
+        "always": "Always prepared"
+      },
+      "PactSlotLabel": "Pact slot {n}",
+      "SlotsConfig": "Spell slot settings",
+      "Empty": "No spells yet. Drag spells onto the sheet to add them.",
+      "Kind": {
+        "prepared": "Prepared",
+        "always": "Always prepared",
+        "pact": "Pact Magic, prepared",
+        "innate": "Innate",
+        "atwill": "At will"
+      }
     }
   }
 }

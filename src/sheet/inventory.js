@@ -2,6 +2,7 @@
  * The Inventory tab's display values (SCOPE §4.6), from plain facts. Pure, like attributes.js: the unit check and the
  * layout fixtures use the same code. `compat.inventoryFacts` gathers the facts from dnd5e.
  */
+import { INVENTORY_PINS, pinView } from './lists.js';
 
 /** The columns a player can show or hide, in Classic's order (user, 2026-10-26). */
 export const INVENTORY_COLUMNS = ['weight', 'uses', 'usage', 'quantity', 'equipped', 'attuned'];
@@ -98,6 +99,7 @@ export function inventoryView(facts, { format, localize })
       editing: !!facts.editing,
       filters: facts.filters ?? [],
       sorting: facts.sorting ?? [],
+      pins: pinView(INVENTORY_PINS, facts.activeFilters, localize),
       // The column menu is a setting, so it shows only in edit mode, like dnd5e's gear icons (user, 2026-10-26).
       columnToggles: facts.editing ? INVENTORY_COLUMNS.map((key) => ({
          key, pressed: columns[key], label: localize(`FHCS.Inventory.Column.${key}`)

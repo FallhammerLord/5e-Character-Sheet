@@ -1,37 +1,11 @@
 {{!-- The Inventory tab (SCOPE §4.6): Classic's sections and columns on dnd5e's own inventory element. The element
       binds its rows by class and data attribute: item-action buttons (use, equip, attune, toggleExpand, edit,
       delete), numeric inputs by data-name, the context menu and drag on each [data-item-id] > .item-row, and the
-      list controls' search, filter and sort on [data-item-list]. It takes dnd5e's "inventory" part ID. --}}
-<section class="tab fhcs-inventory {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
+      list controls' search, filter and sort on [data-item-list] (list-bar.hbs). It takes dnd5e's "inventory" part ID. --}}
+<section class="tab fhcs-list-tab fhcs-inventory {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
    {{#with fhcsInventory}}
-   <dnd5e-inventory class="inventory-element fhcs-inventory-element">
-      <div class="fhcs-inventory-bar">
-         <item-list-controls for="inventory" collection="items" label="{{ text.search }}">
-            {{#if filters.length}}
-            <datalist data-list="filters">
-               {{#each filters}}<option value="{{ key }}" data-group="{{ group }}">{{ label }}</option>{{/each}}
-            </datalist>
-            {{/if}}
-            {{#if sorting.length}}
-            <datalist data-list="sort">
-               {{#each sorting}}<option value="{{ key }}" data-icon="{{ icon }}">{{ label }}</option>{{/each}}
-            </datalist>
-            {{/if}}
-         </item-list-controls>
-         {{#if columnToggles.length}}
-         <details class="fhcs-fold fhcs-columns" data-fold-key="inventory-columns">
-            <summary class="fhcs-button fhcs-label">{{ text.columns }}</summary>
-            <div class="fhcs-tray fhcs-columns-tray">
-               {{#each columnToggles}}
-               <button type="button" class="fhcs-button fhcs-body fhcs-column-toggle" data-action="fhcsToggleColumn"
-                       data-column="{{ key }}" aria-pressed="{{#if pressed}}true{{else}}false{{/if}}">
-                  <svg class="fhcs-icon fhcs-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>{{ label }}
-               </button>
-               {{/each}}
-            </div>
-         </details>
-         {{/if}}
-      </div>
+   <dnd5e-inventory class="inventory-element fhcs-list-element">
+      {{> "modules/fhcs/templates/sheet/list-bar.hbs" list="inventory" }}
 
       <section class="items-list inventory-list fhcs-items" data-item-list="inventory">
          {{#each sections}}

@@ -27,6 +27,8 @@ They wait only for a game where the user tries them; not work for a session to p
 
 ## In code, not yet verified
 
+- **Phase 4 Spellbook (2026-10-26).** Built to the approved mockup; offline checks pass (layout: 6 Spellbook cases at 644–900 in both themes; unit: states, kinds, Can cast, section order, pips; load: part, partials, overrides; each seen failing once). Quench has four new core tests: rows by section and the book (always prepared can't be clicked), the Prepared pin hiding an unprepared spell, the concentration bar (name, Con save reaching dnd5e's hook, End), and the Spellbook column menu. Not yet run in Foundry. Also in this round: Inventory's pinned filters (Action, Bonus, Equipped) and the book with kind colors on Attributes favorites.
+
 - **Chat log scrolling, third try (2026-10-24).** The user saw new cards stop short by exactly the Apply section: dnd5e builds its tray lists after the card is placed. Apply now starts folded, and while following a new card a `ResizeObserver` on it scrolls again on every size change.
 - **Chat log scrolling (2026-10-24, second try).** First try (blocking `scrollBottom`, following only if `isAtBottom`) made no difference in the user's world. Now from Foundry 14's types (`@league-of-foundry-developers/foundry-vtt-types` 14.366 beta: `postOne(message, { notify, scroll })`): folded rolls post with `scroll: false`, no notification; the player's own new card posts with `scroll: true` and redraws of it scroll to the bottom for 8 s unless the player scrolls, clicks or types in the log. Load check covers it. Waiting on the user.
 
@@ -34,4 +36,4 @@ They wait only for a game where the user tries them; not work for a session to p
 
 Track R and Phases 0–3 are done and verified (Phase 3 lacks only the optional pinned filter buttons); don't rerun Quench or rework them unless the user reports a problem.
 
-1. **Phase 4 Spellbook: building** (mockup approved 2026-10-26). Follow the ROADMAP checklist in order; decisions in SCOPE §4.7.
+1. **Phase 4 Spellbook: waiting on the user's test** (built 2026-10-26). Ask for a Quench run (core batch, now 34 tests) and a look at a caster's Spellbook, ideally a multiclass one with Pact Magic. Open in play: Can cast with slots spent, spells granted by items, a ritual caster.

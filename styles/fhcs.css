@@ -40,6 +40,14 @@
    --fhcs-surface: #f4f1ea;
    /* The sheet's own text color, so nothing behind it decides how it reads. */
    --fhcs-ink: #191813;
+   /* Spell preparation kinds (SCOPE §4.7), favorites and concentration: edges, icons and faint tints, never text. */
+   --fhcs-kind-prepared: #1f5fa8;
+   --fhcs-kind-always: #0b6b66;
+   --fhcs-kind-pact: #6a35a0;
+   --fhcs-kind-innate: #8f4a00;
+   --fhcs-kind-atwill: #4d4a44;
+   --fhcs-fav: #b0306a;
+   --fhcs-conc: #7a5a00;
 }
 
 .theme-dark .fhcs-sheet,
@@ -56,6 +64,13 @@
    --fhcs-die-on-ink: #191813;
    --fhcs-surface: #26252b;
    --fhcs-ink: #e8e6e3;
+   --fhcs-kind-prepared: #8ab8ff;
+   --fhcs-kind-always: #6fd0c8;
+   --fhcs-kind-pact: #c9a0ff;
+   --fhcs-kind-innate: #f0a860;
+   --fhcs-kind-atwill: #c8c4bc;
+   --fhcs-fav: #ff8ac0;
+   --fhcs-conc: #e0b84a;
 }
 
 /* ---------- The three text styles ---------- */
@@ -1530,7 +1545,8 @@
    background: var(--fhcs-die-ink);
 }
 
-/* Favorite rows. Equipped and prepared: a tint, a left edge and an icon, never color alone. */
+/* Favorite rows. Equipped and prepared: a tint, a left edge and an icon, never color alone. Prepared spells take
+   their preparation kind's color and the book, as on the Spellbook (SCOPE §4.7). */
 .fhcs-sheet .fhcs-favorite
 {
    display: grid;
@@ -1550,8 +1566,8 @@
 
 .fhcs-sheet .fhcs-favorite.fhcs-prepared
 {
-   background: color-mix(in srgb, var(--fhcs-adv) 12%, transparent);
-   box-shadow: inset 3px 0 0 var(--fhcs-adv);
+   background: color-mix(in srgb, var(--fhcs-kind, var(--fhcs-kind-prepared)) 12%, transparent);
+   box-shadow: inset 3px 0 0 var(--fhcs-kind, var(--fhcs-kind-prepared));
 }
 
 .fhcs-sheet .fhcs-favorite-img
@@ -1591,14 +1607,14 @@
 .fhcs-sheet .fhcs-favorite-uses { text-align: right; white-space: nowrap; }
 .fhcs-sheet .fhcs-state { flex: none; width: 14px; height: 14px; stroke-width: 2.6; }
 .fhcs-sheet .fhcs-equipped .fhcs-state { color: var(--fhcs-success); }
-.fhcs-sheet .fhcs-prepared .fhcs-state { color: var(--fhcs-adv); }
+.fhcs-sheet .fhcs-prepared .fhcs-state { color: var(--fhcs-kind, var(--fhcs-kind-prepared)); }
 .fhcs-sheet .fhcs-state-fill { fill: currentColor; stroke: none; }
 .fhcs-sheet .fhcs-empty { margin: 0; padding: var(--fhcs-s2); }
 
-/* ---------- Inventory tab (SCOPE §4.6) ---------- */
+/* ---------- List tabs: Inventory (SCOPE §4.6) and Spellbook (§4.7) ---------- */
 
-/* The item list scrolls; the search bar above and the money and carried weight below stay in view. */
-.fhcs-sheet .fhcs-inventory.active
+/* The item list scrolls; the search bar above and what sits around the list stay in view. */
+.fhcs-sheet .fhcs-list-tab.active
 {
    display: flex;
    flex-direction: column;
@@ -1606,7 +1622,7 @@
    overflow: hidden;
 }
 
-.fhcs-sheet .fhcs-inventory-element
+.fhcs-sheet .fhcs-list-element
 {
    display: flex;
    flex: 1;
@@ -1615,7 +1631,7 @@
    min-height: 0;
 }
 
-.fhcs-sheet .fhcs-inventory ol
+.fhcs-sheet .fhcs-list-tab ol
 {
    margin: 0;
    padding: 0;
@@ -1623,23 +1639,30 @@
 }
 
 /* The search bar: dnd5e's list controls build their own search field and filter and sort buttons inside. */
-.fhcs-sheet .fhcs-inventory-bar
+.fhcs-sheet .fhcs-list-bar
 {
    display: flex;
+   flex-wrap: wrap;
    align-items: center;
    gap: var(--fhcs-s2);
 }
 
-.fhcs-sheet .fhcs-inventory-bar item-list-controls { flex: 1; min-width: 0; }
+.fhcs-sheet .fhcs-list-bar item-list-controls { flex: 1 1 200px; min-width: 0; }
 
-.fhcs-sheet .fhcs-inventory-bar search
+/* Pinned filters: one click each; on, a heavier edge; excluded (from dnd5e's menu, a right-click), struck through. */
+.fhcs-sheet .fhcs-pins { display: flex; flex-wrap: wrap; gap: var(--fhcs-s1); }
+.fhcs-sheet .fhcs-pin { width: auto; padding: 0 var(--fhcs-s2); }
+.fhcs-sheet .fhcs-pin[aria-pressed="true"] { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
+.fhcs-sheet .fhcs-pin[aria-pressed="mixed"] { border-style: dashed; text-decoration: line-through; }
+
+.fhcs-sheet .fhcs-list-bar search
 {
    display: flex;
    align-items: center;
    gap: var(--fhcs-s1);
 }
 
-.fhcs-sheet .fhcs-inventory-bar search > input
+.fhcs-sheet .fhcs-list-bar search > input
 {
    flex: 1;
    min-width: 0;
@@ -1653,9 +1676,9 @@
    font-size: var(--fhcs-body-size);
 }
 
-.fhcs-sheet .fhcs-inventory-bar search > input::placeholder { color: var(--fhcs-muted); opacity: 1; }
+.fhcs-sheet .fhcs-list-bar search > input::placeholder { color: var(--fhcs-muted); opacity: 1; }
 
-.fhcs-sheet .fhcs-inventory-bar search .controls
+.fhcs-sheet .fhcs-list-bar search .controls
 {
    display: flex;
    gap: var(--fhcs-s1);
@@ -1664,7 +1687,7 @@
    list-style: none;
 }
 
-.fhcs-sheet .fhcs-inventory-bar .filter-control
+.fhcs-sheet .fhcs-list-bar .filter-control
 {
    display: inline-flex;
    align-items: center;
@@ -1681,7 +1704,7 @@
 }
 
 /* dnd5e marks the sort button active always (a sort mode is always in use); only a filter or a search lights up. */
-.fhcs-sheet .fhcs-inventory-bar .filter-control.active:not([data-action="sort"]) { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
+.fhcs-sheet .fhcs-list-bar .filter-control.active:not([data-action="sort"]) { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
 
 /* The column menu (edit mode): a fold beside the search, opening under it at the right edge. */
 .fhcs-sheet .fhcs-columns { position: relative; }
@@ -1815,8 +1838,8 @@
 /* When space runs short, the capacity gives way long before the name does. */
 .fhcs-sheet .fhcs-item-sub { flex: 0 100 auto; min-width: 0; }
 
-.fhcs-sheet .fhcs-inventory .fhcs-input { width: 100%; padding: 0 var(--fhcs-s1); }
-.fhcs-sheet .fhcs-inventory .fhcs-uses-input { width: 32px; text-align: center; }
+.fhcs-sheet .fhcs-list-tab .fhcs-input { width: 100%; padding: 0 var(--fhcs-s1); }
+.fhcs-sheet .fhcs-list-tab .fhcs-uses-input { width: 32px; text-align: center; }
 .fhcs-sheet .fhcs-inventory .fhcs-quantity-input { text-align: center; border-color: var(--fhcs-line-soft); }
 
 /* Equip, attune, edit and delete: square controls of one size. */
@@ -1938,3 +1961,187 @@
 
 /* dnd5e's add button sits at the tab's bottom right; the footer leaves it room. */
 .fhcs-sheet .fhcs-inventory-foot { padding-right: calc(var(--fhcs-control) + var(--fhcs-s2)); }
+
+/* ---------- Spellbook tab (SCOPE §4.7) ---------- */
+
+.fhcs-sheet .fhcs-spellbook.active { gap: var(--fhcs-s2); }
+
+/* One card per casting class, side by side while they fit, then the concentration bar under them. */
+.fhcs-sheet .fhcs-casting
+{
+   display: flex;
+   flex-direction: column;
+   gap: var(--fhcs-s2);
+}
+
+.fhcs-sheet .fhcs-casting-classes
+{
+   display: flex;
+   flex-wrap: wrap;
+   gap: var(--fhcs-s2);
+}
+
+/* The class name on its own line, so two cards side by side keep it whole; the numbers share the line under it. */
+.fhcs-sheet .fhcs-casting-class
+{
+   display: flex;
+   flex: 1 1 280px;
+   flex-wrap: wrap;
+   align-items: center;
+   gap: var(--fhcs-s1) var(--fhcs-s2);
+   min-width: 0;
+   padding: var(--fhcs-s1) var(--fhcs-s2);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-fill);
+}
+
+.fhcs-sheet .fhcs-casting-name { flex: 1 1 100%; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.fhcs-sheet .fhcs-stat
+{
+   display: flex;
+   flex: 1 0 52px;
+   flex-direction: column;
+   align-items: center;
+}
+
+/* The concentration bar: the same place always; gold edge and tint while concentrating, a C mark either way. */
+.fhcs-sheet .fhcs-concentration
+{
+   display: flex;
+   flex-wrap: wrap;
+   align-items: center;
+   gap: var(--fhcs-s2);
+   min-height: calc(var(--fhcs-control) + var(--fhcs-s1) * 2);
+   padding: var(--fhcs-s1) var(--fhcs-s2);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-fill);
+}
+
+.fhcs-sheet .fhcs-concentration.fhcs-on
+{
+   border-color: var(--fhcs-conc);
+   background: color-mix(in srgb, var(--fhcs-conc) 12%, transparent);
+}
+
+.fhcs-sheet .fhcs-conc-mark
+{
+   display: inline-flex;
+   flex: none;
+   align-items: center;
+   justify-content: center;
+   box-sizing: border-box;
+   width: 20px;
+   height: 20px;
+   border: 2px solid currentColor;
+   border-radius: 50%;
+   color: var(--fhcs-muted);
+   letter-spacing: 0;
+}
+
+.fhcs-sheet .fhcs-concentration.fhcs-on > .fhcs-conc-mark { color: var(--fhcs-conc); }
+
+/* On a row: the spell being concentrated on now, filled. */
+.fhcs-sheet .fhcs-col-conc .fhcs-conc-mark.fhcs-on
+{
+   border-color: var(--fhcs-conc);
+   background: var(--fhcs-conc);
+   color: var(--fhcs-surface);
+}
+
+.fhcs-sheet .fhcs-conc-spell
+{
+   display: flex;
+   flex: 1 1 200px;
+   align-items: center;
+   gap: var(--fhcs-s2);
+   min-width: 0;
+}
+
+.fhcs-sheet .fhcs-conc-img { flex: none; width: 24px; height: 24px; border: 0; border-radius: 4px; object-fit: cover; }
+
+.fhcs-sheet .fhcs-conc-open
+{
+   display: flex;
+   flex: 1;
+   align-items: center;
+   gap: var(--fhcs-s2);
+   min-width: 0;
+   min-height: var(--fhcs-control);
+   margin: 0;
+   padding: 0;
+   border: 0;
+   background: none;
+   color: inherit;
+   font-family: inherit;
+   text-align: left;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-conc-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fhcs-sheet .fhcs-conc-none { flex: 1; }
+.fhcs-sheet :is(.fhcs-conc-end, .fhcs-conc-save) { flex: none; width: auto; padding: 0 var(--fhcs-s2); }
+.fhcs-sheet .fhcs-conc-end { border-color: var(--fhcs-failure); color: var(--fhcs-failure); }
+
+/* Section headings: the level, then its slot pips (Attributes' pips) and slots left. */
+.fhcs-sheet .fhcs-spell-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fhcs-s2); }
+.fhcs-sheet .fhcs-item-head .fhcs-spell-head { overflow: visible; }
+.fhcs-sheet .fhcs-slot.fhcs-temp { border-style: dotted; }
+
+.fhcs-sheet .fhcs-col-components { flex: none; width: 52px; text-align: center; white-space: nowrap; }
+.fhcs-sheet .fhcs-col-conc { flex: none; display: flex; justify-content: center; width: var(--fhcs-control); }
+/* With every column on at the narrowest width, these give way (to 48px, ellipsed) before the row overflows. */
+.fhcs-sheet :is(.fhcs-col-time, .fhcs-col-range, .fhcs-col-school, .fhcs-col-target)
+{
+   flex: 0 1 72px;
+   min-width: 48px;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+}
+
+.fhcs-sheet :is(.fhcs-col-time, .fhcs-col-school, .fhcs-col-target) { flex-basis: 104px; }
+
+/* Each preparation kind: a faint tint, a left edge, and its book (or its section) besides, never color alone. */
+.fhcs-sheet .fhcs-kind-prepared { --fhcs-kind: var(--fhcs-kind-prepared); }
+.fhcs-sheet .fhcs-kind-always { --fhcs-kind: var(--fhcs-kind-always); }
+.fhcs-sheet .fhcs-kind-pact { --fhcs-kind: var(--fhcs-kind-pact); }
+.fhcs-sheet .fhcs-kind-innate { --fhcs-kind: var(--fhcs-kind-innate); }
+.fhcs-sheet .fhcs-kind-atwill { --fhcs-kind: var(--fhcs-kind-atwill); }
+
+.fhcs-sheet .fhcs-spell[class*="fhcs-kind-"] > .fhcs-item-row
+{
+   background: color-mix(in srgb, var(--fhcs-kind) 12%, transparent);
+   box-shadow: inset 3px 0 0 var(--fhcs-kind);
+}
+
+/* Favorites: a bookmark by the name and a faint glow inside the row's edge (user, 2026-10-26). */
+.fhcs-sheet .fhcs-spell.fhcs-favorited > .fhcs-item-row
+{
+   border-radius: 4px;
+   box-shadow: inset 3px 0 0 var(--fhcs-kind, transparent), inset 0 0 0 1px var(--fhcs-fav),
+      inset 0 0 6px color-mix(in srgb, var(--fhcs-fav) 50%, transparent);
+}
+
+.fhcs-sheet .fhcs-fav-mark { flex: none; width: 14px; height: 14px; fill: var(--fhcs-fav); stroke: none; }
+
+/* The prepare mark: a book, filled when prepared, in its kind's color; a lock badge when always prepared. */
+.fhcs-sheet .fhcs-toggle-prep { position: relative; }
+.fhcs-sheet .fhcs-toggle-prep .fhcs-icon { stroke-linejoin: round; }
+.fhcs-sheet .fhcs-toggle-prep[aria-pressed="true"] { border-color: var(--fhcs-kind, var(--fhcs-kind-prepared)); color: var(--fhcs-kind, var(--fhcs-kind-prepared)); }
+.fhcs-sheet .fhcs-toggle-prep[aria-pressed="true"] .fhcs-icon { fill: currentColor; }
+.fhcs-sheet .fhcs-toggle-prep[aria-pressed="true"] .fhcs-spine { stroke: var(--fhcs-surface); }
+
+.fhcs-sheet .fhcs-prep-lock
+{
+   position: absolute;
+   right: 1px;
+   bottom: 1px;
+   width: 11px;
+   height: 11px;
+}
+
+.fhcs-sheet .fhcs-prep-lock rect { fill: currentColor; stroke: var(--fhcs-surface); stroke-width: 2; }
+.fhcs-sheet .fhcs-prep-lock path { fill: none; stroke: currentColor; stroke-width: 3; }

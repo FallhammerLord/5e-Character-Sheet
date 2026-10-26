@@ -36,14 +36,14 @@ Classic layout: skills and saves column; resources; favorites; traits (senses, l
 
 ## Phase 3: Inventory
 
-Built on dnd5e's `dnd5e-inventory` element. Equip, attune, quantity, weight and encumbrance, containers, currency, drag and drop, context menus. Verified 2026-10-26 (Quench 30 of 30, and the user in play); only the pinned filter buttons remain.
+Built on dnd5e's `dnd5e-inventory` element. Equip, attune, quantity, weight and encumbrance, containers, currency, drag and drop, context menus. Verified 2026-10-26 (Quench 30 of 30, and the user in play); the pinned filter buttons are in code, waiting on a check.
 
 - [x] Mockup approved with answers (2026-10-26): player-chosen columns, three-state attunement, encumbrance follows dnd5e's setting (SCOPE §4.6)
 - [x] Shared list controls (search, filter, sort), styled once for Inventory, Spellbook and Features (verified 2026-10-26)
 - [x] Item rows: equip and attune toggles, uses, usage, quantity, expand, edit and delete in edit mode; context menus and drag from dnd5e (verified 2026-10-26)
 - [x] Column menu in edit mode, each player's choice (verified 2026-10-26)
 - [x] Attunement, currency and carried-weight footer (verified 2026-10-26)
-- [ ] Pinned filter buttons beside the search (Action, Bonus, Equipped), as in the mockup
+- [ ] Pinned filter buttons beside the search (Action, Bonus, Equipped), as in the mockup (in code 2026-10-26, shared with the Spellbook; waits on Quench and play)
 - [x] Containers: drop onto a container row, contents folding open under it, nested (verified 2026-10-26; no top panel, user's choice)
 
 ## Phase 4: Spellbook
@@ -53,11 +53,13 @@ Slots as pips; prepared state; grouped by level; concentration; spellcasting abi
 - [x] Research: dnd5e 6.0.6 spellbook data, preparation, filters, concentration; Tidy Classic's filters (2026-10-26, research note)
 - [x] Answers on unprepared spells, preparation math, columns, filters (user, 2026-10-26)
 - [x] Mockup approved (user, 2026-10-26: "the rest looks good"; https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, Spellbook boards)
-- [ ] Attributes favorites: prepared shows the book and the kind colors, not the bookmark (`templates/sheet/attributes.hbs`); the bookmark marks favorites only (SCOPE §4.7)
-- [ ] Spellcasting strip: per class ability, attack, DC, prepared / max; concentration space
-- [ ] Level sections with slot pips; pact, innate, at will and item sections
-- [ ] Spell rows: three-state prepare mark, components, activation, range, concentration mark; Columns menu
-- [ ] Filters: pinned buttons; Can cast and component filters added through `_filterItem`
+Built 2026-10-26, all in code; waits on Quench (four new core tests) and the user in play:
+
+- [ ] Attributes favorites: prepared shows the book and the kind colors, not the bookmark; innate and at-will favorites stay plain (no book to mark them)
+- [ ] Spellcasting strip: a card per class (ability, attack, DC, prepared / max); concentration bar with open, End and Con save
+- [ ] Sections in the mockup's order with slot pips (filled = left, temporary dotted); Pact Magic, innate, at will, ritual and item sections; slot settings in edit mode
+- [ ] Spell rows: three-state book, components, time in words, range, concentration mark (filled while held), favorite bookmark and glow; Columns menu (school and target off by default)
+- [ ] Filters: pinned Action, Bonus, Reaction, Conc., Prepared; Can cast and V, S, M added to dnd5e's menu
 
 ## Phase 5: Features, Effects, Biography, Journal
 

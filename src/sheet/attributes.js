@@ -85,7 +85,8 @@ export function attributesView(facts, { format, localize })
                uses: r.uses?.max ? `${r.uses.value} / ${r.uses.max}` : r.quantity > 1 ? `×${r.quantity}` : '',
                equipped: r.state === 'equipped',
                prepared: r.state === 'prepared',
-               stateLabel: r.state ? localize(`FHCS.Attributes.State.${r.state}`) : ''
+               kind: r.kind ?? null,
+               stateLabel: r.kind ? localize(`FHCS.Spellbook.Kind.${r.kind}`) : r.state ? localize(`FHCS.Attributes.State.${r.state}`) : ''
             }))
          };
       });

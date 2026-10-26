@@ -1,7 +1,10 @@
 import { MODULE_ID, MODULE_PATH } from '../constants.js';
-import { attributesFacts, headerFacts, inventoryFacts } from '../compat.js';
+import { attributesFacts, endConcentration, headerFacts, inventoryFacts, passesExtraFilters, spellbookFacts, toggleListFilter,
+   watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
+import { EXTRA_SPELL_FILTERS, spellbookView, spellColumnChoice } from '../sheet/spellbook.js';
+import { INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
 import { headerMinWidth, headerView, tabRow } from '../sheet/header.js';
 import { delayTips, keepFolds } from '../chat/card.js';
 
@@ -11,17 +14,29 @@ export const SHEET_PARTS = {
    tabs: `${MODULE_PATH}/templates/sheet/tabs.hbs`,
    // The Attributes tab takes dnd5e's Details tab: same ID, so dnd5e's tab handling still applies.
    details: `${MODULE_PATH}/templates/sheet/attributes.hbs`,
-   inventory: `${MODULE_PATH}/templates/sheet/inventory.hbs`
+   inventory: `${MODULE_PATH}/templates/sheet/inventory.hbs`,
+   spells: `${MODULE_PATH}/templates/sheet/spellbook.hbs`
 };
 
 /**
- * Part settings of ours that differ from dnd5e's. The Inventory tab scrolls its item list, not the whole tab, so the
- * currency and carried weight stay in view; Foundry keeps the list's scroll place across re-renders. Its row partial
- * is loaded with the part, since the tab and each container include it.
+ * Part settings of ours that differ from dnd5e's. The list tabs scroll their item list, not the whole tab, so the
+ * currency and carried weight (and the spellcasting cards) stay in view; Foundry keeps the list's scroll place across
+ * re-renders. Their partials load with the part, since the tab (and each container) includes them.
  */
+const LIST_BAR = `${MODULE_PATH}/templates/sheet/list-bar.hbs`;
 const PART_OPTIONS = {
-   inventory: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/item-row.hbs`] }
+   inventory: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/item-row.hbs`, LIST_BAR] },
+   spells: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/spell-row.hbs`, LIST_BAR] }
 };
+
+/** Each list tab's column setting, by dnd5e's list name. */
+const COLUMN_SETTINGS = {
+   inventory: { setting: 'inventoryColumns', choice: columnChoice },
+   spells: { setting: 'spellColumns', choice: spellColumnChoice }
+};
+
+/** Each list tab's pinned filters, by dnd5e's list name. */
+const LIST_PINS = { inventory: INVENTORY_PINS, spells: SPELL_PINS };
 
 /** Each player's own choices, kept on their user so they follow them to every character and device. */
 const PREFS = { passives: 'passives', folded: 'foldedFavorites', openContainers: 'openContainers' };
@@ -62,13 +77,48 @@ async function toggleContainer(event, target)
    await game.user.setFlag(MODULE_ID, PREFS.openContainers, [...open]);
 }
 
-/** Shows or hides one Inventory column for this player (user, 2026-10-26); the setting re-renders our sheets. */
+/** Shows or hides one column of a list tab for this player (user, 2026-10-26); the setting re-renders our sheets. */
 async function toggleColumn(event, target)
 {
    const key = target.dataset.column;
-   const columns = columnChoice(game.settings.get(MODULE_ID, 'inventoryColumns'));
+   const list = COLUMN_SETTINGS[target.dataset.list ?? 'inventory'];
+   if (!list) { return; }
+   const columns = list.choice(game.settings.get(MODULE_ID, list.setting));
    if (!(key in columns)) { return; }
-   await game.settings.set(MODULE_ID, 'inventoryColumns', { ...columns, [key]: !columns[key] });
+   await game.settings.set(MODULE_ID, list.setting, { ...columns, [key]: !columns[key] });
+}
+
+/** A pinned filter button: turns one of dnd5e's list filters on or off (mockup, 2026-10-26). */
+function pinFilter(event, target)
+{
+   const controls = target.closest('dnd5e-inventory')?.querySelector('item-list-controls');
+   toggleListFilter(controls, target.dataset.filter);
+}
+
+/** Shows the pins as the list's filters stand, after any pass of dnd5e's filter (pins or its own menu). */
+function showPins(controls)
+{
+   const bar = controls.closest('.fhcs-list-bar');
+   watchListFilters(controls, (active) =>
+   {
+      for (const pin of bar?.querySelectorAll('[data-action="fhcsPinFilter"]') ?? [])
+      {
+         const key = pin.dataset.filter;
+         pin.setAttribute('aria-pressed', active.includes(key) ? 'true' : active.includes(`!${key}`) ? 'mixed' : 'false');
+      }
+   });
+}
+
+/** The concentration bar's name: opens the spell held (user, 2026-10-26). */
+function openConcentration(event, target)
+{
+   this.actor.items.get(target.dataset.itemId)?.sheet?.render({ force: true });
+}
+
+/** The concentration bar's End button: ends that concentration through dnd5e. */
+function endConcentrationAction(event, target)
+{
+   return endConcentration(this.actor, target.dataset.effectId);
 }
 
 /**
@@ -153,7 +203,7 @@ function ourParts(baseParts)
  * since a module can't import from the system by path. dnd5e keeps every mechanic; the look is ours alone.
  *
  * Phase 1: our header. Phase 2: our frame, tab row and Attributes tab in place of dnd5e's sidebar, vertical tabs
- * and Details tab. Phase 3: our Inventory tab.
+ * and Details tab. Phase 3: our Inventory tab. Phase 4: our Spellbook tab.
  */
 export function makeCharacterSheet(Base)
 {
@@ -162,7 +212,8 @@ export function makeCharacterSheet(Base)
       static DEFAULT_OPTIONS = {
          classes: ['fhcs-sheet'],
          actions: { fhcsTogglePassives: togglePassives, fhcsToggleGroup: toggleGroup, fhcsToggleColumn: toggleColumn,
-            fhcsToggleContainer: toggleContainer }
+            fhcsToggleContainer: toggleContainer, fhcsPinFilter: pinFilter, fhcsOpenConcentration: openConcentration,
+            fhcsEndConcentration: endConcentrationAction }
       };
 
       static PARTS = ourParts(Base.PARTS);
@@ -199,6 +250,11 @@ export function makeCharacterSheet(Base)
             const openContainers = game.user.getFlag(MODULE_ID, PREFS.openContainers) ?? [];
             context.fhcsInventory = inventoryView(await inventoryFacts(this, context, { columns, openContainers }), i18n);
          }
+         if (partId === 'spells')
+         {
+            const columns = spellColumnChoice(game.settings.get(MODULE_ID, 'spellColumns'));
+            context.fhcsSpellbook = spellbookView(await spellbookFacts(this, context, { columns }), i18n);
+         }
          if (partId === 'tabs')
          {
             context.fhcsTabs = tabRow(context.tabs, { canEdit: this.isEditable, editing: this.isEditMode }, i18n.localize);
@@ -213,6 +269,20 @@ export function makeCharacterSheet(Base)
       _renderAttunement()
       {
          // Drawn by templates/sheet/inventory.hbs.
+      }
+
+      /** dnd5e adds slot pips into its own spell headings after each render (base-actor-sheet.mjs:1054); ours draw them. */
+      _renderSpellbook()
+      {
+         // Drawn by templates/sheet/spellbook.hbs.
+      }
+
+      /** Our Spellbook filters (Can cast, components) on top of dnd5e's (SCOPE §4.7). */
+      _filterItem(item, filters)
+      {
+         const allowed = super._filterItem(item, filters);
+         if (allowed !== undefined) { return allowed; }
+         return passesExtraFilters(this.actor, item, filters, EXTRA_SPELL_FILTERS);
       }
 
       /** Never narrower than the ability row needs, so it never wraps. */
@@ -235,6 +305,11 @@ export function makeCharacterSheet(Base)
          {
             items.dataset.fhcsWatched = 'true';
             showMatchesInContainers(items);
+         }
+         for (const list of Object.keys(LIST_PINS))
+         {
+            const controls = this.element.querySelector(`item-list-controls[for="${list}"]`);
+            if (controls) { showPins(controls); }
          }
          delayTips(this.element);
       }

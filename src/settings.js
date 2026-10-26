@@ -1,6 +1,7 @@
 import { MODULE_ID, SHEET_CLASS_NAME } from './constants.js';
 import { rerenderSheets } from './compat.js';
 import { DEFAULT_COLUMNS } from './sheet/inventory.js';
+import { DEFAULT_SPELL_COLUMNS } from './sheet/spellbook.js';
 
 /** Our settings. Client ones each player chooses; world ones the GM sets for the table. */
 export function registerSettings()
@@ -38,6 +39,17 @@ export function registerSettings()
       config: false,
       type: Object,
       default: { ...DEFAULT_COLUMNS },
+      onChange: () => rerenderSheets(SHEET_CLASS_NAME)
+   });
+
+   // Which Spellbook columns show (SCOPE §4.7), chosen the same way.
+   game.settings.register(MODULE_ID, 'spellColumns', {
+      name: 'FHCS.Settings.SpellColumns.Name',
+      hint: 'FHCS.Settings.SpellColumns.Hint',
+      scope: 'client',
+      config: false,
+      type: Object,
+      default: { ...DEFAULT_SPELL_COLUMNS },
       onChange: () => rerenderSheets(SHEET_CLASS_NAME)
    });
 
