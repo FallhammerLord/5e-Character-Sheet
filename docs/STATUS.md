@@ -4,18 +4,10 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 4 play check.** Quench passed (core 35 of 35, 2026-10-26) and the user approved the styling pass after first look (2026-10-26: soft-blue pips without a count, fold carets, open-row panels; SCOPE §5.1). Left: one look at a real caster, ideally multiclass with Pact Magic:
-   - Can cast with slots spent;
-   - spells granted by an item (staff, wand) in their own section; a ritual caster's ritual-only spells;
-   - clicking slot pips;
-   - dnd5e's right-click menu and drag on spell rows, and a spell dragged onto a section heading;
-   - the Inventory pins (Action, Bonus, Equipped), Phase 3's last item, built with Phase 4;
-   - innate or at-will favorites on Attributes.
+1. **Ask the user** whether to push the branch to `main` (Phase 4 done), then whether the Actions tab (SCOPE §4.4, no phase yet) goes before Phase 5 (Features, Effects, Biography, Journal). Recommended: Actions first, since it's the default tab in play and the "Now" home (§4.5).
+2. **Then start that phase at research** (CLAUDE.md, "How a phase goes"): dnd5e 6.0.6's source for the tab, Tidy Classic's version, findings into the research note; then design questions and a mockup. Phase 5 has no checklist or SCOPE section yet; Actions has only §4.4.
 
-   Then tick ROADMAP Phase 4, write its BUILT entry (from the ROADMAP list and `src/sheet/spellbook.js`), and ask the user before pushing to `main`.
-2. **Then:** ask whether the Actions tab (SCOPE §4.4, no phase yet) goes before Phase 5 (Features, Effects, Biography, Journal). Either starts with dnd5e research and a mockup (CLAUDE.md, "How a phase goes").
-
-Don't rerun Quench or rework Track R or Phases 0–3 unless the user reports a problem.
+Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.
 
 ## Waiting on the user
 
@@ -32,8 +24,8 @@ Play checks, when convenient (not work for a session to pick up):
 
 In Foundry, by the user:
 
-- **Phase 4 Spellbook in Quench** (2026-10-26, core 35 of 35): rows by section, the book (always prepared locked), the favorite toggle, the Prepared pin, the concentration bar, the column menu, Attributes favorites (details in place, picture uses). Play check pending (Next session).
-- **Phase 3 Inventory** (2026-10-26, Quench 30 of 30 and play): sections, equip and attune toggles, uses and quantity, expand, Columns menu, footer, search, filter and sort, containers (drop in, fold, nest, search inside).
+- **Phase 4 Spellbook** (2026-10-26, Quench core 35 of 35 and play): sections with slot pips (Pact Magic, item, ritual), the book, Can cast with slots spent, favorites and their glow, the concentration bar, filters and Columns menu, context menu and drag, Attributes favorites (innate and at will).
+- **Phase 3 Inventory** (2026-10-26, Quench 30 of 30 and play): sections, equip and attune toggles, uses and quantity, expand, Columns menu, footer, search, filter and sort, pinned filters, containers (drop in, fold, nest, search inside).
 - **Phase 2 Attributes, frame and tab row** (2026-10-24, Quench 26 of 26 and play): skills, passives, traits, favorites, slot pips, death saves in the header, tabs and lock.
 - **Phase 1 header** (2026-10-24, screenshot and Quench): portrait chips, HP, XP and level, origin line, AC, Init and the ability row, in the dark theme with none of dnd5e's look.
 - **Exhaustion penalty** (2026-10-26): skills, saves and Init show the same total at every level; nothing to fix.

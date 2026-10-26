@@ -36,31 +36,31 @@ Classic layout: skills and saves column; resources; favorites; traits (senses, l
 
 ## Phase 3: Inventory
 
-Built on dnd5e's `dnd5e-inventory` element. Equip, attune, quantity, weight and encumbrance, containers, currency, drag and drop, context menus. Verified 2026-10-26 (Quench 30 of 30, and the user in play); the pinned filter buttons are in code, waiting on a check.
+Built on dnd5e's `dnd5e-inventory` element. Equip, attune, quantity, weight and encumbrance, containers, currency, drag and drop, context menus. Verified 2026-10-26 (Quench 30 of 30, and the user in play).
 
 - [x] Mockup approved with answers (2026-10-26): player-chosen columns, three-state attunement, encumbrance follows dnd5e's setting (SCOPE §4.6)
 - [x] Shared list controls (search, filter, sort), styled once for Inventory, Spellbook and Features (verified 2026-10-26)
 - [x] Item rows: equip and attune toggles, uses, usage, quantity, expand, edit and delete in edit mode; context menus and drag from dnd5e (verified 2026-10-26)
 - [x] Column menu in edit mode, each player's choice (verified 2026-10-26)
 - [x] Attunement, currency and carried-weight footer (verified 2026-10-26)
-- [ ] Pinned filter buttons beside the search (Action, Bonus, Equipped), as in the mockup (in code 2026-10-26, shared with the Spellbook; waits on Quench and play)
+- [x] Pinned filter buttons beside the search (Action, Bonus, Equipped), as in the mockup, shared with the Spellbook (verified 2026-10-26)
 - [x] Containers: drop onto a container row, contents folding open under it, nested (verified 2026-10-26; no top panel, user's choice)
 
-## Phase 4: Spellbook
+## Phase 4: Spellbook (done; verified 2026-10-26)
 
 Slots as pips; prepared state; grouped by level; concentration; spellcasting ability and DC. Decisions: SCOPE §4.7.
 
 - [x] Research: dnd5e 6.0.6 spellbook data, preparation, filters, concentration; Tidy Classic's filters (2026-10-26, research note)
 - [x] Answers on unprepared spells, preparation math, columns, filters (user, 2026-10-26)
 - [x] Mockup approved (user, 2026-10-26: "the rest looks good"; https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, Spellbook boards)
-Built 2026-10-26; Quench passes (core 35 of 35, 2026-10-26). Each box is ticked once seen in play:
+Built 2026-10-26; verified in Quench (core 35 of 35) and in play (user, 2026-10-26):
 
-- [ ] Attributes favorites: the home tab's look (book and kind colors; innate and at will tinted and named); the name opens the item's details in place, the picture uses it (user, 2026-10-26)
-- [ ] Spellcasting strip: a card per class (ability, attack, DC, prepared / max); concentration bar with open, End and Con save
-- [ ] Sections in the mockup's order with slot pips (filled = left, temporary dotted); Pact Magic, innate, at will, ritual and item sections; slot settings in edit mode
-- [ ] Spell rows: three-state book, components, time in words, range, concentration mark (filled while held), favorite toggle and glow; Columns menu (school and target off by default)
-- [ ] Favorite toggle column on Inventory rows too, with the glow (user, 2026-10-26); names left-aligned (Foundry centered them)
-- [ ] Filters: pinned Action, Bonus, Reaction, Conc., Prepared; Can cast and V, S, M added to dnd5e's menu
+- [x] Attributes favorites: the home tab's look (book and kind colors; innate and at will tinted and named); the name opens the item's details in place, the picture uses it (user, 2026-10-26)
+- [x] Spellcasting strip: a card per class (ability, attack, DC, prepared / max); concentration bar with open, End and Con save
+- [x] Sections in the mockup's order with slot pips (filled = left, temporary dotted); Pact Magic, innate, at will, ritual and item sections; slot settings in edit mode
+- [x] Spell rows: three-state book, components, time in words, range, concentration mark (filled while held), favorite toggle and glow; Columns menu (school and target off by default)
+- [x] Favorite toggle column on Inventory rows too, with the glow (user, 2026-10-26); names left-aligned (Foundry centered them)
+- [x] Filters: pinned Action, Bonus, Reaction, Conc., Prepared; Can cast and V, S, M added to dnd5e's menu
 
 ## Phase 5: Features, Effects, Biography, Journal
 
