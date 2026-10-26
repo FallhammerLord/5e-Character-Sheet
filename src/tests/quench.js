@@ -218,7 +218,7 @@ export function registerQuenchTests(quench)
             {
                await new Promise((resolve) => { setTimeout(resolve, 50); });
             }
-            assert.isTrue(!!condition(), what);
+            assert.isTrue(!!condition(), typeof what === 'function' ? what() : what);
          };
 
          it('equips, attunes, counts and opens items on the Inventory tab', async function ()
@@ -231,18 +231,21 @@ export function registerQuenchTests(quench)
             }]);
             await sheet.render();
             const row = () => sheet.element.querySelector(`.fhcs-inventory [data-item-id="${ring.id}"]`);
+            // On a failure, say what the row held instead.
+            const found = (step) => () => `${step}; the row: ${row()?.querySelector('.fhcs-item-row')?.outerHTML.replace(/\s+/g, ' ').slice(0, 600) ?? 'missing'}`;
             assert.ok(row(), 'the item has a row in our Inventory tab');
+            assert.ok(row().querySelector('[data-action="attune"]'), found('an item that needs attunement has an attune toggle')());
             row().querySelector('[data-action="equip"]').click();
             await until(() => ring.system.equipped, 'the equip toggle equipped it');
-            await until(() => row()?.querySelector('[data-action="attune"]'), 'the row redrew');
+            await until(() => row()?.querySelector('[data-action="attune"]'), found('the row redrew after equipping'));
             row().querySelector('[data-action="attune"]').click();
             await until(() => ring.system.attuned, 'the attune toggle attuned it');
-            await until(() => row()?.querySelector('[data-name="system.quantity"]'), 'the row redrew');
+            await until(() => row()?.querySelector('[data-name="system.quantity"]'), found('the row redrew after attuning'));
             const quantity = row().querySelector('[data-name="system.quantity"]');
             quantity.value = '+2';
             quantity.dispatchEvent(new Event('change', { bubbles: true }));
             await until(() => ring.system.quantity === 3, 'quantity takes a +2');
-            await until(() => row()?.querySelector('[data-action="toggleExpand"]'), 'the row redrew');
+            await until(() => row()?.querySelector('[data-action="toggleExpand"]'), found('the row redrew after the quantity change'));
             row().querySelector('[data-action="toggleExpand"]').click();
             await until(() => row()?.querySelector('.item-summary'), 'the name opens dnd5e\'s summary');
             await ring.delete();
