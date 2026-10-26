@@ -52,7 +52,7 @@ Slots as pips; prepared state; grouped by level; concentration; spellcasting abi
 
 - [x] Research: dnd5e 6.0.6 spellbook data, preparation, filters, concentration; Tidy Classic's filters (2026-10-26, research note)
 - [x] Answers on unprepared spells, preparation math, columns, filters (user, 2026-10-26)
-- [ ] Mockup approved, including the concentration space
+- [ ] Mockup approved, including the concentration space (built 2026-10-26: https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, Spellbook boards; waits on the user)
 - [ ] Spellcasting strip: per class ability, attack, DC, prepared / max; concentration space
 - [ ] Level sections with slot pips; pact, innate, at will and item sections
 - [ ] Spell rows: three-state prepare mark, components, activation, range, concentration mark; Columns menu
