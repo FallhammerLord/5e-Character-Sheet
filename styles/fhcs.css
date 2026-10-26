@@ -1500,6 +1500,9 @@
    border-radius: var(--fhcs-radius);
 }
 
+/* Buttons that hold text read from the left; Foundry centers a button's content (user, 2026-10-26). */
+.fhcs-sheet :is(.fhcs-group-toggle, .fhcs-favorite-use, .fhcs-conc-open) { justify-content: flex-start; }
+
 /* Favorite groups: a fold button, then the spell slots, outside the button so a slot click never folds. */
 .fhcs-sheet .fhcs-group-toggle
 {

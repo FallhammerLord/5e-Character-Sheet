@@ -324,8 +324,15 @@ export function registerQuenchTests(quench)
             await until(() => row(open) && row(always) && row(cantrip), 'the three spells have rows on our Spellbook tab');
             // Each create starts its own redraw; wait for one that has settled, and say where each spell landed.
             const section = (spell) => row(spell)?.closest('[data-fhcs-section]')?.dataset.fhcsSection;
+            // What dnd5e holds for each spell, and where its own spellbook files it, in case they differ from ours.
+            const held = (spell) =>
+            {
+               const book = Object.values(sheet._prepareSpellbook?.({ itemCategories: { spells: [open, always, cantrip] } }) ?? {});
+               const filed = book.find((s) => s.items.includes(spell))?.slot;
+               return `level ${spell.system.level}, method ${spell.system.method}, prepared ${spell.system.prepared}, dnd5e files it in ${filed}`;
+            };
             await until(() => section(open) && section(open) === section(always),
-               () => `both level 1 spells share a section; the unprepared one is in ${section(open)}, the always prepared one in ${section(always)}`);
+               () => `both level 1 spells share a section; the unprepared one is in ${section(open)} (${held(open)}), the always prepared one in ${section(always)} (${held(always)})`);
             assert.notOk(row(cantrip).querySelector('[data-action="prepare"]'), 'a cantrip has no prepare mark');
             assert.strictEqual(row(always).querySelector('[data-action="prepare"]')?.getAttribute('aria-disabled'), 'true',
                'always prepared can\'t be clicked');
