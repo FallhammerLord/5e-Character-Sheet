@@ -4,6 +4,7 @@ What's verified, what's waiting. Read when picking up work; CLAUDE.md holds only
 
 ## Verified in Foundry by the user
 
+- Exhaustion penalty (2026-10-26, user: "it works as intended"): at exhaustion 6, skills, saves and Init all show the same −12. The mismatch seen on 2026-10-24 doesn't reproduce; dnd5e 6.0.6 applies `conditionRollReduction` to all three and our sheet reads those totals. Nothing to fix.
 - Phase 3 Inventory (2026-10-26, user: Quench 30 of 30, "everything else seems to work as desired"): sections, equip and three-state attune toggles, uses and quantity, expand, the Columns menu in edit mode, the footer, dnd5e's search, filter and sort, containers (drop in, fold open, nested), and search showing matches inside containers. Trays close on a click elsewhere. Lessons kept in the research note: dnd5e keeps attunement only on magical items; each create starts its own redraw, so tests wait for theirs. The sort button no longer lights up all the time (dnd5e marks it active always); in code, not yet seen.
 - Track R complete: the play checks for saves, Apply, sheet rolls, GM requests and settings are closed (2026-10-24, user, reported in a parallel chat).
 - Tabs switch by hand, pips work, and both Quench batches pass, 26 of 26 (2026-10-24, user, after the second round's fixes). Quench covers: header rolls and chips, tab row and lock, skill roll, passive toggle and folds, death saves at 0 HP, rest, item use; usage cards, attack and damage bands, roll on use, no dialogs, late adds, standalone skill card, GM request, save band for selected tokens.
@@ -34,5 +35,4 @@ They wait only for a game where the user tries them; not work for a session to p
 Track R and Phases 0–2 are done and verified; don't rerun Quench or rework them unless the user reports a problem.
 
 1. **What next after Phase 3** (user deciding, 2026-10-26): the pinned filter buttons, the Actions tab, or the Spellbook. See the options in that chat; the Actions tab has no phase on the roadmap yet.
-2. **Exhaustion display mismatch** (user's screenshot, 2026-10-24): at exhaustion 6 the header shows Init and saves with −12, the Attributes tab shows skills without it. Read so far (dnd5e 6.0.6 source, 2026-10-26): dnd5e puts `conditionRollReduction` into skills, saves, Init and passives alike (creature.mjs:307, common.mjs:321, attributes.mjs:523), and our skills read the same prepared `skill.total`. No code cause found. Waiting on the user's console check: on the sheet's actor, `system.attributes.exhaustion`, `conditionRollReduction`, `system.skills.ath.total`, `system.attributes.init.total`, `system.abilities.str.save.value`.
-3. Then Spellbook (Phase 4), reusing the Inventory rows and list controls.
+2. Then Spellbook (Phase 4), reusing the Inventory rows and list controls.
