@@ -63,6 +63,17 @@ async function toggleGroup(event, target)
    await game.user.setFlag(MODULE_ID, PREFS.folded, [...folded]);
 }
 
+/** A favorite's name: opens or shuts the item's details under its row (user, 2026-10-26), until the sheet closes. */
+function toggleFavoriteDetails(event, target)
+{
+   const id = target.closest('[data-favorite-id]')?.dataset.favoriteId;
+   if (!id) { return; }
+   this.fhcsOpenFavorites ??= new Set();
+   if (this.fhcsOpenFavorites.has(id)) { this.fhcsOpenFavorites.delete(id); }
+   else { this.fhcsOpenFavorites.add(id); }
+   this.render({ parts: ['details'] });
+}
+
 /** Folds a container's contents open or shut under its row, and remembers it for this player. */
 async function toggleContainer(event, target)
 {
@@ -213,7 +224,7 @@ export function makeCharacterSheet(Base)
          classes: ['fhcs-sheet'],
          actions: { fhcsTogglePassives: togglePassives, fhcsToggleGroup: toggleGroup, fhcsToggleColumn: toggleColumn,
             fhcsToggleContainer: toggleContainer, fhcsPinFilter: pinFilter, fhcsOpenConcentration: openConcentration,
-            fhcsEndConcentration: endConcentrationAction }
+            fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails }
       };
 
       static PARTS = ourParts(Base.PARTS);
@@ -240,7 +251,8 @@ export function makeCharacterSheet(Base)
          {
             const prefs = {
                passives: game.user.getFlag(MODULE_ID, PREFS.passives) ?? 'all',
-               folded: game.user.getFlag(MODULE_ID, PREFS.folded) ?? []
+               folded: game.user.getFlag(MODULE_ID, PREFS.folded) ?? [],
+               open: this.fhcsOpenFavorites ?? new Set()
             };
             context.fhcsAttributes = attributesView(await attributesFacts(this, context, prefs), i18n);
          }

@@ -55,7 +55,7 @@ Slots as pips; prepared state; grouped by level; concentration; spellcasting abi
 - [x] Mockup approved (user, 2026-10-26: "the rest looks good"; https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, Spellbook boards)
 Built 2026-10-26, all in code; waits on Quench (four new core tests) and the user in play:
 
-- [ ] Attributes favorites: prepared shows the book and the kind colors, not the bookmark; innate and at-will favorites stay plain (no book to mark them)
+- [ ] Attributes favorites: the home tab's look (book and kind colors; innate and at will tinted and named); the name opens the item's details in place, the picture uses it (user, 2026-10-26)
 - [ ] Spellcasting strip: a card per class (ability, attack, DC, prepared / max); concentration bar with open, End and Con save
 - [ ] Sections in the mockup's order with slot pips (filled = left, temporary dotted); Pact Magic, innate, at will, ritual and item sections; slot settings in edit mode
 - [ ] Spell rows: three-state book, components, time in words, range, concentration mark (filled while held), favorite toggle and glow; Columns menu (school and target off by default)

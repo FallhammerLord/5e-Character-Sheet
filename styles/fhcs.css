@@ -1567,11 +1567,36 @@
    box-shadow: inset 3px 0 0 var(--fhcs-success);
 }
 
+.fhcs-sheet .fhcs-favorite[class*="fhcs-kind-"]
+{
+   background: color-mix(in srgb, var(--fhcs-kind) 12%, transparent);
+   box-shadow: inset 3px 0 0 var(--fhcs-kind);
+}
+
 .fhcs-sheet .fhcs-favorite.fhcs-prepared
 {
    background: color-mix(in srgb, var(--fhcs-kind, var(--fhcs-kind-prepared)) 12%, transparent);
    box-shadow: inset 3px 0 0 var(--fhcs-kind, var(--fhcs-kind-prepared));
 }
+
+.fhcs-sheet .fhcs-favorite-pic
+{
+   display: block;
+   width: 24px;
+   height: 24px;
+   min-height: 0;
+   margin: 0;
+   padding: 0;
+   border: 0;
+   background: none;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-favorite-pic:hover .fhcs-favorite-img { box-shadow: 0 0 0 2px var(--fhcs-ink); }
+
+/* An open favorite: dnd5e's summary under the row, across every column. */
+.fhcs-sheet .fhcs-favorite-details { grid-column: 1 / -1; padding: 0 var(--fhcs-s2) var(--fhcs-s2) calc(24px + var(--fhcs-s2)); }
+.fhcs-sheet .fhcs-favorite-details :is(p, ul, ol) { margin: 0 0 var(--fhcs-s1); }
 
 .fhcs-sheet .fhcs-favorite-img
 {

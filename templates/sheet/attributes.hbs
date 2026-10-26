@@ -73,18 +73,30 @@
          <ul class="fhcs-favorites"{{#unless open}} hidden{{/unless}}>
             {{#each rows}}
             {{!-- dnd5e's useFavorite reads these ids from the row and the button. --}}
-            <li class="fhcs-favorite{{#if equipped}} fhcs-equipped{{/if}}{{#if prepared}} fhcs-prepared{{/if}}{{#if kind}} fhcs-kind-{{ kind }}{{/if}}"
+            <li class="fhcs-favorite{{#if equipped}} fhcs-equipped{{/if}}{{#if prepared}} fhcs-prepared{{/if}}{{#if kind}} fhcs-kind-{{ kind }}{{/if}}{{#if expanded}} fhcs-open{{/if}}"
                 data-favorite-id="{{ id }}"{{#if itemId}} data-item-id="{{ itemId }}"{{/if}}{{#if key}} data-key="{{ key }}"{{/if}}
                 {{#if effectId}} data-effect-id="{{ effectId }}"{{/if}}{{#if activityId}} data-activity-id="{{ activityId }}"{{/if}}>
+               {{!-- An item's picture uses it and its name opens its details, as on its own tab; anything else (a skill,
+                     an effect) is one button. --}}
+               {{#if expandable}}
+               <button type="button" class="fhcs-favorite-pic {{ rollableClass }}" data-action="useFavorite"
+                       {{#if activityId}}data-activity-id="{{ activityId }}"{{/if}} aria-label="{{ useLabel }}">
+                  <img class="fhcs-favorite-img" src="{{ img }}" alt="">
+               </button>
+               <button type="button" class="fhcs-favorite-use" data-action="fhcsToggleFavoriteDetails"
+                       aria-expanded="{{#if expanded}}true{{else}}false{{/if}}" aria-label="{{ detailsLabel }}">
+               {{else}}
                <img class="fhcs-favorite-img" src="{{ img }}" alt="">
                <button type="button" class="fhcs-favorite-use {{ rollableClass }}" data-action="useFavorite"
                        {{#if activityId}}data-activity-id="{{ activityId }}"{{/if}}>
+               {{/if}}
                   <span class="fhcs-body fhcs-favorite-name">{{ title }}</span>
                   {{#if equipped}}<svg class="fhcs-icon fhcs-state" viewBox="0 0 24 24" role="img" aria-label="{{ stateLabel }}"><path d="M5 12l5 5 9-10"/></svg>{{/if}}
                   {{#if prepared}}<svg class="fhcs-icon fhcs-state fhcs-state-fill" viewBox="0 0 24 24" role="img" aria-label="{{ stateLabel }}"><path d="M3 5.5c3-1.2 6-1 9 1 3-2 6-2.2 9-1V19c-3-1.2-6-1-9 1-3-2-6-2.2-9-1z"/></svg>{{/if}}
                </button>
-               <span class="fhcs-label fhcs-muted fhcs-favorite-detail">{{ subtitle }}</span>
+               <span class="fhcs-label fhcs-muted fhcs-favorite-detail">{{#if kindText}}{{ kindText }} · {{/if}}{{ subtitle }}</span>
                <span class="fhcs-body fhcs-favorite-uses">{{ uses }}</span>
+               {{#if expanded}}<div class="fhcs-body fhcs-favorite-details">{{{ summary }}}</div>{{/if}}
             </li>
             {{/each}}
          </ul>

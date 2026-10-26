@@ -59,6 +59,7 @@ Attributes decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrd
 - **Traits:** empty ones hidden in play, all shown in edit mode.
 - **Favorites:** grouped as dnd5e groups them; each group folds, and stays as the player left it. Equipped rows green, prepared blue, each with a left edge and an icon as well. Spell slots as 24px pips with "used / total".
 - **Resources:** counters above the favorites, only when the character has any.
+- **Favorite rows act and look as on their home tab** (user, 2026-10-26): the picture uses the item, the name opens its details in place (no item window); equipped and preparation kinds keep their tints and marks. Skills and effects stay one button.
 - **Death saves** go in the header, shown only at 0 HP.
 
 ### 4.4 Actions tab

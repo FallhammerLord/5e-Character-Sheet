@@ -86,7 +86,11 @@ export function attributesView(facts, { format, localize })
                equipped: r.state === 'equipped',
                prepared: r.state === 'prepared',
                kind: r.kind ?? null,
-               stateLabel: r.kind ? localize(`FHCS.Spellbook.Kind.${r.kind}`) : r.state ? localize(`FHCS.Attributes.State.${r.state}`) : ''
+               // Innate and at-will spells have no book; their kind is said in words beside the tint (SCOPE §4.5).
+               kindText: ['innate', 'atwill'].includes(r.kind) ? localize(`FHCS.Spellbook.Kind.${r.kind}`) : '',
+               stateLabel: r.kind ? localize(`FHCS.Spellbook.Kind.${r.kind}`) : r.state ? localize(`FHCS.Attributes.State.${r.state}`) : '',
+               useLabel: format('FHCS.Inventory.UseLabel', { name: r.title }),
+               detailsLabel: format('FHCS.Inventory.DetailsLabel', { name: r.title })
             }))
          };
       });

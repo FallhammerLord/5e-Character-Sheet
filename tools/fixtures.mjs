@@ -167,14 +167,16 @@ const attributesFacts = (over = {}) => ({
       { key: 'tool', title: 'Tool Proficiencies', values: ['Herbalism Kit'] }
    ],
    favorites: [
-      fav('Light Crossbow', 'inventory', { subtitle: 'Ranged Weapon Attack', state: 'equipped' }),
+      fav('Light Crossbow', 'inventory', { subtitle: 'Ranged Weapon Attack', state: 'equipped', expandable: true, expanded: true,
+         summary: '<div class="item-summary"><p>A simple ranged weapon. Load one bolt at a time.</p></div>' }),
       fav('Mace', 'inventory', { subtitle: 'Melee Weapon Attack', state: 'equipped' }),
       fav('Shield', 'inventory', { state: 'equipped' }),
       fav('Torch', 'inventory', { uses: { value: 1, max: 1 }, quantity: 3 }),
       fav('Bless', 'spell', { level: 1, subtitle: 'V S M \u00b7 1 Action', state: 'prepared', kind: 'prepared' }),
       fav('Healing Word', 'spell', { level: 1, subtitle: 'V \u00b7 1 Bonus Action', state: 'prepared', kind: 'always' }),
       fav('Detect Magic', 'spell', { level: 1, subtitle: 'V S \u00b7 1 Action' }),
-      fav('Counterspell', 'spell', { level: 3, subtitle: 'S \u00b7 1 Reaction', state: 'prepared', kind: 'pact' }),
+      fav('Counterspell', 'spell', { level: 3, subtitle: 'S \u00b7 1 Reaction', state: 'prepared', kind: 'pact', expandable: true }),
+      fav('Misty Step', 'spell', { level: 2, subtitle: 'V \u00b7 1 Bonus Action', kind: 'innate', expandable: true }),
       fav('Sacred Flame', 'spell', { level: 0, subtitle: 'V S \u00b7 1 Action' }),
       fav('Channel Divinity: Preserve Life', 'features', { subtitle: '1 Action \u00b7 Short Rest', uses: { value: 1, max: 2 } })
    ],

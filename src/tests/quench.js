@@ -211,6 +211,16 @@ export function registerQuenchTests(quench)
             assert.strictEqual(activity.item.id, item.id);
          });
 
+         /**
+          * Waits for the redraws a change started, then draws once more and waits for that. A click on markup a pending
+          * redraw is about to replace never reaches the sheet (the pin test failed this way, 2026-10-26).
+          */
+         const settled = async () =>
+         {
+            await new Promise((resolve) => { setTimeout(resolve, 100); });
+            await sheet.render();
+         };
+
          /** Waits until a condition holds, or fails the test after HOOK_WAIT_MS. */
          const until = async (condition, what) =>
          {
@@ -321,6 +331,7 @@ export function registerQuenchTests(quench)
                { name: 'FHCS test spark', type: 'spell', system: { level: 0, method: 'spell' } }
             ]);
             const row = (spell) => sheet.element.querySelector(`.fhcs-spellbook [data-item-id="${spell.id}"]`);
+            await settled();
             await until(() => row(open) && row(always) && row(cantrip), 'the three spells have rows on our Spellbook tab');
             // Each create starts its own redraw; wait for one that has settled, and say where each spell landed.
             const section = (spell) => row(spell)?.closest('[data-fhcs-section]')?.dataset.fhcsSection;
@@ -360,6 +371,7 @@ export function registerQuenchTests(quench)
             ]);
             const row = (spell) => sheet.element.querySelector(`.fhcs-spellbook [data-item-id="${spell.id}"]`);
             const pin = () => sheet.element.querySelector('.fhcs-spellbook [data-action="fhcsPinFilter"][data-filter="prepared"]');
+            await settled();
             await until(() => row(ready) && row(idle) && pin(), 'both spells and the Prepared pin are drawn');
             pin().click();
             await until(() => row(idle).hidden && !row(ready).hidden, 'the Prepared pin hides the unprepared spell');
@@ -382,6 +394,7 @@ export function registerQuenchTests(quench)
                name: 'Concentrating', img: spell.img, statuses: [CONFIG.specialStatusEffects.CONCENTRATING],
                flags: { dnd5e: { item: { id: spell.id } } }
             }]);
+            await settled();
             await until(() => bar()?.querySelector(`[data-item-id="${spell.id}"]`), 'the bar names the spell');
             assert.isTrue(bar().classList.contains('fhcs-on'), 'the bar shows concentration is on');
             await clickReaches('.fhcs-spellbook .fhcs-concentration [data-action="roll"]', 'dnd5e.preRollConcentration');
@@ -407,6 +420,24 @@ export function registerQuenchTests(quench)
             sheet.element.querySelector('.fhcs-tabs [data-action="changeMode"]').click();
             await until(() => !sheet.isEditMode, 'back to play mode');
             await spell.delete();
+         });
+
+         it('opens a favorite\'s details from its name and uses it from its picture, on Attributes', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 4);
+            const [axe] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test axe', type: 'weapon' }]);
+            await axe.createActivity('attack', {}, { renderSheet: false });
+            await actor.system.addFavorite({ type: 'item', id: axe.getRelativeUUID(actor) });
+            await settled();
+            const fav = () => sheet.element.querySelector(`.fhcs-attributes [data-favorite-id="${axe.getRelativeUUID(actor)}"]`);
+            await until(() => fav()?.querySelector('[data-action="fhcsToggleFavoriteDetails"]'), 'the favorite\'s name opens its details');
+            fav().querySelector('[data-action="fhcsToggleFavoriteDetails"]').click();
+            await until(() => fav()?.querySelector('.fhcs-favorite-details .item-summary'), 'dnd5e\'s summary opens under the row');
+            assert.notOk(axe.sheet?.rendered, 'no item window opened');
+            const [activity] = await clickReaches(`.fhcs-attributes [data-favorite-id="${axe.getRelativeUUID(actor)}"] .fhcs-favorite-pic`,
+               'dnd5e.preUseActivity');
+            assert.strictEqual(activity.item.id, axe.id, 'the picture uses the item');
+            await axe.delete();
          });
       });
    }, { displayName: 'Fallhammer Character Sheet: core' });

@@ -115,7 +115,7 @@ const plainSubtitle = (html) => String(html ?? '').replace(/\s*&bull;\s*/g, ' \u
  * helpers (`_prepareSenses`, `_prepareTraits`, `_prepareSkillsTools`, `_prepareFavorites`;
  * base-actor-sheet.mjs:541, 662; character-sheet.mjs:627).
  */
-export async function attributesFacts(sheet, context, { passives, folded })
+export async function attributesFacts(sheet, context, { passives, folded, open = new Set() })
 {
    const actor = sheet.actor;
    const config = CONFIG.DND5E;
@@ -157,10 +157,8 @@ export async function attributesFacts(sheet, context, { passives, folded })
       {
          group = 'spell';
          // The Spellbook's preparation kinds (SCOPE §4.7): the book and the kind's color, on Attributes too.
-         // Innate and at-will spells have no book to show, so they stay plain here rather than marked by color alone.
          kind = spellKind(spellFacts(actor, item));
-         if (['innate', 'atwill'].includes(kind)) { kind = null; }
-         if (kind) { state = 'prepared'; }
+         if (['prepared', 'always', 'pact'].includes(kind)) { state = 'prepared'; }
       }
       else if (item?.type === 'feat') { group = 'features'; }
       else if (item && 'quantity' in item.system)
@@ -168,8 +166,12 @@ export async function attributesFacts(sheet, context, { passives, folded })
          group = 'inventory';
          if (item.system.equipped) { state = 'equipped'; }
       }
+      // Name opens the item's details in place, as on its own tab (user, 2026-10-26); the picture uses it.
+      const expanded = !!item && open.has(f.id);
       favorites.push({
          id: f.id, type: f.type, title: f.title, subtitle: plainSubtitle(f.subtitle), img: f.img,
+         expandable: !!item, expanded,
+         summary: expanded ? await renderTemplate(ITEM_SUMMARY, await item.getChatData({ secrets: item.isOwner })) : '',
          uses: f.uses?.max ? { value: f.uses.value, max: f.uses.max } : null, quantity: Number(f.quantity) || 0,
          itemId: f.itemId ?? '', activityId: f.activityId ?? '', effectId: f.effectId ?? '', key: f.key ?? '',
          rollableClass: f.rollableClass ?? '', group, level: item?.type === 'spell' ? item.system.level : null, state, kind
