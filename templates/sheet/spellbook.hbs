@@ -67,6 +67,7 @@
                {{#if ../columns.target}}<span class="fhcs-label fhcs-muted fhcs-col-target">{{ ../text.head.target }}</span>{{/if}}
                {{#if showUses}}<span class="fhcs-label fhcs-muted fhcs-col-uses">{{ ../text.uses }}</span>{{/if}}
                <span class="fhcs-col-toggle" role="img" aria-label="{{ ../text.prep }}"></span>
+               {{#if ../columns.favorite}}<span class="fhcs-muted fhcs-col-toggle" role="img" aria-label="{{ ../text.head.favorite }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>{{/if}}
                {{#if ../editing}}
                <span class="fhcs-col-edit">
                   {{#if slots}}

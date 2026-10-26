@@ -322,7 +322,10 @@ export function registerQuenchTests(quench)
             ]);
             const row = (spell) => sheet.element.querySelector(`.fhcs-spellbook [data-item-id="${spell.id}"]`);
             await until(() => row(open) && row(always) && row(cantrip), 'the three spells have rows on our Spellbook tab');
-            assert.ok(row(open).closest('.items-section')?.contains(row(always)), 'both level 1 spells share a section');
+            // Each create starts its own redraw; wait for one that has settled, and say where each spell landed.
+            const section = (spell) => row(spell)?.closest('[data-fhcs-section]')?.dataset.fhcsSection;
+            await until(() => section(open) && section(open) === section(always),
+               () => `both level 1 spells share a section; the unprepared one is in ${section(open)}, the always prepared one in ${section(always)}`);
             assert.notOk(row(cantrip).querySelector('[data-action="prepare"]'), 'a cantrip has no prepare mark');
             assert.strictEqual(row(always).querySelector('[data-action="prepare"]')?.getAttribute('aria-disabled'), 'true',
                'always prepared can\'t be clicked');
@@ -332,6 +335,12 @@ export function registerQuenchTests(quench)
             row(always).querySelector('[data-action="prepare"]').click();
             await new Promise((resolve) => { setTimeout(resolve, 300); });
             assert.strictEqual(always.system.prepared, 2, 'a click on always prepared changes nothing');
+            // The bookmark in the row favorites the spell, as dnd5e's right-click menu does.
+            const favorite = () => actor.system.favorites.some((f) => f.id === open.getRelativeUUID(actor));
+            const wasFavorite = favorite();
+            await until(() => row(open)?.querySelector('[data-action="toggleFavorite"]'), 'the row has a favorite toggle');
+            row(open).querySelector('[data-action="toggleFavorite"]').click();
+            await until(() => favorite() !== wasFavorite, 'the bookmark toggled the favorite');
             await actor.deleteEmbeddedDocuments('Item', [open.id, always.id, cantrip.id]);
          });
 

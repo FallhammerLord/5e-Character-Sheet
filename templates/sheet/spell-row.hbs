@@ -1,7 +1,7 @@
 {{!-- One Spellbook row (SCOPE §4.7), included by spellbook.hbs with its section's `showUses`. Built like an
       Inventory row (item-row.hbs) so dnd5e's inventory element binds it the same way: the picture casts (use), the
-      name opens dnd5e's summary (toggleExpand), the book flips preparation (prepare), and the context menu and drag
-      work on the row. The tint and left edge follow the preparation kind; favorites add a bookmark and a glow. --}}
+      name opens dnd5e's summary (toggleExpand), the book flips preparation (prepare), the bookmark favorites it (toggleFavorite), and the context menu and drag
+      work on the row. The tint and left edge follow the preparation kind; favorites glow. --}}
 <li class="item collapsible fhcs-item fhcs-spell{{#unless expanded}} collapsed{{/unless}}{{#if kind}} fhcs-kind-{{ kind }}{{/if}}{{#if favorite}} fhcs-favorited{{/if}}"
     data-uuid="{{ uuid }}" data-item-id="{{ id }}" data-entry-id="{{ id }}" data-item-name="{{ name }}">
    <div class="item-row draggable fhcs-item-row">
@@ -14,7 +14,6 @@
               aria-label="{{ detailsLabel }}">
          <i class="fhcs-expand" aria-hidden="true"></i>
          <span class="fhcs-body fhcs-item-title">{{ name }}</span>
-         {{#if favorite}}<svg class="fhcs-icon fhcs-fav-mark" viewBox="0 0 24 24" role="img" aria-label="{{ favoriteLabel }}"><path d="M6 3h12v18l-6-4-6 4z"/></svg>{{/if}}
          {{#if ritual}}<span class="fhcs-label fhcs-muted" role="img" aria-label="{{ ritualLabel }}">R</span>{{/if}}
          {{#if sub}}<span class="fhcs-label fhcs-muted fhcs-item-sub">{{ sub }}</span>{{/if}}
       </button>
@@ -50,6 +49,14 @@
          </button>
          {{/if}}
       </span>
+      {{#if @root.fhcsSpellbook.columns.favorite}}
+      <span class="fhcs-col-toggle">
+         <button type="button" class="item-action fhcs-toggle fhcs-toggle-fav" data-action="toggleFavorite"
+                 aria-pressed="{{#if favorite}}true{{else}}false{{/if}}" aria-label="{{ favoriteLabel }}" data-fhcs-tip="{{ favoriteLabel }}">
+            <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
+         </button>
+      </span>
+      {{/if}}
       {{#if @root.fhcsSpellbook.editing}}
       <span class="fhcs-col-edit">
          <button type="button" class="item-action fhcs-toggle" data-action="edit" aria-label="{{ editLabel }}" data-fhcs-tip="{{ editLabel }}">

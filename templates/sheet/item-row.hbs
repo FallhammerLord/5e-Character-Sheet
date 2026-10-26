@@ -2,7 +2,7 @@
       tab's settings from @root, since it is drawn at any depth. A container row carries dnd5e's `container` class:
       dnd5e's sheet moves an item dropped anywhere on it into the container (base-actor-sheet.mjs:1718). Its contents
       sit in their own item-list inside it, so dnd5e's sorting keeps them there. --}}
-<li class="item collapsible fhcs-item{{#unless expanded}} collapsed{{/unless}}{{#if equipped}} fhcs-equipped{{/if}}{{#if container}} container{{/if}}"
+<li class="item collapsible fhcs-item{{#unless expanded}} collapsed{{/unless}}{{#if equipped}} fhcs-equipped{{/if}}{{#if favorite}} fhcs-favorited{{/if}}{{#if container}} container{{/if}}"
     data-uuid="{{ uuid }}" data-item-id="{{ id }}" data-entry-id="{{ id }}" data-item-name="{{ name }}">
    <div class="item-row draggable fhcs-item-row">
       <button type="button" class="item-action fhcs-col-img fhcs-item-use {{ @root.rollableClass }}"
@@ -64,6 +64,14 @@
             <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.4 6.1L21 12l-6.6 2.9L12 21l-2.4-6.1L3 12l6.6-2.9z"/></svg>
          </button>
          {{/if}}
+      </span>
+      {{/if}}
+      {{#if @root.fhcsInventory.columns.favorite}}
+      <span class="fhcs-col-toggle">
+         <button type="button" class="item-action fhcs-toggle fhcs-toggle-fav" data-action="toggleFavorite"
+                 aria-pressed="{{#if favorite}}true{{else}}false{{/if}}" aria-label="{{ favoriteLabel }}" data-fhcs-tip="{{ favoriteLabel }}">
+            <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
+         </button>
       </span>
       {{/if}}
       {{#if @root.fhcsInventory.editing}}

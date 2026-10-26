@@ -276,7 +276,7 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
 
 // Inventory: columns default to the user's choice (weight off), a saved choice wins, and a new column still shows.
 {
-   try { deepStrictEqual(columnChoice(null), { weight: false, uses: true, usage: true, quantity: true, equipped: true, attuned: true }); }
+   try { deepStrictEqual(columnChoice(null), { weight: false, uses: true, usage: true, quantity: true, equipped: true, attuned: true, favorite: true }); }
    catch { problems.push(`default inventory columns: ${JSON.stringify(columnChoice(null))}`); }
    const chosen = columnChoice({ weight: true, usage: false, gone: true });
    if (!chosen.weight || chosen.usage || 'gone' in chosen || !chosen.attuned) { problems.push(`saved inventory columns: ${JSON.stringify(chosen)}`); }
@@ -305,7 +305,7 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const shape = [bag.container?.count, bag.container?.open, bag.container?.contents[1].container?.open, chest.container?.count, view.sections[0].items[0].container];
    try { deepStrictEqual(shape, [2, true, false, 0, null]); }
    catch { problems.push(`container contents: ${JSON.stringify(shape)}`); }
-   if (inventoryView({ ...base, editing: true }, { format, localize }).columnToggles.length !== 6) { problems.push('the column menu is missing in edit mode'); }
+   if (inventoryView({ ...base, editing: true }, { format, localize }).columnToggles.length !== 7) { problems.push('the column menu is missing in edit mode'); }
 }
 
 // Spellbook (SCOPE §4.7): preparation states and kinds, Can cast, section order, slot pips, the concentration mark.
@@ -335,7 +335,7 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    try { deepStrictEqual(cast, [true, false, false, false, true, true, false, true]); }
    catch { problems.push(`can cast: ${JSON.stringify(cast)}`); }
 
-   try { deepStrictEqual(spellColumnChoice({ school: true, time: false, gone: 1 }), { components: true, concentration: true, time: false, range: true, school: true, target: false }); }
+   try { deepStrictEqual(spellColumnChoice({ school: true, time: false, gone: 1 }), { components: true, concentration: true, time: false, range: true, school: true, target: false, favorite: true }); }
    catch { problems.push(`spell columns: ${JSON.stringify(spellColumnChoice({ school: true, time: false }))}`); }
 
    const pins = pinView(['action', 'bonus', 'prepared'], ['action', '!prepared'], localize).map((p) => p.pressed);

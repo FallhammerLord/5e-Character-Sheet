@@ -175,7 +175,8 @@
         "usage": "Usage",
         "quantity": "Qty",
         "equipped": "Equipped",
-        "attuned": "Attuned"
+        "attuned": "Attuned",
+        "favorite": "Favorite"
       },
       "Other": "Other",
       "Empty": "Nothing carried yet. Drag items onto the sheet to add them.",
@@ -214,7 +215,8 @@
         "time": "Time",
         "range": "Range",
         "school": "School",
-        "target": "Target"
+        "target": "Target",
+        "favorite": "Favorite"
       },
       "Attack": "Attack",
       "SaveDC": "Save DC",
@@ -230,7 +232,6 @@
       "OpenLabel": "Open {name}",
       "EndLabel": "End concentration on {name}",
       "CastLabel": "Cast {name}",
-      "Favorite": "Favorite",
       "Ritual": "Ritual",
       "State": {
         "prepared": "Prepared",
@@ -247,6 +248,10 @@
         "innate": "Innate",
         "atwill": "At will"
       }
+    },
+    "Favorite": {
+      "On": "Favorite: click to remove",
+      "Off": "Not a favorite: click to add"
     }
   }
 }

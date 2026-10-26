@@ -50,7 +50,7 @@ const frame = (kind, width, theme, body) => `<section class="application ${FRAME
 const page = (html) => `<!doctype html><html><head><meta charset="utf-8">
    <style>body{margin:0;background:#444;font-family:sans-serif}*{box-sizing:border-box}button,input,select{font:inherit}
    /* Foundry core's control defaults, roughly (v13/v14 foundry.css): ours must override them. */
-   button{min-height:var(--button-size,2rem);padding:0 .5rem;line-height:1.5}input[type=text]{height:var(--input-height,2rem)}
+   button{min-height:var(--button-size,2rem);padding:0 .5rem;line-height:1.5;justify-content:center}input[type=text]{height:var(--input-height,2rem)}
    ${css}</style></head><body>${html}</body></html>`;
 
 /** Runs in the page: lists everything that overflows, and text fields inside width containers. */

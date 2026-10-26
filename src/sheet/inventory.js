@@ -5,10 +5,10 @@
 import { INVENTORY_PINS, pinView } from './lists.js';
 
 /** The columns a player can show or hide, in Classic's order (user, 2026-10-26). */
-export const INVENTORY_COLUMNS = ['weight', 'uses', 'usage', 'quantity', 'equipped', 'attuned'];
+export const INVENTORY_COLUMNS = ['weight', 'uses', 'usage', 'quantity', 'equipped', 'attuned', 'favorite'];
 
 /** What shows before a player chooses: weight is off, since nothing at the table enforces it (user, 2026-10-26). */
-export const DEFAULT_COLUMNS = { weight: false, uses: true, usage: true, quantity: true, equipped: true, attuned: true };
+export const DEFAULT_COLUMNS = { weight: false, uses: true, usage: true, quantity: true, equipped: true, attuned: true, favorite: true };
 
 /** @returns {object} A player's saved choice laid over the defaults, so a column added later still shows. */
 export function columnChoice(saved)
@@ -75,6 +75,8 @@ export function inventoryView(facts, { format, localize })
             label: format('FHCS.Inventory.ContentsLabel', { name: item.name, count: contents.length }),
             contents
          } : null,
+         favorite: !!item.favorite,
+         favoriteLabel: localize(item.favorite ? 'FHCS.Favorite.On' : 'FHCS.Favorite.Off'),
          editLabel: format('FHCS.Inventory.EditLabel', { name: item.name }),
          deleteLabel: format('FHCS.Inventory.DeleteLabel', { name: item.name })
       };

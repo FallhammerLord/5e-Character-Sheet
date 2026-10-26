@@ -198,7 +198,7 @@ const inventoryFacts = (over = {}) => ({
       { id: 'weapons', label: 'Weapons', items: [
          gear('Light Crossbow', '#6b5a3a', { equip: worn(true), weight: '5 lb', usage: '1 Action', expanded: true,
             summary: '<div class="item-summary"><p>A simple ranged weapon. Load one bolt at a time.</p></div>' }),
-         gear('Mace', '#5a5a66', { equip: worn(true), weight: '4 lb', usage: '1 Action' }),
+         gear('Mace', '#5a5a66', { equip: worn(true), weight: '4 lb', usage: '1 Action', favorite: true }),
          gear('Mace of Disruption of the Seventh Sunless Vault', '#9a7a2a', { equip: worn(false), weight: '4 lb', usage: '1 Action',
             attune: { on: false, disabled: false, need: 'Requires attunement' } })
       ] },

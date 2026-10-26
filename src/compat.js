@@ -216,6 +216,13 @@ async function containedContext(sheet, item)
    return ctx;
 }
 
+/** @returns {boolean} Whether an item is among the actor's favorites (`system.favorites`, relative UUIDs). */
+function isFavorite(actor, item)
+{
+   const id = item.getRelativeUUID?.(actor) ?? `.Item.${item.id}`;
+   return (actor.system.favorites ?? []).some((f) => f.type === 'item' && f.id === id);
+}
+
 /** One Inventory row's facts; a container's carries its contents, unless dnd5e hides them from this user. */
 async function rowFacts(sheet, item, ctx, depth = 0)
 {
@@ -252,6 +259,7 @@ async function rowFacts(sheet, item, ctx, depth = 0)
       uses,
       usage: item.isActive ? (item.labels?.activation ?? '') : '',
       quantity: item.system.quantity ?? null,
+      favorite: isFavorite(sheet.actor, item),
       equip: ctx.equip?.applicable ? { on: !!item.system.equipped, disabled: !!ctx.equip.disabled } : null,
       attune: ctx.attunement?.applicable ? {
          on: !!item.system.attuned,
@@ -425,7 +433,6 @@ export async function spellbookFacts(sheet, context, { columns })
    const actor = sheet.actor;
    const config = CONFIG.DND5E;
    const ctxs = context.itemContext ?? {};
-   const favorites = new Set((actor.system.favorites ?? []).filter((f) => f.type === 'item').map((f) => f.id));
 
    const sections = [];
    for (const section of Object.values(context.spellbook ?? {}))
@@ -446,7 +453,7 @@ export async function spellbookFacts(sheet, context, { columns })
             // dnd5e's subtitle is the granting item and the components (base-actor-sheet.mjs:990); components have a column.
             sub: String(ctx.subtitle ?? '').split('\u2022').map((part) => part.trim())
                .filter((part) => part && part !== item.labels?.components?.vsm).join(' \u00b7 '),
-            favorite: favorites.has(item.getRelativeUUID?.(actor) ?? `.Item.${item.id}`),
+            favorite: isFavorite(actor, item),
             expanded: !!ctx.isExpanded,
             summary: ctx.isExpanded && ctx.expanded ? await renderTemplate(ITEM_SUMMARY, ctx.expanded) : '',
             components: item.labels?.components?.vsm ?? '',

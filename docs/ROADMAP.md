@@ -58,7 +58,8 @@ Built 2026-10-26, all in code; waits on Quench (four new core tests) and the use
 - [ ] Attributes favorites: prepared shows the book and the kind colors, not the bookmark; innate and at-will favorites stay plain (no book to mark them)
 - [ ] Spellcasting strip: a card per class (ability, attack, DC, prepared / max); concentration bar with open, End and Con save
 - [ ] Sections in the mockup's order with slot pips (filled = left, temporary dotted); Pact Magic, innate, at will, ritual and item sections; slot settings in edit mode
-- [ ] Spell rows: three-state book, components, time in words, range, concentration mark (filled while held), favorite bookmark and glow; Columns menu (school and target off by default)
+- [ ] Spell rows: three-state book, components, time in words, range, concentration mark (filled while held), favorite toggle and glow; Columns menu (school and target off by default)
+- [ ] Favorite toggle column on Inventory rows too, with the glow (user, 2026-10-26); names left-aligned (Foundry centered them)
 - [ ] Filters: pinned Action, Bonus, Reaction, Conc., Prepared; Can cast and V, S, M added to dnd5e's menu
 
 ## Phase 5: Features, Effects, Biography, Journal

@@ -5,10 +5,11 @@
 import { SPELL_PINS, pinView } from './lists.js';
 
 /** The columns a player can show or hide. The prepare mark always shows; it isn't a column choice. */
-export const SPELL_COLUMNS = ['components', 'concentration', 'time', 'range', 'school', 'target'];
+export const SPELL_COLUMNS = ['components', 'concentration', 'time', 'range', 'school', 'target', 'favorite'];
 
-/** What shows before a player chooses (user, 2026-10-26): components, concentration, time and range. */
-export const DEFAULT_SPELL_COLUMNS = { components: true, concentration: true, time: true, range: true, school: false, target: false };
+/** What shows before a player chooses (user, 2026-10-26): components, concentration, time, range and the favorite toggle. */
+export const DEFAULT_SPELL_COLUMNS = { components: true, concentration: true, time: true, range: true, school: false, target: false,
+   favorite: true };
 
 /** Filters we add to dnd5e's: Can cast and the components (Tidy Classic's menu has them; dnd5e doesn't). */
 export const EXTRA_SPELL_FILTERS = ['canCast', 'vocal', 'somatic', 'material'];
@@ -103,7 +104,7 @@ export function spellbookView(facts, { format, localize })
          sub: spell.sub ?? '',
          kind,
          favorite: !!spell.favorite,
-         favoriteLabel: localize('FHCS.Spellbook.Favorite'),
+         favoriteLabel: localize(spell.favorite ? 'FHCS.Favorite.On' : 'FHCS.Favorite.Off'),
          useLabel: format('FHCS.Spellbook.CastLabel', { name: spell.name }),
          detailsLabel: format('FHCS.Inventory.DetailsLabel', { name: spell.name }),
          expanded: !!spell.expanded,

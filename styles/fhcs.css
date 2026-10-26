@@ -1742,14 +1742,21 @@
 }
 
 .fhcs-sheet .fhcs-col-img { flex: none; width: 24px; }
-.fhcs-sheet .fhcs-col-name { flex: 1; min-width: 0; }
+/* Names keep at least 96px; the columns that can give way (usage, time, range) do so first. */
+.fhcs-sheet .fhcs-col-name { flex: 1; min-width: 96px; }
 .fhcs-sheet .fhcs-col-weight { flex: none; width: 56px; text-align: right; white-space: nowrap; }
 .fhcs-sheet .fhcs-col-uses { flex: none; display: flex; align-items: center; justify-content: center; gap: var(--fhcs-s1); width: 72px; white-space: nowrap; }
-.fhcs-sheet .fhcs-col-usage { flex: none; width: 112px; overflow: hidden; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+/* Usage gives way (to 64px, ellipsed) before the name does, with every column on at the narrowest width. */
+.fhcs-sheet .fhcs-col-usage { flex: 0 1 112px; min-width: 64px; overflow: hidden; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
 .fhcs-sheet .fhcs-col-quantity { flex: none; width: 44px; text-align: center; }
 .fhcs-sheet .fhcs-col-toggle { flex: none; display: flex; justify-content: center; width: var(--fhcs-control); }
 .fhcs-sheet .fhcs-col-edit { flex: none; display: flex; gap: var(--fhcs-s1); width: calc(var(--fhcs-control) * 2 + var(--fhcs-s1)); }
 .fhcs-sheet .fhcs-item-head .fhcs-col-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* An Inventory heading: the section name gives way to the count beside it. */
+.fhcs-sheet .fhcs-inventory .fhcs-item-head .fhcs-col-name { display: flex; align-items: center; gap: var(--fhcs-s1); }
+.fhcs-sheet .fhcs-inventory .fhcs-item-head .fhcs-col-name > :first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.fhcs-sheet .fhcs-inventory .fhcs-item-head .fhcs-col-name > :last-child { flex: none; }
 
 .fhcs-sheet .fhcs-item { border-bottom: 1px solid var(--fhcs-line-soft); }
 
@@ -1786,6 +1793,8 @@
 .fhcs-sheet .fhcs-contents-toggle[aria-expanded="true"] .fhcs-caret { transform: rotate(90deg); }
 
 /* Equipped: a tint, a left edge and the check in its toggle, never color alone (SCOPE §4.5). */
+.fhcs-sheet .fhcs-item.fhcs-equipped { --fhcs-edge: var(--fhcs-success); }
+
 .fhcs-sheet .fhcs-item.fhcs-equipped > .fhcs-item-row
 {
    background: color-mix(in srgb, var(--fhcs-success) 12%, transparent);
@@ -1820,6 +1829,8 @@
 {
    display: flex;
    align-items: center;
+   /* Foundry centers a button's content; names read from the left (user, 2026-10-26). */
+   justify-content: flex-start;
    gap: var(--fhcs-s2);
    min-height: var(--fhcs-control);
    margin: 0;
@@ -2092,11 +2103,11 @@
 
 .fhcs-sheet .fhcs-col-components { flex: none; width: 52px; text-align: center; white-space: nowrap; }
 .fhcs-sheet .fhcs-col-conc { flex: none; display: flex; justify-content: center; width: var(--fhcs-control); }
-/* With every column on at the narrowest width, these give way (to 48px, ellipsed) before the row overflows. */
+/* With every column on at the narrowest width, these give way (to 40px, ellipsed) before the row overflows. */
 .fhcs-sheet :is(.fhcs-col-time, .fhcs-col-range, .fhcs-col-school, .fhcs-col-target)
 {
    flex: 0 1 72px;
-   min-width: 48px;
+   min-width: 40px;
    overflow: hidden;
    text-overflow: ellipsis;
    white-space: nowrap;
@@ -2117,15 +2128,19 @@
    box-shadow: inset 3px 0 0 var(--fhcs-kind);
 }
 
-/* Favorites: a bookmark by the name and a faint glow inside the row's edge (user, 2026-10-26). */
-.fhcs-sheet .fhcs-spell.fhcs-favorited > .fhcs-item-row
+/* Favorites, on both list tabs: the bookmark toggle filled, and a faint glow inside the row's edge, which keeps
+   the row's own left edge (equipped, or the preparation kind) (user, 2026-10-26). */
+.fhcs-sheet .fhcs-spell[class*="fhcs-kind-"] { --fhcs-edge: var(--fhcs-kind); }
+
+.fhcs-sheet .fhcs-item.fhcs-favorited > .fhcs-item-row
 {
    border-radius: 4px;
-   box-shadow: inset 3px 0 0 var(--fhcs-kind, transparent), inset 0 0 0 1px var(--fhcs-fav),
+   box-shadow: inset 3px 0 0 var(--fhcs-edge, transparent), inset 0 0 0 1px var(--fhcs-fav),
       inset 0 0 6px color-mix(in srgb, var(--fhcs-fav) 50%, transparent);
 }
 
-.fhcs-sheet .fhcs-fav-mark { flex: none; width: 14px; height: 14px; fill: var(--fhcs-fav); stroke: none; }
+.fhcs-sheet .fhcs-toggle-fav[aria-pressed="true"] { border-color: var(--fhcs-fav); color: var(--fhcs-fav); }
+.fhcs-sheet .fhcs-toggle-fav[aria-pressed="true"] .fhcs-icon { fill: currentColor; }
 
 /* The prepare mark: a book, filled when prepared, in its kind's color; a lock badge when always prepared. */
 .fhcs-sheet .fhcs-toggle-prep { position: relative; }
