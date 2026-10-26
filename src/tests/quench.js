@@ -61,6 +61,16 @@ export function registerQuenchTests(quench)
          field.dispatchEvent(new Event('change', { bubbles: true })); // redraw-safe: after settled()
       };
 
+      /**
+       * Creates items and returns them in the order given, matched by name: Foundry's result need not keep that order,
+       * and a test that took it on trust mixed up its spells (2026-10-26).
+       */
+      const createItems = async (data) =>
+      {
+         const made = await actor.createEmbeddedDocuments('Item', data);
+         return data.map((d) => made.find((item) => item.name === d.name));
+      };
+
       /** Waits until a condition holds, or fails the test after HOOK_WAIT_MS. */
       const until = async (condition, what) =>
       {
@@ -312,7 +322,7 @@ export function registerQuenchTests(quench)
          {
             this.timeout(HOOK_WAIT_MS * 4);
             const [pack] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test pack', type: 'container' }]);
-            const [rope, torch] = await actor.createEmbeddedDocuments('Item', [
+            const [rope, torch] = await createItems([
                { name: 'FHCS test rope', type: 'loot', system: { container: pack.id } },
                { name: 'FHCS test torch', type: 'loot' }
             ]);
@@ -366,7 +376,7 @@ export function registerQuenchTests(quench)
          it('lists spells by section and prepares them from the book', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 4);
-            const [open, always, cantrip] = await actor.createEmbeddedDocuments('Item', [
+            const [open, always, cantrip] = await createItems([
                { name: 'FHCS test bolt', type: 'spell', system: { level: 1, method: 'spell', prepared: 0 } },
                { name: 'FHCS test ward', type: 'spell', system: { level: 1, method: 'spell', prepared: 2 } },
                { name: 'FHCS test spark', type: 'spell', system: { level: 0, method: 'spell' } }
@@ -406,7 +416,7 @@ export function registerQuenchTests(quench)
          it('filters spells from a pinned button and shows the pin pressed', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 3);
-            const [ready, idle] = await actor.createEmbeddedDocuments('Item', [
+            const [ready, idle] = await createItems([
                { name: 'FHCS test ready', type: 'spell', system: { level: 1, method: 'spell', prepared: 1 } },
                { name: 'FHCS test idle', type: 'spell', system: { level: 1, method: 'spell', prepared: 0 } }
             ]);
