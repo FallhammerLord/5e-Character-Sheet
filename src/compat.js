@@ -689,6 +689,38 @@ export async function effectsFacts(sheet, context)
    };
 }
 
+/** The five text boxes of dnd5e's Biography, by field: Classic's order, personality first (character-biography.hbs). */
+const BIOGRAPHY_BOXES = [
+   ['trait', 'DND5E.PersonalityTraits'], ['ideal', 'DND5E.Ideals'], ['bond', 'DND5E.Bonds'], ['flaw', 'DND5E.Flaws'],
+   ['appearance', 'DND5E.Appearance']
+];
+
+/**
+ * Plain facts for the Biography tab (src/sheet/biography.js), from dnd5e's own fields (SCOPE §4.8: text carries over
+ * between sheets): `_prepareBiographyContext`'s characteristics and enriched biography (character-sheet.mjs:290),
+ * and the five text boxes at `system.details.*`.
+ */
+export function biographyFacts(sheet, context)
+{
+   const details = sheet.actor.system.details ?? {};
+   return {
+      characteristics: (context.characteristics ?? []).map((c) => ({
+         name: c.name, label: game.i18n.localize(c.label ?? ''), value: String(c.value ?? ''), source: String(c.source ?? '')
+      })),
+      boxes: BIOGRAPHY_BOXES.map(([key, label]) => ({
+         key, name: `system.details.${key}`, label: game.i18n.localize(label), value: String(details[key] ?? '')
+      })),
+      biography: {
+         name: 'system.details.biography.value',
+         label: game.i18n.localize('DND5E.Biography'),
+         enriched: context.enriched?.value ?? '',
+         source: details.biography?.value ?? ''
+      },
+      uuid: sheet.actor.uuid,
+      editing: sheet.isEditMode && sheet.isEditable
+   };
+}
+
 /**
  * After dnd5e's advancement finishes (`dnd5e.advancementManagerComplete`), records the order of class levels: the
  * recorded order, brought up to date by `reconcile` (src/sheet/header.js levelOrder).

@@ -11,6 +11,7 @@ import { inventoryView } from '../src/sheet/inventory.js';
 import { spellbookView } from '../src/sheet/spellbook.js';
 import { featuresView } from '../src/sheet/features.js';
 import { effectsView } from '../src/sheet/effects.js';
+import { biographyView } from '../src/sheet/biography.js';
 import { format, localize } from './templates.mjs';
 
 /** A usage card's context as FHCSUsageMessageData#_prepareContext builds it, with overrides. */
@@ -399,7 +400,51 @@ const effects = (over) => ({
    fhcsEffects: effectsView(effectsFacts(over), { format, localize })
 });
 
+/** The Biography tab's facts as compat.biographyFacts gathers them, with overrides. */
+const CHARACTERISTICS = { alignment: 'Neutral Good', eyes: 'Grey', height: '4 ft 5 in', faith: 'Lathander, the Morninglord',
+   hair: 'Copper, braided', weight: '170 lb', gender: 'Female', skin: 'Ruddy', age: '87' };
+const biographyFacts = (over = {}, chars = CHARACTERISTICS) => ({
+   characteristics: Object.entries(chars).map(([key, value]) => ({
+      name: `system.details.${key}`, label: key[0].toUpperCase() + key.slice(1), value, source: value
+   })),
+   boxes: [
+      ['trait', 'Personality Traits', 'Quotes scripture at the worst possible moment.'],
+      ['ideal', 'Ideals', 'Charity. Every soul deserves a second dawn.'],
+      ['bond', 'Bonds', 'The temple at Thunderforge took me in when the clan would not.'],
+      ['flaw', 'Flaws', 'I trust priests far too quickly.'],
+      ['appearance', 'Appearance', 'Stocky and weathered, with a sunburst tattoo across her left forearm.']
+   ].map(([key, label, value]) => ({ key, name: `system.details.${key}`, label, value })),
+   biography: { name: 'system.details.biography.value', label: 'Biography',
+      enriched: '<p>Born to a clan of smiths in the Thunderforge holds, Brenna was expected to work the forge.</p><p>A cave-in changed that.</p>',
+      source: '<p>Born to a clan of smiths…</p>' },
+   uuid: 'Actor.x',
+   editing: false,
+   ...over
+});
+const biography = (over, chars) => ({
+   tab: { id: 'biography', group: 'primary', cssClass: 'active' },
+   fhcsBiography: biographyView(biographyFacts(over, chars), { format, localize })
+});
+const LONG_BIO = ['Born to a clan of smiths in the Thunderforge holds, Brenna Coppervein was expected to work the forge like her mothers before her. A cave-in at the eastern seam changed that: trapped for three days with the injured, she prayed until the dark answered with light.',
+   'The temple of Lathander took her in when the clan called the vision madness. Twenty years of service followed: field hospitals in the Goblin Wars, plague wards in Neverwinter, and one ill-advised pilgrimage with a bard who still owes her forty gold.',
+   'Notes: owes the Harpers a favour; Brother Aldo knows her real name; https://example.invalid/an-unbroken-very-long-link-that-must-wrap-somewhere-sensible'];
+
 export const CASES = [
+   { name: 'biography', template: 'sheet/biography', context: biography() },
+   {
+      name: 'biography-long', template: 'sheet/biography',
+      context: biography({
+         boxes: biographyFacts().boxes.map((b) => ({ ...b, value: b.key === 'flaw' ? '' : b.key === 'trait'
+            ? 'Quotes scripture at the worst possible moment, and means every word.\nKeeps a tally of every life saved, scratched into the haft of her mace.' : b.value })),
+         biography: { ...biographyFacts().biography, enriched: LONG_BIO.map((p) => `<p>${p}</p>`).join('') }
+      }, { ...CHARACTERISTICS, faith: '', skin: '' })
+   },
+   { name: 'biography-editing', template: 'sheet/biography', context: biography({ editing: true }, { ...CHARACTERISTICS, faith: '', skin: '' }) },
+   {
+      name: 'biography-empty', template: 'sheet/biography',
+      context: biography({ boxes: biographyFacts().boxes.map((b) => ({ ...b, value: '' })), biography: { ...biographyFacts().biography, enriched: '' } },
+         Object.fromEntries(Object.keys(CHARACTERISTICS).map((k) => [k, ''])))
+   },
    { name: 'effects', template: 'sheet/effects', context: effects() },
    {
       name: 'effects-long', template: 'sheet/effects',

@@ -106,6 +106,6 @@ Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies insta
 - **STATUS holds the current state, short.** One entry per thing; the run-by-run story belongs in commit messages. When a part is verified, its entry moves to "Verified" and its how-it-works goes to BUILT.
 - **SCOPE records decisions with who and when** ("user, 2026-10-26"). Replace a superseded decision in place and say what changed; don't leave both.
 
-### Quest log rules not yet needed
+### Quest log rules, carried over
 
-Copy into the sections above when the first case comes up: no `container-type` around text fields; `<prose-mirror toggled>` without `open`; HTML in templates.
+Taken in with the Biography tab (2026-10-26), the first text fields: no `container-type` around text fields; `<prose-mirror toggled>` without `open` (the text shows until the player chooses to edit); enriched HTML goes into templates with `{{{ }}}`, computed in the view, never built from strings in the template.

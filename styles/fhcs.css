@@ -2346,3 +2346,59 @@
 .fhcs-sheet .fhcs-condition-name { flex: 1; min-width: 0; overflow: hidden; text-align: left; text-overflow: ellipsis; }
 .fhcs-sheet .fhcs-condition:not([aria-pressed="true"]) .fhcs-switch-mark { color: var(--fhcs-muted); }
 .fhcs-sheet .fhcs-condition[aria-pressed="true"] { border-color: currentColor; background: var(--fhcs-fill); }
+
+/* ---------- Biography tab (SCOPE §4.8) ---------- */
+
+.fhcs-sheet .fhcs-biography.active { display: flex; flex-direction: column; gap: var(--fhcs-s2); }
+
+/* Characteristics: a label beside each value, in as many columns as fit. */
+.fhcs-sheet .fhcs-characteristics
+{
+   display: grid;
+   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+   gap: var(--fhcs-s1) var(--fhcs-s2);
+   margin: 0;
+   padding: var(--fhcs-s2);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-fill);
+}
+
+.fhcs-sheet .fhcs-characteristic { display: flex; align-items: baseline; gap: var(--fhcs-s2); min-width: 0; }
+.fhcs-sheet .fhcs-characteristic dt { flex: none; width: 84px; }
+.fhcs-sheet .fhcs-characteristic dd { flex: 1; min-width: 0; margin: 0; overflow-wrap: anywhere; }
+
+/* Two columns: the short boxes on the left, appearance and the biography (wider) on the right. */
+.fhcs-sheet .fhcs-bio-columns
+{
+   display: grid;
+   grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+   align-items: start;
+   gap: var(--fhcs-s2);
+}
+
+.fhcs-sheet .fhcs-bio-column { display: flex; flex-direction: column; gap: var(--fhcs-s2); min-width: 0; }
+.fhcs-sheet .fhcs-bio-column:empty { display: none; }
+
+.fhcs-sheet .fhcs-bio-box
+{
+   display: flex;
+   flex-direction: column;
+   gap: var(--fhcs-s1);
+   min-width: 0;
+   padding: var(--fhcs-s2);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+}
+
+.fhcs-sheet .fhcs-bio-box h3 { margin: 0; border: 0; }
+.fhcs-sheet .fhcs-bio-box p { margin: 0; overflow-wrap: anywhere; }
+.fhcs-sheet .fhcs-bio-text { overflow-wrap: anywhere; }
+.fhcs-sheet .fhcs-bio-text > :first-child { margin-top: 0; }
+.fhcs-sheet .fhcs-bio-text > :last-child { margin-bottom: 0; }
+.fhcs-sheet :is(.fhcs-bio-text, .fhcs-bio-story prose-mirror) :is(p, ul, ol) { margin: 0 0 var(--fhcs-s2); }
+
+/* Edit mode: dnd5e's fields, reading from the left. */
+.fhcs-sheet .fhcs-biography .fhcs-input { text-align: left; }
+.fhcs-sheet .fhcs-bio-input { min-height: calc(var(--fhcs-control) * 3); padding: var(--fhcs-s1); white-space: pre-wrap; resize: vertical; }
+.fhcs-sheet .fhcs-bio-story prose-mirror { display: block; min-height: 160px; font-size: var(--fhcs-body-size); line-height: var(--fhcs-body-line); }

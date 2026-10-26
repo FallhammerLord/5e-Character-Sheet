@@ -117,8 +117,8 @@ Research note, "Features, Effects, Biography, Journal". Every list matches Inven
 - **Top row** (user, 2026-10-26): class cards, Species and Background side by side in one row, to save height; wraps only when they don't fit (species and background drop together). Picture and name open the item.
 - **Class cards:** picture, class, subclass, level, and a Level up button (arrow, tip "Level up") that opens dnd5e's level-up wizard (its advancement manager, as its level dropdown does; a plain level change when the world turns advancements off). A dashed "Subclass" button when one is due (dnd5e's `findItem`). Level down and adding a class stay edit mode (Phase 6).
 - **Species and Background cards:** the kind as a label, the item's picture and name; a dashed "Choose" button when missing (`findItem`).
-- **Effects:** dnd5e's categories (Temporary, Passive, Inactive, Suppressed when any), rows with Source and Duration and an on/off mark; under them a conditions grid, each with its icon and name. The header keeps showing active conditions.
-- **Biography:** Classic's layout (characteristics across the top; ideals, bonds, flaws, personality; appearance and biography). Read in play, written in edit mode (Phase 6).
+- **Effects:** dnd5e's categories (Temporary, Passive, Inactive, Suppressed when any), rows with Source and Duration and an on/off switch (a concentration shows its C: it ends on the Spellbook); under them a conditions grid, each with its icon and name. The header keeps showing active conditions. Fixed columns, no Columns menu (Claude, 2026-10-26: four short columns, nothing to hide).
+- **Biography:** Classic's layout (characteristics across the top; personality, ideals, bonds, flaws on the left; appearance and biography on the right). Read in play, empty fields hidden. Edit mode shows dnd5e's own fields now, not in Phase 6, so players can keep writing on our sheet (Claude, 2026-10-26, a small extension).
 - **Journal: dropped** (user, 2026-10-26). dnd5e has none; quests live in the quest log, notes in the biography. Tidy's Journal notes stay untouched in Tidy's flags on the actor.
 
 ## 5. ADHD rules carried over

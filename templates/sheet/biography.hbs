@@ -1,0 +1,43 @@
+{{!-- The Biography tab (SCOPE §4.8): dnd5e's own fields, so text written on dnd5e's sheet or Tidy's shows here and the
+      other way round. Characteristics across the top; personality, ideals, bonds and flaws on the left; appearance and
+      the biography on the right. In play it reads (empty fields hidden); in edit mode each field is dnd5e's input under
+      dnd5e's name, which the sheet's form saves. It takes dnd5e's "biography" part ID. --}}
+<section class="tab fhcs-biography {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
+   {{#with fhcsBiography}}
+   {{#if characteristics.length}}
+   <dl class="fhcs-characteristics">
+      {{#each characteristics}}
+      <div class="fhcs-characteristic">
+         <dt class="fhcs-label fhcs-muted">{{#if ../editing}}<label for="fhcs-bio-{{ @index }}">{{ label }}</label>{{else}}{{ label }}{{/if}}</dt>
+         <dd class="fhcs-body">
+            {{#if ../editing}}<input type="text" class="fhcs-input fhcs-body" id="fhcs-bio-{{ @index }}" name="{{ name }}" value="{{ source }}">
+            {{else}}{{ value }}{{/if}}
+         </dd>
+      </div>
+      {{/each}}
+   </dl>
+   {{/if}}
+
+   {{#if empty}}<p class="fhcs-body fhcs-muted fhcs-empty">{{ text.empty }}</p>{{/if}}
+
+   <div class="fhcs-bio-columns">
+      <div class="fhcs-bio-column">
+         {{#each left}}{{> "modules/fhcs/templates/sheet/bio-box.hbs" editing=../editing }}{{/each}}
+      </div>
+      <div class="fhcs-bio-column fhcs-bio-wide">
+         {{#each right}}{{> "modules/fhcs/templates/sheet/bio-box.hbs" editing=../editing }}{{/each}}
+         {{#if biography}}
+         <section class="fhcs-bio-box fhcs-bio-story">
+            <h3 class="fhcs-label">{{ biography.label }}</h3>
+            {{#if editing}}
+            {{!-- Toggled, without open: the text shows until the player chooses to edit it (the quest log's rule). --}}
+            <prose-mirror name="{{ biography.name }}" value="{{ biography.source }}" document-uuid="{{ uuid }}" toggled>{{{ biography.enriched }}}</prose-mirror>
+            {{else}}
+            <div class="fhcs-body fhcs-bio-text">{{{ biography.enriched }}}</div>
+            {{/if}}
+         </section>
+         {{/if}}
+      </div>
+   </div>
+   {{/with}}
+</section>

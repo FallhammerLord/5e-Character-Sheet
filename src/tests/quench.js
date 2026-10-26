@@ -580,6 +580,25 @@ export function registerQuenchTests(quench)
             await until(() => prone() === had, 'a second click puts it back');
             await effect.delete();
          });
+
+         it('reads the biography in play from dnd5e\'s fields, and writes them in edit mode', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 4);
+            const before = foundry.utils.deepClone(actor._source.system.details);
+            await actor.update({ 'system.details.ideal': 'FHCS test ideal', 'system.details.bond': '', 'system.details.eyes': 'Grey' });
+            await settled();
+            const box = (key) => sheet.element.querySelector(`.fhcs-biography [data-fhcs-box="${key}"]`);
+            await until(() => box('ideal')?.textContent.includes('FHCS test ideal'), 'the ideal written through dnd5e shows in play');
+            assert.notOk(box('bond'), 'an empty box is hidden in play');
+            await click('.fhcs-tabs [data-action="changeMode"]');
+            await until(() => sheet.isEditMode && sheet.element.querySelector('.fhcs-biography textarea[name="system.details.bond"]'),
+               'edit mode shows dnd5e\'s field for every box');
+            await enter('.fhcs-biography textarea[name="system.details.bond"]', 'FHCS test bond');
+            await until(() => actor.system.details.bond === 'FHCS test bond', () => `the box saves to dnd5e's field; bond is "${actor.system.details.bond}"`);
+            await click('.fhcs-tabs [data-action="changeMode"]');
+            await until(() => !sheet.isEditMode, 'back to play mode');
+            await actor.update({ 'system.details.ideal': before.ideal ?? '', 'system.details.bond': before.bond ?? '', 'system.details.eyes': before.eyes ?? '' });
+         });
       });
    }, { displayName: 'Fallhammer Character Sheet: core' });
 

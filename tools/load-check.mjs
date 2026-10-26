@@ -146,6 +146,9 @@ else
    if (parts.features?.scrollable?.join() !== '.fhcs-items') { problems.push('the features part does not keep its list\'s scroll'); }
    if (!parts.effects?.template.startsWith('modules/fhcs/')) { problems.push('the effects part is still dnd5e\'s'); }
    if (!parts.effects?.templates?.some((p) => p.endsWith('/list-bar.hbs'))) { problems.push('the effects part does not load list-bar.hbs'); }
+   if (!parts.biography?.template.startsWith('modules/fhcs/')) { problems.push('the biography part is still dnd5e\'s'); }
+   if (!parts.biography?.templates?.some((p) => p.endsWith('/bio-box.hbs'))) { problems.push('the biography part does not load bio-box.hbs'); }
+   if (parts.biography?.scrollable?.join() !== '') { problems.push('the biography tab lost dnd5e\'s scrolling'); }
    // Partials included by a tab must load with its part: each list tab's rows and the shared search bar.
    for (const [id, row] of [['inventory', 'item-row'], ['spells', 'spell-row'], ['features', 'feature-row']])
    {

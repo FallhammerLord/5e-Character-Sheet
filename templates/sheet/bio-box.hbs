@@ -1,0 +1,11 @@
+{{!-- One Biography text box (personality, ideals, bonds, flaws, appearance), included by biography.hbs with
+      `editing`: its paragraphs in play, dnd5e's textarea under dnd5e's name in edit mode. --}}
+<section class="fhcs-bio-box" data-fhcs-box="{{ key }}">
+   {{#if editing}}
+   <label class="fhcs-label" for="fhcs-bio-{{ key }}">{{ label }}</label>
+   <textarea class="fhcs-input fhcs-body fhcs-bio-input" id="fhcs-bio-{{ key }}" name="{{ name }}" rows="3">{{ value }}</textarea>
+   {{else}}
+   <h3 class="fhcs-label">{{ label }}</h3>
+   {{#each paragraphs}}<p class="fhcs-body">{{ this }}</p>{{/each}}
+   {{/if}}
+</section>

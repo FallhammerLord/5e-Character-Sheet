@@ -304,6 +304,9 @@
       "Level": "{level}",
       "LevelLabel": "{name}, level {level}: click to raise, right-click to lower",
       "Empty": "No effects on this character."
+    },
+    "Biography": {
+      "Empty": "Nothing written yet. Unlock the sheet to write a biography."
     }
   }
 }

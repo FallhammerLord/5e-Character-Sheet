@@ -74,7 +74,7 @@ Built in slices; each box is ticked once seen in Quench and play:
 
 - [ ] 5a Features (built 2026-10-26): one row of class, species and background cards (Level up opens dnd5e's wizard; dashed Choose for a missing subclass, class, species or background); features by source or active and passive (dnd5e's grouping, named in words); Uses, Usage, Recovery, favorite; Columns menu; pins Action, Bonus, Reaction
 - [ ] 5b Effects (built 2026-10-26): dnd5e's categories (Temporary, Passive, Inactive, Suppressed when any) on its effects element, with Source, Duration, the on/off switch (a concentration shows its C) and the favorite bookmark; edit and delete in edit mode; the conditions grid (exhaustion counts up on a click, down on a right-click)
-- [ ] 5c Biography: characteristics, the five text boxes and the biography, read in play, empty ones hidden
+- [ ] 5c Biography (built 2026-10-26): characteristics, the five text boxes and the biography from dnd5e's fields, read in play with empty ones hidden; dnd5e's inputs and its toggled editor in edit mode
 
 ## Phase 6: Edit mode and lifecycle
 

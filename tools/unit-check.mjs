@@ -13,6 +13,7 @@ import { columnChoice, inventoryView } from '../src/sheet/inventory.js';
 import { canCast, prepState, spellbookView, spellColumnChoice, spellKind } from '../src/sheet/spellbook.js';
 import { featureColumnChoice, featuresView, groupingOf } from '../src/sheet/features.js';
 import { effectsView } from '../src/sheet/effects.js';
+import { biographyView, paragraphs } from '../src/sheet/biography.js';
 import { pinView } from '../src/sheet/lists.js';
 import { headerMinWidth, headerView, levelOrder, levelTrack, signed, tabRow } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
@@ -444,10 +445,31 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    if (!effectsView({ categories: [], conditions: [] }, { format, localize }).empty) { problems.push('an empty Effects tab is not marked empty'); }
 }
 
+// Biography (SCOPE §4.8): empty fields hidden in play, every field in edit mode, boxes split into columns.
+{
+   const facts = (editing, enriched) => ({
+      editing,
+      characteristics: [{ name: 'system.details.eyes', label: 'Eyes', value: 'Grey', source: 'Grey' },
+         { name: 'system.details.faith', label: 'Faith', value: ' ', source: '' }],
+      boxes: ['trait', 'ideal', 'bond', 'flaw', 'appearance'].map((key) => ({ key, name: `system.details.${key}`, label: key, value: key === 'flaw' ? '' : `${key} text` })),
+      biography: { name: 'system.details.biography.value', label: 'Biography', enriched, source: enriched }
+   });
+   const play = biographyView(facts(false, '<p> </p>'), { format, localize });
+   const shape = [play.characteristics.length, play.left.map((b) => b.key).join(), play.right.map((b) => b.key).join(), play.biography];
+   try { deepStrictEqual(shape, [1, 'trait,ideal,bond', 'appearance', null]); }
+   catch { problems.push(`biography in play: ${JSON.stringify(shape)}`); }
+   const edit = biographyView(facts(true, ''), { format, localize });
+   if (edit.characteristics.length !== 2 || edit.left.length !== 4 || !edit.biography || edit.empty) { problems.push('edit mode does not show every biography field'); }
+   const blank = biographyView({ characteristics: [], boxes: [], biography: { enriched: '' } }, { format, localize });
+   if (!blank.empty) { problems.push('an empty Biography is not marked empty'); }
+   try { deepStrictEqual(paragraphs('One\r\n\n  Two  \n'), ['One', 'Two']); }
+   catch { problems.push(`paragraphs: ${JSON.stringify(paragraphs('One\r\n\n  Two  \n'))}`); }
+}
+
 // Each extra ability (honor, sanity) widens the minimum by one column and its gap.
 if (headerMinWidth(7) - headerMinWidth(6) !== 56) { problems.push('the sheet minimum does not grow by one ability column'); }
 
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
 console.log(`${CASES.length} outcome lines, ${PART_CASES.length} card layouts, ${ROW_CASES.length} d20 rows, `
    + `${DAMAGE_CASES.length} damage bands, ${SAVE_CASES.length} save rows, ${KEEP_CASES.length} late adds and `
-   + `${MATH_CASES.length} dice sums read as expected; ${ORDER_CASES.length} level orders, the milestone track, the inventory, spellbook, features and effects views hold.`);
+   + `${MATH_CASES.length} dice sums read as expected; ${ORDER_CASES.length} level orders, the milestone track, the inventory, spellbook, features, effects and biography views hold.`);

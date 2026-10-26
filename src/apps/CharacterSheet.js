@@ -1,11 +1,12 @@
 import { MODULE_ID, MODULE_PATH } from '../constants.js';
-import { attributesFacts, cycleListGrouping, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelUpClass,
+import { attributesFacts, biographyFacts, cycleListGrouping, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelUpClass,
    passesExtraFilters, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
 import { EXTRA_SPELL_FILTERS, spellbookView, spellColumnChoice } from '../sheet/spellbook.js';
 import { featureColumnChoice, featuresView } from '../sheet/features.js';
 import { effectsView } from '../sheet/effects.js';
+import { biographyView } from '../sheet/biography.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
 import { headerMinWidth, headerView, tabRow } from '../sheet/header.js';
 import { delayTips, keepFolds } from '../chat/card.js';
@@ -19,7 +20,8 @@ export const SHEET_PARTS = {
    inventory: `${MODULE_PATH}/templates/sheet/inventory.hbs`,
    spells: `${MODULE_PATH}/templates/sheet/spellbook.hbs`,
    features: `${MODULE_PATH}/templates/sheet/features.hbs`,
-   effects: `${MODULE_PATH}/templates/sheet/effects.hbs`
+   effects: `${MODULE_PATH}/templates/sheet/effects.hbs`,
+   biography: `${MODULE_PATH}/templates/sheet/biography.hbs`
 };
 
 /**
@@ -32,7 +34,8 @@ const PART_OPTIONS = {
    inventory: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/item-row.hbs`, LIST_BAR] },
    spells: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/spell-row.hbs`, LIST_BAR] },
    features: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/feature-row.hbs`, LIST_BAR] },
-   effects: { scrollable: ['.fhcs-items'], templates: [LIST_BAR] }
+   effects: { scrollable: ['.fhcs-items'], templates: [LIST_BAR] },
+   biography: { templates: [`${MODULE_PATH}/templates/sheet/bio-box.hbs`] }
 };
 
 /** Each list tab's column setting, by dnd5e's list name. */
@@ -239,7 +242,7 @@ function ourParts(baseParts)
  * since a module can't import from the system by path. dnd5e keeps every mechanic; the look is ours alone.
  *
  * Phase 1: our header. Phase 2: our frame, tab row and Attributes tab in place of dnd5e's sidebar, vertical tabs
- * and Details tab. Phase 3: our Inventory tab. Phase 4: our Spellbook tab. Phase 5: our Features and Effects tabs.
+ * and Details tab. Phase 3: our Inventory tab. Phase 4: our Spellbook tab. Phase 5: our Features, Effects and Biography tabs.
  */
 export function makeCharacterSheet(Base)
 {
@@ -301,6 +304,10 @@ export function makeCharacterSheet(Base)
          if (partId === 'effects')
          {
             context.fhcsEffects = effectsView(await effectsFacts(this, context), i18n);
+         }
+         if (partId === 'biography')
+         {
+            context.fhcsBiography = biographyView(biographyFacts(this, context), i18n);
          }
          if (partId === 'tabs')
          {
