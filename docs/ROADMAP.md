@@ -62,10 +62,12 @@ Built 2026-10-26; verified in Quench (core 35 of 35) and in play (user, 2026-10-
 - [x] Favorite toggle column on Inventory rows too, with the glow (user, 2026-10-26); names left-aligned (Foundry centered them)
 - [x] Filters: pinned Action, Bonus, Reaction, Conc., Prepared; Can cast and V, S, M added to dnd5e's menu
 
-## Phase 5: Features, Effects, Biography, Journal
+## Phase 5: Features, Effects, Biography
+
+Journal dropped (user, 2026-10-26; SCOPE §4.8).
 
 - [x] Research: dnd5e 6.0.6 features, effects and biography parts; Tidy Classic's four tabs and its Journal (2026-10-26, research note)
-- [ ] Design answers (SCOPE)
+- [x] Design answers: grouping, class cards, columns, effects and conditions, biography, data carried over, no Journal (user, 2026-10-26; SCOPE §4.8)
 - [ ] Mockup approved (Design canvas, a Phase 5 row)
 
 ## Phase 6: Edit mode and lifecycle

@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 5 design questions** (research done, research note "Features, Effects, Biography, Journal"). Asked 2026-10-26; record answers in a new SCOPE section, then mock up a Phase 5 row on the canvas.
+1. **Phase 5 mockup** (answers in SCOPE §4.8): a Phase 5 row on the canvas, Features, Effects and Biography boards, light, dark and 644px with a hard case (multiclass with many features; many effects and conditions).
 2. **Ask before pushing to `main`:** Phase 4's close-out and this research are on the branch only.
 
 The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.

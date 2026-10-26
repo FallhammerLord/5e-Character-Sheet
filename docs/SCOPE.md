@@ -46,7 +46,7 @@ Header decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrdDsbn
 
 ### 4.2 Tabs
 
-A tab row across the top, under the header, in Classic's order: Attributes, Inventory, Spellbook, Features, Effects, Biography (Bastion when the character has one); Special Traits only in edit mode. The sheet lock (play and edit) sits at the far right of the row.
+A tab row across the top, under the header, in Classic's order: Attributes, Inventory, Spellbook, Features, Effects, Biography (Bastion when the character has one; no Journal, §4.8); Special Traits only in edit mode. The sheet lock (play and edit) sits at the far right of the row.
 
 Planned, not built: the Actions tab (§4.4, backburner); players choosing and ordering their tabs (Classic's tab selection window); the Attributes skills column kept beside every tab, as Tidy's current sheet does with its sidebar (user, 2026-10-26; Phase 7, where tab bodies narrow by about 240px and the list tabs need a recheck at 644).
 
@@ -107,6 +107,17 @@ Built on dnd5e's `spells` part and `dnd5e-inventory`, like Inventory (research n
 - **Unprepared spells show,** marked by the outline book and a plain row, not faded; the Prepared filter narrows the list.
 - **Filters:** pinned Action, Bonus, Reaction, Conc. and Prepared (Tidy Classic's pins plus Prepared); dnd5e's menu has Ritual, schools and casting class, and we add Can cast and V, S, M.
 - **Choosing the primary spellcasting ability** is edit mode only (Phase 6).
+
+### 4.8 Phase 5: Features, Effects, Biography (user, 2026-10-26)
+
+Research note, "Features, Effects, Biography, Journal". Every list matches Inventory and Spellbook: the shared search bar, pins, Columns menu, row layout and column widths, the picture uses, the name opens details in place; the rules in CLAUDE.md and §5.1 apply.
+
+- **Data carries over** (user, 2026-10-26): every player-written field is dnd5e's own (`system.details.*`, biography, characteristics), so text written on dnd5e's sheet or Tidy's shows on ours, and the other way round. We add no text fields of our own.
+- **Features:** dnd5e's sections and its grouping switch, starting By source (one section per class, Species, Background, Other); Active and Passive one click away. Columns Uses, Usage (in words, like spell time), Recovery. Pins Action, Bonus, Reaction.
+- **Classes:** cards at the top, like the Spellbook's class cards (class, subclass, level), with a mark when a subclass is due. Changing level is edit mode (Phase 6).
+- **Effects:** dnd5e's categories (Temporary, Passive, Inactive, Suppressed when any), rows with Source and Duration and an on/off mark; under them a conditions grid, each with its icon and name. The header keeps showing active conditions.
+- **Biography:** Classic's layout (characteristics across the top; ideals, bonds, flaws, personality; appearance and biography). Read in play, written in edit mode (Phase 6).
+- **Journal: dropped** (user, 2026-10-26). dnd5e has none; quests live in the quest log, notes in the biography. Tidy's Journal notes stay untouched in Tidy's flags on the actor.
 
 ## 5. ADHD rules carried over
 
