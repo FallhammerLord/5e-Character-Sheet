@@ -227,12 +227,21 @@ export function registerQuenchTests(quench)
             this.timeout(HOOK_WAIT_MS * 5);
             const [ring] = await actor.createEmbeddedDocuments('Item', [{
                name: 'FHCS test ring', type: 'equipment',
-               system: { attunement: 'required', equipped: false, attuned: false, quantity: 1 }
+               // dnd5e keeps attunement only on magical items (equippable-item.mjs:136).
+               system: { attunement: 'required', properties: ['mgc'], equipped: false, attuned: false, quantity: 1 }
             }]);
             await sheet.render();
             const row = () => sheet.element.querySelector(`.fhcs-inventory [data-item-id="${ring.id}"]`);
             // On a failure, say what the row held instead.
-            const found = (step) => () => `${step}; the row: ${row()?.querySelector('.fhcs-item-row')?.outerHTML.replace(/\s+/g, ' ').slice(0, 600) ?? 'missing'}`;
+            const found = (step) => () =>
+            {
+               // Plain words, not markup: Quench draws failure text as HTML.
+               const r = row();
+               if (!r) { return `${step}; the row is missing`; }
+               const actions = [...r.querySelectorAll('[data-action]')].map((el) => el.dataset.action).join(', ');
+               const fields = [...r.querySelectorAll('[data-name]')].map((el) => el.dataset.name).join(', ');
+               return `${step}; the row has actions: ${actions || 'none'}; fields: ${fields || 'none'}`;
+            };
             assert.ok(row(), 'the item has a row in our Inventory tab');
             assert.ok(row().querySelector('[data-action="attune"]'), found('an item that needs attunement has an attune toggle')());
             row().querySelector('[data-action="equip"]').click();
