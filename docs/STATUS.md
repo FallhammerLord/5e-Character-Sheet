@@ -32,7 +32,6 @@ They wait only for a game where the user tries them; not work for a session to p
 
 ## Next session
 
-Track R and Phases 0–2 are done and verified; don't rerun Quench or rework them unless the user reports a problem.
+Track R and Phases 0–3 are done and verified (Phase 3 lacks only the optional pinned filter buttons); don't rerun Quench or rework them unless the user reports a problem.
 
-1. **What next after Phase 3** (user deciding, 2026-10-26): the pinned filter buttons, the Actions tab, or the Spellbook. See the options in that chat; the Actions tab has no phase on the roadmap yet.
-2. Then Spellbook (Phase 4), reusing the Inventory rows and list controls.
+1. **Choose what's next** (user deciding, 2026-10-26). Proposed: the Spellbook (Phase 4), reusing the Inventory rows, list controls and Columns menu, with the pinned filter buttons built once for both tabs; then the Actions tab (SCOPE §4.4), which has no phase on the roadmap yet. Alternative: the Actions tab first, for its value at the table.
