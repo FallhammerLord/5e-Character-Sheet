@@ -160,6 +160,18 @@ for (const name of ['dnd5e.rollDeathSaveV2', 'preUpdateActor'])
 }
 if (typeof hooks['dnd5e.advancementManagerComplete'] !== 'function') { problems.push('level order is not hooked to dnd5e.advancementManagerComplete'); }
 
+// The redraw rule (CLAUDE.md): in the sheet's Quench batch, every click or input waits for the sheet to settle first.
+// A bare `.click()` or `dispatchEvent(` there must go through the batch's helpers, which carry a `redraw-safe` note.
+{
+   const quench = readFileSync(new URL('../src/tests/quench.js', import.meta.url), 'utf8');
+   const core = quench.slice(quench.indexOf('registerBatch(`${MODULE_ID}.core`'), quench.indexOf('registerBatch(`${MODULE_ID}.chat`'));
+   core.split('\n').forEach((line, i) =>
+   {
+      if (/^\s*\*/.test(line) || !/\.click\(\)|dispatchEvent\(/.test(line) || line.includes('redraw-safe')) { return; }
+      problems.push(`Quench core batch, line ${i + 1} of the batch: clicks without waiting for redraws; use click(), enter() or clickReaches()`);
+   });
+}
+
 // Everything the manifest names exists, and every label key the code uses is in lang/en.json.
 const root = new URL('../', import.meta.url);
 // Every template part a card includes is preloaded and exists (Foundry won't find a partial it hasn't loaded).

@@ -4,6 +4,9 @@ import { addBonus, addD20, systemCharacterSheet } from '../compat.js';
 /** How long a click may take to reach dnd5e's hook before a test fails. */
 const HOOK_WAIT_MS = 3000;
 
+/** How long a change gets to start its sheet redraws before `settled()` waits them out. */
+const REDRAW_START_MS = 100;
+
 /**
  * In-world tests for Quench (https://github.com/Ethaks/FVTT-Quench), run by a GM from the Quench window.
  * Unlike tools/*-check.mjs, these use the real dnd5e system: they open our sheet on a temporary character and click
@@ -20,8 +23,65 @@ export function registerQuenchTests(quench)
       let actor = null;
       let sheet = null;
 
-      /** Clicks an element (Shift held, as a fast-forward) and resolves with the hook's arguments, or rejects. */
-      const clickReaches = (selector, hook) => new Promise((resolve, reject) =>
+      /*
+       * The redraw rule (CLAUDE.md): a click on markup a pending redraw is about to replace never reaches the sheet,
+       * and that failed several tests at random (2026-10-26). So every click and input here goes through `click`,
+       * `clickReaches` or `enter`: each waits for the sheet to settle, then finds its element by selector, fresh.
+       * The load check fails on a bare `.click()` or `dispatchEvent(` in this batch.
+       */
+
+      /** Waits for the redraws a change started, then draws once more and waits for that. */
+      const settled = async () =>
+      {
+         await new Promise((resolve) => { setTimeout(resolve, REDRAW_START_MS); });
+         await sheet.render();
+      };
+
+      /** @returns {HTMLElement} The sheet's element for a selector, now; fails the test if there is none. */
+      const find = (selector) =>
+      {
+         const element = sheet.element.querySelector(selector);
+         assert.ok(element, `no element matches ${selector}`);
+         return element;
+      };
+
+      /** Once the sheet has settled, clicks the element a selector finds. */
+      const click = async (selector) =>
+      {
+         await settled();
+         find(selector).click(); // redraw-safe: after settled()
+      };
+
+      /** Once the sheet has settled, types a value into a field and sends its change. */
+      const enter = async (selector, value) =>
+      {
+         await settled();
+         const field = find(selector);
+         field.value = value;
+         field.dispatchEvent(new Event('change', { bubbles: true })); // redraw-safe: after settled()
+      };
+
+      /** Waits until a condition holds, or fails the test after HOOK_WAIT_MS. */
+      const until = async (condition, what) =>
+      {
+         for (let waited = 0; !condition() && waited < HOOK_WAIT_MS; waited += 50)
+         {
+            await new Promise((resolve) => { setTimeout(resolve, 50); });
+         }
+         assert.isTrue(!!condition(), typeof what === 'function' ? what() : what);
+      };
+
+      /**
+       * Once the sheet has settled, clicks an element (Shift held, as a fast-forward) and resolves with the hook's
+       * arguments, or rejects.
+       */
+      const clickReaches = async (selector, hook) =>
+      {
+         await settled();
+         return clickNow(selector, hook);
+      };
+
+      const clickNow = (selector, hook) => new Promise((resolve, reject) =>
       {
          const element = sheet.element.querySelector(selector);
          if (!element) { reject(new Error(`no element matches ${selector}`)); return; }
@@ -37,7 +97,7 @@ export function registerQuenchTests(quench)
             resolve(args);
             return false;
          });
-         element.dispatchEvent(new PointerEvent('click', { bubbles: true, cancelable: true, shiftKey: true }));
+         element.dispatchEvent(new PointerEvent('click', { bubbles: true, cancelable: true, shiftKey: true })); // redraw-safe: clickReaches settles first
       });
 
       describe('Fallhammer Character Sheet', function ()
@@ -123,11 +183,11 @@ export function registerQuenchTests(quench)
                });
             });
             let done = changed('system.attributes.inspiration');
-            sheet.element.querySelector('.fhcs-header [data-action="toggleInspiration"]').click();
+            await click('.fhcs-header [data-action="toggleInspiration"]');
             await done;
             assert.strictEqual(!!actor.system.attributes.inspiration, !before);
             done = changed('system.attributes.exhaustion');
-            sheet.element.querySelector('.fhcs-header [data-prop="system.attributes.exhaustion"] [data-n="2"]').click();
+            await click('.fhcs-header [data-prop="system.attributes.exhaustion"] [data-n="2"]');
             await done;
             // dnd5e reads the level from an exhaustion effect it creates after the update (attributes.mjs:451).
             for (let waited = 0; actor.system.attributes.exhaustion !== 2 && waited < HOOK_WAIT_MS; waited += 50)
@@ -148,16 +208,16 @@ export function registerQuenchTests(quench)
 
          it('switches tabs from our tab row, and play and edit from its lock', async function ()
          {
-            sheet.element.querySelector('.fhcs-tabs [data-tab="inventory"]').click();
+            await click('.fhcs-tabs [data-tab="inventory"]');
             assert.strictEqual(sheet.tabGroups.primary, 'inventory');
             assert.isTrue(sheet.element.querySelector('.tab[data-tab="inventory"]').classList.contains('active'));
-            sheet.element.querySelector('.fhcs-tabs [data-tab="details"]').click();
+            await click('.fhcs-tabs [data-tab="details"]');
             assert.strictEqual(sheet.tabGroups.primary, 'details');
             // The lock: each click switches mode and the sheet redraws with the lock's new state.
             const flip = async () =>
             {
                const was = sheet.isEditMode;
-               sheet.element.querySelector('.fhcs-tabs [data-action="changeMode"]').click();
+               await click('.fhcs-tabs [data-action="changeMode"]');
                for (let waited = 0; sheet.isEditMode === was && waited < HOOK_WAIT_MS; waited += 50)
                {
                   await new Promise((resolve) => { setTimeout(resolve, 50); });
@@ -173,7 +233,7 @@ export function registerQuenchTests(quench)
             const [skill] = await clickReaches('.fhcs-attributes [data-key="prc"] [data-action="roll"]', 'dnd5e.preRollSkill');
             assert.strictEqual(skill.skill, 'prc');
             const before = game.user.getFlag(MODULE_ID, 'passives') ?? 'all';
-            sheet.element.querySelector('.fhcs-attributes [data-action="fhcsTogglePassives"]').click();
+            await click('.fhcs-attributes [data-action="fhcsTogglePassives"]');
             for (let waited = 0; (game.user.getFlag(MODULE_ID, 'passives') ?? 'all') === before && waited < HOOK_WAIT_MS; waited += 50)
             {
                await new Promise((resolve) => { setTimeout(resolve, 50); });
@@ -211,26 +271,6 @@ export function registerQuenchTests(quench)
             assert.strictEqual(activity.item.id, item.id);
          });
 
-         /**
-          * Waits for the redraws a change started, then draws once more and waits for that. A click on markup a pending
-          * redraw is about to replace never reaches the sheet (the pin test failed this way, 2026-10-26).
-          */
-         const settled = async () =>
-         {
-            await new Promise((resolve) => { setTimeout(resolve, 100); });
-            await sheet.render();
-         };
-
-         /** Waits until a condition holds, or fails the test after HOOK_WAIT_MS. */
-         const until = async (condition, what) =>
-         {
-            for (let waited = 0; !condition() && waited < HOOK_WAIT_MS; waited += 50)
-            {
-               await new Promise((resolve) => { setTimeout(resolve, 50); });
-            }
-            assert.isTrue(!!condition(), typeof what === 'function' ? what() : what);
-         };
-
          it('equips, attunes, counts and opens items on the Inventory tab', async function ()
          {
             // Four saves, each with a redraw: more than Mocha's default 2 s, so each step has its own wait instead.
@@ -254,18 +294,16 @@ export function registerQuenchTests(quench)
             };
             assert.ok(row(), 'the item has a row in our Inventory tab');
             assert.ok(row().querySelector('[data-action="attune"]'), found('an item that needs attunement has an attune toggle')());
-            row().querySelector('[data-action="equip"]').click();
+            await click(`.fhcs-inventory [data-item-id="${ring.id}"] [data-action="equip"]`);
             await until(() => ring.system.equipped, 'the equip toggle equipped it');
             await until(() => row()?.querySelector('[data-action="attune"]'), found('the row redrew after equipping'));
-            row().querySelector('[data-action="attune"]').click();
+            await click(`.fhcs-inventory [data-item-id="${ring.id}"] [data-action="attune"]`);
             await until(() => ring.system.attuned, 'the attune toggle attuned it');
             await until(() => row()?.querySelector('[data-name="system.quantity"]'), found('the row redrew after attuning'));
-            const quantity = row().querySelector('[data-name="system.quantity"]');
-            quantity.value = '+2';
-            quantity.dispatchEvent(new Event('change', { bubbles: true }));
+            await enter(`.fhcs-inventory [data-item-id="${ring.id}"] [data-name="system.quantity"]`, '+2');
             await until(() => ring.system.quantity === 3, 'quantity takes a +2');
             await until(() => row()?.querySelector('[data-action="toggleExpand"]'), found('the row redrew after the quantity change'));
-            row().querySelector('[data-action="toggleExpand"]').click();
+            await click(`.fhcs-inventory [data-item-id="${ring.id}"] [data-action="toggleExpand"]`);
             await until(() => row()?.querySelector('.item-summary'), 'the name opens dnd5e\'s summary');
             await ring.delete();
          });
@@ -284,25 +322,28 @@ export function registerQuenchTests(quench)
             assert.isTrue(packRow()?.classList.contains('container'), 'the container row carries dnd5e\'s drop class');
             // Each create starts its own redraw; wait for the one that has the rope.
             await until(() => packRow()?.querySelector(`:scope > .fhcs-contents [data-item-id="${rope.id}"]`), 'the rope is drawn inside the pack');
-            const list = packRow().querySelector(':scope > .fhcs-contents');
-            const wasHidden = list.hidden;
-            packRow().querySelector('[data-action="fhcsToggleContainer"]').click();
-            assert.notStrictEqual(list.hidden, wasHidden, 'the fold button opens or shuts the contents');
+            const shut = () => packRow()?.querySelector(':scope > .fhcs-contents')?.hidden;
+            const wasShut = shut();
+            await click(`.fhcs-inventory [data-item-id="${pack.id}"] > .fhcs-item-row [data-action="fhcsToggleContainer"]`);
+            await until(() => shut() !== wasShut, 'the fold button opens or shuts the contents');
             // dnd5e's own drop handler, as a drag of the torch onto the pack row would reach it.
-            await sheet._onDropItem({ target: packRow().querySelector('.fhcs-item-name'), _behavior: 'move' }, torch);
+            await settled();
+            await sheet._onDropItem({ target: find(`.fhcs-inventory [data-item-id="${pack.id}"] .fhcs-item-name`), _behavior: 'move' }, torch);
             await until(() => torch.system.container === pack.id, 'a drop on the pack row puts the torch in it');
             await game.user.setFlag(MODULE_ID, 'openContainers', flag ?? []);
             await actor.deleteEmbeddedDocuments('Item', [pack.id, rope.id, torch.id]);
          });
 
-         it('closes an open tray when the player clicks off it, not when they click inside it', function ()
+         it('closes an open tray when the player clicks off it, not when they click inside it', async function ()
          {
+            // Nothing below redraws the sheet, so one wait covers both presses.
+            await settled();
             const tray = sheet.element.querySelector('.fhcs-header details.fhcs-fold[data-fold-key="exhaustion"]');
             assert.ok(tray, 'the exhaustion chip has a tray');
             tray.open = true;
-            tray.querySelector('.fhcs-tray').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+            tray.querySelector('.fhcs-tray').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); // redraw-safe: after settled()
             assert.isTrue(tray.open, 'a click inside keeps it open');
-            sheet.element.querySelector('.fhcs-tabs').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+            sheet.element.querySelector('.fhcs-tabs').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); // redraw-safe: after settled()
             assert.isFalse(tray.open, 'a click elsewhere closes it');
          });
 
@@ -311,14 +352,14 @@ export function registerQuenchTests(quench)
             this.timeout(HOOK_WAIT_MS * 4);
             const before = game.settings.get(MODULE_ID, 'inventoryColumns');
             assert.notOk(sheet.element.querySelector('[data-action="fhcsToggleColumn"]'), 'no column menu in play mode');
-            sheet.element.querySelector('.fhcs-tabs [data-action="changeMode"]').click();
+            await click('.fhcs-tabs [data-action="changeMode"]');
             await until(() => sheet.isEditMode && sheet.element.querySelector('[data-action="fhcsToggleColumn"]'), 'edit mode shows the column menu');
             const weight = () => !!sheet.element.querySelector('.fhcs-inventory .fhcs-item-head .fhcs-col-weight');
             const had = weight();
-            sheet.element.querySelector('[data-action="fhcsToggleColumn"][data-column="weight"]').click();
+            await click('[data-action="fhcsToggleColumn"][data-list="inventory"][data-column="weight"]');
             await until(() => weight() !== had, 'the weight column switched');
             await game.settings.set(MODULE_ID, 'inventoryColumns', before);
-            sheet.element.querySelector('.fhcs-tabs [data-action="changeMode"]').click();
+            await click('.fhcs-tabs [data-action="changeMode"]');
             await until(() => !sheet.isEditMode, 'back to play mode');
          });
 
@@ -347,17 +388,17 @@ export function registerQuenchTests(quench)
             assert.notOk(row(cantrip).querySelector('[data-action="prepare"]'), 'a cantrip has no prepare mark');
             assert.strictEqual(row(always).querySelector('[data-action="prepare"]')?.getAttribute('aria-disabled'), 'true',
                'always prepared can\'t be clicked');
-            row(open).querySelector('[data-action="prepare"]').click();
+            await click(`.fhcs-spellbook [data-item-id="${open.id}"] [data-action="prepare"]`);
             await until(() => open.system.prepared === 1, 'the book prepared the spell');
             await until(() => row(open)?.classList.contains('fhcs-kind-prepared'), 'the row took the prepared color');
-            row(always).querySelector('[data-action="prepare"]').click();
-            await new Promise((resolve) => { setTimeout(resolve, 300); });
+            await click(`.fhcs-spellbook [data-item-id="${always.id}"] [data-action="prepare"]`);
+            await settled();
             assert.strictEqual(always.system.prepared, 2, 'a click on always prepared changes nothing');
             // The bookmark in the row favorites the spell, as dnd5e's right-click menu does.
             const favorite = () => actor.system.favorites.some((f) => f.id === open.getRelativeUUID(actor));
             const wasFavorite = favorite();
             await until(() => row(open)?.querySelector('[data-action="toggleFavorite"]'), 'the row has a favorite toggle');
-            row(open).querySelector('[data-action="toggleFavorite"]').click();
+            await click(`.fhcs-spellbook [data-item-id="${open.id}"] [data-action="toggleFavorite"]`);
             await until(() => favorite() !== wasFavorite, 'the bookmark toggled the favorite');
             await actor.deleteEmbeddedDocuments('Item', [open.id, always.id, cantrip.id]);
          });
@@ -373,10 +414,10 @@ export function registerQuenchTests(quench)
             const pin = () => sheet.element.querySelector('.fhcs-spellbook [data-action="fhcsPinFilter"][data-filter="prepared"]');
             await settled();
             await until(() => row(ready) && row(idle) && pin(), 'both spells and the Prepared pin are drawn');
-            pin().click();
+            await click('.fhcs-spellbook [data-action="fhcsPinFilter"][data-filter="prepared"]');
             await until(() => row(idle).hidden && !row(ready).hidden, 'the Prepared pin hides the unprepared spell');
             assert.strictEqual(pin().getAttribute('aria-pressed'), 'true', 'the pin shows it is on');
-            pin().click();
+            await click('.fhcs-spellbook [data-action="fhcsPinFilter"][data-filter="prepared"]');
             await until(() => !row(idle).hidden, 'a second click shows it again');
             assert.strictEqual(pin().getAttribute('aria-pressed'), 'false', 'the pin shows it is off');
             await actor.deleteEmbeddedDocuments('Item', [ready.id, idle.id]);
@@ -398,7 +439,7 @@ export function registerQuenchTests(quench)
             await until(() => bar()?.querySelector(`[data-item-id="${spell.id}"]`), 'the bar names the spell');
             assert.isTrue(bar().classList.contains('fhcs-on'), 'the bar shows concentration is on');
             await clickReaches('.fhcs-spellbook .fhcs-concentration [data-action="roll"]', 'dnd5e.preRollConcentration');
-            bar().querySelector(`[data-action="fhcsEndConcentration"][data-effect-id="${effect.id}"]`).click();
+            await click(`.fhcs-spellbook [data-action="fhcsEndConcentration"][data-effect-id="${effect.id}"]`);
             await until(() => !actor.effects.get(effect.id), 'End removes the concentration effect');
             await until(() => !bar()?.classList.contains('fhcs-on'), 'the bar goes idle');
             await spell.delete();
@@ -409,15 +450,15 @@ export function registerQuenchTests(quench)
             this.timeout(HOOK_WAIT_MS * 4);
             const before = game.settings.get(MODULE_ID, 'spellColumns');
             const [spell] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test light', type: 'spell', system: { level: 0 } }]);
-            sheet.element.querySelector('.fhcs-tabs [data-action="changeMode"]').click();
+            await click('.fhcs-tabs [data-action="changeMode"]');
             await until(() => sheet.isEditMode && sheet.element.querySelector('[data-action="fhcsToggleColumn"][data-list="spells"]'),
                'edit mode shows the Spellbook column menu');
             const school = () => !!sheet.element.querySelector('.fhcs-spellbook .fhcs-item-head .fhcs-col-school');
             const had = school();
-            sheet.element.querySelector('[data-action="fhcsToggleColumn"][data-list="spells"][data-column="school"]').click();
+            await click('[data-action="fhcsToggleColumn"][data-list="spells"][data-column="school"]');
             await until(() => school() !== had, 'the school column switched');
             await game.settings.set(MODULE_ID, 'spellColumns', before);
-            sheet.element.querySelector('.fhcs-tabs [data-action="changeMode"]').click();
+            await click('.fhcs-tabs [data-action="changeMode"]');
             await until(() => !sheet.isEditMode, 'back to play mode');
             await spell.delete();
          });
@@ -431,7 +472,7 @@ export function registerQuenchTests(quench)
             await settled();
             const fav = () => sheet.element.querySelector(`.fhcs-attributes [data-favorite-id="${axe.getRelativeUUID(actor)}"]`);
             await until(() => fav()?.querySelector('[data-action="fhcsToggleFavoriteDetails"]'), 'the favorite\'s name opens its details');
-            fav().querySelector('[data-action="fhcsToggleFavoriteDetails"]').click();
+            await click(`.fhcs-attributes [data-favorite-id="${axe.getRelativeUUID(actor)}"] [data-action="fhcsToggleFavoriteDetails"]`);
             await until(() => fav()?.querySelector('.fhcs-favorite-details .item-summary'), 'dnd5e\'s summary opens under the row');
             assert.notOk(axe.sheet?.rendered, 'no item window opened');
             const [activity] = await clickReaches(`.fhcs-attributes [data-favorite-id="${axe.getRelativeUUID(actor)}"] .fhcs-favorite-pic`,
