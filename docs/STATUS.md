@@ -4,8 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 5 mockup** (answers in SCOPE §4.8): a Phase 5 row on the canvas, Features, Effects and Biography boards, light, dark and 644px with a hard case (multiclass with many features; many effects and conditions).
-2. **Ask before pushing to `main`:** Phase 4's close-out and this research are on the branch only.
+1. **Phase 5 mockup review.** Boards on the canvas (2026-10-26): Features, Effects, Biography rows, each light, dark and 644px with a hard case. New marks proposed, not yet in SCOPE §5.1: a switch for an effect or condition being on; a dashed "Choose subclass" button. On approval: record answers in SCOPE §4.8 and §5.1, tick ROADMAP, plan the build slices (Features first).
 
 The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.
 
