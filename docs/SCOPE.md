@@ -1,6 +1,6 @@
 # Scope
 
-The design and every decision. Skeleton: sections fill in as decisions are made.
+The design and every decision, with who decided and when. What's built and verified lives in `docs/STATUS.md` and `docs/ROADMAP.md`; how it works, in `docs/BUILT.md`. A superseded decision is replaced in place, not kept beside the new one.
 
 ## 1. What this is
 
@@ -20,7 +20,7 @@ The user's table: players used to Tidy 5e's classic layout. Private use for now 
 
 ## 4. Layout
 
-Target: Tidy 5e Classic, as in `docs/reference/` (screenshots) and its source at Tidy commit `54fdbad4` (the last before Classic was removed, 2026-09-01; `src/sheets/classic/character/`). Default window 740 × 810.
+Target: Tidy 5e Classic, as in `docs/reference/` (screenshots) and its source at Tidy commit `54fdbad4` (the last before Classic was removed, 2026-09-01; tag `v13.0.0` has it too; `src/sheets/classic/`). Default window 740 × 810; minimum 644 wide.
 
 **Skeleton, our style** (user, 2026-10-24): every part sits where Classic puts it, so muscle memory carries over; type, spacing, contrast and controls follow our rules (§5, CLAUDE.md). Everything visual goes through tokens, so themes beyond light and dark can follow the first working sheet.
 
@@ -39,27 +39,29 @@ Header decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrdDsbn
 - **Corner chips on the frame:** exhaustion, inspiration, rest, hit dice.
 - **Ability emphasis is a per-player choice** (client setting): modifier large with the score small (our default), or Classic's large score.
 - **Leveling follows dnd5e's `levelingMode` world setting** (the GM's choice; we add no setting of our own). XP modes show the usual XP bar. Milestone mode (`noxp`) puts a Level button where the bar was; it folds out a tray of 20 pips (4 rows of 5). Each class level fills the next pip with that class's icon, in the order the levels were gained; empty pips show levels not reached. A pip fills when the player levels up through dnd5e, after its advancement finishes. Nothing to add by hand.
-  - To research: dnd5e stores levels per class, not their order. We record the order in an actor flag at each level-up; characters from before that fill class by class, original class first. Icons: the class item's own image, so any source's classes work.
+  - dnd5e stores levels per class, not their order, so we record the order in an actor flag after each advancement (`dnd5e.advancementManagerComplete`); characters from before that fill class by class, original class first. Icons: the class item's own image, so any source's classes work.
 - **Pinned strip** when scrolled (§4.5): portrait thumbnail, name, HP and bar, AC, conditions, inspiration.
 - **The ability row never wraps** (user, 2026-10-24): AC, Init and the abilities stay in one row; columns stretch between 52 and 88px, and the sheet stops shrinking at the width that row needs (644px with six abilities; `headerMinWidth`). Text sizes stay the three styles; only the columns scale.
 - Saves show as a proficiency dot and the modifier, without the word "Save": at the default width a column is about 62px, too narrow for "Save +10". The button's tooltip and label name it.
 
 ### 4.2 Tabs
 
-Across the top, under the header: Actions, Attributes, Inventory, Spellbook, Features, Effects; Biography and Journal optional. Players choose and order them (Classic's tab selection window). Sheet lock at the far right of the tab row.
+A tab row across the top, under the header, in Classic's order: Attributes, Inventory, Spellbook, Features, Effects, Biography (Bastion when the character has one); Special Traits only in edit mode. The sheet lock (play and edit) sits at the far right of the row.
+
+Planned, not built: the Actions tab (§4.4, no phase yet); players choosing and ordering their tabs (Classic's tab selection window); the Attributes skills column kept beside every tab, as Tidy's current sheet does with its sidebar (user, 2026-10-26; Phase 7, where tab bodies narrow by about 240px and the list tabs need a recheck at 644).
 
 ### 4.3 Attributes tab
 
 - **Side panel** (about 240px, left): skills list (proficiency, name, ability, modifier, passive), then traits (senses, languages, damage immunities, resistances and vulnerabilities, condition immunities, weapon, armor and tool proficiencies).
-- **Main panel:** pinned and favorite items, grouped (Inventory, Spell Level N with slots used / total). Columns: name, uses, spell components, activation (1 Action, 1 Bonus Action).
+- **Main panel:** resources, then favorites grouped (Inventory, Features, Cantrips, Spell level N with its slot pips, Effects, Skills and tools). Each row: picture, name, details (components, activation), uses.
 
 Attributes decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, Attributes boards):
 - **Skills:** one 28px roll button per skill. Proficiency is a mark, not bold text: empty circle none, half-filled half (Jack of All Trades), filled proficient, ringed expertise.
 - **Passive scores:** a toggle in the Skills heading switches between every skill's passive and only Perception, Insight and Investigation; each player's choice is remembered.
 - **Traits:** empty ones hidden in play, all shown in edit mode.
-- **Favorites:** grouped as dnd5e groups them; each group folds, and stays as the player left it. Equipped rows green, prepared blue, each with a left edge and an icon as well. Spell slots as 24px pips with "used / total".
+- **Favorites:** each group folds, and stays as the player left it. Rows carry their home tab's marks (§5.1); slot pips sit in each spell level's heading.
 - **Resources:** counters above the favorites, only when the character has any.
-- **Favorite rows act and look as on their home tab** (user, 2026-10-26): the picture uses the item, the name opens its details in place (no item window); equipped and preparation kinds keep their tints and marks. Skills and effects stay one button.
+- **Favorite rows act and look as on their home tab** (user, 2026-10-26): the picture uses the item; the name (with fold caret) opens its details in place, no item window; equipped and preparation kinds keep their tints and marks, and innate and at-will spells are also named in words. Skills and effects stay one button. No favorite glow here: every row is one.
 - **Death saves** go in the header, shown only at 0 HP.
 
 ### 4.4 Actions tab
@@ -71,7 +73,7 @@ Everything usable, grouped by Action, Bonus Action, Reaction, Other. Each row: i
 Keep the layout players know; fix what costs attention:
 
 - **Gear and pencil icons only in edit mode.** Classic shows about 30 of them in play; each is a target under 24px.
-- **Equipped and prepared** get an icon or label as well as the green and blue row color (color alone fails the colorblind player).
+- **Equipped and prepared** get an icon or label as well as their row color (color alone fails the colorblind player; §5.1).
 - **Actions tab is the "Now" home** (Phase 7): it's already grouped by action type, so turn economy fits there. Make it the default tab in play.
 - **Targets at least 24px**, three text sizes, tooltips two to four words. On chat cards, our tooltips wait 1.5 s, open above the button and clear on a click (user, 2026-10-24).
 - **Pinned header:** HP, AC and conditions never scroll away.
@@ -82,34 +84,57 @@ Classic's layout (Tidy source, `src/sheets/classic/actor/tabs/ActorInventoryTab.
 
 Inventory decisions (user, 2026-10-26; mockup https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, Inventory boards):
 - **What matters at the table:** uses, usage, equipped, and attunement. Weight is mostly unimportant: nothing enforces 5e weight rules, and this isn't a video game.
-- **Players choose the columns:** Weight, Uses, Usage, Qty, Equipped, Attuned. Default: all but Weight. A client setting, so the choice follows the player to every character. The Columns menu shows only in edit mode, since it's a setting.
+- **Players choose the columns:** Weight, Uses, Usage, Qty, Equipped, Attuned, Favorite. Default: all but Weight. A client setting, so the choice follows the player to every character. The Columns menu shows only in edit mode, since it's a setting.
+- **Filters:** dnd5e's search, filter menu and sort, with Action, Bonus and Equipped pinned beside the search (mockup).
 - **Attunement has three states:** filled star (attuned), outline star (needs attuning; click to attune), blank (not required). Its own column, like the equip toggle.
 - **Equipped:** a 28px toggle per row, plus the green tint and left edge. Edit and delete show only in edit mode.
 - **The carried-weight bar follows dnd5e's encumbrance world setting:** hidden when the GM has it off. We add no setting of our own.
-- **The picture uses the item; the name opens its details** (Classic's split).
+- **The picture uses the item; the name opens its details** (Classic's split), with a fold caret; an open row sits in a faint panel.
 - **Containers** (user, 2026-10-26): a container is a row like any other, and a drop anywhere on it puts the item inside (dnd5e's own drop handling). Its contents fold open under it, indented, with a count on the fold button; each player's open containers are remembered. Containers nest. No container panel at the top. dnd5e's container window (from the picture) keeps dnd5e's look for now.
 
 ### 4.7 Spellbook tab
 
-Built on dnd5e's spells part and `dnd5e-inventory`, like Inventory (research note, "Spellbook").
+Built on dnd5e's `spells` part and `dnd5e-inventory`, like Inventory (research note, "Spellbook"). Decisions: user, 2026-10-26 (questions, mockup boards "Spellbook", first play), unless marked.
 
-Spellbook decisions (user, 2026-10-26):
-- **Unprepared spells show.** No hiding by default; a Prepared filter narrows the list. Unprepared rows are marked, not faded (contrast rule).
-- **Preparation follows dnd5e's class math:** "prepared / max" per casting class, from dnd5e's counts. We compute nothing ourselves.
-- **Default columns:** components, activation, range, a concentration mark, and a prepare mark on spells that need preparing.
-- **Spell states are two things in dnd5e** (checked 2026-10-26): how it's cast (`method`: Spellcasting, Pact Magic, Innate, At will, Ritual; plus spells granted by an item) and whether it's prepared (unprepared, prepared, always prepared). Spellcasting and Pact Magic spells prepare; the others don't. The section shows the method; the prepare mark shows the state, three-way like attunement: filled (prepared; click to unprepare), outline (unprepared; click to prepare), locked (always prepared; no click). Innate, at-will, ritual-only, item spells and cantrips show no mark (dnd5e marks cantrips; we hide it, since they never count).
-- **Icons and colors** (user, 2026-10-26): the bookmark means "favorite" everywhere on the sheet; preparation is a book (filled prepared, outline unprepared, filled with a lock badge always prepared). Each preparation kind has its own tint and left edge: prepared (blue), always prepared (teal), Pact Magic prepared (violet), innate (orange-brown), at will (grey); unprepared rows plain. Favorited rows glow faintly in the favorite color (rose). Favorite is a bookmark toggle on every row of both list tabs, a column on by default (user, 2026-10-26), as well as in dnd5e's right-click menu. Names are left-aligned. Every tint keeps an icon or mark beside it, never color alone.
-- **Mockup answers** (user, 2026-10-26, "the rest looks good"): favorite glow in its own rose; the Con save button stays in the concentration bar when not concentrating; filled pips are slots still available (as on Attributes); choosing the primary spellcasting ability is edit mode only (Phase 6). Mockup: https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, Spellbook boards.
-- **Look, after first play** (user, 2026-10-26): slot pips are 12px dots (no taller than the heading's text) in 24px targets, soft blue, filled while left to spend and a ring once spent, with no "3 / 4" count beside them (the pips say it), here and on Attributes. Names carry a fold caret that turns when open; an open row sits in a faint panel, its details a step below the name and lined up with it, on Inventory, Spellbook and Attributes favorites.
-- **Filters of its own,** after Tidy Classic: pinned Action, Bonus, Reaction, Concentration, plus Prepared; the menu adds Ritual, Can cast, components, schools and casting class.
-- **Concentration space** (approved, 2026-10-26): a fixed slot in the spellcasting strip showing the spell's icon and name, or "Not concentrating". Name opens the spell; an End button ends it (dnd5e's `endConcentration`); the concentration save rolls from the slot. One entry per concentration when the limit is above 1. Phase 7 may mirror it in the header beside the conditions.
+- **Spell states are two things in dnd5e:** how it's cast (`method`: Spellcasting, Pact Magic, Innate, At will, Ritual, or granted by an item) and its preparation (unprepared, prepared, always prepared). Only Spellcasting and Pact Magic spells prepare (2024 warlocks prepare).
+- **Top of the tab:** one card per casting class (ability, attack, save DC, prepared / max), the class name on its own line so two cards fit side by side at 644px. Preparation follows dnd5e's class math: we show its counts and compute nothing; a class without a preparation formula shows a count only.
+- **Concentration bar,** under the cards, always in the same place: the held spell's icon and name (opens the spell), End (dnd5e's `endConcentration`), and a Con save button that stays when not concentrating. One entry per concentration when the limit is above 1. A save after damage is dnd5e's own chat prompt, not the sheet's job. Phase 7 may mirror the bar in the header.
+- **Sections:** cantrips, spell levels, Pact Magic, then innate, at will, ritual and item spells. Slot sections carry their pips in the heading (§5.1) and, in edit mode, a gear for dnd5e's slot settings. A section with limited-use spells adds a Uses column.
+- **Rows:** the picture casts; the name (with fold caret) opens dnd5e's summary in place. Columns: components, concentration mark, time in words ("1 Bonus Action", not dnd5e's "1BA"), range; school and target off by default; then the book and the favorite bookmark. Players choose columns from the Columns menu in edit mode (client setting).
+- **The book** has three states, like attunement: filled (prepared; click to unprepare), outline (unprepared; click to prepare), locked (always prepared; no click). Cantrips (they never count), innate, at-will, ritual-only and item spells have none.
+- **Unprepared spells show,** marked by the outline book and a plain row, not faded; the Prepared filter narrows the list.
+- **Filters:** pinned Action, Bonus, Reaction, Conc. and Prepared (Tidy Classic's pins plus Prepared); dnd5e's menu has Ritual, schools and casting class, and we add Can cast and V, S, M.
+- **Choosing the primary spellcasting ability** is edit mode only (Phase 6).
 
 ## 5. ADHD rules carried over
 
 Typography and spacing (user, 2026-10-24): three text styles across the module (display, body, label), two spacing steps, one control height; every panel uses space economically, folded and open: a band's heading, total and open mark share one line; the card header is one label line (actor · details) over the title.
 
+From the quest log and Initiative: three text sizes; targets at least 24px; tooltips two to four words, details in a tips panel; play and edit modes; one main action per area; plain words, no blame or counters; reduced motion; colors only through tokens.
 
-From the quest log and Initiative: three text sizes; buttons at least 24px; tooltips two to four words, details in a tips panel; play and edit modes; one main action per area; plain words, no blame or counters; reduced motion; colors only through tokens.
+Don't say a thing twice: a mark that shows its own state needs no count beside it (user, 2026-10-26: the slot pips lost their "3 / 4").
+
+### 5.1 Icons and colors on the sheet (one meaning each)
+
+Check here before choosing a mark, and add new ones. Every tint has an icon, mark or word beside it; never color alone. Colors are tokens with light and dark values (`styles/fhcs.css`).
+
+| Mark | Means | Where |
+|---|---|---|
+| Bookmark; filled rose when on | Favorite | Toggle column on Inventory and Spellbook rows, and dnd5e's right-click menu. Favorited rows glow faintly rose, keeping their own left edge (user, 2026-10-26). |
+| Book: filled, outline, filled with a lock | Prepared, not prepared, always prepared | Spellbook rows (a toggle); Attributes favorites (filled only) |
+| Tint and left edge by kind: blue, teal, violet, orange-brown, grey | Prepared, always prepared, Pact Magic prepared, innate, at will | Spellbook rows, Attributes favorites. Unprepared rows plain. |
+| Check in a green toggle; green tint and left edge | Equipped | Inventory rows, Attributes favorites |
+| Star: filled, outline, none | Attuned, needs attuning (click to attune), no attunement | Inventory rows |
+| C in a ring; filled gold | Concentration spell; held now | Spellbook rows. The concentration bar takes a gold edge and tint while concentrating. |
+| R | Ritual | Beside the spell's name |
+| Soft blue dot, 12px in a 24px target: filled, ring, dotted ring | Slot left, spent, temporary | Spell level headings on Spellbook and Attributes; no count beside them |
+| Caret: pointing right, pointing down | Folded, open | Row names (details), favorite groups, containers |
+| Faint panel with a line under it | An open row | Inventory, Spellbook, Attributes favorites |
+| Pin: heavier edge; dashed and struck through | Filter on; filter excluding | Pinned filters beside a list's search |
+| Green pips with a tick, red with a cross | Death save successes, failures | Header, at 0 HP |
+| Underline | The open tab | Tab row |
+
+Chat cards keep their own scheme (§6.6): the primary d20 black (white in dark themes), disadvantage dice red, advantage dice blue.
 
 ## 6. Rolls and chat cards
 
