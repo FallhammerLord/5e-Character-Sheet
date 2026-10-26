@@ -549,6 +549,37 @@ export function registerQuenchTests(quench)
             await wizard()?.close();
             await cls.delete();
          });
+
+         it('switches an effect off and on, favorites it, and toggles a condition from the Effects tab', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 6);
+            const [effect] = await actor.createEmbeddedDocuments('ActiveEffect', [{ name: 'FHCS test ward', img: 'icons/svg/aura.svg' }]);
+            const row = () => sheet.element.querySelector(`.fhcs-effects [data-effect-id="${effect.id}"]`);
+            const category = () => row()?.closest('[data-effect-type]')?.dataset.effectType;
+            await settled();
+            await until(() => row()?.querySelector('[data-action="toggle"]'), 'the effect has a row with a switch');
+            assert.strictEqual(row().querySelector('[data-action="toggle"]').getAttribute('aria-pressed'), 'true', 'the switch starts on');
+            await click(`.fhcs-effects [data-effect-id="${effect.id}"] [data-action="toggle"]`);
+            await until(() => effect.disabled && category() === 'inactive',
+               () => `the switch turns it off and it moves to Inactive; disabled ${effect.disabled}, in ${category()}`);
+            await click(`.fhcs-effects [data-effect-id="${effect.id}"] [data-action="toggle"]`);
+            await until(() => !effect.disabled, 'a second click turns it back on');
+            const relative = foundry.utils.buildRelativeUuid(effect, actor);
+            await click(`.fhcs-effects [data-effect-id="${effect.id}"] [data-action="favorite"]`);
+            await until(() => actor.system.hasFavorite(relative), 'the bookmark makes it a favorite');
+            await until(() => row()?.querySelector('[data-action="unfavorite"]'), 'the bookmark now offers to remove it');
+            await click(`.fhcs-effects [data-effect-id="${effect.id}"] [data-action="unfavorite"]`);
+            await until(() => !actor.system.hasFavorite(relative), 'a second click removes the favorite');
+            const prone = () => actor.statuses.has('prone');
+            const had = prone();
+            await click('.fhcs-effects [data-action="toggleCondition"][data-condition-id="prone"]');
+            await until(() => prone() !== had, () => `the Prone button toggles the condition; prone is ${prone()}`);
+            await until(() => sheet.element.querySelector('.fhcs-effects [data-condition-id="prone"]')?.getAttribute('aria-pressed') === String(!had),
+               'the Prone button shows its new state');
+            await click('.fhcs-effects [data-action="toggleCondition"][data-condition-id="prone"]');
+            await until(() => prone() === had, 'a second click puts it back');
+            await effect.delete();
+         });
       });
    }, { displayName: 'Fallhammer Character Sheet: core' });
 

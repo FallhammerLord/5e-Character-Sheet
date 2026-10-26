@@ -633,6 +633,62 @@ export async function featuresFacts(sheet, context, { columns })
    };
 }
 
+/** dnd5e's summary of an expanded effect (effects.mjs `_onToggleExpand`), drawn again when the sheet re-renders. */
+const EFFECT_SUMMARY = 'systems/dnd5e/templates/effects/parts/effect-summary.hbs';
+
+/** The effect categories a character shows, in dnd5e's order (effects.mjs:134); enchantments belong to items. */
+const EFFECT_CATEGORIES = ['temporary', 'passive', 'inactive', 'suppressed'];
+
+/**
+ * Plain facts for the Effects tab (src/sheet/effects.js), from what dnd5e's `_prepareEffectsContext` puts on the
+ * context (base-actor-sheet.mjs:250): effect categories with each effect's sheet context, and the conditions list.
+ */
+export async function effectsFacts(sheet, context)
+{
+   const actor = sheet.actor;
+   const categories = [];
+   for (const key of EFFECT_CATEGORIES)
+   {
+      const category = context.effects?.[key];
+      if (!category || category.hidden) { continue; }
+      const effects = [];
+      for (const ctx of category.effects ?? [])
+      {
+         const effect = ctx.effect;
+         const relative = effect ? foundry.utils.buildRelativeUuid(effect, actor) : '';
+         effects.push({
+            id: ctx.id,
+            uuid: effect?.uuid ?? '',
+            parentId: ctx.parentId ?? '',
+            name: ctx.name,
+            img: ctx.img,
+            source: ctx.source?.name ?? '',
+            duration: ctx.showDuration ? (ctx.durationParts ?? []).filter(Boolean).join(' ') : '',
+            disabled: !!ctx.disabled,
+            // dnd5e lets the sheet switch any effect but a concentration (which ends on the Spellbook).
+            toggleable: ctx.toggleable !== false,
+            concentration: ctx.toggleable === false,
+            expanded: !!ctx.isExpanded,
+            summary: ctx.isExpanded && ctx.expanded ? await renderTemplate(EFFECT_SUMMARY, ctx.expanded) : '',
+            favorite: relative ? !!actor.system.hasFavorite?.(relative) : false
+         });
+      }
+      categories.push({ id: key, label: game.i18n.localize(category.label), effects });
+   }
+   return {
+      categories,
+      conditions: (context.conditions ?? []).map((c) => ({
+         id: c.id,
+         name: game.i18n.localize(c.name),
+         img: c.img,
+         on: !c.disabled,
+         level: c.level ?? null
+      })),
+      editing: sheet.isEditMode,
+      canEdit: sheet.isEditable
+   };
+}
+
 /**
  * After dnd5e's advancement finishes (`dnd5e.advancementManagerComplete`), records the order of class levels: the
  * recorded order, brought up to date by `reconcile` (src/sheet/header.js levelOrder).

@@ -291,6 +291,19 @@
       "Passive": "Passive",
       "Empty": "No features yet. Drag features onto the sheet to add them.",
       "Class": "Class"
+    },
+    "Effects": {
+      "Search": "Search effects",
+      "Source": "Source",
+      "Duration": "Duration",
+      "On": "On",
+      "TurnOn": "{name}: off, click to turn on",
+      "TurnOff": "{name}: on, click to turn off",
+      "Concentrating": "Concentrating: end it on the Spellbook",
+      "Conditions": "Conditions",
+      "Level": "{level}",
+      "LevelLabel": "{name}, level {level}: click to raise, right-click to lower",
+      "Empty": "No effects on this character."
     }
   }
 }

@@ -58,6 +58,7 @@ function findProblems()
 {
    const issues = [];
    const POPOVER = '.fhcs-tray';
+   const WHOLE = '.fhcs-condition-name, .fhcs-origin-text > .fhcs-label, .fhcs-class-card .fhcs-origin-name.fhcs-label';
    const app = document.querySelector('.application');
    const edge = app.getBoundingClientRect().right;
    for (const el of app.querySelectorAll('.window-content *'))
@@ -94,6 +95,8 @@ function findProblems()
       {
          issues.push(`content wider than box by ${wider}px: ${label}`);
       }
+      // Short fixed words may never be cut short, ellipsis or not: "Exhaus…" passed once (2026-10-26).
+      if (clipsOnPurpose && wider > 1 && el.matches(WHOLE)) { issues.push(`cut short by ${wider}px: ${label}`); }
    }
    // A round control stays round: Foundry's button sizes once made our pips oval (user, 2026-10-24).
    for (const el of app.querySelectorAll('.window-content :is(button, span, div)'))

@@ -10,6 +10,7 @@ import { attributesView } from '../src/sheet/attributes.js';
 import { inventoryView } from '../src/sheet/inventory.js';
 import { spellbookView } from '../src/sheet/spellbook.js';
 import { featuresView } from '../src/sheet/features.js';
+import { effectsView } from '../src/sheet/effects.js';
 import { format, localize } from './templates.mjs';
 
 /** A usage card's context as FHCSUsageMessageData#_prepareContext builds it, with overrides. */
@@ -361,7 +362,58 @@ const MULTICLASS_FEATURES = [
 ];
 const ALL_FEATURE_COLUMNS = { uses: true, usage: true, recovery: true, favorite: true };
 
+/** One effect's facts as compat.effectsFacts gathers them, with overrides. */
+const fx = (name, fill, over = {}) => ({
+   id: name.replace(/\W/g, ''), uuid: `Actor.x.ActiveEffect.${name}`, parentId: '', name, img: ICON(fill), source: '', duration: '',
+   disabled: false, toggleable: true, concentration: false, expanded: false, summary: '', favorite: false, ...over
+});
+const CONDITIONS = ['Blinded', 'Charmed', 'Deafened', 'Exhaustion', 'Frightened', 'Grappled', 'Incapacitated', 'Invisible',
+   'Paralyzed', 'Petrified', 'Poisoned', 'Prone', 'Restrained', 'Stunned', 'Unconscious'];
+const conditionFacts = (on = [], exhaustion = 0) => CONDITIONS.map((name, i) => ({
+   id: name.toLowerCase(), name, img: ICON(['#5a5a6a', '#8a4a6a', '#6a6a5a', '#7a5a3a', '#6a3a3a'][i % 5]),
+   on: on.includes(name), level: name === 'Exhaustion' ? exhaustion : null
+}));
+const effectsFacts = (over = {}) => ({
+   categories: [
+      { id: 'temporary', label: 'Temporary Effects', effects: [
+         fx('Concentrating: Spirit Guardians', '#c9a227', { toggleable: false, concentration: true, source: 'Spirit Guardians', duration: '9 min' }),
+         fx('Bless', '#c9a227', { source: 'Brother Aldo', duration: '7 rounds', favorite: true, expanded: true,
+            summary: '<div class="item-summary"><p>Add 1d4 to attack rolls and saving throws.</p></div>' }),
+         fx('Frightened', '#6a3a3a', { source: 'Dragon Fear', duration: '1 round' })
+      ] },
+      { id: 'passive', label: 'Passive Effects', effects: [
+         fx('Dwarven Resilience', '#8a6a4a', { source: 'Dwarf' }),
+         fx('Cloak of Protection', '#4a6a8a', { source: 'Cloak of Protection', parentId: 'cloak' })
+      ] },
+      { id: 'inactive', label: 'Inactive Effects', effects: [
+         fx('Enlarge (Potion of Growth)', '#8a5a3a', { disabled: true, source: 'Potion of Growth', duration: '1 hour' })
+      ] }
+   ],
+   conditions: conditionFacts(['Frightened', 'Prone'], 1),
+   editing: false,
+   canEdit: true,
+   ...over
+});
+const effects = (over) => ({
+   tab: { id: 'effects', group: 'primary', cssClass: 'active' }, rollableClass: 'rollable',
+   fhcsEffects: effectsView(effectsFacts(over), { format, localize })
+});
+
 export const CASES = [
+   { name: 'effects', template: 'sheet/effects', context: effects() },
+   {
+      name: 'effects-long', template: 'sheet/effects',
+      context: effects({ categories: [
+         { id: 'temporary', label: 'Temporary Effects', effects: [
+            fx('Aura of Protection (Sir Bartholomew the Unyielding)', '#c9b060', { source: 'Sir Bartholomew the Unyielding', duration: 'While within 10 ft' }),
+            fx('Hex: Strength', '#5a2a6a', { source: 'Mirela Vantorre, Warlock of the Hollow Star', duration: '58 minutes, 30 seconds' })
+         ] },
+         { id: 'suppressed', label: 'Unavailable Effects', effects: [fx('Ring of Protection', '#8a8ab8', { source: 'Ring of Protection' })] }
+      ], conditions: conditionFacts(['Blinded', 'Charmed', 'Deafened', 'Grappled', 'Incapacitated', 'Invisible', 'Paralyzed', 'Petrified',
+         'Poisoned', 'Prone', 'Restrained', 'Stunned', 'Unconscious'], 6) })
+   },
+   { name: 'effects-editing', template: 'sheet/effects', context: effects({ editing: true }) },
+   { name: 'effects-empty', template: 'sheet/effects', context: effects({ categories: [], conditions: conditionFacts() }) },
    { name: 'features', template: 'sheet/features', context: features() },
    {
       name: 'features-multiclass', template: 'sheet/features',

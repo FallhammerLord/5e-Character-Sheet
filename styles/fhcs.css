@@ -2302,3 +2302,47 @@
 .fhcs-sheet .fhcs-col-recovery { flex: 0 1 104px; min-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .fhcs-sheet .fhcs-features .fhcs-col-usage { text-align: left; }
 .fhcs-sheet .fhcs-recharge { width: auto; min-height: 24px; padding: 0 var(--fhcs-s1); }
+
+/* ---------- Effects tab (SCOPE §4.8) ---------- */
+
+/* Source and duration give way, like usage, before the name does. */
+.fhcs-sheet .fhcs-col-source { flex: 0 1 160px; min-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fhcs-sheet .fhcs-col-duration { flex: 0 1 104px; min-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fhcs-sheet .fhcs-effects .fhcs-item-head .fhcs-col-toggle { justify-content: center; }
+
+.fhcs-sheet .fhcs-effect-pic img { display: block; width: 24px; height: 24px; border: 0; border-radius: 4px; object-fit: cover; }
+
+/* The switch (SCOPE §5.1): on, a filled track with the knob right; off, an outline with the knob left. Neutral ink:
+   green already means equipped. */
+.fhcs-sheet .fhcs-switch-mark { flex: none; width: 20px; height: 12px; overflow: visible; }
+.fhcs-sheet .fhcs-switch-mark rect { fill: none; stroke: currentColor; stroke-width: 1.5; }
+.fhcs-sheet .fhcs-switch-mark circle { cx: 6px; fill: currentColor; }
+.fhcs-sheet [aria-pressed="true"] > .fhcs-switch-mark rect { fill: currentColor; }
+.fhcs-sheet [aria-pressed="true"] > .fhcs-switch-mark circle { cx: 14px; fill: var(--fhcs-surface); }
+.fhcs-sheet .fhcs-switch[aria-pressed="true"] { border-color: currentColor; color: var(--fhcs-ink); }
+
+/* Conditions: a grid of buttons, each with its picture, name and switch; on, a heavier edge besides the switch. */
+.fhcs-sheet .fhcs-conditions { display: flex; flex-direction: column; gap: var(--fhcs-s1); }
+
+.fhcs-sheet .fhcs-condition-grid
+{
+   display: grid;
+   margin: 0;
+   padding: 0;
+   list-style: none;
+   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+   gap: var(--fhcs-s1);
+}
+
+.fhcs-sheet .fhcs-condition
+{
+   justify-content: flex-start;
+   gap: var(--fhcs-s2);
+   padding: 0 var(--fhcs-s2) 0 var(--fhcs-s1);
+   background: transparent;
+}
+
+.fhcs-sheet .fhcs-condition img { flex: none; width: 24px; height: 24px; border: 0; border-radius: 4px; object-fit: cover; }
+.fhcs-sheet .fhcs-condition-name { flex: 1; min-width: 0; overflow: hidden; text-align: left; text-overflow: ellipsis; }
+.fhcs-sheet .fhcs-condition:not([aria-pressed="true"]) .fhcs-switch-mark { color: var(--fhcs-muted); }
+.fhcs-sheet .fhcs-condition[aria-pressed="true"] { border-color: currentColor; background: var(--fhcs-fill); }

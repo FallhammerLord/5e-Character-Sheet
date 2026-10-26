@@ -1,0 +1,96 @@
+{{!-- The Effects tab (SCOPE §4.8): dnd5e's effect categories on its own effects element, which binds every
+      [data-action] inside it (toggle, toggleExpand, favorite, unfavorite, edit, delete, toggleCondition) and the
+      right-click menu on [data-effect-id]; then the conditions grid. It takes dnd5e's "effects" part ID. --}}
+<section class="tab fhcs-list-tab fhcs-effects {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
+   {{#with fhcsEffects}}
+   <dnd5e-effects class="effects-element fhcs-list-element">
+      {{> "modules/fhcs/templates/sheet/list-bar.hbs" list="effects" collection="effects" }}
+
+      <section class="items-list effects-list fhcs-items" data-item-list="effects">
+         {{#each sections}}
+         <div class="items-section fhcs-section" data-effect-type="{{ id }}">
+            <div class="items-header fhcs-item-head">
+               <span class="fhcs-col-img" aria-hidden="true"></span>
+               <span class="fhcs-label fhcs-col-name">{{ label }}</span>
+               <span class="fhcs-label fhcs-muted fhcs-col-source">{{ ../text.source }}</span>
+               <span class="fhcs-label fhcs-muted fhcs-col-duration">{{ ../text.duration }}</span>
+               <span class="fhcs-label fhcs-muted fhcs-col-toggle">{{ ../text.on }}</span>
+               <span class="fhcs-muted fhcs-col-toggle" role="img" aria-label="{{ ../text.favorite }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>
+               {{#if ../editing}}<span class="fhcs-col-edit"></span>{{/if}}
+            </div>
+            <ol class="item-list fhcs-item-list">
+               {{#each items}}
+               <li class="item effect collapsible fhcs-item fhcs-effect{{#unless expanded}} collapsed{{/unless}}{{#if favorite}} fhcs-favorited{{/if}}{{#if toggle}}{{#unless toggle.on}} fhcs-off{{/unless}}{{/if}}"
+                   data-uuid="{{ uuid }}" data-effect-id="{{ id }}" data-entry-id="{{ id }}" data-item-name="{{ name }}"{{#if parentId}} data-parent-id="{{ parentId }}"{{/if}}>
+                  <div class="item-row draggable fhcs-item-row">
+                     <span class="fhcs-col-img fhcs-effect-pic"><img src="{{ img }}" alt=""></span>
+                     {{!-- dnd5e's expand flips the classes on this button's <i>, so it must have one. --}}
+                     <button type="button" class="fhcs-col-name fhcs-item-name" data-action="toggleExpand" aria-label="{{ detailsLabel }}">
+                        <i class="fhcs-expand" aria-hidden="true"></i>
+                        <svg class="fhcs-icon fhcs-caret fhcs-name-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                        <span class="fhcs-body fhcs-item-title">{{ name }}</span>
+                     </button>
+                     <span class="fhcs-body fhcs-col-source">{{ source }}</span>
+                     <span class="fhcs-body fhcs-col-duration">{{ duration }}</span>
+                     <span class="fhcs-col-toggle">
+                        {{#if toggle}}
+                        <button type="button" class="fhcs-toggle fhcs-switch" data-action="toggle"
+                                aria-pressed="{{#if toggle.on}}true{{else}}false{{/if}}" aria-label="{{ toggle.label }}" data-fhcs-tip="{{ toggle.label }}">
+                           <svg class="fhcs-switch-mark" viewBox="0 0 20 12" aria-hidden="true"><rect x="1" y="1" width="18" height="10" rx="5"/><circle cy="6" r="3"/></svg>
+                        </button>
+                        {{/if}}
+                        {{#if concentration}}<span class="fhcs-label fhcs-conc-mark fhcs-on" role="img" aria-label="{{ concentration.label }}">C</span>{{/if}}
+                     </span>
+                     <span class="fhcs-col-toggle">
+                        <button type="button" class="fhcs-toggle fhcs-toggle-fav" data-action="{{ favoriteAction }}"
+                                aria-pressed="{{#if favorite}}true{{else}}false{{/if}}" aria-label="{{ favoriteLabel }}" data-fhcs-tip="{{ favoriteLabel }}">
+                           <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
+                        </button>
+                     </span>
+                     {{#if ../../editing}}
+                     <span class="fhcs-col-edit">
+                        <button type="button" class="fhcs-toggle" data-action="edit" aria-label="{{ editLabel }}" data-fhcs-tip="{{ editLabel }}">
+                           <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>
+                        </button>
+                        {{#if toggle}}
+                        <button type="button" class="fhcs-toggle" data-action="delete" aria-label="{{ deleteLabel }}" data-fhcs-tip="{{ deleteLabel }}">
+                           <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></svg>
+                        </button>
+                        {{/if}}
+                     </span>
+                     {{/if}}
+                  </div>
+                  <div class="item-description collapsible-content fhcs-item-details">
+                     <div class="wrapper fhcs-body">{{{ summary }}}</div>
+                  </div>
+               </li>
+               {{/each}}
+            </ol>
+         </div>
+         {{/each}}
+         {{#if empty}}<p class="fhcs-body fhcs-muted fhcs-empty">{{ text.empty }}</p>{{/if}}
+
+         {{!-- Conditions: each one button with its picture, name and switch; exhaustion counts up on a click and
+               down on a right-click (dnd5e's toggleCondition). Not an items-section, so a search never hides it. --}}
+         {{#if conditions.length}}
+         <div class="fhcs-conditions">
+            <div class="fhcs-item-head"><span class="fhcs-label">{{ text.conditions }}</span></div>
+            <ul class="fhcs-condition-grid">
+               {{#each conditions}}
+               <li>
+                  <button type="button" class="fhcs-button fhcs-body fhcs-condition" data-action="toggleCondition" data-condition-id="{{ id }}"
+                          aria-pressed="{{#if on}}true{{else}}false{{/if}}" aria-label="{{ label }}">
+                     <img src="{{ img }}" alt="">
+                     <span class="fhcs-condition-name">{{ name }}</span>
+                     {{#if level}}<span class="fhcs-label">{{ level }}</span>{{/if}}
+                     <svg class="fhcs-switch-mark" viewBox="0 0 20 12" aria-hidden="true"><rect x="1" y="1" width="18" height="10" rx="5"/><circle cy="6" r="3"/></svg>
+                  </button>
+               </li>
+               {{/each}}
+            </ul>
+         </div>
+         {{/if}}
+      </section>
+   </dnd5e-effects>
+   {{/with}}
+</section>

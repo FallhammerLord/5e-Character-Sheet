@@ -1,9 +1,10 @@
-{{!-- The search bar of a list tab (Inventory, Spellbook, Features): dnd5e's list controls (search, filter menu, sort,
-      and grouping where the tab has it), the filters pinned beside them (fhcsPinFilter turns one of dnd5e's filters
-      on or off), the grouping in words (fhcsCycleGroup steps dnd5e's own switch, whose icon button we hide), and in
-      edit mode the Columns menu. Takes `list` (dnd5e's list name: "inventory", "spells", "features") from the include. --}}
+{{!-- The search bar of a list tab (Inventory, Spellbook, Features, Effects): dnd5e's list controls (search, filter
+      menu, sort, and grouping where the tab has it), the filters pinned beside them (fhcsPinFilter turns one of
+      dnd5e's filters on or off), the grouping in words (fhcsCycleGroup steps dnd5e's own switch, whose icon button we
+      hide), and in edit mode the Columns menu. Takes `list` (dnd5e's list name: "inventory", "spells", "features",
+      "effects") and, for effects, `collection="effects"` from the include. --}}
 <div class="fhcs-list-bar">
-   <item-list-controls for="{{ list }}" collection="items" label="{{ text.search }}">
+   <item-list-controls for="{{ list }}" collection="{{#if collection}}{{ collection }}{{else}}items{{/if}}" label="{{ text.search }}">
       {{#if filters.length}}
       <datalist data-list="filters">
          {{#each filters}}<option value="{{ key }}" data-group="{{ group }}">{{ label }}</option>{{/each}}

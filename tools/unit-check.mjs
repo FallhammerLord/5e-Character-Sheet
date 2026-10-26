@@ -12,6 +12,7 @@ import { healUpdates, keepStable } from '../src/sheet/death.js';
 import { columnChoice, inventoryView } from '../src/sheet/inventory.js';
 import { canCast, prepState, spellbookView, spellColumnChoice, spellKind } from '../src/sheet/spellbook.js';
 import { featureColumnChoice, featuresView, groupingOf } from '../src/sheet/features.js';
+import { effectsView } from '../src/sheet/effects.js';
 import { pinView } from '../src/sheet/lists.js';
 import { headerMinWidth, headerView, levelOrder, levelTrack, signed, tabRow } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
@@ -415,10 +416,38 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    catch { problems.push(`feature columns: ${JSON.stringify(featureColumnChoice({ usage: false }))}`); }
 }
 
+// Effects (SCOPE §4.8): empty categories hidden, the switch, concentration's C, conditions with levels.
+{
+   const e = (id, over) => ({ id, uuid: id, name: id, img: '', toggleable: true, disabled: false, ...over });
+   const view = effectsView({
+      categories: [
+         { id: 'temporary', label: 'Temporary', effects: [e('Conc', { toggleable: false, concentration: true }), e('Bless', { favorite: true })] },
+         { id: 'passive', label: 'Passive', effects: [] },
+         { id: 'inactive', label: 'Inactive', effects: [e('Enlarge', { disabled: true })] }
+      ],
+      conditions: [
+         { id: 'prone', name: 'Prone', img: '', on: true, level: null },
+         { id: 'exhaustion', name: 'Exhaustion', img: '', on: true, level: 0 },
+         { id: 'blinded', name: 'Blinded', img: '', on: false, level: null }
+      ]
+   }, { format, localize });
+   const shape = [
+      view.sections.map((x) => x.id).join(),
+      view.sections[0].items.map((i) => `${i.toggle ? (i.toggle.on ? 'on' : 'off') : 'none'}${i.concentration ? '+C' : ''}`).join(),
+      view.sections[1].items[0].toggle.on,
+      view.sections[0].items[1].favoriteAction,
+      view.conditions.map((c) => `${c.on ? 1 : 0}${c.level}`).join()
+   ];
+   // Exhaustion at level 0 is off whatever dnd5e's disabled says; its level reads as a number.
+   try { deepStrictEqual(shape, ['temporary,inactive', 'none+C,on', false, 'unfavorite', '1,00,0']); }
+   catch { problems.push(`effects view: ${JSON.stringify(shape)}`); }
+   if (!effectsView({ categories: [], conditions: [] }, { format, localize }).empty) { problems.push('an empty Effects tab is not marked empty'); }
+}
+
 // Each extra ability (honor, sanity) widens the minimum by one column and its gap.
 if (headerMinWidth(7) - headerMinWidth(6) !== 56) { problems.push('the sheet minimum does not grow by one ability column'); }
 
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
 console.log(`${CASES.length} outcome lines, ${PART_CASES.length} card layouts, ${ROW_CASES.length} d20 rows, `
    + `${DAMAGE_CASES.length} damage bands, ${SAVE_CASES.length} save rows, ${KEEP_CASES.length} late adds and `
-   + `${MATH_CASES.length} dice sums read as expected; ${ORDER_CASES.length} level orders, the milestone track, the inventory, spellbook and features views hold.`);
+   + `${MATH_CASES.length} dice sums read as expected; ${ORDER_CASES.length} level orders, the milestone track, the inventory, spellbook, features and effects views hold.`);
