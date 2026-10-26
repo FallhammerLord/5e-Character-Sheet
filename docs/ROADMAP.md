@@ -36,15 +36,15 @@ Classic layout: skills and saves column; resources; favorites; traits (senses, l
 
 ## Phase 3: Inventory
 
-Built on dnd5e's `dnd5e-inventory` element. Equip, attune, quantity, weight and encumbrance, containers, currency, drag and drop, context menus. In progress (2026-10-26).
+Built on dnd5e's `dnd5e-inventory` element. Equip, attune, quantity, weight and encumbrance, containers, currency, drag and drop, context menus. Verified 2026-10-26 (Quench 30 of 30, and the user in play); only the pinned filter buttons remain.
 
 - [x] Mockup approved with answers (2026-10-26): player-chosen columns, three-state attunement, encumbrance follows dnd5e's setting (SCOPE §4.6)
-- [ ] Shared list controls (search, filter, sort), styled once for Inventory, Spellbook and Features (in code 2026-10-26)
-- [ ] Item rows: equip and attune toggles, uses, usage, quantity, expand, edit and delete in edit mode; context menus and drag from dnd5e (in code 2026-10-26)
-- [ ] Column menu in edit mode, each player's choice (in code 2026-10-26)
-- [ ] Attunement, currency and carried-weight footer (in code 2026-10-26)
+- [x] Shared list controls (search, filter, sort), styled once for Inventory, Spellbook and Features (verified 2026-10-26)
+- [x] Item rows: equip and attune toggles, uses, usage, quantity, expand, edit and delete in edit mode; context menus and drag from dnd5e (verified 2026-10-26)
+- [x] Column menu in edit mode, each player's choice (verified 2026-10-26)
+- [x] Attunement, currency and carried-weight footer (verified 2026-10-26)
 - [ ] Pinned filter buttons beside the search (Action, Bonus, Equipped), as in the mockup
-- [ ] Containers: drop onto a container row, contents folding open under it, nested (in code 2026-10-26; no top panel, user's choice)
+- [x] Containers: drop onto a container row, contents folding open under it, nested (verified 2026-10-26; no top panel, user's choice)
 
 ## Phase 4: Spellbook
 

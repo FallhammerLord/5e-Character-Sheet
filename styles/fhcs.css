@@ -1680,7 +1680,8 @@
    cursor: pointer;
 }
 
-.fhcs-sheet .fhcs-inventory-bar .filter-control.active { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
+/* dnd5e marks the sort button active always (a sort mode is always in use); only a filter or a search lights up. */
+.fhcs-sheet .fhcs-inventory-bar .filter-control.active:not([data-action="sort"]) { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
 
 /* The column menu (edit mode): a fold beside the search, opening under it at the right edge. */
 .fhcs-sheet .fhcs-columns { position: relative; }
