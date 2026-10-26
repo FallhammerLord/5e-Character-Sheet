@@ -114,7 +114,8 @@ Research note, "Features, Effects, Biography, Journal". Every list matches Inven
 
 - **Data carries over** (user, 2026-10-26): every player-written field is dnd5e's own (`system.details.*`, biography, characteristics), so text written on dnd5e's sheet or Tidy's shows on ours, and the other way round. We add no text fields of our own.
 - **Features:** dnd5e's sections and its grouping switch, starting By source (one section per class, Species, Background, Other); Active and Passive one click away. Columns Uses, Usage (in words, like spell time), Recovery. Pins Action, Bonus, Reaction.
-- **Classes:** cards at the top, like the Spellbook's class cards (class, subclass, level), with a mark when a subclass is due. Changing level is edit mode (Phase 6).
+- **Classes:** cards at the top, like the Spellbook's class cards (class, subclass, level), with a dashed "Choose subclass" button when one is due (dnd5e's `findItem`). Each card has a **Level up** button that opens dnd5e's level-up wizard (its advancement manager, as its level dropdown does; a plain level change when the world turns advancements off) (user, 2026-10-26). Level down and adding a class stay edit mode (Phase 6).
+- **Species and Background:** two cards in a row of their own under the class cards; the picture and name open the item; a missing one shows a dashed "Choose species" or "Choose background" button (`findItem`) (user, 2026-10-26).
 - **Effects:** dnd5e's categories (Temporary, Passive, Inactive, Suppressed when any), rows with Source and Duration and an on/off mark; under them a conditions grid, each with its icon and name. The header keeps showing active conditions.
 - **Biography:** Classic's layout (characteristics across the top; ideals, bonds, flaws, personality; appearance and biography). Read in play, written in edit mode (Phase 6).
 - **Journal: dropped** (user, 2026-10-26). dnd5e has none; quests live in the quest log, notes in the biography. Tidy's Journal notes stay untouched in Tidy's flags on the actor.
@@ -146,6 +147,8 @@ Check here before choosing a mark, and add new ones. Every tint has an icon, mar
 | Pin: heavier edge; dashed and struck through | Filter on; filter excluding | Pinned filters beside a list's search |
 | Green pips with a tick, red with a cross | Death save successes, failures | Header, at 0 HP |
 | Underline | The open tab | Tab row |
+| Switch: filled track, knob right; outline track, knob left | On, off | Effects rows and conditions (user, 2026-10-26). Neutral ink, not green. |
+| Dashed button with a plus | Something to choose or add | Class cards (subclass), Species and Background cards (user, 2026-10-26) |
 
 Chat cards keep their own scheme (§6.6): the primary d20 black (white in dark themes), disadvantage dice red, advantage dice blue.
 

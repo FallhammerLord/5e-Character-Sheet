@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 5 mockup review.** Boards on the canvas (2026-10-26): Features, Effects, Biography rows, each light, dark and 644px with a hard case. New marks proposed, not yet in SCOPE §5.1: a switch for an effect or condition being on; a dashed "Choose subclass" button. On approval: record answers in SCOPE §4.8 and §5.1, tick ROADMAP, plan the build slices (Features first).
+1. **Phase 5 mockup review.** Boards on the canvas (2026-10-26): Features, Effects, Biography rows, each light, dark and 644px with a hard case. First round (user, 2026-10-26): switch and dashed add approved (SCOPE §5.1); Level up on class cards and the Species and Background row added (§4.8). Waiting on approval of the revised Features boards; then tick ROADMAP and plan the build slices (Features first).
 
 The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.
 
