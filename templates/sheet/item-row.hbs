@@ -1,0 +1,88 @@
+{{!-- One Inventory row (SCOPE §4.6), included by inventory.hbs and by itself for a container's contents. Reads the
+      tab's settings from @root, since it is drawn at any depth. A container row carries dnd5e's `container` class:
+      dnd5e's sheet moves an item dropped anywhere on it into the container (base-actor-sheet.mjs:1718). Its contents
+      sit in their own item-list inside it, so dnd5e's sorting keeps them there. --}}
+<li class="item collapsible fhcs-item{{#unless expanded}} collapsed{{/unless}}{{#if equipped}} fhcs-equipped{{/if}}{{#if container}} container{{/if}}"
+    data-uuid="{{ uuid }}" data-item-id="{{ id }}" data-entry-id="{{ id }}" data-item-name="{{ name }}">
+   <div class="item-row draggable fhcs-item-row">
+      <button type="button" class="item-action fhcs-col-img fhcs-item-use {{ @root.rollableClass }}"
+              data-action="{{ useAction }}" aria-label="{{ useLabel }}">
+         <img src="{{ img }}" alt="">
+      </button>
+      {{#if container.count}}
+      <button type="button" class="fhcs-contents-toggle" data-action="fhcsToggleContainer"
+              aria-expanded="{{#if container.open}}true{{else}}false{{/if}}" aria-label="{{ container.label }}">
+         <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+         <span class="fhcs-label">{{ container.count }}</span>
+      </button>
+      {{/if}}
+      {{!-- dnd5e's expand flips the classes on this button's <i>, so it must have one. --}}
+      <button type="button" class="item-action fhcs-col-name fhcs-item-name" data-action="toggleExpand"
+              aria-label="{{ detailsLabel }}">
+         <i class="fhcs-expand" aria-hidden="true"></i>
+         <span class="fhcs-body fhcs-item-title">{{ name }}</span>
+         {{#if sub}}<span class="fhcs-label fhcs-muted fhcs-item-sub">{{ sub }}</span>{{/if}}
+      </button>
+      {{#if @root.fhcsInventory.columns.weight}}<span class="fhcs-body fhcs-col-weight">{{ weight }}</span>{{/if}}
+      {{#if @root.fhcsInventory.columns.uses}}
+      <span class="fhcs-col-uses">
+         {{#if uses}}
+         <input type="text" class="fhcs-input fhcs-body fhcs-uses-input" value="{{ uses.value }}" placeholder="0"
+                data-dtype="Number" data-name="{{ uses.prop }}" inputmode="numeric" pattern="[+=\-]?\d*"
+                aria-label="{{ uses.label }}">
+         <span class="fhcs-body fhcs-muted">/ {{ uses.max }}</span>
+         {{/if}}
+      </span>
+      {{/if}}
+      {{#if @root.fhcsInventory.columns.usage}}<span class="fhcs-body fhcs-col-usage">{{ usage }}</span>{{/if}}
+      {{#if @root.fhcsInventory.columns.quantity}}
+      <span class="fhcs-col-quantity">
+         {{#if quantity includeZero=true}}
+         <input type="text" class="fhcs-input fhcs-body fhcs-quantity-input" value="{{ quantity }}" placeholder="0"
+                data-dtype="Number" data-name="system.quantity" inputmode="numeric" pattern="^[+=\-]?\d*" min="0"
+                aria-label="{{ quantityLabel }}">
+         {{/if}}
+      </span>
+      {{/if}}
+      {{#if @root.fhcsInventory.columns.equipped}}
+      <span class="fhcs-col-toggle">
+         {{#if equip}}
+         <button type="button" class="item-action fhcs-toggle fhcs-toggle-equip" data-action="equip"
+                 aria-pressed="{{#if equip.pressed}}true{{else}}false{{/if}}" aria-label="{{ equip.label }}"
+                 data-fhcs-tip="{{ equip.label }}"{{#if equip.disabled}} aria-disabled="true"{{/if}}>
+            <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true">{{#if equip.pressed}}<path d="M5 12l5 5 9-10"/>{{else}}<path d="M8 12h8"/>{{/if}}</svg>
+         </button>
+         {{/if}}
+      </span>
+      {{/if}}
+      {{#if @root.fhcsInventory.columns.attuned}}
+      <span class="fhcs-col-toggle">
+         {{#if attune}}
+         <button type="button" class="item-action fhcs-toggle fhcs-toggle-attune" data-action="attune"
+                 aria-pressed="{{#if attune.pressed}}true{{else}}false{{/if}}" aria-label="{{ attune.label }}"
+                 data-fhcs-tip="{{ attune.label }}"{{#if attune.disabled}} aria-disabled="true"{{/if}}>
+            <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.4 6.1L21 12l-6.6 2.9L12 21l-2.4-6.1L3 12l6.6-2.9z"/></svg>
+         </button>
+         {{/if}}
+      </span>
+      {{/if}}
+      {{#if @root.fhcsInventory.editing}}
+      <span class="fhcs-col-edit">
+         <button type="button" class="item-action fhcs-toggle" data-action="edit" aria-label="{{ editLabel }}" data-fhcs-tip="{{ editLabel }}">
+            <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>
+         </button>
+         <button type="button" class="item-action fhcs-toggle" data-action="delete" aria-label="{{ deleteLabel }}" data-fhcs-tip="{{ deleteLabel }}">
+            <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></svg>
+         </button>
+      </span>
+      {{/if}}
+   </div>
+   <div class="item-description collapsible-content fhcs-item-details">
+      <div class="wrapper fhcs-body">{{{ summary }}}</div>
+   </div>
+   {{#if container.count}}
+   <ol class="item-list fhcs-contents"{{#unless container.open}} hidden{{/unless}}>
+      {{#each container.contents}}{{> "modules/fhcs/templates/sheet/item-row.hbs" }}{{/each}}
+   </ol>
+   {{/if}}
+</li>

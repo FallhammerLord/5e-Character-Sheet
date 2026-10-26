@@ -1729,8 +1729,37 @@
 
 .fhcs-sheet .fhcs-item { border-bottom: 1px solid var(--fhcs-line-soft); }
 
+/* A container's contents: indented under it, past its picture, with a line down the left. */
+.fhcs-sheet .fhcs-inventory .fhcs-contents
+{
+   margin-left: calc(var(--fhcs-s1) + 12px);
+   padding-left: var(--fhcs-s2);
+   border-left: 1px solid var(--fhcs-line);
+}
+
+.fhcs-sheet .fhcs-contents > .fhcs-item:last-child { border-bottom: 0; }
+
+.fhcs-sheet .fhcs-contents-toggle
+{
+   display: inline-flex;
+   flex: none;
+   align-items: center;
+   gap: 2px;
+   height: var(--fhcs-control);
+   margin: 0;
+   padding: 0 var(--fhcs-s1);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-fill);
+   color: inherit;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-contents-toggle .fhcs-caret { width: 12px; height: 12px; }
+.fhcs-sheet .fhcs-contents-toggle[aria-expanded="true"] .fhcs-caret { transform: rotate(90deg); }
+
 /* Equipped: a tint, a left edge and the check in its toggle, never color alone (SCOPE §4.5). */
-.fhcs-sheet .fhcs-item.fhcs-equipped
+.fhcs-sheet .fhcs-item.fhcs-equipped > .fhcs-item-row
 {
    background: color-mix(in srgb, var(--fhcs-success) 12%, transparent);
    box-shadow: inset 3px 0 0 var(--fhcs-success);
@@ -1778,7 +1807,9 @@
 
 .fhcs-sheet .fhcs-expand { display: none; }
 .fhcs-sheet :is(.fhcs-item-title, .fhcs-item-sub) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.fhcs-sheet .fhcs-item-sub { flex: none; max-width: 40%; }
+.fhcs-sheet .fhcs-item-title { flex: 0 1 auto; min-width: 0; }
+/* When space runs short, the capacity gives way long before the name does. */
+.fhcs-sheet .fhcs-item-sub { flex: 0 100 auto; min-width: 0; }
 
 .fhcs-sheet .fhcs-inventory .fhcs-input { width: 100%; padding: 0 var(--fhcs-s1); }
 .fhcs-sheet .fhcs-inventory .fhcs-uses-input { width: 32px; text-align: center; }
@@ -1809,7 +1840,7 @@
 .fhcs-sheet .fhcs-toggle:hover:not([aria-disabled="true"]) { color: var(--fhcs-ink); }
 
 /* dnd5e's summary, put in here when a row opens. */
-.fhcs-sheet .fhcs-item.collapsed .fhcs-item-details { display: none; }
+.fhcs-sheet .fhcs-item.collapsed > .fhcs-item-details { display: none; }
 .fhcs-sheet .fhcs-item-details > .wrapper { padding: 0 var(--fhcs-s2) var(--fhcs-s2) calc(24px + var(--fhcs-s2) * 2); }
 .fhcs-sheet .fhcs-item-details :is(p, ul, ol) { margin: 0 0 var(--fhcs-s1); }
 

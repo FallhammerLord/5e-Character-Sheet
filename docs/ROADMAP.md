@@ -44,7 +44,7 @@ Built on dnd5e's `dnd5e-inventory` element. Equip, attune, quantity, weight and 
 - [ ] Column menu in edit mode, each player's choice (in code 2026-10-26)
 - [ ] Attunement, currency and carried-weight footer (in code 2026-10-26)
 - [ ] Pinned filter buttons beside the search (Action, Bonus, Equipped), as in the mockup
-- [ ] Containers: Classic's container panel, and items inside containers
+- [ ] Containers: drop onto a container row, contents folding open under it, nested (in code 2026-10-26; no top panel, user's choice)
 
 ## Phase 4: Spellbook
 

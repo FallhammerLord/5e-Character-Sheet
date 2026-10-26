@@ -260,6 +260,30 @@ export function registerQuenchTests(quench)
             await ring.delete();
          });
 
+         it('lists a container\'s contents under it, folds them, and takes items dropped on it', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 4);
+            const [pack] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test pack', type: 'container' }]);
+            const [rope, torch] = await actor.createEmbeddedDocuments('Item', [
+               { name: 'FHCS test rope', type: 'loot', system: { container: pack.id } },
+               { name: 'FHCS test torch', type: 'loot' }
+            ]);
+            const flag = game.user.getFlag(MODULE_ID, 'openContainers');
+            await sheet.render();
+            const packRow = () => sheet.element.querySelector(`.fhcs-inventory [data-item-id="${pack.id}"]`);
+            assert.isTrue(packRow()?.classList.contains('container'), 'the container row carries dnd5e\'s drop class');
+            assert.ok(packRow().querySelector(`:scope > .fhcs-contents [data-item-id="${rope.id}"]`), 'the rope is drawn inside the pack');
+            const list = packRow().querySelector(':scope > .fhcs-contents');
+            const wasHidden = list.hidden;
+            packRow().querySelector('[data-action="fhcsToggleContainer"]').click();
+            assert.notStrictEqual(list.hidden, wasHidden, 'the fold button opens or shuts the contents');
+            // dnd5e's own drop handler, as a drag of the torch onto the pack row would reach it.
+            await sheet._onDropItem({ target: packRow().querySelector('.fhcs-item-name'), _behavior: 'move' }, torch);
+            await until(() => torch.system.container === pack.id, 'a drop on the pack row puts the torch in it');
+            await game.user.setFlag(MODULE_ID, 'openContainers', flag ?? []);
+            await actor.deleteEmbeddedDocuments('Item', [pack.id, rope.id, torch.id]);
+         });
+
          it('closes an open tray when the player clicks off it, not when they click inside it', function ()
          {
             const tray = sheet.element.querySelector('.fhcs-header details.fhcs-fold[data-fold-key="exhaustion"]');

@@ -190,7 +190,8 @@
       "AttunementMax": "Most items you can attune",
       "CurrencyLabel": "{name}",
       "Carried": "Carried",
-      "CarriedLabel": "Carrying {value} of {max} {units}"
+      "CarriedLabel": "Carrying {value} of {max} {units}",
+      "ContentsLabel": "Show or hide what's in {name} ({count})"
     }
   }
 }

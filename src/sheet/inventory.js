@@ -31,49 +31,57 @@ const pct = (n) => Math.max(0, Math.min(100, Number(n) || 0));
 export function inventoryView(facts, { format, localize })
 {
    const columns = columnChoice(facts.columns);
+   const open = new Set(facts.openContainers ?? []);
+
+   /** One row, and for a container its contents, at any depth. */
+   const row = (item) =>
+   {
+      const equipped = !!item.equip?.on;
+      const contents = item.contents ? item.contents.map(row) : null;
+      return {
+         id: item.id,
+         uuid: item.uuid,
+         name: item.name,
+         img: item.img,
+         sub: item.sub ?? '',
+         useAction: item.useAction ?? 'use',
+         useLabel: format(item.useAction === 'view' ? 'FHCS.Inventory.ViewLabel' : 'FHCS.Inventory.UseLabel', { name: item.name }),
+         detailsLabel: format('FHCS.Inventory.DetailsLabel', { name: item.name }),
+         expanded: !!item.expanded,
+         summary: item.summary ?? '',
+         weight: item.weight ?? '',
+         uses: item.uses?.max ? { value: item.uses.value, max: item.uses.max, prop: item.uses.prop,
+            label: format('FHCS.Inventory.UsesLabel', { name: item.name }) } : null,
+         usage: item.usage ?? '',
+         quantity: item.quantity ?? null,
+         quantityLabel: format('FHCS.Inventory.QuantityLabel', { name: item.name }),
+         equipped,
+         equip: item.equip ? {
+            pressed: equipped,
+            disabled: !!item.equip.disabled,
+            label: localize(equipped ? 'FHCS.Inventory.Equipped' : 'FHCS.Inventory.NotEquipped')
+         } : null,
+         // Three states (user, 2026-10-26): attuned, needs attuning (click to attune), or no attunement at all.
+         attune: item.attune ? {
+            pressed: !!item.attune.on,
+            disabled: !!item.attune.disabled,
+            label: item.attune.on ? localize('FHCS.Inventory.Attuned') : item.attune.need || localize('FHCS.Inventory.NotAttuned')
+         } : null,
+         // A container folds its contents open under its row (user, 2026-10-26), as each player last left it.
+         container: contents ? {
+            count: contents.length,
+            open: open.has(item.id),
+            label: format('FHCS.Inventory.ContentsLabel', { name: item.name, count: contents.length }),
+            contents
+         } : null,
+         editLabel: format('FHCS.Inventory.EditLabel', { name: item.name }),
+         deleteLabel: format('FHCS.Inventory.DeleteLabel', { name: item.name })
+      };
+   };
+
    const sections = facts.sections
       .filter((s) => s.items.length)
-      .map((s) => ({
-         id: s.id,
-         label: s.label,
-         count: s.items.length,
-         items: s.items.map((item) =>
-         {
-            const equipped = !!item.equip?.on;
-            return {
-               id: item.id,
-               uuid: item.uuid,
-               name: item.name,
-               img: item.img,
-               sub: item.sub ?? '',
-               useAction: item.useAction ?? 'use',
-               useLabel: format(item.useAction === 'view' ? 'FHCS.Inventory.ViewLabel' : 'FHCS.Inventory.UseLabel', { name: item.name }),
-               detailsLabel: format('FHCS.Inventory.DetailsLabel', { name: item.name }),
-               expanded: !!item.expanded,
-               summary: item.summary ?? '',
-               weight: item.weight ?? '',
-               uses: item.uses?.max ? { value: item.uses.value, max: item.uses.max, prop: item.uses.prop,
-                  label: format('FHCS.Inventory.UsesLabel', { name: item.name }) } : null,
-               usage: item.usage ?? '',
-               quantity: item.quantity ?? null,
-               quantityLabel: format('FHCS.Inventory.QuantityLabel', { name: item.name }),
-               equipped,
-               equip: item.equip ? {
-                  pressed: equipped,
-                  disabled: !!item.equip.disabled,
-                  label: localize(equipped ? 'FHCS.Inventory.Equipped' : 'FHCS.Inventory.NotEquipped')
-               } : null,
-               // Three states (user, 2026-10-26): attuned, needs attuning (click to attune), or no attunement at all.
-               attune: item.attune ? {
-                  pressed: !!item.attune.on,
-                  disabled: !!item.attune.disabled,
-                  label: item.attune.on ? localize('FHCS.Inventory.Attuned') : item.attune.need || localize('FHCS.Inventory.NotAttuned')
-               } : null,
-               editLabel: format('FHCS.Inventory.EditLabel', { name: item.name }),
-               deleteLabel: format('FHCS.Inventory.DeleteLabel', { name: item.name })
-            };
-         })
-      }));
+      .map((s) => ({ id: s.id, label: s.label, count: s.items.length, items: s.items.map(row) }));
 
    const enc = facts.encumbrance;
    const encumbrance = enc ? {

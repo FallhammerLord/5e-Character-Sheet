@@ -86,6 +86,7 @@ Inventory decisions (user, 2026-10-26; mockup https://claude.ai/artifact/PfrTrdD
 - **Equipped:** a 28px toggle per row, plus the green tint and left edge. Edit and delete show only in edit mode.
 - **The carried-weight bar follows dnd5e's encumbrance world setting:** hidden when the GM has it off. We add no setting of our own.
 - **The picture uses the item; the name opens its details** (Classic's split).
+- **Containers** (user, 2026-10-26): a container is a row like any other, and a drop anywhere on it puts the item inside (dnd5e's own drop handling). Its contents fold open under it, indented, with a count on the fold button; each player's open containers are remembered. Containers nest. No container panel at the top. dnd5e's container window (from the picture) keeps dnd5e's look for now.
 
 ## 5. ADHD rules carried over
 

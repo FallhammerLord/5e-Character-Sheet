@@ -188,13 +188,81 @@ const weightUnit = (key) => game.i18n.localize(CONFIG.DND5E.weightUnits?.[key]?.
 /** @returns {string} A number rounded to one decimal place, in the user's language. */
 const tenths = (n) => (Math.round((Number(n) || 0) * 10) / 10).toLocaleString(game.i18n.lang);
 
+/** Containers inside containers stop here, in case a bad import ever makes a loop. */
+const MAX_DEPTH = 8;
+
+/**
+ * Row context for an item inside a container. dnd5e's `_prepareItems` skips contained items (base-actor-sheet.mjs:466),
+ * so we run the same per-item steps it runs for loose ones.
+ */
+async function containedContext(sheet, item)
+{
+   const ctx = { clickAction: 'use' };
+   sheet._prepareItem(item, ctx);
+   if ('quantity' in item.system) { await sheet._prepareItemPhysical(item, ctx); }
+   ctx.isExpanded = sheet.expandedSections?.get(`items.${item.id}`) === true;
+   if (ctx.isExpanded) { ctx.expanded = await item.getChatData({ secrets: item.isOwner }); }
+   if (item.type === 'container')
+   {
+      ctx.capacity = await item.system.computeCapacity();
+      ctx.clickAction = 'view';
+   }
+   return ctx;
+}
+
+/** One Inventory row's facts; a container's carries its contents, unless dnd5e hides them from this user. */
+async function rowFacts(sheet, item, ctx, depth = 0)
+{
+   const uses = ctx.uses?.hasUses ? { value: ctx.uses.value ?? 0, max: ctx.uses.max, prop: ctx.uses.prop } : null;
+   let sub = '';
+   if (ctx.capacity && !ctx.capacity.hidden)
+   {
+      const max = Number.isFinite(ctx.capacity.max) ? tenths(ctx.capacity.max) : '\u221e';
+      // dnd5e's units are a full label ("Pounds"); by weight we show the short one ("lb"), by count its "Items".
+      const units = item.system.capacity?.count ? ctx.capacity.units ?? '' : weightUnit(item.system.capacity?.weight?.units);
+      sub = `${tenths(ctx.capacity.value)} / ${max} ${units}`.trim();
+   }
+   let contents = null;
+   if (item.type === 'container')
+   {
+      contents = [];
+      if (item.system.canViewContents !== false && depth < MAX_DEPTH)
+      {
+         const inside = sheet.actor.items.filter((i) => i.system.container === item.id && (sheet._isItemVisible?.(i) ?? true))
+            .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
+         for (const child of inside) { contents.push(await rowFacts(sheet, child, await containedContext(sheet, child), depth + 1)); }
+      }
+   }
+   return {
+      id: item.id,
+      uuid: item.uuid,
+      name: item.name,
+      img: item.img,
+      sub,
+      useAction: ctx.clickAction === 'view' ? 'view' : 'use',
+      expanded: !!ctx.isExpanded,
+      summary: ctx.isExpanded && ctx.expanded ? await renderTemplate(ITEM_SUMMARY, ctx.expanded) : '',
+      weight: ctx.totalWeight ? `${tenths(ctx.totalWeight)} ${weightUnit(item.system.weight?.units)}`.trim() : '',
+      uses,
+      usage: item.isActive ? (item.labels?.activation ?? '') : '',
+      quantity: item.system.quantity ?? null,
+      equip: ctx.equip?.applicable ? { on: !!item.system.equipped, disabled: !!ctx.equip.disabled } : null,
+      attune: ctx.attunement?.applicable ? {
+         on: !!item.system.attuned,
+         disabled: !!ctx.attunement.disabled,
+         need: game.i18n.localize(ctx.attunement.title ?? '')
+      } : null,
+      contents
+   };
+}
+
 /**
  * Plain facts for the Inventory tab (src/sheet/inventory.js), from what dnd5e's `_prepareInventoryContext` and
  * `_prepareItems` put on the context (base-actor-sheet.mjs:311, 463; character-sheet.mjs:506, 874). dnd5e renders
  * every item into one hidden list and moves rows into sections in the browser; we place them here instead, by the
  * item type each section groups (`inventorySection.groups.type`).
  */
-export async function inventoryFacts(sheet, context, { columns })
+export async function inventoryFacts(sheet, context, { columns, openContainers })
 {
    const actor = sheet.actor;
    const config = CONFIG.DND5E;
@@ -209,35 +277,7 @@ export async function inventoryFacts(sheet, context, { columns })
       .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
    for (const item of items)
    {
-      const ctx = ctxs[item.id] ?? {};
-      const uses = ctx.uses?.hasUses ? { value: ctx.uses.value ?? 0, max: ctx.uses.max, prop: ctx.uses.prop } : null;
-      let sub = '';
-      if (ctx.capacity)
-      {
-         const max = Number.isFinite(ctx.capacity.max) ? tenths(ctx.capacity.max) : '∞';
-         sub = `${tenths(ctx.capacity.value)} / ${max} ${weightUnit(ctx.capacity.units)}`.trim();
-      }
-      const fact = {
-         id: item.id,
-         uuid: item.uuid,
-         name: item.name,
-         img: item.img,
-         sub,
-         useAction: ctx.clickAction === 'view' ? 'view' : 'use',
-         expanded: !!ctx.isExpanded,
-         summary: ctx.isExpanded && ctx.expanded ? await renderTemplate(ITEM_SUMMARY, ctx.expanded) : '',
-         weight: ctx.totalWeight ? `${tenths(ctx.totalWeight)} ${weightUnit(item.system.weight?.units)}`.trim() : '',
-         uses,
-         usage: item.isActive ? (item.labels?.activation ?? '') : '',
-         quantity: item.system.quantity ?? null,
-         equip: ctx.equip?.applicable ? { on: !!item.system.equipped, disabled: !!ctx.equip.disabled } : null,
-         attune: ctx.attunement?.applicable ? {
-            on: !!item.system.attuned,
-            disabled: !!ctx.attunement.disabled,
-            need: game.i18n.localize(ctx.attunement.title ?? '')
-         } : null
-      };
-      (sections.find((s) => s.type === item.type) ?? other).items.push(fact);
+      (sections.find((s) => s.type === item.type) ?? other).items.push(await rowFacts(sheet, item, ctxs[item.id] ?? {}));
    }
 
    const encumbrance = game.settings.get('dnd5e', 'encumbrance') === 'none' ? null : (() =>
@@ -250,6 +290,7 @@ export async function inventoryFacts(sheet, context, { columns })
    return {
       sections: [...sections, other],
       columns,
+      openContainers,
       editing: sheet.isEditMode,
       filters: (controls.filters ?? []).map((f) => ({ key: f.key, group: f.group ?? '', label: game.i18n.localize(f.label) })),
       sorting: (controls.sorting ?? []).map((s) => ({ key: s.key, icon: s.dataset?.icon ?? '', label: game.i18n.localize(s.label) })),

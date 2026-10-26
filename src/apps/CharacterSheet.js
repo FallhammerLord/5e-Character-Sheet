@@ -16,12 +16,15 @@ export const SHEET_PARTS = {
 
 /**
  * Part settings of ours that differ from dnd5e's. The Inventory tab scrolls its item list, not the whole tab, so the
- * currency and carried weight stay in view; Foundry keeps the list's scroll place across re-renders.
+ * currency and carried weight stay in view; Foundry keeps the list's scroll place across re-renders. Its row partial
+ * is loaded with the part, since the tab and each container include it.
  */
-const PART_OPTIONS = { inventory: { scrollable: ['.fhcs-items'] } };
+const PART_OPTIONS = {
+   inventory: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/item-row.hbs`] }
+};
 
 /** Each player's own choices, kept on their user so they follow them to every character and device. */
-const PREFS = { passives: 'passives', folded: 'foldedFavorites' };
+const PREFS = { passives: 'passives', folded: 'foldedFavorites', openContainers: 'openContainers' };
 
 /** Shows every passive, or only the key ones (Perception, Insight, Investigation). */
 async function togglePassives()
@@ -43,6 +46,20 @@ async function toggleGroup(event, target)
    if (list.hidden) { folded.add(group.dataset.fhcsGroup); }
    else { folded.delete(group.dataset.fhcsGroup); }
    await game.user.setFlag(MODULE_ID, PREFS.folded, [...folded]);
+}
+
+/** Folds a container's contents open or shut under its row, and remembers it for this player. */
+async function toggleContainer(event, target)
+{
+   const row = target.closest('[data-item-id]');
+   const list = row?.querySelector(':scope > .fhcs-contents');
+   if (!list) { return; }
+   list.hidden = !list.hidden;
+   target.setAttribute('aria-expanded', String(!list.hidden));
+   const open = new Set(game.user.getFlag(MODULE_ID, PREFS.openContainers) ?? []);
+   if (list.hidden) { open.delete(row.dataset.itemId); }
+   else { open.add(row.dataset.itemId); }
+   await game.user.setFlag(MODULE_ID, PREFS.openContainers, [...open]);
 }
 
 /** Shows or hides one Inventory column for this player (user, 2026-10-26); the setting re-renders our sheets. */
@@ -96,10 +113,10 @@ function ourParts(baseParts)
       .map(([id, part]) =>
       {
          if (!SHEET_PARTS[id]) { return [id, part]; }
-         const kept = { ...part, template: SHEET_PARTS[id], ...PART_OPTIONS[id] };
+         const kept = { ...part, template: SHEET_PARTS[id] };
          delete kept.classes;
          delete kept.templates;
-         return [id, kept];
+         return [id, { ...kept, ...PART_OPTIONS[id] }];
       });
    const rank = (id) => (LEADING_PARTS.includes(id) ? LEADING_PARTS.indexOf(id) : LEADING_PARTS.length);
    return Object.fromEntries(entries.sort(([a], [b]) => rank(a) - rank(b)));
@@ -118,7 +135,8 @@ export function makeCharacterSheet(Base)
    {
       static DEFAULT_OPTIONS = {
          classes: ['fhcs-sheet'],
-         actions: { fhcsTogglePassives: togglePassives, fhcsToggleGroup: toggleGroup, fhcsToggleColumn: toggleColumn }
+         actions: { fhcsTogglePassives: togglePassives, fhcsToggleGroup: toggleGroup, fhcsToggleColumn: toggleColumn,
+            fhcsToggleContainer: toggleContainer }
       };
 
       static PARTS = ourParts(Base.PARTS);
@@ -152,7 +170,8 @@ export function makeCharacterSheet(Base)
          if (partId === 'inventory')
          {
             const columns = columnChoice(game.settings.get(MODULE_ID, 'inventoryColumns'));
-            context.fhcsInventory = inventoryView(await inventoryFacts(this, context, { columns }), i18n);
+            const openContainers = game.user.getFlag(MODULE_ID, PREFS.openContainers) ?? [];
+            context.fhcsInventory = inventoryView(await inventoryFacts(this, context, { columns, openContainers }), i18n);
          }
          if (partId === 'tabs')
          {

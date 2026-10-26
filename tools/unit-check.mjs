@@ -296,6 +296,13 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    catch { problems.push(`attunement states: ${JSON.stringify(states)}`); }
    if (view.sections[0].items[2].equip?.label !== 'Not equipped') { problems.push('an unequipped item does not say so'); }
    if (view.columnToggles.length) { problems.push('the column menu shows in play mode'); }
+   // A container lists its contents, folded as the player left it; an empty one has no fold.
+   const packs = inventoryView({ ...base, openContainers: ['bag'], sections: [{ id: 'containers', label: 'Containers', items: [
+      row('bag', { contents: [row('Rope'), row('box', { contents: [row('Gem')] })] }), row('chest', { contents: [] })] }] }, { format, localize });
+   const [bag, chest] = packs.sections[0].items;
+   const shape = [bag.container?.count, bag.container?.open, bag.container?.contents[1].container?.open, chest.container?.count, view.sections[0].items[0].container];
+   try { deepStrictEqual(shape, [2, true, false, 0, null]); }
+   catch { problems.push(`container contents: ${JSON.stringify(shape)}`); }
    if (inventoryView({ ...base, editing: true }, { format, localize }).columnToggles.length !== 6) { problems.push('the column menu is missing in edit mode'); }
 }
 

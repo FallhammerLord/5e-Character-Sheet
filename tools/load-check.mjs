@@ -133,6 +133,9 @@ else
    if (!parts.inventory?.template.startsWith('modules/fhcs/')) { problems.push('the inventory part is still dnd5e\'s'); }
    // The item list scrolls, not the tab, so Foundry keeps its place when an equip or quantity change re-renders.
    if (parts.inventory?.scrollable?.join() !== '.fhcs-items') { problems.push('the inventory part does not keep its item list\'s scroll'); }
+   // The row partial is included by the tab and by every container; Foundry won't find it unless the part loads it.
+   for (const path of parts.inventory?.templates ?? []) { if (!existsSync(new URL(`../${path.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`inventory partial ${path} is missing`); } }
+   if (!parts.inventory?.templates?.some((p) => p.endsWith('/item-row.hbs'))) { problems.push('the inventory part does not load its row partial'); }
    // dnd5e adds its attunement counter into markup ours lacks; without our override every render throws.
    if (!Object.hasOwn(sheet.prototype, '_renderAttunement')) { problems.push('dnd5e\'s attunement counter is not replaced'); }
 }

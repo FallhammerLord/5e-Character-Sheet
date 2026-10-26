@@ -211,7 +211,13 @@ const inventoryFacts = (over = {}) => ({
          gear('Crossbow Bolts', '#5a4a3a', { weight: '1.5 lb', quantity: 20 })
       ] },
       { id: 'containers', label: 'Containers', items: [
-         gear('Backpack', '#6a5a3a', { useAction: 'view', weight: '5 lb', sub: '12 / 30 lb', quantity: 1 })
+         gear('Backpack', '#6a5a3a', { useAction: 'view', weight: '17 lb', sub: '12 / 30 lb', quantity: 1, contents: [
+            gear('Rations (1 day)', '#8a7a5a', { weight: '2 lb', quantity: 5, usage: '1 Action' }),
+            gear('Waterskin', '#4a6a8a', { weight: '5 lb' }),
+            gear('Pouch of Seven Curious Trinkets from the Market', '#7a5a3a', { useAction: 'view', weight: '1 lb', sub: '3 / 6 lb', quantity: 1,
+               contents: [gear('Ring of Mind Shielding', '#9a7a2a', { equip: worn(false), weight: '', attune: { on: false, disabled: false, need: 'Requires attunement' } })] })
+         ] }),
+         gear('Chest', '#5a4a2a', { useAction: 'view', weight: '25 lb', sub: '0 / 300 lb', contents: [] })
       ] },
       { id: 'other', label: 'Other', items: [] }
    ],
@@ -222,6 +228,7 @@ const inventoryFacts = (over = {}) => ({
    currency: ['pp', 'gp', 'ep', 'sp', 'cp'].map((key, i) => ({ key, value: [0, 147, 0, 32, 15][i], prop: `system.currency.${key}`,
       abbr: key.toUpperCase(), name: `${key} coins` })),
    attunement: { value: 1, max: 3, sourceMax: 3 },
+   openContainers: ['Backpack', 'PouchofSevenCuriousTrinketsfromtheMarket'],
    encumbrance: { value: '84', max: '240', pct: 35, stops: { encumbered: 33, heavilyEncumbered: 66 }, units: 'lb' },
    ...over
 });
@@ -239,6 +246,7 @@ export const CASES = [
       name: 'inventory-few-columns', template: 'sheet/inventory',
       context: inventory({ columns: { uses: false, usage: false, quantity: false, equipped: true, attuned: false }, encumbrance: null })
    },
+   { name: 'inventory-containers-shut', template: 'sheet/inventory', context: inventory({ openContainers: [], editing: true, columns: ALL_COLUMNS }) },
    { name: 'inventory-empty', template: 'sheet/inventory', context: inventory({ sections: [], attunement: { value: 0, max: 0 }, encumbrance: null }) },
    { name: 'attributes', template: 'sheet/attributes', context: attributes() },
    { name: 'attributes-key-passives-folded', template: 'sheet/attributes', context: attributes({ passives: 'key', folded: ['inventory', 'spell-1'] }) },
