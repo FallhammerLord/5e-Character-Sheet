@@ -55,6 +55,24 @@ async function toggleColumn(event, target)
 }
 
 /**
+ * Closes our open fold-out trays (exhaustion, rest, levels, inventory columns) when the player clicks anywhere else
+ * (user, 2026-10-26: they closed only on a second click). One listener for the page, added with the first sheet.
+ */
+let traysCloseOnClickOff = false;
+function closeTraysOnClickOff()
+{
+   if (traysCloseOnClickOff) { return; }
+   traysCloseOnClickOff = true;
+   document.addEventListener('pointerdown', (event) =>
+   {
+      for (const fold of document.querySelectorAll('.fhcs-sheet details.fhcs-fold[open]'))
+      {
+         if (!fold.contains(event.target)) { fold.open = false; }
+      }
+   }, { capture: true });
+}
+
+/**
  * dnd5e parts we drop: our header holds the ability scores; the sidebar's portrait, HP and AC are in the header, its
  * favorites move to the Attributes tab and its death saves to the header.
  */
@@ -166,6 +184,7 @@ export function makeCharacterSheet(Base)
          await super._onRender(context, options);
          // The header's trays stay open across re-renders; its chips' tooltips wait like the cards' do.
          keepFolds(this.element, `sheet-${this.id}`);
+         closeTraysOnClickOff();
          delayTips(this.element);
       }
    };

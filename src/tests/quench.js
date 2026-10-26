@@ -223,6 +223,8 @@ export function registerQuenchTests(quench)
 
          it('equips, attunes, counts and opens items on the Inventory tab', async function ()
          {
+            // Four saves, each with a redraw: more than Mocha's default 2 s, so each step has its own wait instead.
+            this.timeout(HOOK_WAIT_MS * 5);
             const [ring] = await actor.createEmbeddedDocuments('Item', [{
                name: 'FHCS test ring', type: 'equipment',
                system: { attunement: 'required', equipped: false, attuned: false, quantity: 1 }
@@ -246,8 +248,20 @@ export function registerQuenchTests(quench)
             await ring.delete();
          });
 
+         it('closes an open tray when the player clicks off it, not when they click inside it', function ()
+         {
+            const tray = sheet.element.querySelector('.fhcs-header details.fhcs-fold[data-fold-key="exhaustion"]');
+            assert.ok(tray, 'the exhaustion chip has a tray');
+            tray.open = true;
+            tray.querySelector('.fhcs-tray').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+            assert.isTrue(tray.open, 'a click inside keeps it open');
+            sheet.element.querySelector('.fhcs-tabs').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+            assert.isFalse(tray.open, 'a click elsewhere closes it');
+         });
+
          it('shows and hides Inventory columns from edit mode, for this player', async function ()
          {
+            this.timeout(HOOK_WAIT_MS * 4);
             const before = game.settings.get(MODULE_ID, 'inventoryColumns');
             assert.notOk(sheet.element.querySelector('[data-action="fhcsToggleColumn"]'), 'no column menu in play mode');
             sheet.element.querySelector('.fhcs-tabs [data-action="changeMode"]').click();
