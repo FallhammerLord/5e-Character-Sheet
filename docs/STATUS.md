@@ -34,4 +34,4 @@ They wait only for a game where the user tries them; not work for a session to p
 
 Track R and Phases 0–3 are done and verified (Phase 3 lacks only the optional pinned filter buttons); don't rerun Quench or rework them unless the user reports a problem.
 
-1. **Choose what's next** (user deciding, 2026-10-26). Proposed: the Spellbook (Phase 4), reusing the Inventory rows, list controls and Columns menu, with the pinned filter buttons built once for both tabs; then the Actions tab (SCOPE §4.4), which has no phase on the roadmap yet. Alternative: the Actions tab first, for its value at the table.
+1. **Phase 4 Spellbook mockup** (user chose the Spellbook, 2026-10-26). Answers and research are in SCOPE §4.7 and the research note. The mockup should settle the concentration space, the pinned filters and the strip layout; then build in the ROADMAP order.

@@ -88,6 +88,17 @@ Inventory decisions (user, 2026-10-26; mockup https://claude.ai/artifact/PfrTrdD
 - **The picture uses the item; the name opens its details** (Classic's split).
 - **Containers** (user, 2026-10-26): a container is a row like any other, and a drop anywhere on it puts the item inside (dnd5e's own drop handling). Its contents fold open under it, indented, with a count on the fold button; each player's open containers are remembered. Containers nest. No container panel at the top. dnd5e's container window (from the picture) keeps dnd5e's look for now.
 
+### 4.7 Spellbook tab
+
+Built on dnd5e's spells part and `dnd5e-inventory`, like Inventory (research note, "Spellbook").
+
+Spellbook decisions (user, 2026-10-26):
+- **Unprepared spells show.** No hiding by default; a Prepared filter narrows the list. Unprepared rows are marked, not faded (contrast rule).
+- **Preparation follows dnd5e's class math:** "prepared / max" per casting class, from dnd5e's counts. We compute nothing ourselves.
+- **Default columns:** components, activation, range, a concentration mark, and a prepare mark on spells that need preparing. The prepare mark has three states, like attunement: filled (prepared; click to unprepare), outline (unprepared; click to prepare), locked (always prepared; no click). Spells that need no preparation (cantrips, pact, innate, at will) show none.
+- **Filters of its own,** after Tidy Classic: pinned Action, Bonus, Reaction, Concentration, plus Prepared; the menu adds Ritual, Can cast, components, schools and casting class.
+- **Concentration space** (proposed, 2026-10-26; waits on the mockup): a fixed slot in the spellcasting strip showing the spell's icon and name, or "Not concentrating". Name opens the spell; an End button ends it (dnd5e's `endConcentration`); the concentration save rolls from the slot. One entry per concentration when the limit is above 1. Phase 7 may mirror it in the header beside the conditions.
+
 ## 5. ADHD rules carried over
 
 Typography and spacing (user, 2026-10-24): three text styles across the module (display, body, label), two spacing steps, one control height; every panel uses space economically, folded and open: a band's heading, total and open mark share one line; the card header is one label line (actor · details) over the title.

@@ -48,7 +48,15 @@ Built on dnd5e's `dnd5e-inventory` element. Equip, attune, quantity, weight and 
 
 ## Phase 4: Spellbook
 
-Slots as pips; prepared state; grouped by level; concentration; spellcasting ability and DC.
+Slots as pips; prepared state; grouped by level; concentration; spellcasting ability and DC. Decisions: SCOPE §4.7.
+
+- [x] Research: dnd5e 6.0.6 spellbook data, preparation, filters, concentration; Tidy Classic's filters (2026-10-26, research note)
+- [x] Answers on unprepared spells, preparation math, columns, filters (user, 2026-10-26)
+- [ ] Mockup approved, including the concentration space
+- [ ] Spellcasting strip: per class ability, attack, DC, prepared / max; concentration space
+- [ ] Level sections with slot pips; pact, innate, at will and item sections
+- [ ] Spell rows: three-state prepare mark, components, activation, range, concentration mark; Columns menu
+- [ ] Filters: pinned buttons; Can cast and component filters added through `_filterItem`
 
 ## Phase 5: Features, Effects, Biography, Journal
 
