@@ -1,40 +1,45 @@
 # Status
 
-What's verified, what's waiting. Read when picking up work; CLAUDE.md holds only the rules.
-
-## Verified in Foundry by the user
-
-- Phase 4 Spellbook in Quench (2026-10-26, user: core 35 of 35): spell rows by section, the book (always prepared locked), the favorite toggle, the Prepared pin, the concentration bar (name, Con save, End), the Spellbook column menu, and Attributes favorites (name opens details in place, picture uses the item). Getting there took four runs; every failure was the tests, not the sheet: clicks on markup a redraw replaced, and multi-item creates taken in result order. Both are rules in CLAUDE.md now, the first enforced by the load check. Not yet looked at in play (see Next session).
-- Exhaustion penalty (2026-10-26, user: "it works as intended"): at exhaustion 6, skills, saves and Init all show the same −12. The mismatch seen on 2026-10-24 doesn't reproduce; dnd5e 6.0.6 applies `conditionRollReduction` to all three and our sheet reads those totals. Nothing to fix.
-- Phase 3 Inventory (2026-10-26, user: Quench 30 of 30, "everything else seems to work as desired"): sections, equip and three-state attune toggles, uses and quantity, expand, the Columns menu in edit mode, the footer, dnd5e's search, filter and sort, containers (drop in, fold open, nested), and search showing matches inside containers. Trays close on a click elsewhere. Lessons kept in the research note: dnd5e keeps attunement only on magical items; each create starts its own redraw, so tests wait for theirs. The sort button no longer lights up all the time (dnd5e marks it active always); in code, not yet seen.
-- Track R complete: the play checks for saves, Apply, sheet rolls, GM requests and settings are closed (2026-10-24, user, reported in a parallel chat).
-- Tabs switch by hand, pips work, and both Quench batches pass, 26 of 26 (2026-10-24, user, after the second round's fixes). Quench covers: header rolls and chips, tab row and lock, skill roll, passive toggle and folds, death saves at 0 HP, rest, item use; usage cards, attack and damage bands, roll on use, no dialogs, late adds, standalone skill card, GM request, save band for selected tokens.
-- Unbuilt tabs (Inventory, Spellbook, Features, Effects, Biography) show Foundry's bare defaults: bulleted controls, no rows, loose numbers (2026-10-24, user's screenshots: "everything tossed into the tab"). Expected until each phase replaces them; Phase 3 starts with the shared list controls.
-- Our header and frame render in the user's v14 world, dark theme, with none of dnd5e's sheet look (2026-10-24, user's screenshot): portrait chips, HP, XP and level, origin line, AC, Init and the ability row. Fixes from that round: death save pips were oval (Foundry's button min-height; now reset, and the layout check imitates it and fails on a round control that isn't square), three successes cleared the pips (dnd5e's reset; now kept until HP rises above 0, which clears both rows: `src/sheet/death.js`), skill rows too tall (now 24px), death saves made the header much taller (now drawn over the greyed portrait), the title bar looked separate (now a slim strip in the sheet's colors, title hidden), and an `Item5e` "type: may not be undefined" error, most likely dnd5e's add button, unstyled once dnd5e's look was gone and creating an item with no type on the Attributes tab (now shown only on Inventory, Features, Spells and Effects, as dnd5e does).
-
-- Track R basic tests pass after updating the installed copy to this branch (2026-10-24, user: "works on basic tests as expected").
-- Track R in play (2026-10-24, user's screenshots and reports): attack and damage bands with every die shown; late advantage and disadvantage by click order, the newest die in the slot; Roll again and the Critical switch keep their state and their places; earlier rolls scroll in their own box; open panels stay open on re-render; dark mode with a white default die; delayed tooltips cleared by a click; three text styles and compact panels ("very professional now").
-- The module registers: "Fallhammer Character Sheet" appears in a character's Sheet configuration (2026-10-23).
-
-## Verified offline
-
-- Hooks fire (2026-10-23): session start runs `npm ci`; editing a JS file lints it and returns errors; `git push` is blocked when `npm run check` fails and passes on a clean tree.
-
-## Play checks (when convenient; not blocking)
-
-They wait only for a game where the user tries them; not work for a session to pick up.
-
-1. **Header:** art fits (round, square, tall), both ability emphasis settings, the milestone track with dnd5e's leveling set to no XP.
-
-## In code, not yet verified
-
-
-- **Chat log scrolling, third try (2026-10-24).** The user saw new cards stop short by exactly the Apply section: dnd5e builds its tray lists after the card is placed. Apply now starts folded, and while following a new card a `ResizeObserver` on it scrolls again on every size change.
-- **Chat log scrolling (2026-10-24, second try).** First try (blocking `scrollBottom`, following only if `isAtBottom`) made no difference in the user's world. Now from Foundry 14's types (`@league-of-foundry-developers/foundry-vtt-types` 14.366 beta: `postOne(message, { notify, scroll })`): folded rolls post with `scroll: false`, no notification; the player's own new card posts with `scroll: true` and redraws of it scroll to the bottom for 8 s unless the player scrolls, clicks or types in the log. Load check covers it. Waiting on the user.
+The current state: what the next session does, what waits on the user, what's verified. Short, one entry per thing; history lives in commits, how things work in `docs/BUILT.md`, rules in `CLAUDE.md`.
 
 ## Next session
 
-Track R and Phases 0–3 are done and verified; don't rerun Quench or rework them unless the user reports a problem. Phase 3's last item, the pinned filter buttons, was built with Phase 4 and is checked with it.
+1. **Phase 4 play check.** Quench passed (core 35 of 35, 2026-10-26) and the user approved the styling pass after first look (2026-10-26: soft-blue pips without a count, fold carets, open-row panels; SCOPE §5.1). Left: one look at a real caster, ideally multiclass with Pact Magic:
+   - Can cast with slots spent;
+   - spells granted by an item (staff, wand) in their own section; a ritual caster's ritual-only spells;
+   - clicking slot pips;
+   - dnd5e's right-click menu and drag on spell rows, and a spell dragged onto a section heading;
+   - the Inventory pins (Action, Bonus, Equipped), Phase 3's last item, built with Phase 4;
+   - innate or at-will favorites on Attributes.
 
-1. **Phase 4 play check.** Quench passed (35 of 35) and the user approved the styling pass after first look (2026-10-26: soft-blue pips without a count, fold carets, open-row panels; SCOPE §5.1). Left: one look at a real caster, ideally multiclass with Pact Magic: Can cast with slots spent; spells granted by an item (staff, wand) in their own section; a ritual caster's ritual-only spells; clicking slot pips; dnd5e's right-click menu and drag on spell rows, and a spell dragged onto a section heading; the Inventory pins; innate or at-will favorites on Attributes. Then tick ROADMAP Phase 4, write its BUILT entry, and ask the user before pushing to `main`.
-2. **Then:** Phase 5 (Features, Effects, Biography, Journal) in ROADMAP order, starting with dnd5e research and a mockup (CLAUDE.md, "How a phase goes"). The Actions tab (SCOPE §4.4) still has no phase; ask whether it goes before Phase 5.
+   Then tick ROADMAP Phase 4, write its BUILT entry (from the ROADMAP list and `src/sheet/spellbook.js`), and ask the user before pushing to `main`.
+2. **Then:** ask whether the Actions tab (SCOPE §4.4, no phase yet) goes before Phase 5 (Features, Effects, Biography, Journal). Either starts with dnd5e research and a mockup (CLAUDE.md, "How a phase goes").
+
+Don't rerun Quench or rework Track R or Phases 0–3 unless the user reports a problem.
+
+## Waiting on the user
+
+In code, not yet seen in Foundry:
+
+- **Chat log scrolling** (2026-10-24, third try). New cards stopped short by the Apply section, which dnd5e fills in after the card is placed. Folded rolls post with `scroll: false`; the player's own new card posts with `scroll: true`, and while following it (8 s, until the player scrolls, clicks or types in the log) a `ResizeObserver` scrolls again on every size change. Apply starts folded.
+- **Inventory sort button** lights only when a filter or search is on (dnd5e marks it active always).
+
+Play checks, when convenient (not work for a session to pick up):
+
+- **Header:** art fits (round, square, tall); both ability emphasis settings; the milestone track with dnd5e's leveling set to no XP.
+
+## Verified
+
+In Foundry, by the user:
+
+- **Phase 4 Spellbook in Quench** (2026-10-26, core 35 of 35): rows by section, the book (always prepared locked), the favorite toggle, the Prepared pin, the concentration bar, the column menu, Attributes favorites (details in place, picture uses). Play check pending (Next session).
+- **Phase 3 Inventory** (2026-10-26, Quench 30 of 30 and play): sections, equip and attune toggles, uses and quantity, expand, Columns menu, footer, search, filter and sort, containers (drop in, fold, nest, search inside).
+- **Phase 2 Attributes, frame and tab row** (2026-10-24, Quench 26 of 26 and play): skills, passives, traits, favorites, slot pips, death saves in the header, tabs and lock.
+- **Phase 1 header** (2026-10-24, screenshot and Quench): portrait chips, HP, XP and level, origin line, AC, Init and the ability row, in the dark theme with none of dnd5e's look.
+- **Exhaustion penalty** (2026-10-26): skills, saves and Init show the same total at every level; nothing to fix.
+- **Track R, rolls and chat cards** (2026-10-24, Quench and play): bands, late adds, saves for selected tokens, Apply, standalone rolls, GM requests, settings.
+- **Features, Effects and Biography** still show Foundry's bare defaults; expected until their phase.
+
+Offline:
+
+- **Hooks** (2026-10-23): session start installs, editing a JS file lints it, `git push` is blocked until `npm run check` passes.
