@@ -1739,6 +1739,9 @@
 
 .fhcs-sheet .fhcs-contents > .fhcs-item:last-child { border-bottom: 0; }
 
+/* While a search matches something inside a container, its contents show whatever the player's fold says. */
+.fhcs-sheet .fhcs-item.fhcs-has-match > .fhcs-contents[hidden] { display: block; }
+
 .fhcs-sheet .fhcs-contents-toggle
 {
    display: inline-flex;

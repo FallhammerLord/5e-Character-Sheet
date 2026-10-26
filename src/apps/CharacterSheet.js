@@ -90,6 +90,32 @@ function closeTraysOnClickOff()
 }
 
 /**
+ * Keeps a search match inside a container in view (user, 2026-10-26). dnd5e's list controls hide every row that
+ * doesn't match, the container around a match included, and don't know about our folds. After each of their passes,
+ * a container holding a visible match is shown again and marked, and CSS opens its contents while it is marked; the
+ * player's own fold is untouched, so clearing the search puts it back.
+ *
+ * @param {HTMLElement} list  The Inventory tab's item list.
+ */
+function showMatchesInContainers(list)
+{
+   const pass = () =>
+   {
+      for (const box of list.querySelectorAll('.fhcs-item.container'))
+      {
+         const match = !!box.querySelector(':scope > .fhcs-contents .item:not([hidden])');
+         // A match means a search is on: when nothing is filtered, every row is visible and no box needs opening.
+         const searching = match && !!list.querySelector('.item[hidden]');
+         box.classList.toggle('fhcs-has-match', searching);
+         if (searching && box.hidden) { box.hidden = false; }
+      }
+   };
+   pass();
+   // Our own changes come back as mutations; the pass changes nothing the second time, so it settles.
+   new MutationObserver(pass).observe(list, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
+}
+
+/**
  * dnd5e parts we drop: our header holds the ability scores; the sidebar's portrait, HP and AC are in the header, its
  * favorites move to the Attributes tab and its death saves to the header.
  */
@@ -204,6 +230,12 @@ export function makeCharacterSheet(Base)
          // The header's trays stay open across re-renders; its chips' tooltips wait like the cards' do.
          keepFolds(this.element, `sheet-${this.id}`);
          closeTraysOnClickOff();
+         const items = this.element.querySelector('.fhcs-inventory .fhcs-items');
+         if (items && !items.dataset.fhcsWatched)
+         {
+            items.dataset.fhcsWatched = 'true';
+            showMatchesInContainers(items);
+         }
          delayTips(this.element);
       }
    };

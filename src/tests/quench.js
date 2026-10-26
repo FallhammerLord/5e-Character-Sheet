@@ -272,7 +272,8 @@ export function registerQuenchTests(quench)
             await sheet.render();
             const packRow = () => sheet.element.querySelector(`.fhcs-inventory [data-item-id="${pack.id}"]`);
             assert.isTrue(packRow()?.classList.contains('container'), 'the container row carries dnd5e\'s drop class');
-            assert.ok(packRow().querySelector(`:scope > .fhcs-contents [data-item-id="${rope.id}"]`), 'the rope is drawn inside the pack');
+            // Each create starts its own redraw; wait for the one that has the rope.
+            await until(() => packRow()?.querySelector(`:scope > .fhcs-contents [data-item-id="${rope.id}"]`), 'the rope is drawn inside the pack');
             const list = packRow().querySelector(':scope > .fhcs-contents');
             const wasHidden = list.hidden;
             packRow().querySelector('[data-action="fhcsToggleContainer"]').click();
