@@ -397,7 +397,7 @@ export function registerQuenchTests(quench)
                () => `both level 1 spells share a section; the unprepared one is in ${section(open)} (${held(open)}), the always prepared one in ${section(always)} (${held(always)})`);
             assert.notOk(row(cantrip).querySelector('[data-action="prepare"]'), 'a cantrip has no prepare mark');
             assert.strictEqual(row(always).querySelector('[data-action="prepare"]')?.getAttribute('aria-disabled'), 'true',
-               'always prepared can\'t be clicked');
+               `always prepared can't be clicked (${held(always)})`);
             await click(`.fhcs-spellbook [data-item-id="${open.id}"] [data-action="prepare"]`);
             await until(() => open.system.prepared === 1, 'the book prepared the spell');
             await until(() => row(open)?.classList.contains('fhcs-kind-prepared'), 'the row took the prepared color');
