@@ -411,8 +411,8 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const viewer = featuresView(facts({ canEdit: false }), { format, localize });
    if (viewer.classes.some((k) => k.levelUp || k.chooseSubclass) || viewer.origins.some((o) => o.choose)) { problems.push('a viewer without edit rights gets level up or choose buttons'); }
    const blank = featuresView(facts({ classes: [], features: [] }), { format, localize });
-   if (!blank.chooseClass || blank.classBasis !== 200 || !blank.empty) { problems.push(`no class: ${JSON.stringify([blank.chooseClass, blank.classBasis, blank.empty])}`); }
-   if (byOrigin.classBasis !== 408) { problems.push(`two class cards take ${byOrigin.classBasis}px`); }
+   if (!blank.chooseClass || blank.classBasis !== 240 || !blank.empty) { problems.push(`no class: ${JSON.stringify([blank.chooseClass, blank.classBasis, blank.empty])}`); }
+   if (byOrigin.classBasis !== 488) { problems.push(`two class cards take ${byOrigin.classBasis}px`); }
    try { deepStrictEqual(featureColumnChoice({ usage: false, gone: true }), { uses: true, usage: false, recovery: true, favorite: true }); }
    catch { problems.push(`feature columns: ${JSON.stringify(featureColumnChoice({ usage: false }))}`); }
 }
@@ -445,10 +445,10 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    if (!effectsView({ categories: [], conditions: [] }, { format, localize }).empty) { problems.push('an empty Effects tab is not marked empty'); }
 }
 
-// Biography (SCOPE §4.8): empty fields hidden in play, every field in edit mode, boxes split into columns.
+// Biography (SCOPE §4.8): every field for whoever may edit; a viewer's empty fields hidden; boxes split into columns.
 {
-   const facts = (editing, enriched) => ({
-      editing,
+   const facts = (editable, enriched) => ({
+      editable,
       characteristics: [{ name: 'system.details.eyes', label: 'Eyes', value: 'Grey', source: 'Grey' },
          { name: 'system.details.faith', label: 'Faith', value: ' ', source: '' }],
       boxes: ['trait', 'ideal', 'bond', 'flaw', 'appearance'].map((key) => ({ key, name: `system.details.${key}`, label: key, value: key === 'flaw' ? '' : `${key} text` })),
@@ -459,7 +459,7 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    try { deepStrictEqual(shape, [1, 'trait,ideal,bond', 'appearance', null]); }
    catch { problems.push(`biography in play: ${JSON.stringify(shape)}`); }
    const edit = biographyView(facts(true, ''), { format, localize });
-   if (edit.characteristics.length !== 2 || edit.left.length !== 4 || !edit.biography || edit.empty) { problems.push('edit mode does not show every biography field'); }
+   if (edit.characteristics.length !== 2 || edit.left.length !== 4 || !edit.biography || edit.empty) { problems.push('an owner does not see every biography field'); }
    const blank = biographyView({ characteristics: [], boxes: [], biography: { enriched: '' } }, { format, localize });
    if (!blank.empty) { problems.push('an empty Biography is not marked empty'); }
    try { deepStrictEqual(paragraphs('One\r\n\n  Two  \n'), ['One', 'Two']); }

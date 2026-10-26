@@ -380,14 +380,12 @@ const effectsFacts = (over = {}) => ({
          fx('Concentrating: Spirit Guardians', '#c9a227', { toggleable: false, concentration: true, source: 'Spirit Guardians', duration: '9 min' }),
          fx('Bless', '#c9a227', { source: 'Brother Aldo', duration: '7 rounds', favorite: true, expanded: true,
             summary: '<div class="item-summary"><p>Add 1d4 to attack rolls and saving throws.</p></div>' }),
+         fx('Enlarge (Potion of Growth)', '#8a5a3a', { disabled: true, source: 'Potion of Growth', duration: '1 hour' }),
          fx('Frightened', '#6a3a3a', { source: 'Dragon Fear', duration: '1 round' })
       ] },
       { id: 'passive', label: 'Passive Effects', effects: [
-         fx('Dwarven Resilience', '#8a6a4a', { source: 'Dwarf' }),
-         fx('Cloak of Protection', '#4a6a8a', { source: 'Cloak of Protection', parentId: 'cloak' })
-      ] },
-      { id: 'inactive', label: 'Inactive Effects', effects: [
-         fx('Enlarge (Potion of Growth)', '#8a5a3a', { disabled: true, source: 'Potion of Growth', duration: '1 hour' })
+         fx('Cloak of Protection', '#4a6a8a', { source: 'Cloak of Protection', parentId: 'cloak' }),
+         fx('Dwarven Resilience', '#8a6a4a', { source: 'Dwarf', disabled: true })
       ] }
    ],
    conditions: conditionFacts(['Frightened', 'Prone'], 1),
@@ -418,7 +416,7 @@ const biographyFacts = (over = {}, chars = CHARACTERISTICS) => ({
       enriched: '<p>Born to a clan of smiths in the Thunderforge holds, Brenna was expected to work the forge.</p><p>A cave-in changed that.</p>',
       source: '<p>Born to a clan of smiths…</p>' },
    uuid: 'Actor.x',
-   editing: false,
+   editable: true,
    ...over
 });
 const biography = (over, chars) => ({
@@ -430,19 +428,19 @@ const LONG_BIO = ['Born to a clan of smiths in the Thunderforge holds, Brenna Co
    'Notes: owes the Harpers a favour; Brother Aldo knows her real name; https://example.invalid/an-unbroken-very-long-link-that-must-wrap-somewhere-sensible'];
 
 export const CASES = [
-   { name: 'biography', template: 'sheet/biography', context: biography() },
+   { name: 'biography', template: 'sheet/biography', context: biography({}, { ...CHARACTERISTICS, faith: '', skin: '' }) },
    {
-      name: 'biography-long', template: 'sheet/biography',
+      name: 'biography-viewer', template: 'sheet/biography',
       context: biography({
+         editable: false,
          boxes: biographyFacts().boxes.map((b) => ({ ...b, value: b.key === 'flaw' ? '' : b.key === 'trait'
             ? 'Quotes scripture at the worst possible moment, and means every word.\nKeeps a tally of every life saved, scratched into the haft of her mace.' : b.value })),
          biography: { ...biographyFacts().biography, enriched: LONG_BIO.map((p) => `<p>${p}</p>`).join('') }
       }, { ...CHARACTERISTICS, faith: '', skin: '' })
    },
-   { name: 'biography-editing', template: 'sheet/biography', context: biography({ editing: true }, { ...CHARACTERISTICS, faith: '', skin: '' }) },
    {
-      name: 'biography-empty', template: 'sheet/biography',
-      context: biography({ boxes: biographyFacts().boxes.map((b) => ({ ...b, value: '' })), biography: { ...biographyFacts().biography, enriched: '' } },
+      name: 'biography-viewer-empty', template: 'sheet/biography',
+      context: biography({ editable: false, boxes: biographyFacts().boxes.map((b) => ({ ...b, value: '' })), biography: { ...biographyFacts().biography, enriched: '' } },
          Object.fromEntries(Object.keys(CHARACTERISTICS).map((k) => [k, ''])))
    },
    { name: 'effects', template: 'sheet/effects', context: effects() },

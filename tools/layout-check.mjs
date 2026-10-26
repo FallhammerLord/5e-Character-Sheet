@@ -58,7 +58,7 @@ function findProblems()
 {
    const issues = [];
    const POPOVER = '.fhcs-tray';
-   const WHOLE = '.fhcs-condition-name, .fhcs-origin-text > .fhcs-label, .fhcs-class-card .fhcs-origin-name.fhcs-label';
+   const WHOLE = '.fhcs-condition-name, .fhcs-origin-text > .fhcs-label, .fhcs-class-card .fhcs-origin-line > .fhcs-origin-name';
    const app = document.querySelector('.application');
    const edge = app.getBoundingClientRect().right;
    for (const el of app.querySelectorAll('.window-content *'))

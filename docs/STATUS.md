@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 5 in Quench and play** (user). All three tabs are built (2026-10-26). Ask for a Quench run (core gains five tests), then a look at a real character: a multiclass with a subclass due; Level up into dnd5e's wizard; the By source switch; an effect switched off and on; a condition and exhaustion (right-click lowers it); the biography in play and in edit mode, with text written on dnd5e's sheet showing on ours.
+1. **Phase 5 in Quench and play** (user). All three tabs are built and the first-look fixes are in (2026-10-26: cards alike with art underlays and a remove in edit mode, effects keep their place, biography fields edit in place, ledger rows on every list). Ask for a Quench run (core gains five tests), then a look at a real character: a multiclass with a subclass due; Level up into dnd5e's wizard; removing and choosing a background in edit mode; the By source switch; an effect switched off and on (it stays put); a condition and exhaustion (right-click lowers it); writing in the biography with the sheet locked; the ledger rows on Inventory and Spellbook too.
 2. **Then:** fix what play finds (expect one styling pass), tick ROADMAP Phase 5, write its BUILT entry, ask before pushing to `main`.
 
 The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.

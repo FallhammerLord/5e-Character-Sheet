@@ -559,9 +559,13 @@ export function registerQuenchTests(quench)
             await settled();
             await until(() => row()?.querySelector('[data-action="toggle"]'), 'the effect has a row with a switch');
             assert.strictEqual(row().querySelector('[data-action="toggle"]').getAttribute('aria-pressed'), 'true', 'the switch starts on');
+            const place = () => [...(row()?.closest('ol')?.children ?? [])].indexOf(row());
+            const [was, wasAt] = [category(), place()];
             await click(`.fhcs-effects [data-effect-id="${effect.id}"] [data-action="toggle"]`);
-            await until(() => effect.disabled && category() === 'inactive',
-               () => `the switch turns it off and it moves to Inactive; disabled ${effect.disabled}, in ${category()}`);
+            await until(() => effect.disabled && row()?.querySelector('[data-action="toggle"]')?.getAttribute('aria-pressed') === 'false',
+               () => `the switch turns it off and shows it; disabled ${effect.disabled}`);
+            // Switching never moves the row (user, 2026-10-26): dnd5e would file it under Inactive.
+            assert.strictEqual(`${category()} ${place()}`, `${was} ${wasAt}`, 'the row stays where it was');
             await click(`.fhcs-effects [data-effect-id="${effect.id}"] [data-action="toggle"]`);
             await until(() => !effect.disabled, 'a second click turns it back on');
             const relative = foundry.utils.buildRelativeUuid(effect, actor);
@@ -581,23 +585,20 @@ export function registerQuenchTests(quench)
             await effect.delete();
          });
 
-         it('reads the biography in play from dnd5e\'s fields, and writes them in edit mode', async function ()
+         it('shows every biography field from dnd5e\'s data, and saves one edited without unlocking', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 4);
             const before = foundry.utils.deepClone(actor._source.system.details);
-            await actor.update({ 'system.details.ideal': 'FHCS test ideal', 'system.details.bond': '', 'system.details.eyes': 'Grey' });
+            await actor.update({ 'system.details.ideal': 'FHCS test ideal', 'system.details.bond': '' });
             await settled();
-            const box = (key) => sheet.element.querySelector(`.fhcs-biography [data-fhcs-box="${key}"]`);
-            await until(() => box('ideal')?.textContent.includes('FHCS test ideal'), 'the ideal written through dnd5e shows in play');
-            assert.notOk(box('bond'), 'an empty box is hidden in play');
-            await click('.fhcs-tabs [data-action="changeMode"]');
-            await until(() => sheet.isEditMode && sheet.element.querySelector('.fhcs-biography textarea[name="system.details.bond"]'),
-               'edit mode shows dnd5e\'s field for every box');
-            await enter('.fhcs-biography textarea[name="system.details.bond"]', 'FHCS test bond');
+            const field = (key) => sheet.element.querySelector(`.fhcs-biography [name="system.details.${key}"]`);
+            assert.isFalse(sheet.isEditMode, 'the sheet is locked');
+            await until(() => field('ideal')?.value === 'FHCS test ideal', 'the ideal written through dnd5e shows in its field');
+            assert.ok(field('bond'), 'an empty box still shows, ready to write in');
+            assert.isFalse(field('bond').disabled || field('bond').readOnly, 'the box can be written in while the sheet is locked');
+            await enter('.fhcs-biography [name="system.details.bond"]', 'FHCS test bond');
             await until(() => actor.system.details.bond === 'FHCS test bond', () => `the box saves to dnd5e's field; bond is "${actor.system.details.bond}"`);
-            await click('.fhcs-tabs [data-action="changeMode"]');
-            await until(() => !sheet.isEditMode, 'back to play mode');
-            await actor.update({ 'system.details.ideal': before.ideal ?? '', 'system.details.bond': before.bond ?? '', 'system.details.eyes': before.eyes ?? '' });
+            await actor.update({ 'system.details.ideal': before.ideal ?? '', 'system.details.bond': before.bond ?? '' });
          });
       });
    }, { displayName: 'Fallhammer Character Sheet: core' });

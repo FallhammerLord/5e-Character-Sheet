@@ -4,6 +4,8 @@
       moves rows between them in the browser; each row carries both of its groups. --}}
 <section class="tab fhcs-list-tab fhcs-features {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
    {{#with fhcsFeatures}}
+   {{!-- One row of cards (SCOPE §4.8), each alike: the kind as a label, then the name, which opens the item; the item's
+         art as a faded underlay at the right. Edit mode adds a remove (dnd5e's deleteDocument, which asks first). --}}
    <div class="fhcs-origin-row">
       {{#if classBasis}}
       <div class="fhcs-origin-classes" style="flex-basis: {{ classBasis }}px">
@@ -11,28 +13,35 @@
          <div class="fhcs-origin-card" data-fhcs-origin="class">
             <span class="fhcs-origin-text">
                <span class="fhcs-label fhcs-muted">{{ chooseClass.kind }}</span>
-               <button type="button" class="fhcs-button fhcs-body fhcs-choose" data-action="findItem" data-item-type="class"
-                       aria-label="{{ chooseClass.label }}">
-                  <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>{{ text.choose }}
-               </button>
+               <span class="fhcs-origin-line">
+                  <button type="button" class="fhcs-button fhcs-body fhcs-choose" data-action="findItem" data-item-type="class"
+                          aria-label="{{ chooseClass.label }}">
+                     <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>{{ text.choose }}
+                  </button>
+               </span>
             </span>
          </div>
          {{/if}}
          {{#each classes}}
          <div class="fhcs-origin-card fhcs-class-card" data-item-id="{{ id }}" data-uuid="{{ uuid }}">
-            <button type="button" class="fhcs-origin-pic" data-action="showDocument" aria-label="{{ openLabel }}"><img src="{{ img }}" alt=""></button>
+            <img class="fhcs-origin-underlay" src="{{ img }}" alt="">
             <span class="fhcs-origin-text">
-               <button type="button" class="fhcs-origin-name fhcs-label" data-action="showDocument" aria-label="{{ openLabel }}">{{ name }}</button>
-               {{#if subclass}}
-               <button type="button" class="fhcs-origin-name fhcs-body" data-action="showDocument" data-uuid="{{ subclass.uuid }}"
-                       aria-label="{{ subclass.openLabel }}">{{ subclass.name }}</button>
-               {{/if}}
-               {{#if chooseSubclass}}
-               <button type="button" class="fhcs-button fhcs-body fhcs-choose" data-action="findItem" data-item-type="subclass"
-                       data-class-identifier="{{ chooseSubclass.identifier }}" aria-label="{{ chooseSubclass.label }}">
-                  <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>{{ ../text.subclass }}
-               </button>
-               {{/if}}
+               <span class="fhcs-label fhcs-muted">{{ kind }}</span>
+               <span class="fhcs-origin-line">
+                  <button type="button" class="fhcs-origin-name fhcs-body" data-action="showDocument" aria-label="{{ openLabel }}">{{ name }}</button>
+                  {{#if subclass}}
+                  <span class="fhcs-origin-sub" data-uuid="{{ subclass.uuid }}">
+                     <button type="button" class="fhcs-origin-name fhcs-body" data-action="showDocument" aria-label="{{ subclass.openLabel }}">{{ subclass.name }}</button>
+                     {{#if subclass.clear}}{{> "modules/fhcs/templates/sheet/origin-clear.hbs" subclass.clear }}{{/if}}
+                  </span>
+                  {{/if}}
+                  {{#if chooseSubclass}}
+                  <button type="button" class="fhcs-button fhcs-body fhcs-choose" data-action="findItem" data-item-type="subclass"
+                          data-class-identifier="{{ chooseSubclass.identifier }}" aria-label="{{ chooseSubclass.label }}">
+                     <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>{{ ../text.subclass }}
+                  </button>
+                  {{/if}}
+               </span>
             </span>
             <span class="fhcs-display fhcs-class-level" role="img" aria-label="{{ levelLabel }}">{{ level }}</span>
             {{#if levelUp}}
@@ -41,6 +50,7 @@
                <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
             </button>
             {{/if}}
+            {{#if clear}}{{> "modules/fhcs/templates/sheet/origin-clear.hbs" clear }}{{/if}}
          </div>
          {{/each}}
       </div>
@@ -48,21 +58,22 @@
       <div class="fhcs-origin-others">
          {{#each origins}}
          <div class="fhcs-origin-card" data-fhcs-origin="{{ kind }}"{{#if item}} data-item-id="{{ item.id }}" data-uuid="{{ item.uuid }}"{{/if}}>
-            {{#if item}}
-            <button type="button" class="fhcs-origin-pic" data-action="showDocument" aria-label="{{ item.openLabel }}"><img src="{{ item.img }}" alt=""></button>
-            {{/if}}
+            {{#if item}}<img class="fhcs-origin-underlay" src="{{ item.img }}" alt="">{{/if}}
             <span class="fhcs-origin-text">
                <span class="fhcs-label fhcs-muted">{{ label }}</span>
-               {{#if item}}
-               <button type="button" class="fhcs-origin-name fhcs-body" data-action="showDocument" aria-label="{{ item.openLabel }}">{{ item.name }}</button>
-               {{/if}}
-               {{#if choose}}
-               <button type="button" class="fhcs-button fhcs-body fhcs-choose" data-action="findItem" data-item-type="{{ choose.type }}"
-                       aria-label="{{ choose.label }}">
-                  <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>{{ ../text.choose }}
-               </button>
-               {{/if}}
+               <span class="fhcs-origin-line">
+                  {{#if item}}
+                  <button type="button" class="fhcs-origin-name fhcs-body" data-action="showDocument" aria-label="{{ item.openLabel }}">{{ item.name }}</button>
+                  {{/if}}
+                  {{#if choose}}
+                  <button type="button" class="fhcs-button fhcs-body fhcs-choose" data-action="findItem" data-item-type="{{ choose.type }}"
+                          aria-label="{{ choose.label }}">
+                     <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>{{ ../text.choose }}
+                  </button>
+                  {{/if}}
+               </span>
             </span>
+            {{#if item.clear}}{{> "modules/fhcs/templates/sheet/origin-clear.hbs" item.clear }}{{/if}}
          </div>
          {{/each}}
       </div>

@@ -1,35 +1,40 @@
 {{!-- The Biography tab (SCOPE §4.8): dnd5e's own fields, so text written on dnd5e's sheet or Tidy's shows here and the
       other way round. Characteristics across the top; personality, ideals, bonds and flaws on the left; appearance and
-      the biography on the right. In play it reads (empty fields hidden); in edit mode each field is dnd5e's input under
-      dnd5e's name, which the sheet's form saves. It takes dnd5e's "biography" part ID. --}}
+      the biography on the right. Whoever may edit the character edits each field where it stands, locked sheet or not
+      (dnd5e's inputs under dnd5e's names, which the sheet's form saves); a viewer without rights reads, empty fields
+      hidden. It takes dnd5e's "biography" part ID. --}}
 <section class="tab fhcs-biography {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
    {{#with fhcsBiography}}
    {{#if characteristics.length}}
-   <dl class="fhcs-characteristics">
+   <div class="fhcs-characteristics">
       {{#each characteristics}}
+      {{#if ../editable}}
+      <label class="fhcs-characteristic">
+         <span class="fhcs-label fhcs-muted">{{ label }}</span>
+         <input type="text" class="fhcs-input fhcs-body fhcs-bio-field" name="{{ name }}" value="{{ source }}">
+      </label>
+      {{else}}
       <div class="fhcs-characteristic">
-         <dt class="fhcs-label fhcs-muted">{{#if ../editing}}<label for="fhcs-bio-{{ @index }}">{{ label }}</label>{{else}}{{ label }}{{/if}}</dt>
-         <dd class="fhcs-body">
-            {{#if ../editing}}<input type="text" class="fhcs-input fhcs-body" id="fhcs-bio-{{ @index }}" name="{{ name }}" value="{{ source }}">
-            {{else}}{{ value }}{{/if}}
-         </dd>
+         <span class="fhcs-label fhcs-muted">{{ label }}</span>
+         <span class="fhcs-body fhcs-bio-value">{{ value }}</span>
       </div>
+      {{/if}}
       {{/each}}
-   </dl>
+   </div>
    {{/if}}
 
    {{#if empty}}<p class="fhcs-body fhcs-muted fhcs-empty">{{ text.empty }}</p>{{/if}}
 
    <div class="fhcs-bio-columns">
       <div class="fhcs-bio-column">
-         {{#each left}}{{> "modules/fhcs/templates/sheet/bio-box.hbs" editing=../editing }}{{/each}}
+         {{#each left}}{{> "modules/fhcs/templates/sheet/bio-box.hbs" editable=../editable }}{{/each}}
       </div>
       <div class="fhcs-bio-column fhcs-bio-wide">
-         {{#each right}}{{> "modules/fhcs/templates/sheet/bio-box.hbs" editing=../editing }}{{/each}}
+         {{#each right}}{{> "modules/fhcs/templates/sheet/bio-box.hbs" editable=../editable }}{{/each}}
          {{#if biography}}
          <section class="fhcs-bio-box fhcs-bio-story">
             <h3 class="fhcs-label">{{ biography.label }}</h3>
-            {{#if editing}}
+            {{#if editable}}
             {{!-- Toggled, without open: the text shows until the player chooses to edit it (the quest log's rule). --}}
             <prose-mirror name="{{ biography.name }}" value="{{ biography.source }}" document-uuid="{{ uuid }}" toggled>{{{ biography.enriched }}}</prose-mirror>
             {{else}}

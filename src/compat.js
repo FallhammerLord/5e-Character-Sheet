@@ -636,8 +636,12 @@ export async function featuresFacts(sheet, context, { columns })
 /** dnd5e's summary of an expanded effect (effects.mjs `_onToggleExpand`), drawn again when the sheet re-renders. */
 const EFFECT_SUMMARY = 'systems/dnd5e/templates/effects/parts/effect-summary.hbs';
 
-/** The effect categories a character shows, in dnd5e's order (effects.mjs:134); enchantments belong to items. */
-const EFFECT_CATEGORIES = ['temporary', 'passive', 'inactive', 'suppressed'];
+/**
+ * The effect categories a character shows. dnd5e files a switched-off effect under Inactive (effects.mjs:188), so a
+ * click would move its row; we keep each effect where its kind puts it, Temporary or Passive, and the switch shows
+ * whether it is on (user, 2026-10-26). Suppressed stays apart: its effects can't be switched from the sheet.
+ */
+const EFFECT_CATEGORIES = { temporary: 'temporary', passive: 'passive', inactive: null, suppressed: 'suppressed' };
 
 /**
  * Plain facts for the Effects tab (src/sheet/effects.js), from what dnd5e's `_prepareEffectsContext` puts on the
@@ -646,20 +650,18 @@ const EFFECT_CATEGORIES = ['temporary', 'passive', 'inactive', 'suppressed'];
 export async function effectsFacts(sheet, context)
 {
    const actor = sheet.actor;
-   const categories = [];
-   for (const key of EFFECT_CATEGORIES)
+   const filed = { temporary: [], passive: [], suppressed: [] };
+   for (const [key, target] of Object.entries(EFFECT_CATEGORIES))
    {
-      const category = context.effects?.[key];
-      if (!category || category.hidden) { continue; }
-      const effects = [];
-      for (const ctx of category.effects ?? [])
+      for (const ctx of context.effects?.[key]?.effects ?? [])
       {
          const effect = ctx.effect;
          const relative = effect ? foundry.utils.buildRelativeUuid(effect, actor) : '';
-         effects.push({
+         filed[target ?? (effect?.isTemporary ? 'temporary' : 'passive')].push({
             id: ctx.id,
             uuid: effect?.uuid ?? '',
             parentId: ctx.parentId ?? '',
+            sort: effect?.sort ?? 0,
             name: ctx.name,
             img: ctx.img,
             source: ctx.source?.name ?? '',
@@ -673,8 +675,14 @@ export async function effectsFacts(sheet, context)
             favorite: relative ? !!actor.system.hasFavorite?.(relative) : false
          });
       }
-      categories.push({ id: key, label: game.i18n.localize(category.label), effects });
    }
+   // One order whatever the switches say: the effects' own sort, then name.
+   const lang = game.i18n.lang;
+   const categories = Object.entries(filed).map(([key, effects]) => ({
+      id: key,
+      label: game.i18n.localize(context.effects?.[key]?.label ?? key),
+      effects: effects.sort((a, b) => (a.sort - b.sort) || a.name.localeCompare(b.name, lang))
+   }));
    return {
       categories,
       conditions: (context.conditions ?? []).map((c) => ({
@@ -717,7 +725,8 @@ export function biographyFacts(sheet, context)
          source: details.biography?.value ?? ''
       },
       uuid: sheet.actor.uuid,
-      editing: sheet.isEditMode && sheet.isEditable
+      // Each field edits in place, locked sheet or not (user, 2026-10-26); only a viewer without rights just reads.
+      editable: sheet.isEditable
    };
 }
 

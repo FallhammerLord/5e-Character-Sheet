@@ -290,7 +290,8 @@
       "Active": "Active",
       "Passive": "Passive",
       "Empty": "No features yet. Drag features onto the sheet to add them.",
-      "Class": "Class"
+      "Class": "Class",
+      "ClearLabel": "Remove {name}"
     },
     "Effects": {
       "Search": "Search effects",
@@ -306,7 +307,7 @@
       "Empty": "No effects on this character."
     },
     "Biography": {
-      "Empty": "Nothing written yet. Unlock the sheet to write a biography."
+      "Empty": "Nothing written yet."
     }
   }
 }
