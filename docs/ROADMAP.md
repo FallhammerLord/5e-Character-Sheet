@@ -53,7 +53,7 @@ Slots as pips; prepared state; grouped by level; concentration; spellcasting abi
 - [x] Research: dnd5e 6.0.6 spellbook data, preparation, filters, concentration; Tidy Classic's filters (2026-10-26, research note)
 - [x] Answers on unprepared spells, preparation math, columns, filters (user, 2026-10-26)
 - [x] Mockup approved (user, 2026-10-26: "the rest looks good"; https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, Spellbook boards)
-Built 2026-10-26, all in code; waits on Quench (four new core tests) and the user in play:
+Built 2026-10-26; Quench passes (core 35 of 35, 2026-10-26). Each box is ticked once seen in play:
 
 - [ ] Attributes favorites: the home tab's look (book and kind colors; innate and at will tinted and named); the name opens the item's details in place, the picture uses it (user, 2026-10-26)
 - [ ] Spellcasting strip: a card per class (ability, attack, DC, prepared / max); concentration bar with open, End and Con save
