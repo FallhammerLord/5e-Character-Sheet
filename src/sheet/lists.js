@@ -1,10 +1,11 @@
 /**
- * What the list tabs (Inventory, Spellbook) share: the filter buttons pinned beside dnd5e's search. Pure.
+ * What the list tabs (Inventory, Spellbook, Features) share: the filter buttons pinned beside dnd5e's search. Pure.
  */
 
 /** Filters pinned beside each tab's search (mockup, 2026-10-26; Tidy Classic's pins, plus Prepared). */
 export const SPELL_PINS = ['action', 'bonus', 'reaction', 'concentration', 'prepared'];
 export const INVENTORY_PINS = ['action', 'bonus', 'equipped'];
+export const FEATURE_PINS = ['action', 'bonus', 'reaction'];
 
 /**
  * Pinned filter buttons beside a tab's search. dnd5e's filters are three-state: a key includes, `!key` excludes.

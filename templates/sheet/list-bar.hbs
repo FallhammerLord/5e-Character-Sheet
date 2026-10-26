@@ -1,6 +1,7 @@
-{{!-- The search bar of a list tab (Inventory, Spellbook): dnd5e's list controls (search, filter menu, sort), the
-      filters pinned beside them (fhcsPinFilter turns one of dnd5e's filters on or off), and in edit mode the
-      Columns menu. Takes `list` (dnd5e's list name, "inventory" or "spells") from the include. --}}
+{{!-- The search bar of a list tab (Inventory, Spellbook, Features): dnd5e's list controls (search, filter menu, sort,
+      and grouping where the tab has it), the filters pinned beside them (fhcsPinFilter turns one of dnd5e's filters
+      on or off), the grouping in words (fhcsCycleGroup steps dnd5e's own switch, whose icon button we hide), and in
+      edit mode the Columns menu. Takes `list` (dnd5e's list name: "inventory", "spells", "features") from the include. --}}
 <div class="fhcs-list-bar">
    <item-list-controls for="{{ list }}" collection="items" label="{{ text.search }}">
       {{#if filters.length}}
@@ -13,6 +14,11 @@
          {{#each sorting}}<option value="{{ key }}" data-icon="{{ icon }}">{{ label }}</option>{{/each}}
       </datalist>
       {{/if}}
+      {{#if groupings.length}}
+      <datalist data-list="group">
+         {{#each groupings}}<option value="{{ key }}">{{ label }}</option>{{/each}}
+      </datalist>
+      {{/if}}
    </item-list-controls>
    {{#if pins.length}}
    <span class="fhcs-pins" role="group" aria-label="{{ text.search }}">
@@ -21,6 +27,12 @@
               aria-pressed="{{ pressed }}">{{ label }}</button>
       {{/each}}
    </span>
+   {{/if}}
+   {{#if groupings.length}}
+   <button type="button" class="fhcs-button fhcs-body fhcs-group" data-action="fhcsCycleGroup" aria-label="{{ text.group }}: {{ groupLabel }}">
+      <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l9 5-9 5-9-5zM3 13l9 5 9-5"/></svg>
+      <span class="fhcs-group-name">{{ groupLabel }}</span>
+   </button>
    {{/if}}
    {{#if columnToggles.length}}
    <details class="fhcs-fold fhcs-columns" data-fold-key="{{ list }}-columns">

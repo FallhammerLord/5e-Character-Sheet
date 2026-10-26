@@ -22,7 +22,7 @@ Details, Inventory, Features, Spells, Effects, Biography, Bastion (if any), Reno
 ## Actions (`DEFAULT_OPTIONS.actions`)
 
 - Base: `rest`, `restoreTransformation`, `roll`, `showArtwork`, `showConfiguration`, `togglePip`, `toggleSidebar`.
-- Character: `deleteFavorite`, `deleteOccupant`, `findItem`, `setSpellcastingAbility`, `toggleDeathTray`, `toggleInspiration`, `useFacility`, `useFavorite`.
+- Character: `deleteFavorite`, `deleteOccupant`, `findItem`, `setSpellcastingAbility`, `toggleDeathTray`, `toggleInspiration`, `useFacility`, `useFavorite`. Shared with every dnd5e document sheet (primary-sheet-mixin.mjs:22): `showDocument` (opens the document at the nearest `data-uuid`).
 
 Our templates keep `data-action` names so these keep working.
 

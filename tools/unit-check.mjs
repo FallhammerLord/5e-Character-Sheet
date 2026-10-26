@@ -11,6 +11,7 @@ import { attributesView } from '../src/sheet/attributes.js';
 import { healUpdates, keepStable } from '../src/sheet/death.js';
 import { columnChoice, inventoryView } from '../src/sheet/inventory.js';
 import { canCast, prepState, spellbookView, spellColumnChoice, spellKind } from '../src/sheet/spellbook.js';
+import { featureColumnChoice, featuresView, groupingOf } from '../src/sheet/features.js';
 import { pinView } from '../src/sheet/lists.js';
 import { headerMinWidth, headerView, levelOrder, levelTrack, signed, tabRow } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
@@ -366,10 +367,58 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    if (view.classes[0].prepared !== '5' || view.concentration.save !== '-1' || !view.concentration.on) { problems.push(`casting strip: ${JSON.stringify([view.classes[0].prepared, view.concentration])}`); }
 }
 
+// Features (SCOPE §4.8): rows placed by the grouping in force, the cards' marks, level up, recharge.
+{
+   const f = (id, origin, activation, over) => ({ id, uuid: id, name: id, img: '', origin, activation, ...over });
+   const facts = (over) => ({
+      classes: [
+         { id: 'c', uuid: 'c', name: 'Cleric', img: '', identifier: 'cleric', level: 9, subclass: { id: 's', uuid: 's', name: 'Life', img: '' }, needsSubclass: false },
+         { id: 'w', uuid: 'w', name: 'Warlock', img: '', identifier: 'warlock', level: 1, subclass: null, needsSubclass: true }
+      ],
+      origins: [{ kind: 'species', item: { id: 'd', uuid: 'd', name: 'Dwarf', img: '' } }, { kind: 'background', item: null }],
+      maxLevel: 20,
+      canEdit: true,
+      sections: [
+         { id: 'cleric', label: 'Cleric', group: 'origin', value: 'cleric' },
+         { id: 'other', label: 'Other', group: 'origin', value: 'other' },
+         { id: 'active', label: 'Active', group: 'activation', value: 'active' },
+         { id: 'passive', label: 'Passive', group: 'activation', value: 'passive' }
+      ],
+      features: [
+         f('Turn', 'cleric', 'active', { uses: { value: 1, max: 2, prop: 'system.uses.value' } }),
+         f('Gone', 'paladin', 'passive'),
+         f('Breath', 'other', 'active', { recharge: { cooldown: true, label: 'Recharge [5+]' } })
+      ],
+      ...over
+   });
+   const shape = (view) => view.sections.map((x) => `${x.id}:${x.items.map((i) => i.id).join('+')}${x.hidden ? '!' : ''}`).join(' ');
+   const byOrigin = featuresView(facts(), { format, localize });
+   // A row whose class has no section any more (Gone) lands in Other; the other grouping's sections start hidden.
+   if (shape(byOrigin) !== 'cleric:Turn other:Gone+Breath active:! passive:!') { problems.push(`features by source: ${shape(byOrigin)}`); }
+   const byActivation = featuresView(facts({ grouping: 'activation' }), { format, localize });
+   if (shape(byActivation) !== 'cleric:! other:! active:Turn+Breath passive:Gone') { problems.push(`features by activation: ${shape(byActivation)}`); }
+   if (groupingOf('nonsense') !== 'origin' || byActivation.groupLabel !== 'Active or passive') { problems.push('the grouping falls back wrongly or is unnamed'); }
+   const [cleric, warlock] = byOrigin.classes;
+   const marks = [!!cleric.chooseSubclass, warlock.chooseSubclass?.identifier, !!cleric.levelUp, byOrigin.origins[1].choose?.type,
+      byOrigin.origins[0].choose, byOrigin.sections[1].items[1].recharge?.text, byOrigin.chooseClass];
+   try { deepStrictEqual(marks, [false, 'warlock', true, 'background', null, 'Recharge', null]); }
+   catch { problems.push(`feature cards: ${JSON.stringify(marks)}`); }
+   // At level 20 in total, no Level up; without edit rights, no buttons at all.
+   const capped = featuresView(facts({ classes: [{ ...facts().classes[0], level: 19 }, facts().classes[1]] }), { format, localize });
+   if (capped.classes[0].levelUp) { problems.push('Level up shows at level 20'); }
+   const viewer = featuresView(facts({ canEdit: false }), { format, localize });
+   if (viewer.classes.some((k) => k.levelUp || k.chooseSubclass) || viewer.origins.some((o) => o.choose)) { problems.push('a viewer without edit rights gets level up or choose buttons'); }
+   const blank = featuresView(facts({ classes: [], features: [] }), { format, localize });
+   if (!blank.chooseClass || blank.classBasis !== 200 || !blank.empty) { problems.push(`no class: ${JSON.stringify([blank.chooseClass, blank.classBasis, blank.empty])}`); }
+   if (byOrigin.classBasis !== 408) { problems.push(`two class cards take ${byOrigin.classBasis}px`); }
+   try { deepStrictEqual(featureColumnChoice({ usage: false, gone: true }), { uses: true, usage: false, recovery: true, favorite: true }); }
+   catch { problems.push(`feature columns: ${JSON.stringify(featureColumnChoice({ usage: false }))}`); }
+}
+
 // Each extra ability (honor, sanity) widens the minimum by one column and its gap.
 if (headerMinWidth(7) - headerMinWidth(6) !== 56) { problems.push('the sheet minimum does not grow by one ability column'); }
 
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
 console.log(`${CASES.length} outcome lines, ${PART_CASES.length} card layouts, ${ROW_CASES.length} d20 rows, `
    + `${DAMAGE_CASES.length} damage bands, ${SAVE_CASES.length} save rows, ${KEEP_CASES.length} late adds and `
-   + `${MATH_CASES.length} dice sums read as expected; ${ORDER_CASES.length} level orders, the milestone track, the inventory and the spellbook views hold.`);
+   + `${MATH_CASES.length} dice sums read as expected; ${ORDER_CASES.length} level orders, the milestone track, the inventory, spellbook and features views hold.`);

@@ -2029,7 +2029,7 @@
 
 /* ---------- Spellbook tab (SCOPE §4.7) ---------- */
 
-.fhcs-sheet .fhcs-spellbook.active { gap: var(--fhcs-s2); }
+.fhcs-sheet :is(.fhcs-spellbook, .fhcs-features).active { gap: var(--fhcs-s2); }
 
 /* One card per casting class, side by side while they fit, then the concentration bar under them. */
 .fhcs-sheet .fhcs-casting
@@ -2214,3 +2214,91 @@
 
 .fhcs-sheet .fhcs-prep-lock rect { fill: currentColor; stroke: var(--fhcs-surface); stroke-width: 2; }
 .fhcs-sheet .fhcs-prep-lock path { fill: none; stroke: currentColor; stroke-width: 3; }
+
+/* ---------- Features tab (SCOPE §4.8) ---------- */
+
+/* One row of cards above the list: each class, then species and background, side by side to save height (user,
+   2026-10-26). When they don't fit, species and background drop to a row of their own, together. */
+.fhcs-sheet .fhcs-origin-row
+{
+   display: flex;
+   flex-wrap: wrap;
+   gap: var(--fhcs-s2);
+}
+
+.fhcs-sheet .fhcs-origin-classes { display: flex; flex: 2 1 200px; gap: var(--fhcs-s2); min-width: 0; }
+.fhcs-sheet .fhcs-origin-others { display: flex; flex: 1 1 308px; gap: var(--fhcs-s2); min-width: 0; }
+
+.fhcs-sheet .fhcs-origin-card
+{
+   display: flex;
+   flex: 1 1 0;
+   align-items: center;
+   gap: var(--fhcs-s2);
+   min-width: 0;
+   padding: var(--fhcs-s1) var(--fhcs-s2);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-fill);
+}
+
+.fhcs-sheet .fhcs-origin-pic
+{
+   flex: none;
+   width: 24px;
+   height: 24px;
+   margin: 0;
+   padding: 0;
+   border: 0;
+   border-radius: 4px;
+   background: none;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-origin-pic img { display: block; width: 24px; height: 24px; border: 0; border-radius: 4px; object-fit: cover; }
+.fhcs-sheet .fhcs-origin-pic:hover img { box-shadow: 0 0 0 2px var(--fhcs-ink); }
+
+.fhcs-sheet .fhcs-origin-text { display: flex; flex: 1; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+
+/* Names open the item; they read from the left (Foundry centers a button's content). */
+.fhcs-sheet .fhcs-origin-name
+{
+   display: block;
+   max-width: 100%;
+   min-height: 24px;
+   margin: 0;
+   padding: 0;
+   border: 0;
+   background: none;
+   color: inherit;
+   font-family: inherit;
+   text-align: left;
+   overflow: hidden;
+   text-overflow: ellipsis;
+   white-space: nowrap;
+   cursor: pointer;
+}
+
+/* Something to choose: a dashed button with a plus (SCOPE §5.1). */
+.fhcs-sheet .fhcs-choose
+{
+   justify-content: flex-start;
+   width: auto;
+   min-height: 24px;
+   padding: 0 var(--fhcs-s1);
+   border-style: dashed;
+   border-color: currentColor;
+   background: var(--fhcs-surface);
+}
+
+.fhcs-sheet .fhcs-class-level { flex: none; }
+.fhcs-sheet .fhcs-level-up { flex: none; color: inherit; }
+
+/* The grouping in words, beside the pins; dnd5e's own icon button for it is hidden. */
+.fhcs-sheet .fhcs-list-bar .filter-control[data-action="group"] { display: none; }
+.fhcs-sheet .fhcs-group { justify-content: flex-start; width: auto; padding: 0 var(--fhcs-s2); }
+
+/* Recovery gives way like usage, before the name does. */
+.fhcs-sheet .fhcs-col-recovery { flex: 0 1 104px; min-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fhcs-sheet .fhcs-features .fhcs-col-usage { text-align: left; }
+.fhcs-sheet .fhcs-recharge { width: auto; min-height: 24px; padding: 0 var(--fhcs-s1); }

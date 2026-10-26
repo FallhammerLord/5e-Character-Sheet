@@ -68,7 +68,13 @@ Journal dropped (user, 2026-10-26; SCOPE §4.8).
 
 - [x] Research: dnd5e 6.0.6 features, effects and biography parts; Tidy Classic's four tabs and its Journal (2026-10-26, research note)
 - [x] Design answers: grouping, class cards, columns, effects and conditions, biography, data carried over, no Journal (user, 2026-10-26; SCOPE §4.8)
-- [ ] Mockup approved (Design canvas, a Phase 5 row)
+- [x] Mockup approved (user, 2026-10-26: "should be good"; canvas rows Features, Effects, Biography)
+
+Built in slices; each box is ticked once seen in Quench and play:
+
+- [ ] 5a Features (built 2026-10-26): one row of class, species and background cards (Level up opens dnd5e's wizard; dashed Choose for a missing subclass, class, species or background); features by source or active and passive (dnd5e's grouping, named in words); Uses, Usage, Recovery, favorite; Columns menu; pins Action, Bonus, Reaction
+- [ ] 5b Effects: categories with Source, Duration and the on/off switch; the conditions grid
+- [ ] 5c Biography: characteristics, the five text boxes and the biography, read in play, empty ones hidden
 
 ## Phase 6: Edit mode and lifecycle
 

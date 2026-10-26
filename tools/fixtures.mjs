@@ -9,6 +9,7 @@ import { headerView, tabRow } from '../src/sheet/header.js';
 import { attributesView } from '../src/sheet/attributes.js';
 import { inventoryView } from '../src/sheet/inventory.js';
 import { spellbookView } from '../src/sheet/spellbook.js';
+import { featuresView } from '../src/sheet/features.js';
 import { format, localize } from './templates.mjs';
 
 /** A usage card's context as FHCSUsageMessageData#_prepareContext builds it, with overrides. */
@@ -297,7 +298,82 @@ const MULTICLASS_CASTER = [
    { label: 'Warlock Spellcasting', abbr: 'CHA', mod: 2, attack: 5, save: 13, prepared: { value: 4, max: 4 }, primary: false }
 ];
 
+/** One feature's facts as compat.featuresFacts gathers them, with overrides. */
+const feat = (name, fill, origin, over = {}) => ({
+   id: name.replace(/\W/g, ''), uuid: `Actor.x.Item.${name}`, name, img: ICON(fill), origin, activation: 'passive',
+   expanded: false, summary: '', uses: null, recharge: null, usage: '', recovery: '', favorite: false, ...over
+});
+const act = (usage, over = {}) => ({ activation: 'active', usage, ...over });
+const uses = (value, max) => ({ value, max, prop: 'system.uses.value' });
+const doc = (name, fill) => ({ id: name.replace(/\W/g, ''), uuid: `Actor.x.Item.${name}`, name, img: ICON(fill) });
+const FEATURE_SECTIONS = (classes) => [
+   ...classes.map((k) => ({ id: k.identifier, label: `${k.name} Features`, group: 'origin', value: k.identifier })),
+   { id: 'species', label: 'Species Features', group: 'origin', value: 'species' },
+   { id: 'background', label: 'Background Features', group: 'origin', value: 'background' },
+   { id: 'other', label: 'Other Features', group: 'origin', value: 'other' },
+   { id: 'active', label: 'Active', group: 'activation', value: 'active' },
+   { id: 'passive', label: 'Passive', group: 'activation', value: 'passive' }
+];
+const CLERIC = { ...doc('Cleric', '#c9a227'), identifier: 'cleric', level: 9, subclass: doc('Life Domain', '#3a8a5a'), needsSubclass: false };
+const featuresFacts = (over = {}) => ({
+   classes: [CLERIC],
+   origins: [{ kind: 'species', item: doc('Dwarf', '#8a6a4a') }, { kind: 'background', item: doc('Acolyte', '#7a5ab8') }],
+   maxLevel: 20,
+   canEdit: true,
+   sections: FEATURE_SECTIONS([CLERIC]),
+   features: [
+      feat('Channel Divinity', '#c9a227', 'cleric', { uses: uses(1, 2), recovery: 'Short Rest', favorite: true, expanded: true,
+         summary: '<div class="item-summary"><p>Channel divine energy for one of your Channel Divinity options.</p></div>' }),
+      feat('Turn Undead', '#4a4a5a', 'cleric', act('1 Action')),
+      feat('Preserve Life', '#3a8a5a', 'cleric', act('1 Action')),
+      feat('Blessed Healer', '#3a9a7a', 'cleric'),
+      feat('Divine Order: Protector', '#5a7ab8', 'cleric'),
+      feat('Stonecunning', '#8a6a4a', 'species', act('1 Bonus Action', { uses: uses(2, 2), recovery: 'Long Rest' })),
+      feat('Darkvision', '#3a3a4a', 'species'),
+      feat('Magic Initiate (Cleric)', '#7a5ab8', 'background', { uses: uses(1, 1), recovery: 'Long Rest' }),
+      feat('Lucky', '#3a8a3a', 'other', { uses: uses(3, 3), recovery: 'Long Rest', favorite: true }),
+      feat('Breath of the Wyrm', '#8a3a2a', 'other', act('1 Action', { recharge: { cooldown: true, label: 'Recharge [5+]' } }))
+   ],
+   columns: {},
+   grouping: 'origin',
+   editing: false,
+   activeFilters: [],
+   filters: [{ key: 'action', group: 'activation', label: 'Action' }, { key: 'sr', group: 'recovery', label: 'Short Rest' }],
+   sorting: [{ key: 'a', icon: 'fa-solid fa-arrow-down-a-z', label: 'Alphabetical' }],
+   ...over
+});
+const features = (over) => ({
+   tab: { id: 'features', group: 'primary', cssClass: 'active' }, rollableClass: 'rollable',
+   fhcsFeatures: featuresView(featuresFacts(over), { format, localize })
+});
+const MULTICLASS_FEATS = [
+   { ...doc('Cleric', '#c9a227'), identifier: 'cleric', level: 5, subclass: doc('Light Domain', '#e0b040'), needsSubclass: false },
+   { ...doc('Warlock', '#6a3a8a'), identifier: 'warlock', level: 3, subclass: null, needsSubclass: true }
+];
+const MULTICLASS_FEATURES = [
+   feat('Channel Divinity', '#c9a227', 'cleric', { uses: uses(2, 2), recovery: 'Short Rest' }),
+   feat('Warding Flare', '#e0a030', 'cleric', act('1 Reaction', { uses: uses(3, 3), recovery: 'Long Rest' })),
+   feat('Radiance of the Dawn', '#e0b040', 'cleric', act('1 Action')),
+   feat('Pact Magic', '#6a3a8a', 'warlock'),
+   feat('Magical Cunning', '#7a4a9a', 'warlock', act('1 Minute', { uses: uses(1, 1), recovery: 'Long Rest' })),
+   feat('Celestial Revelation: Heavenly Wings of the Morning', '#e0c060', 'species', act('1 Bonus Action', { uses: uses(1, 1), recovery: 'Long Rest, Dawn' })),
+   feat('Fey Touched (Misty Step, Gift of Alacrity)', '#5a7ab8', 'other', { uses: uses(1, 1), recovery: 'Long Rest' })
+];
+const ALL_FEATURE_COLUMNS = { uses: true, usage: true, recovery: true, favorite: true };
+
 export const CASES = [
+   { name: 'features', template: 'sheet/features', context: features() },
+   {
+      name: 'features-multiclass', template: 'sheet/features',
+      context: features({ classes: MULTICLASS_FEATS, sections: FEATURE_SECTIONS(MULTICLASS_FEATS), features: MULTICLASS_FEATURES,
+         origins: [{ kind: 'species', item: doc('Aasimar of the Radiant Dawn', '#e0c060') }, { kind: 'background', item: null }] })
+   },
+   { name: 'features-by-activation', template: 'sheet/features', context: features({ grouping: 'activation' }) },
+   { name: 'features-editing', template: 'sheet/features', open: ['features-columns'], context: features({ editing: true, columns: ALL_FEATURE_COLUMNS }) },
+   {
+      name: 'features-empty', template: 'sheet/features',
+      context: features({ classes: [], sections: FEATURE_SECTIONS([]), features: [], origins: [{ kind: 'species', item: null }, { kind: 'background', item: null }] })
+   },
    { name: 'spellbook', template: 'sheet/spellbook', context: spellbook() },
    { name: 'spellbook-multiclass-idle', template: 'sheet/spellbook', context: spellbook({ classes: MULTICLASS_CASTER, concentration: { save: -1, spells: [] } }) },
    { name: 'spellbook-editing', template: 'sheet/spellbook', open: ['spells-columns'], context: spellbook({ editing: true, columns: ALL_SPELL_COLUMNS }) },

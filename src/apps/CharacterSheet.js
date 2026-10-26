@@ -1,10 +1,11 @@
 import { MODULE_ID, MODULE_PATH } from '../constants.js';
-import { attributesFacts, endConcentration, headerFacts, inventoryFacts, passesExtraFilters, spellbookFacts, toggleListFilter,
-   watchListFilters } from '../compat.js';
+import { attributesFacts, cycleListGrouping, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelUpClass,
+   passesExtraFilters, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
 import { EXTRA_SPELL_FILTERS, spellbookView, spellColumnChoice } from '../sheet/spellbook.js';
-import { INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
+import { featureColumnChoice, featuresView } from '../sheet/features.js';
+import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
 import { headerMinWidth, headerView, tabRow } from '../sheet/header.js';
 import { delayTips, keepFolds } from '../chat/card.js';
 
@@ -15,7 +16,8 @@ export const SHEET_PARTS = {
    // The Attributes tab takes dnd5e's Details tab: same ID, so dnd5e's tab handling still applies.
    details: `${MODULE_PATH}/templates/sheet/attributes.hbs`,
    inventory: `${MODULE_PATH}/templates/sheet/inventory.hbs`,
-   spells: `${MODULE_PATH}/templates/sheet/spellbook.hbs`
+   spells: `${MODULE_PATH}/templates/sheet/spellbook.hbs`,
+   features: `${MODULE_PATH}/templates/sheet/features.hbs`
 };
 
 /**
@@ -26,17 +28,19 @@ export const SHEET_PARTS = {
 const LIST_BAR = `${MODULE_PATH}/templates/sheet/list-bar.hbs`;
 const PART_OPTIONS = {
    inventory: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/item-row.hbs`, LIST_BAR] },
-   spells: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/spell-row.hbs`, LIST_BAR] }
+   spells: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/spell-row.hbs`, LIST_BAR] },
+   features: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/feature-row.hbs`, LIST_BAR] }
 };
 
 /** Each list tab's column setting, by dnd5e's list name. */
 const COLUMN_SETTINGS = {
    inventory: { setting: 'inventoryColumns', choice: columnChoice },
-   spells: { setting: 'spellColumns', choice: spellColumnChoice }
+   spells: { setting: 'spellColumns', choice: spellColumnChoice },
+   features: { setting: 'featureColumns', choice: featureColumnChoice }
 };
 
 /** Each list tab's pinned filters, by dnd5e's list name. */
-const LIST_PINS = { inventory: INVENTORY_PINS, spells: SPELL_PINS };
+const LIST_PINS = { inventory: INVENTORY_PINS, spells: SPELL_PINS, features: FEATURE_PINS };
 
 /** Each player's own choices, kept on their user so they follow them to every character and device. */
 const PREFS = { passives: 'passives', folded: 'foldedFavorites', openContainers: 'openContainers' };
@@ -118,6 +122,24 @@ function showPins(controls)
          pin.setAttribute('aria-pressed', active.includes(key) ? 'true' : active.includes(`!${key}`) ? 'mixed' : 'false');
       }
    });
+}
+
+/** A class card's Level up: dnd5e's level-up wizard for that class (user, 2026-10-26; SCOPE §4.8). */
+function levelUp(event, target)
+{
+   return levelUpClass(this, target.dataset.itemId);
+}
+
+/** The grouping button in words: steps dnd5e's own switch, which moves the rows, then names the grouping now in force. */
+async function cycleGroup(event, target)
+{
+   const controls = target.closest('dnd5e-inventory')?.querySelector('item-list-controls');
+   const grouping = await cycleListGrouping(controls);
+   if (!grouping) { return; }
+   const label = game.i18n.localize(`FHCS.Features.Group.${grouping}`);
+   const name = target.querySelector('.fhcs-group-name');
+   if (name) { name.textContent = label; }
+   target.setAttribute('aria-label', `${game.i18n.localize('FHCS.Features.GroupLabel')}: ${label}`);
 }
 
 /** The concentration bar's name: opens the spell held (user, 2026-10-26). */
@@ -214,7 +236,7 @@ function ourParts(baseParts)
  * since a module can't import from the system by path. dnd5e keeps every mechanic; the look is ours alone.
  *
  * Phase 1: our header. Phase 2: our frame, tab row and Attributes tab in place of dnd5e's sidebar, vertical tabs
- * and Details tab. Phase 3: our Inventory tab. Phase 4: our Spellbook tab.
+ * and Details tab. Phase 3: our Inventory tab. Phase 4: our Spellbook tab. Phase 5: our Features tab.
  */
 export function makeCharacterSheet(Base)
 {
@@ -224,7 +246,8 @@ export function makeCharacterSheet(Base)
          classes: ['fhcs-sheet'],
          actions: { fhcsTogglePassives: togglePassives, fhcsToggleGroup: toggleGroup, fhcsToggleColumn: toggleColumn,
             fhcsToggleContainer: toggleContainer, fhcsPinFilter: pinFilter, fhcsOpenConcentration: openConcentration,
-            fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails }
+            fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails,
+            fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup }
       };
 
       static PARTS = ourParts(Base.PARTS);
@@ -266,6 +289,11 @@ export function makeCharacterSheet(Base)
          {
             const columns = spellColumnChoice(game.settings.get(MODULE_ID, 'spellColumns'));
             context.fhcsSpellbook = spellbookView(await spellbookFacts(this, context, { columns }), i18n);
+         }
+         if (partId === 'features')
+         {
+            const columns = featureColumnChoice(game.settings.get(MODULE_ID, 'featureColumns'));
+            context.fhcsFeatures = featuresView(await featuresFacts(this, context, { columns }), i18n);
          }
          if (partId === 'tabs')
          {

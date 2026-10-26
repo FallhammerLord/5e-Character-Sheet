@@ -1,0 +1,95 @@
+{{!-- The Features tab (SCOPE §4.8): one row of cards (each class, then species and background), then the features by
+      section on dnd5e's own inventory element, as on Inventory and Spellbook. It takes dnd5e's "features" part ID.
+      Every section of both groupings is drawn (data-group-origin, data-group-activation), so dnd5e's grouping switch
+      moves rows between them in the browser; each row carries both of its groups. --}}
+<section class="tab fhcs-list-tab fhcs-features {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
+   {{#with fhcsFeatures}}
+   <div class="fhcs-origin-row">
+      {{#if classBasis}}
+      <div class="fhcs-origin-classes" style="flex-basis: {{ classBasis }}px">
+         {{#if chooseClass}}
+         <div class="fhcs-origin-card" data-fhcs-origin="class">
+            <span class="fhcs-origin-text">
+               <span class="fhcs-label fhcs-muted">{{ chooseClass.kind }}</span>
+               <button type="button" class="fhcs-button fhcs-body fhcs-choose" data-action="findItem" data-item-type="class"
+                       aria-label="{{ chooseClass.label }}">
+                  <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>{{ text.choose }}
+               </button>
+            </span>
+         </div>
+         {{/if}}
+         {{#each classes}}
+         <div class="fhcs-origin-card fhcs-class-card" data-item-id="{{ id }}" data-uuid="{{ uuid }}">
+            <button type="button" class="fhcs-origin-pic" data-action="showDocument" aria-label="{{ openLabel }}"><img src="{{ img }}" alt=""></button>
+            <span class="fhcs-origin-text">
+               <button type="button" class="fhcs-origin-name fhcs-label" data-action="showDocument" aria-label="{{ openLabel }}">{{ name }}</button>
+               {{#if subclass}}
+               <button type="button" class="fhcs-origin-name fhcs-body" data-action="showDocument" data-uuid="{{ subclass.uuid }}"
+                       aria-label="{{ subclass.openLabel }}">{{ subclass.name }}</button>
+               {{/if}}
+               {{#if chooseSubclass}}
+               <button type="button" class="fhcs-button fhcs-body fhcs-choose" data-action="findItem" data-item-type="subclass"
+                       data-class-identifier="{{ chooseSubclass.identifier }}" aria-label="{{ chooseSubclass.label }}">
+                  <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>{{ ../text.subclass }}
+               </button>
+               {{/if}}
+            </span>
+            <span class="fhcs-display fhcs-class-level" role="img" aria-label="{{ levelLabel }}">{{ level }}</span>
+            {{#if levelUp}}
+            <button type="button" class="fhcs-toggle fhcs-level-up" data-action="fhcsLevelUp" data-item-id="{{ id }}"
+                    aria-label="{{ levelUp.label }}" data-fhcs-tip="{{ ../text.levelUp }}">
+               <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+            </button>
+            {{/if}}
+         </div>
+         {{/each}}
+      </div>
+      {{/if}}
+      <div class="fhcs-origin-others">
+         {{#each origins}}
+         <div class="fhcs-origin-card" data-fhcs-origin="{{ kind }}"{{#if item}} data-item-id="{{ item.id }}" data-uuid="{{ item.uuid }}"{{/if}}>
+            {{#if item}}
+            <button type="button" class="fhcs-origin-pic" data-action="showDocument" aria-label="{{ item.openLabel }}"><img src="{{ item.img }}" alt=""></button>
+            {{/if}}
+            <span class="fhcs-origin-text">
+               <span class="fhcs-label fhcs-muted">{{ label }}</span>
+               {{#if item}}
+               <button type="button" class="fhcs-origin-name fhcs-body" data-action="showDocument" aria-label="{{ item.openLabel }}">{{ item.name }}</button>
+               {{/if}}
+               {{#if choose}}
+               <button type="button" class="fhcs-button fhcs-body fhcs-choose" data-action="findItem" data-item-type="{{ choose.type }}"
+                       aria-label="{{ choose.label }}">
+                  <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>{{ ../text.choose }}
+               </button>
+               {{/if}}
+            </span>
+         </div>
+         {{/each}}
+      </div>
+   </div>
+
+   <dnd5e-inventory class="inventory-element fhcs-list-element">
+      {{> "modules/fhcs/templates/sheet/list-bar.hbs" list="features" }}
+
+      <section class="items-list features-list fhcs-items" data-item-list="features">
+         {{#each sections}}
+         <div class="items-section fhcs-section" data-fhcs-section="{{ id }}" data-group-{{ group }}="{{ value }}"{{#if hidden}} hidden{{/if}}>
+            <div class="items-header fhcs-item-head">
+               <span class="fhcs-col-img" aria-hidden="true"></span>
+               <span class="fhcs-label fhcs-col-name">{{ label }}</span>
+               {{#if ../columns.uses}}<span class="fhcs-label fhcs-muted fhcs-col-uses">{{ ../text.head.uses }}</span>{{/if}}
+               {{#if ../columns.usage}}<span class="fhcs-label fhcs-muted fhcs-col-usage">{{ ../text.head.usage }}</span>{{/if}}
+               {{#if ../columns.recovery}}<span class="fhcs-label fhcs-muted fhcs-col-recovery">{{ ../text.head.recovery }}</span>{{/if}}
+               {{#if ../columns.favorite}}<span class="fhcs-muted fhcs-col-toggle" role="img" aria-label="{{ ../text.head.favorite }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>{{/if}}
+               {{#if ../editing}}<span class="fhcs-col-edit"></span>{{/if}}
+            </div>
+            <ol class="item-list fhcs-item-list">
+               {{#each items}}{{> "modules/fhcs/templates/sheet/feature-row.hbs" }}{{/each}}
+            </ol>
+         </div>
+         {{/each}}
+         {{#if empty}}<p class="fhcs-body fhcs-muted fhcs-empty">{{ text.empty }}</p>{{/if}}
+      </section>
+   </dnd5e-inventory>
+   {{/with}}
+</section>

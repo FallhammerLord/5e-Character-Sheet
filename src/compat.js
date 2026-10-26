@@ -517,6 +517,122 @@ export async function spellbookFacts(sheet, context, { columns })
    };
 }
 
+/** @returns {string} How an item's uses come back, in words (dnd5e keeps abbreviations, uses-field.mjs:62). */
+function recoveryWords(item)
+{
+   const periods = CONFIG.DND5E.limitedUsePeriods ?? {};
+   return (item.system.uses?.recovery ?? []).map((r) =>
+   {
+      if (r.period === 'recharge') { return item.labels?.recharge ?? ''; }
+      return periods[r.period] ? game.i18n.localize(periods[r.period].label) : '';
+   }).filter(Boolean).join(', ');
+}
+
+/** @returns {{id, uuid, name, img}} What our cards need of an item. */
+const docFacts = (item) => ({ id: item.id, uuid: item.uuid, name: item.name, img: item.img });
+
+/** @returns {object|null} The actor's species or background item; dnd5e keeps a plain string there without one. */
+const originItem = (value) => (value && typeof value === 'object' && value.id ? docFacts(value) : null);
+
+/** The grouping a player chose for a list tab, as dnd5e's list controls store it (item-list-controls.mjs:174). */
+export function listGrouping(actor, tab)
+{
+   return game.user.getFlag('dnd5e', `sheetPrefs.${actor.type}.tabs.${tab}.group`);
+}
+
+/**
+ * Switches a list to its next grouping, as dnd5e's own group button does (`_onCycleMode`, item-list-controls.mjs:479),
+ * which saves the choice and moves the rows. Returns the grouping now in force.
+ * @param {HTMLElement} controls  The list's `item-list-controls` element.
+ */
+export async function cycleListGrouping(controls)
+{
+   const button = controls?._controls?.group;
+   if (!button || typeof controls._onCycleMode !== 'function') { return null; }
+   await controls._onCycleMode({ currentTarget: button });
+   return controls.prefs?.group ?? null;
+}
+
+/**
+ * Levels a class up by one, as dnd5e's level dropdown does (`#changeLevel`, base-actor-sheet.mjs:1232): through its
+ * advancement manager (the level-up wizard), or a plain level change when the world turns advancements off.
+ */
+export async function levelUpClass(sheet, classId)
+{
+   const actor = sheet.actor;
+   const item = actor.items.get(classId);
+   if (!item || item.type !== 'class') { return null; }
+   const Manager = globalThis.dnd5e?.applications?.advancement?.AdvancementManager;
+   if (Manager && !game.settings.get('dnd5e', 'disableAdvancements'))
+   {
+      const manager = Manager.forLevelChange(actor, classId, 1);
+      if (manager.steps.length) { return sheet._renderChild ? sheet._renderChild(manager) : manager.render({ force: true }); }
+   }
+   return item.update({ 'system.levels': item.system.levels + 1 });
+}
+
+/**
+ * Plain facts for the Features tab (src/sheet/features.js), from what dnd5e's `_prepareFeaturesContext` puts on the
+ * context (character-sheet.mjs:394: classes, sections with their groups, list controls) and its feature row context
+ * (`_prepareItemFeature`, :850: each row's origin and activation group).
+ */
+export async function featuresFacts(sheet, context, { columns })
+{
+   const actor = sheet.actor;
+   const ctxs = context.itemContext ?? {};
+   const sections = (context.sections ?? []).map((s) =>
+   {
+      const [group, value] = Object.entries(s.groups ?? {})[0] ?? ['origin', 'other'];
+      return { id: s.id, label: game.i18n.localize(s.label), group, value };
+   });
+
+   const features = [];
+   const items = [...(context.itemCategories?.features ?? []), ...(context.subclasses ?? [])]
+      .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
+   for (const item of items)
+   {
+      const ctx = ctxs[item.id] ?? {};
+      const uses = ctx.uses ?? {};
+      features.push({
+         ...docFacts(item),
+         origin: ctx.groups?.origin ?? 'other',
+         activation: ctx.groups?.activation ?? 'passive',
+         expanded: !!ctx.isExpanded,
+         summary: ctx.isExpanded && ctx.expanded ? await renderTemplate(ITEM_SUMMARY, ctx.expanded) : '',
+         uses: uses.hasUses && !uses.hasRecharge ? { value: uses.value ?? 0, max: uses.max, prop: uses.prop } : null,
+         recharge: uses.hasRecharge ? { cooldown: !!uses.isOnCooldown, label: item.labels?.recharge ?? '' } : null,
+         usage: item.system.activities?.size ? (item.labels?.activation ?? '') : '',
+         recovery: recoveryWords(item),
+         favorite: isFavorite(actor, item)
+      });
+   }
+
+   const controls = context.listControls ?? {};
+   return {
+      classes: (context.classes ?? []).map((cls) => ({
+         ...docFacts(cls),
+         identifier: cls.identifier,
+         level: cls.system.levels,
+         subclass: cls.subclass ? docFacts(cls.subclass) : null,
+         needsSubclass: !!ctxs[cls.id]?.needsSubclass
+      })),
+      origins: [
+         { kind: 'species', item: originItem(actor.system.details?.race) },
+         { kind: 'background', item: originItem(actor.system.details?.background) }
+      ],
+      maxLevel: CONFIG.DND5E.maxLevel ?? 20,
+      canEdit: sheet.isEditable,
+      sections,
+      features,
+      columns,
+      grouping: listGrouping(actor, 'features'),
+      editing: sheet.isEditMode,
+      activeFilters: listFilters(sheet, 'features'),
+      filters: (controls.filters ?? []).map((f) => ({ key: f.key, group: f.group ?? '', label: game.i18n.localize(f.label) })),
+      sorting: (controls.sorting ?? []).map((s) => ({ key: s.key, icon: s.dataset?.icon ?? '', label: game.i18n.localize(s.label) }))
+   };
+}
+
 /**
  * After dnd5e's advancement finishes (`dnd5e.advancementManagerComplete`), records the order of class levels: the
  * recorded order, brought up to date by `reconcile` (src/sheet/header.js levelOrder).

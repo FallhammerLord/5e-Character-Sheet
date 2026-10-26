@@ -35,6 +35,10 @@
       "SpellColumns": {
         "Name": "Spellbook columns",
         "Hint": "Which columns the Spellbook tab shows. Change them from the tab's Columns menu in edit mode."
+      },
+      "FeatureColumns": {
+        "Name": "Features columns",
+        "Hint": "Which columns the Features tab shows. Change them from the tab's Columns menu in edit mode."
       }
     },
     "Chat": {
@@ -252,6 +256,41 @@
     "Favorite": {
       "On": "Favorite: click to remove",
       "Off": "Not a favorite: click to add"
+    },
+    "Features": {
+      "Search": "Search features",
+      "Column": {
+        "uses": "Uses",
+        "usage": "Usage",
+        "recovery": "Recovery",
+        "favorite": "Favorite"
+      },
+      "Group": {
+        "origin": "By source",
+        "activation": "Active or passive"
+      },
+      "GroupLabel": "Group features",
+      "Origin": {
+        "species": "Species",
+        "background": "Background"
+      },
+      "Level": "Level",
+      "LevelUp": "Level up",
+      "LevelLabel": "{name}, level {level}",
+      "LevelUpLabel": "Level up {name}",
+      "Subclass": "Subclass",
+      "ChooseSubclassLabel": "Choose a subclass for {name}",
+      "Choose": "Choose",
+      "ChooseLabel": "Choose a {kind}",
+      "OpenLabel": "Open {name}",
+      "UseLabel": "Use {name}",
+      "Recharge": "Recharge",
+      "Charged": "Charged",
+      "Other": "Other features",
+      "Active": "Active",
+      "Passive": "Passive",
+      "Empty": "No features yet. Drag features onto the sheet to add them.",
+      "Class": "Class"
     }
   }
 }

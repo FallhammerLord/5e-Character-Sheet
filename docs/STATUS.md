@@ -4,13 +4,16 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 5 mockup review.** Boards on the canvas (2026-10-26): Features, Effects, Biography rows, each light, dark and 644px with a hard case. First round (user, 2026-10-26): switch and dashed add approved (SCOPE §5.1); Level up on class cards; classes, Species and Background in one row (§4.8). Waiting on approval of the revised Features boards; then tick ROADMAP and plan the build slices (Features first).
+1. **Build Phase 5's slices 5b Effects and 5c Biography** (SCOPE §4.8, mockup approved 2026-10-26), each with fixtures, unit cases and a Quench test, as 5a was.
+2. **Then Quench and play** for all three tabs (user).
 
 The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.
 
 ## Waiting on the user
 
 In code, not yet seen in Foundry:
+
+- **Phase 5a Features tab** (2026-10-26): offline checks pass (load, unit, layout; screenshots checked). Quench has two new core tests (grouping, use and favorite; Level up and Choose).
 
 - **Chat log scrolling** (2026-10-24, third try). New cards stopped short by the Apply section, which dnd5e fills in after the card is placed. Folded rolls post with `scroll: false`; the player's own new card posts with `scroll: true`, and while following it (8 s, until the player scrolls, clicks or types in the log) a `ResizeObserver` scrolls again on every size change. Apply starts folded.
 - **Inventory sort button** lights only when a filter or search is on (dnd5e marks it active always).

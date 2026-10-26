@@ -1,0 +1,62 @@
+{{!-- One Features row (SCOPE §4.8), included by features.hbs. Built like an Inventory row (item-row.hbs) so dnd5e's
+      inventory element binds it the same way: the picture uses the feature (use), the name opens dnd5e's summary
+      (toggleExpand), a spent recharge rolls (recharge), the bookmark favorites it (toggleFavorite), and the context
+      menu and drag work on the row. Both its groups ride on it, for dnd5e's grouping switch. --}}
+<li class="item collapsible fhcs-item fhcs-feature{{#unless expanded}} collapsed{{/unless}}{{#if favorite}} fhcs-favorited{{/if}}"
+    data-uuid="{{ uuid }}" data-item-id="{{ id }}" data-entry-id="{{ id }}" data-item-name="{{ name }}"
+    data-group-origin="{{ origin }}" data-group-activation="{{ activation }}">
+   <div class="item-row draggable fhcs-item-row">
+      <button type="button" class="item-action fhcs-col-img fhcs-item-use {{ @root.rollableClass }}"
+              data-action="use" aria-label="{{ useLabel }}">
+         <img src="{{ img }}" alt="">
+      </button>
+      {{!-- dnd5e's expand flips the classes on this button's <i>, so it must have one. --}}
+      <button type="button" class="item-action fhcs-col-name fhcs-item-name" data-action="toggleExpand"
+              aria-label="{{ detailsLabel }}">
+         <i class="fhcs-expand" aria-hidden="true"></i>
+         <svg class="fhcs-icon fhcs-caret fhcs-name-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+         <span class="fhcs-body fhcs-item-title">{{ name }}</span>
+         {{#if sub}}<span class="fhcs-label fhcs-muted fhcs-item-sub">{{ sub }}</span>{{/if}}
+      </button>
+      {{#with @root.fhcsFeatures.columns}}
+      {{#if uses}}
+      <span class="fhcs-col-uses">
+         {{#if ../uses}}
+         <input type="text" class="fhcs-input fhcs-body fhcs-uses-input" value="{{ ../uses.value }}" placeholder="0"
+                data-dtype="Number" data-name="{{ ../uses.prop }}" inputmode="numeric" pattern="[+=\-]?\d*"
+                aria-label="{{ ../uses.label }}">
+         <span class="fhcs-body fhcs-muted">/ {{ ../uses.max }}</span>
+         {{else if ../recharge.cooldown}}
+         <button type="button" class="item-action fhcs-button fhcs-body fhcs-recharge" data-action="recharge"
+                 aria-label="{{ ../recharge.label }}">{{ ../recharge.text }}</button>
+         {{else if ../recharge}}
+         <span class="fhcs-body" aria-label="{{ ../recharge.label }}">{{ ../recharge.text }}</span>
+         {{/if}}
+      </span>
+      {{/if}}
+      {{#if usage}}<span class="fhcs-body fhcs-col-usage">{{ ../usage }}</span>{{/if}}
+      {{#if recovery}}<span class="fhcs-body fhcs-col-recovery">{{ ../recovery }}</span>{{/if}}
+      {{/with}}
+      {{#if @root.fhcsFeatures.columns.favorite}}
+      <span class="fhcs-col-toggle">
+         <button type="button" class="item-action fhcs-toggle fhcs-toggle-fav" data-action="toggleFavorite"
+                 aria-pressed="{{#if favorite}}true{{else}}false{{/if}}" aria-label="{{ favoriteLabel }}" data-fhcs-tip="{{ favoriteLabel }}">
+            <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg>
+         </button>
+      </span>
+      {{/if}}
+      {{#if @root.fhcsFeatures.editing}}
+      <span class="fhcs-col-edit">
+         <button type="button" class="item-action fhcs-toggle" data-action="edit" aria-label="{{ editLabel }}" data-fhcs-tip="{{ editLabel }}">
+            <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>
+         </button>
+         <button type="button" class="item-action fhcs-toggle" data-action="delete" aria-label="{{ deleteLabel }}" data-fhcs-tip="{{ deleteLabel }}">
+            <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></svg>
+         </button>
+      </span>
+      {{/if}}
+   </div>
+   <div class="item-description collapsible-content fhcs-item-details">
+      <div class="wrapper fhcs-body">{{{ summary }}}</div>
+   </div>
+</li>

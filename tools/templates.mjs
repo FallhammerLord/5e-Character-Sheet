@@ -10,7 +10,12 @@ const root = new URL('..', import.meta.url).pathname;
 const lang = JSON.parse(readFileSync(`${root}lang/en.json`, 'utf8'));
 
 /** @returns {string} The English text for a key, or the key. */
-export const localize = (key) => key.replace(/^FHCS\./, '').split('.').reduce((o, p) => o?.[p], lang.FHCS) ?? key;
+export const localize = (key) =>
+{
+   const text = key.replace(/^FHCS\./, '').split('.').reduce((o, p) => o?.[p], lang.FHCS);
+   // A key naming a group of keys (a tab's plain label "Features" meets our Features group) is not text.
+   return typeof text === 'string' ? text : key;
+};
 
 /** @returns {string} The English text for a key with its {placeholders} filled, like game.i18n.format. */
 export const format = (key, data = {}) => localize(key).replace(/{(\w+)}/g, (match, name) => data[name] ?? match);

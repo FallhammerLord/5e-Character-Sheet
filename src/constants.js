@@ -11,6 +11,6 @@ export const SHEET_ID = `${MODULE_ID}.${SHEET_CLASS_NAME}`;
  */
 export const SYSTEM_ACTIONS = [
    'changeMode', 'rest', 'restoreTransformation', 'roll', 'showArtwork', 'showConfiguration', 'togglePip', 'toggleSidebar',
-   'deleteFavorite', 'deleteOccupant', 'findItem', 'setSpellcastingAbility', 'toggleDeathTray', 'toggleInspiration',
+   'deleteFavorite', 'deleteOccupant', 'findItem', 'setSpellcastingAbility', 'showDocument', 'toggleDeathTray', 'toggleInspiration',
    'useFacility', 'useFavorite'
 ];

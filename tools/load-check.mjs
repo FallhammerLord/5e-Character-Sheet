@@ -19,6 +19,9 @@ class SystemCharacterSheet
       details: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/character-details.hbs' },
       inventory: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/character-inventory.hbs', scrollable: [''] },
       spells: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/creature-spells.hbs', scrollable: [''] },
+      features: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/character-features.hbs', scrollable: [''] },
+      effects: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/actor-effects.hbs', scrollable: [''] },
+      biography: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/character-biography.hbs', scrollable: [''] },
       abilityScores: { template: 'systems/dnd5e/templates/actors/character-ability-scores.hbs' },
       warnings: { template: 'systems/dnd5e/templates/shared/sheet-warnings-dialog.hbs' },
       tabs: { id: 'tabs', classes: ['tabs-right'], template: 'systems/dnd5e/templates/shared/sidebar-tabs.hbs' }
@@ -117,7 +120,7 @@ else
    if (options?.makeDefault) { problems.push('sheet must not make itself the default'); }
    // Our header and tab row come first, in place of dnd5e's; its ability scores and sidebar are gone; its tab bodies stay.
    const parts = sheet.PARTS ?? {};
-   const expected = 'header,tabs,details,inventory,spells,warnings';
+   const expected = 'header,tabs,details,inventory,spells,features,effects,biography,warnings';
    if (Object.keys(parts).join() !== expected) { problems.push(`sheet parts are ${Object.keys(parts).join()}, not ${expected}`); }
    if (parts.tabs?.classes) { problems.push('our tab row still carries dnd5e\'s tab classes'); }
    // None of dnd5e's look reaches our window.
@@ -139,8 +142,10 @@ else
    if (!parts.inventory?.templates?.some((p) => p.endsWith('/item-row.hbs'))) { problems.push('the inventory part does not load its row partial'); }
    if (!parts.spells?.template.startsWith('modules/fhcs/')) { problems.push('the spells part is still dnd5e\'s'); }
    if (parts.spells?.scrollable?.join() !== '.fhcs-items') { problems.push('the spells part does not keep its list\'s scroll'); }
+   if (!parts.features?.template.startsWith('modules/fhcs/')) { problems.push('the features part is still dnd5e\'s'); }
+   if (parts.features?.scrollable?.join() !== '.fhcs-items') { problems.push('the features part does not keep its list\'s scroll'); }
    // Partials included by a tab must load with its part: each list tab's rows and the shared search bar.
-   for (const [id, row] of [['inventory', 'item-row'], ['spells', 'spell-row']])
+   for (const [id, row] of [['inventory', 'item-row'], ['spells', 'spell-row'], ['features', 'feature-row']])
    {
       for (const name of [row, 'list-bar'])
       {

@@ -490,6 +490,65 @@ export function registerQuenchTests(quench)
             assert.strictEqual(activity.item.id, axe.id, 'the picture uses the item');
             await axe.delete();
          });
+
+         it('lists features by source, switches to active and passive, uses and favorites a feature', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 6);
+            const flag = 'sheetPrefs.character.tabs.features.group';
+            const before = game.user.getFlag('dnd5e', flag);
+            await game.user.unsetFlag('dnd5e', flag);
+            const [rage, tough] = await createItems([
+               { name: 'FHCS test rage', type: 'feat' },
+               { name: 'FHCS test tough', type: 'feat' }
+            ]);
+            await rage.createActivity('utility', {}, { renderSheet: false });
+            const row = (item) => sheet.element.querySelector(`.fhcs-features [data-item-id="${item.id}"]`);
+            const home = (item, key) => row(item)?.closest('.items-section')?.getAttribute(`data-group-${key}`);
+            await settled();
+            await until(() => row(rage) && row(tough), 'both features have rows on our Features tab');
+            // Neither came from a class, species or background, so dnd5e files both under Other.
+            await until(() => home(rage, 'origin') === 'other' && home(tough, 'origin') === 'other',
+               () => `both start in Other; found ${home(rage, 'origin')} and ${home(tough, 'origin')} (rows say ${row(rage)?.dataset.groupOrigin}, ${row(tough)?.dataset.groupOrigin})`);
+            await click('.fhcs-features [data-action="fhcsCycleGroup"]');
+            await until(() => home(rage, 'activation') === 'active' && home(tough, 'activation') === 'passive',
+               () => `the switch moves them to Active and Passive; found ${home(rage, 'activation')} and ${home(tough, 'activation')} (rows say ${row(rage)?.dataset.groupActivation}, ${row(tough)?.dataset.groupActivation})`);
+            assert.include(sheet.element.querySelector('.fhcs-features .fhcs-group')?.textContent ?? '', game.i18n.localize('FHCS.Features.Group.activation'),
+               'the button names the grouping now in force');
+            const [activity] = await clickReaches(`.fhcs-features [data-item-id="${rage.id}"] [data-action="use"]`, 'dnd5e.preUseActivity');
+            assert.strictEqual(activity.item.id, rage.id, 'the picture uses the feature');
+            const favorite = () => actor.system.favorites.some((f) => f.id === tough.getRelativeUUID(actor));
+            const wasFavorite = favorite();
+            await click(`.fhcs-features [data-item-id="${tough.id}"] [data-action="toggleFavorite"]`);
+            await until(() => favorite() !== wasFavorite, 'the bookmark toggled the favorite');
+            if (before === undefined) { await game.user.unsetFlag('dnd5e', flag); }
+            else { await game.user.setFlag('dnd5e', flag, before); }
+            await actor.deleteEmbeddedDocuments('Item', [rage.id, tough.id]);
+         });
+
+         it('levels a class up from its card, and offers to choose what is missing', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 4);
+            const [cls] = await actor.createEmbeddedDocuments('Item', [
+               { name: 'FHCS test class', type: 'class', system: { identifier: 'fhcs-test', levels: 1 } }
+            ]);
+            await settled();
+            const card = () => sheet.element.querySelector(`.fhcs-features .fhcs-class-card[data-item-id="${cls.id}"]`);
+            await until(() => card()?.querySelector('[data-action="fhcsLevelUp"]'), 'the class has a card with Level up');
+            for (const type of ['race', 'background'])
+            {
+               if (actor.system.details[type] && typeof actor.system.details[type] === 'object') { continue; }
+               assert.ok(sheet.element.querySelector(`.fhcs-features [data-action="findItem"][data-item-type="${type}"]`),
+                  `a missing ${type} offers dnd5e's Choose`);
+            }
+            const Manager = globalThis.dnd5e.applications.advancement.AdvancementManager;
+            const wizard = () => [...foundry.applications.instances.values()].find((app) => app instanceof Manager && app.actor === actor);
+            await click(`.fhcs-features .fhcs-class-card[data-item-id="${cls.id}"] [data-action="fhcsLevelUp"]`);
+            // With advancement steps, dnd5e's wizard opens; with none (or advancements off), the level just goes up.
+            await until(() => wizard() || cls.system.levels === 2,
+               () => `Level up opens dnd5e's wizard or raises the level; the class is level ${cls.system.levels}`);
+            await wizard()?.close();
+            await cls.delete();
+         });
       });
    }, { displayName: 'Fallhammer Character Sheet: core' });
 
