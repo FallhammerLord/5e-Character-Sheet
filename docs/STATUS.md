@@ -34,4 +34,4 @@ They wait only for a game where the user tries them; not work for a session to p
 
 Track R and Phases 0–3 are done and verified (Phase 3 lacks only the optional pinned filter buttons); don't rerun Quench or rework them unless the user reports a problem.
 
-1. **Phase 4 Spellbook mockup: waiting on the user's review** (built 2026-10-26, https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, three Spellbook boards: light, dark, 644px multiclass). Record the answers in SCOPE §4.7, then build in the ROADMAP order.
+1. **Phase 4 Spellbook: building** (mockup approved 2026-10-26). Follow the ROADMAP checklist in order; decisions in SCOPE §4.7.

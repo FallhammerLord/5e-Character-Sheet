@@ -52,7 +52,7 @@ Slots as pips; prepared state; grouped by level; concentration; spellcasting abi
 
 - [x] Research: dnd5e 6.0.6 spellbook data, preparation, filters, concentration; Tidy Classic's filters (2026-10-26, research note)
 - [x] Answers on unprepared spells, preparation math, columns, filters (user, 2026-10-26)
-- [ ] Mockup approved, including the concentration space (built 2026-10-26: https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, Spellbook boards; waits on the user)
+- [x] Mockup approved (user, 2026-10-26: "the rest looks good"; https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, Spellbook boards)
 - [ ] Attributes favorites: prepared shows the book and the kind colors, not the bookmark (`templates/sheet/attributes.hbs`); the bookmark marks favorites only (SCOPE §4.7)
 - [ ] Spellcasting strip: per class ability, attack, DC, prepared / max; concentration space
 - [ ] Level sections with slot pips; pact, innate, at will and item sections
@@ -67,7 +67,7 @@ Edit mode for every field; advancement and level-up; short and long rest; death 
 
 ## Phase 7: The ADHD layer
 
-Optional "Now" strip: action, bonus action, reaction and movement, with spent ones dimmed until the next turn. Favorites capped at five. Panels fold; HP, AC and conditions stay pinned.
+Skills column on every tab (user, 2026-10-26): the Attributes skills column stays beside every tab, as in Tidy's current sheet (its sidebar; Classic showed skills on Attributes only, checked in Tidy v13.0.0 source). Tab bodies then lose about 240px; recheck Inventory and Spellbook rows at 644px. Optional "Now" strip: action, bonus action, reaction and movement, with spent ones dimmed until the next turn. Favorites capped at five. Panels fold; HP, AC and conditions stay pinned.
 
 ## Phase 8: Themes, compatibility, release
 
