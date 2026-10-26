@@ -4,10 +4,10 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Ask the user** whether to push the branch to `main` (Phase 4 done), then whether the Actions tab (SCOPE §4.4, no phase yet) goes before Phase 5 (Features, Effects, Biography, Journal). Recommended: Actions first, since it's the default tab in play and the "Now" home (§4.5).
-2. **Then start that phase at research** (CLAUDE.md, "How a phase goes"): dnd5e 6.0.6's source for the tab, Tidy Classic's version, findings into the research note; then design questions and a mockup. Phase 5 has no checklist or SCOPE section yet; Actions has only §4.4.
+1. **Phase 5 design questions** (research done, research note "Features, Effects, Biography, Journal"). Asked 2026-10-26; record answers in a new SCOPE section, then mock up a Phase 5 row on the canvas.
+2. **Ask before pushing to `main`:** Phase 4's close-out and this research are on the branch only.
 
-Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.
+The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.
 
 ## Waiting on the user
 

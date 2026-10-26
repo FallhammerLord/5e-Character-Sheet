@@ -48,7 +48,7 @@ Header decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrdDsbn
 
 A tab row across the top, under the header, in Classic's order: Attributes, Inventory, Spellbook, Features, Effects, Biography (Bastion when the character has one); Special Traits only in edit mode. The sheet lock (play and edit) sits at the far right of the row.
 
-Planned, not built: the Actions tab (§4.4, no phase yet); players choosing and ordering their tabs (Classic's tab selection window); the Attributes skills column kept beside every tab, as Tidy's current sheet does with its sidebar (user, 2026-10-26; Phase 7, where tab bodies narrow by about 240px and the list tabs need a recheck at 644).
+Planned, not built: the Actions tab (§4.4, backburner); players choosing and ordering their tabs (Classic's tab selection window); the Attributes skills column kept beside every tab, as Tidy's current sheet does with its sidebar (user, 2026-10-26; Phase 7, where tab bodies narrow by about 240px and the list tabs need a recheck at 644).
 
 ### 4.3 Attributes tab
 
@@ -66,6 +66,8 @@ Attributes decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrd
 
 ### 4.4 Actions tab
 
+Backburner (user, 2026-10-26): Attributes favorites probably cover the same space; revisit after Phase 5. Kept for reference:
+
 Everything usable, grouped by Action, Bonus Action, Reaction, Other. Each row: icon, name with a small subtitle (type, spell level and school), uses, range and target, hit or DC, damage, roll.
 
 ### 4.5 Where we change Classic (ADHD rules)
@@ -74,7 +76,7 @@ Keep the layout players know; fix what costs attention:
 
 - **Gear and pencil icons only in edit mode.** Classic shows about 30 of them in play; each is a target under 24px.
 - **Equipped and prepared** get an icon or label as well as their row color (color alone fails the colorblind player; §5.1).
-- **Actions tab is the "Now" home** (Phase 7): it's already grouped by action type, so turn economy fits there. Make it the default tab in play.
+- **The "Now" home** (Phase 7): was to be the Actions tab, now backburnered (user, 2026-10-26); where turn economy lives is open again (§7).
 - **Targets at least 24px**, three text sizes, tooltips two to four words. On chat cards, our tooltips wait 1.5 s, open above the button and clear on a click (user, 2026-10-24).
 - **Pinned header:** HP, AC and conditions never scroll away.
 

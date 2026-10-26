@@ -64,6 +64,10 @@ Built 2026-10-26; verified in Quench (core 35 of 35) and in play (user, 2026-10-
 
 ## Phase 5: Features, Effects, Biography, Journal
 
+- [x] Research: dnd5e 6.0.6 features, effects and biography parts; Tidy Classic's four tabs and its Journal (2026-10-26, research note)
+- [ ] Design answers (SCOPE)
+- [ ] Mockup approved (Design canvas, a Phase 5 row)
+
 ## Phase 6: Edit mode and lifecycle
 
 Edit mode for every field; advancement and level-up; short and long rest; death saves; transformation.
