@@ -66,7 +66,6 @@
                <button type="button" class="fhcs-slot{{#if filled}} fhcs-on{{/if}}" data-action="togglePip" data-n="{{ n }}"
                        aria-pressed="{{#if filled}}true{{else}}false{{/if}}" aria-label="{{ label }}"></button>
                {{/each}}
-               <span class="fhcs-label fhcs-muted">{{ slots.text }}</span>
             </span>
             {{/if}}
          </div>
@@ -85,6 +84,7 @@
                </button>
                <button type="button" class="fhcs-favorite-use" data-action="fhcsToggleFavoriteDetails"
                        aria-expanded="{{#if expanded}}true{{else}}false{{/if}}" aria-label="{{ detailsLabel }}">
+                  <svg class="fhcs-icon fhcs-caret fhcs-name-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
                {{else}}
                <img class="fhcs-favorite-img" src="{{ img }}" alt="">
                <button type="button" class="fhcs-favorite-use {{ rollableClass }}" data-action="useFavorite"

@@ -48,6 +48,8 @@
    --fhcs-kind-atwill: #4d4a44;
    --fhcs-fav: #b0306a;
    --fhcs-conc: #7a5a00;
+   /* Spell slot pips: a soft blue, lighter than the prepared edge (user, 2026-10-26). */
+   --fhcs-slot: #4a86c8;
 }
 
 .theme-dark .fhcs-sheet,
@@ -71,6 +73,7 @@
    --fhcs-kind-atwill: #c8c4bc;
    --fhcs-fav: #ff8ac0;
    --fhcs-conc: #e0b84a;
+   --fhcs-slot: #7fb0ec;
 }
 
 /* ---------- The three text styles ---------- */
@@ -1527,26 +1530,38 @@
 {
    display: flex;
    align-items: center;
-   gap: var(--fhcs-s1);
+   gap: 0;
 }
 
+/* Spell slot pips: a 12px dot, no taller than the heading's text, in a 24px target (user, 2026-10-26). Left to
+   spend: filled; spent: a ring, so color isn't alone. No count beside them: the pips say it. */
 .fhcs-sheet .fhcs-slot
 {
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
    width: 24px;
    height: 24px;
    margin: 0;
    padding: 0;
-   border: 2px dashed var(--fhcs-muted);
+   border: 0;
    border-radius: 50%;
    background: none;
    cursor: pointer;
 }
 
-.fhcs-sheet .fhcs-slot.fhcs-on
+.fhcs-sheet .fhcs-slot::before
 {
-   border: 2px solid var(--fhcs-die-ink);
-   background: var(--fhcs-die-ink);
+   content: "";
+   box-sizing: border-box;
+   width: 12px;
+   height: 12px;
+   border: 2px solid var(--fhcs-slot);
+   border-radius: 50%;
 }
+
+.fhcs-sheet .fhcs-slot.fhcs-on::before { background: var(--fhcs-slot); }
+.fhcs-sheet .fhcs-slot:hover::before { box-shadow: 0 0 0 2px color-mix(in srgb, var(--fhcs-slot) 35%, transparent); }
 
 /* Favorite rows. Equipped and prepared: a tint, a left edge and an icon, never color alone. Prepared spells take
    their preparation kind's color and the book, as on the Spellbook (SCOPE §4.7). */
@@ -1595,7 +1610,7 @@
 .fhcs-sheet .fhcs-favorite-pic:hover .fhcs-favorite-img { box-shadow: 0 0 0 2px var(--fhcs-ink); }
 
 /* An open favorite: dnd5e's summary under the row, across every column. */
-.fhcs-sheet .fhcs-favorite-details { grid-column: 1 / -1; padding: 0 var(--fhcs-s2) var(--fhcs-s2) calc(24px + var(--fhcs-s2)); }
+.fhcs-sheet .fhcs-favorite-details { grid-column: 1 / -1; margin: 0 calc(var(--fhcs-s1) * -1); background: var(--fhcs-fill); padding: var(--fhcs-s1) var(--fhcs-s2) var(--fhcs-s2) calc(var(--fhcs-s1) + 24px + var(--fhcs-s2)); }
 .fhcs-sheet .fhcs-favorite-details :is(p, ul, ol) { margin: 0 0 var(--fhcs-s1); }
 
 .fhcs-sheet .fhcs-favorite-img
@@ -1872,6 +1887,16 @@
 }
 
 .fhcs-sheet .fhcs-expand { display: none; }
+
+/* The name's fold caret: it unfolds the details under the row, turning when open (user, 2026-10-26). */
+.fhcs-sheet .fhcs-name-caret { flex: none; width: 12px; height: 12px; color: var(--fhcs-muted); transition: transform 0.15s; }
+.fhcs-sheet .fhcs-item:not(.collapsed) > .fhcs-item-row .fhcs-name-caret,
+.fhcs-sheet .fhcs-favorite-use[aria-expanded="true"] .fhcs-name-caret { transform: rotate(90deg); }
+
+/* An open row: a faint panel round the row and its details, so one entry ends before the next begins. */
+.fhcs-sheet .fhcs-item:not(.collapsed) { background: var(--fhcs-fill); box-shadow: inset 0 -1px 0 var(--fhcs-line); }
+/* On Attributes the row keeps its own tint (equipped, preparation kind); the panel is the details alone. */
+.fhcs-sheet .fhcs-favorite.fhcs-open { border-bottom-color: var(--fhcs-line); }
 .fhcs-sheet :is(.fhcs-item-title, .fhcs-item-sub) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .fhcs-sheet .fhcs-item-title { flex: 0 1 auto; min-width: 0; }
 /* When space runs short, the capacity gives way long before the name does. */
@@ -1907,7 +1932,8 @@
 
 /* dnd5e's summary, put in here when a row opens. */
 .fhcs-sheet .fhcs-item.collapsed > .fhcs-item-details { display: none; }
-.fhcs-sheet .fhcs-item-details > .wrapper { padding: 0 var(--fhcs-s2) var(--fhcs-s2) calc(24px + var(--fhcs-s2) * 2); }
+/* Details start a step below the name and line up with it (user, 2026-10-26: they sat tight under the name). */
+.fhcs-sheet .fhcs-item-details > .wrapper { padding: var(--fhcs-s1) var(--fhcs-s2) var(--fhcs-s2) calc(var(--fhcs-s1) + 24px + var(--fhcs-s2)); }
 .fhcs-sheet .fhcs-item-details :is(p, ul, ol) { margin: 0 0 var(--fhcs-s1); }
 
 /* The footer: attunement and money in one row, carried weight under it. */
@@ -2127,7 +2153,7 @@
 /* Section headings: the level, then its slot pips (Attributes' pips) and slots left. */
 .fhcs-sheet .fhcs-spell-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fhcs-s2); }
 .fhcs-sheet .fhcs-item-head .fhcs-spell-head { overflow: visible; }
-.fhcs-sheet .fhcs-slot.fhcs-temp { border-style: dotted; }
+.fhcs-sheet .fhcs-slot.fhcs-temp::before { border-style: dotted; }
 
 .fhcs-sheet .fhcs-col-components { flex: none; width: 52px; text-align: center; white-space: nowrap; }
 .fhcs-sheet .fhcs-col-conc { flex: none; display: flex; justify-content: center; width: var(--fhcs-control); }

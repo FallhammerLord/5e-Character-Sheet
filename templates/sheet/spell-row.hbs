@@ -13,6 +13,7 @@
       <button type="button" class="item-action fhcs-col-name fhcs-item-name" data-action="toggleExpand"
               aria-label="{{ detailsLabel }}">
          <i class="fhcs-expand" aria-hidden="true"></i>
+         <svg class="fhcs-icon fhcs-caret fhcs-name-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
          <span class="fhcs-body fhcs-item-title">{{ name }}</span>
          {{#if ritual}}<span class="fhcs-label fhcs-muted" role="img" aria-label="{{ ritualLabel }}">R</span>{{/if}}
          {{#if sub}}<span class="fhcs-label fhcs-muted fhcs-item-sub">{{ sub }}</span>{{/if}}

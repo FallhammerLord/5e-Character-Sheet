@@ -150,7 +150,6 @@ export function spellbookView(facts, { format, localize })
             // Filled pips are slots still to spend, as on Attributes (user, 2026-10-26); past the max, temporary ones.
             slots: total ? {
                prop: `system.spells.${s.id}.value`,
-               text: `${slot.value} / ${slot.max}`,
                pips: Array.from({ length: total }, (_, i) => ({
                   n: i + 1,
                   filled: slot.value > i,

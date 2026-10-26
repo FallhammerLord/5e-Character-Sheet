@@ -75,7 +75,6 @@ export function attributesView(facts, { format, localize })
             open: !facts.folded.includes(key),
             slots: slot?.max ? {
                prop: `system.spells.spell${level}.value`,
-               text: `${slot.value} / ${slot.max}`,
                pips: Array.from({ length: slot.max }, (_, i) => ({
                   n: i + 1, filled: slot.value > i, label: format('FHCS.Attributes.SlotLabel', { n: i + 1, level })
                }))
