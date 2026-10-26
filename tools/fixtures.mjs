@@ -7,6 +7,7 @@
 import { cardParts, d20Band, damageBand, saveRow } from '../src/chat/card.js';
 import { headerView, tabRow } from '../src/sheet/header.js';
 import { attributesView } from '../src/sheet/attributes.js';
+import { inventoryView } from '../src/sheet/inventory.js';
 import { format, localize } from './templates.mjs';
 
 /** A usage card's context as FHCSUsageMessageData#_prepareContext builds it, with overrides. */
@@ -185,7 +186,60 @@ const attributes = (over) => ({
    fhcsAttributes: attributesView(attributesFacts(over), { format, localize })
 });
 
+/** One inventory row's facts as compat.inventoryFacts gathers them, with overrides. */
+const gear = (name, fill, over = {}) => ({
+   id: name.replace(/\W/g, ''), uuid: `Actor.x.Item.${name}`, name, img: ICON(fill), sub: '', useAction: 'use',
+   expanded: false, summary: '', weight: '', uses: null, usage: '', quantity: 1, equip: null, attune: null, ...over
+});
+const worn = (on) => ({ on, disabled: false });
+const inventoryFacts = (over = {}) => ({
+   sections: [
+      { id: 'weapons', label: 'Weapons', items: [
+         gear('Light Crossbow', '#6b5a3a', { equip: worn(true), weight: '5 lb', usage: '1 Action', expanded: true,
+            summary: '<div class="item-summary"><p>A simple ranged weapon. Load one bolt at a time.</p></div>' }),
+         gear('Mace', '#5a5a66', { equip: worn(true), weight: '4 lb', usage: '1 Action' }),
+         gear('Mace of Disruption of the Seventh Sunless Vault', '#9a7a2a', { equip: worn(false), weight: '4 lb', usage: '1 Action',
+            attune: { on: false, disabled: false, need: 'Requires attunement' } })
+      ] },
+      { id: 'equipment', label: 'Equipment', items: [
+         gear('Scale Mail', '#77705f', { equip: worn(true), weight: '45 lb' }),
+         gear('Amulet of Health', '#7a2e5a', { equip: worn(true), attune: { on: true, disabled: false, need: '' }, weight: '1 lb' })
+      ] },
+      { id: 'consumables', label: 'Consumables', items: [
+         gear('Potion of Healing', '#a3221b', { weight: '1.5 lb', usage: '1 Bonus Action', quantity: 3,
+            uses: { value: 1, max: 1, prop: 'system.uses.value' } }),
+         gear('Crossbow Bolts', '#5a4a3a', { weight: '1.5 lb', quantity: 20 })
+      ] },
+      { id: 'containers', label: 'Containers', items: [
+         gear('Backpack', '#6a5a3a', { useAction: 'view', weight: '5 lb', sub: '12 / 30 lb', quantity: 1 })
+      ] },
+      { id: 'other', label: 'Other', items: [] }
+   ],
+   columns: {},
+   editing: false,
+   filters: [{ key: 'action', group: 'activation', label: 'Action' }, { key: 'equipped', group: 'property', label: 'Equipped' }],
+   sorting: [{ key: 'm', icon: 'fa-solid fa-arrow-down-short-wide', label: 'Manual' }, { key: 'a', icon: 'fa-solid fa-arrow-down-a-z', label: 'Alphabetical' }],
+   currency: ['pp', 'gp', 'ep', 'sp', 'cp'].map((key, i) => ({ key, value: [0, 147, 0, 32, 15][i], prop: `system.currency.${key}`,
+      abbr: key.toUpperCase(), name: `${key} coins` })),
+   attunement: { value: 1, max: 3, sourceMax: 3 },
+   encumbrance: { value: '84', max: '240', pct: 35, stops: { encumbered: 33, heavilyEncumbered: 66 }, units: 'lb' },
+   ...over
+});
+const inventory = (over) => ({
+   tab: { id: 'inventory', group: 'primary', cssClass: 'active' }, rollableClass: 'rollable',
+   fhcsInventory: inventoryView(inventoryFacts(over), { format, localize })
+});
+const ALL_COLUMNS = { weight: true, uses: true, usage: true, quantity: true, equipped: true, attuned: true };
+
 export const CASES = [
+   { name: 'inventory', template: 'sheet/inventory', context: inventory() },
+   { name: 'inventory-all-columns', template: 'sheet/inventory', context: inventory({ columns: ALL_COLUMNS }) },
+   { name: 'inventory-editing', template: 'sheet/inventory', open: ['inventory-columns'], context: inventory({ editing: true, columns: ALL_COLUMNS }) },
+   {
+      name: 'inventory-few-columns', template: 'sheet/inventory',
+      context: inventory({ columns: { uses: false, usage: false, quantity: false, equipped: true, attuned: false }, encumbrance: null })
+   },
+   { name: 'inventory-empty', template: 'sheet/inventory', context: inventory({ sections: [], attunement: { value: 0, max: 0 }, encumbrance: null }) },
    { name: 'attributes', template: 'sheet/attributes', context: attributes() },
    { name: 'attributes-key-passives-folded', template: 'sheet/attributes', context: attributes({ passives: 'key', folded: ['inventory', 'spell-1'] }) },
    { name: 'attributes-editing', template: 'sheet/attributes', context: attributes({ editing: true }) },

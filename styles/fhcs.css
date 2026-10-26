@@ -1594,3 +1594,312 @@
 .fhcs-sheet .fhcs-prepared .fhcs-state { color: var(--fhcs-adv); }
 .fhcs-sheet .fhcs-state-fill { fill: currentColor; stroke: none; }
 .fhcs-sheet .fhcs-empty { margin: 0; padding: var(--fhcs-s2); }
+
+/* ---------- Inventory tab (SCOPE §4.6) ---------- */
+
+/* The item list scrolls; the search bar above and the money and carried weight below stay in view. */
+.fhcs-sheet .fhcs-inventory.active
+{
+   display: flex;
+   flex-direction: column;
+   height: 100%;
+   overflow: hidden;
+}
+
+.fhcs-sheet .fhcs-inventory-element
+{
+   display: flex;
+   flex: 1;
+   flex-direction: column;
+   gap: var(--fhcs-s2);
+   min-height: 0;
+}
+
+.fhcs-sheet .fhcs-inventory ol
+{
+   margin: 0;
+   padding: 0;
+   list-style: none;
+}
+
+/* The search bar: dnd5e's list controls build their own search field and filter and sort buttons inside. */
+.fhcs-sheet .fhcs-inventory-bar
+{
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s2);
+}
+
+.fhcs-sheet .fhcs-inventory-bar item-list-controls { flex: 1; min-width: 0; }
+
+.fhcs-sheet .fhcs-inventory-bar search
+{
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s1);
+}
+
+.fhcs-sheet .fhcs-inventory-bar search > input
+{
+   flex: 1;
+   min-width: 0;
+   height: var(--fhcs-control);
+   margin: 0;
+   padding: 0 var(--fhcs-s2);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: transparent;
+   color: inherit;
+   font-size: var(--fhcs-body-size);
+}
+
+.fhcs-sheet .fhcs-inventory-bar search > input::placeholder { color: var(--fhcs-muted); opacity: 1; }
+
+.fhcs-sheet .fhcs-inventory-bar search .controls
+{
+   display: flex;
+   gap: var(--fhcs-s1);
+   margin: 0;
+   padding: 0;
+   list-style: none;
+}
+
+.fhcs-sheet .fhcs-inventory-bar .filter-control
+{
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   width: var(--fhcs-control);
+   height: var(--fhcs-control);
+   margin: 0;
+   padding: 0;
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-fill);
+   color: inherit;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-inventory-bar .filter-control.active { border-color: currentColor; box-shadow: inset 0 0 0 1px currentColor; }
+
+/* The column menu (edit mode): a fold beside the search, opening under it at the right edge. */
+.fhcs-sheet .fhcs-columns { position: relative; }
+.fhcs-sheet .fhcs-columns > summary { width: auto; padding: 0 var(--fhcs-s2); list-style: none; }
+.fhcs-sheet .fhcs-columns > summary::-webkit-details-marker { display: none; }
+.fhcs-sheet .fhcs-columns-tray { left: auto; right: 0; min-width: 160px; }
+.fhcs-sheet .fhcs-column-toggle { justify-content: flex-start; }
+.fhcs-sheet .fhcs-column-toggle[aria-pressed="false"] { border-style: dashed; }
+.fhcs-sheet .fhcs-column-toggle[aria-pressed="false"] .fhcs-check { visibility: hidden; }
+
+/* Sections and rows: one set of column widths for the heading and every row, so they line up. */
+.fhcs-sheet .fhcs-items
+{
+   display: flex;
+   flex: 1;
+   flex-direction: column;
+   gap: var(--fhcs-s2);
+   min-height: 0;
+   overflow-y: auto;
+}
+
+.fhcs-sheet :is(.fhcs-item-head, .fhcs-item-row)
+{
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s2);
+   min-height: 32px;
+   padding: 0 var(--fhcs-s1);
+}
+
+.fhcs-sheet .fhcs-item-head
+{
+   min-height: var(--fhcs-control);
+   border-bottom: 1px solid var(--fhcs-line);
+}
+
+.fhcs-sheet .fhcs-col-img { flex: none; width: 24px; }
+.fhcs-sheet .fhcs-col-name { flex: 1; min-width: 0; }
+.fhcs-sheet .fhcs-col-weight { flex: none; width: 56px; text-align: right; white-space: nowrap; }
+.fhcs-sheet .fhcs-col-uses { flex: none; display: flex; align-items: center; justify-content: center; gap: var(--fhcs-s1); width: 72px; white-space: nowrap; }
+.fhcs-sheet .fhcs-col-usage { flex: none; width: 112px; overflow: hidden; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+.fhcs-sheet .fhcs-col-quantity { flex: none; width: 44px; text-align: center; }
+.fhcs-sheet .fhcs-col-toggle { flex: none; display: flex; justify-content: center; width: var(--fhcs-control); }
+.fhcs-sheet .fhcs-col-edit { flex: none; display: flex; gap: var(--fhcs-s1); width: calc(var(--fhcs-control) * 2 + var(--fhcs-s1)); }
+.fhcs-sheet .fhcs-item-head .fhcs-col-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.fhcs-sheet .fhcs-item { border-bottom: 1px solid var(--fhcs-line-soft); }
+
+/* Equipped: a tint, a left edge and the check in its toggle, never color alone (SCOPE §4.5). */
+.fhcs-sheet .fhcs-item.fhcs-equipped
+{
+   background: color-mix(in srgb, var(--fhcs-success) 12%, transparent);
+   box-shadow: inset 3px 0 0 var(--fhcs-success);
+}
+
+/* The picture uses the item, as in Classic; the name opens its details. */
+.fhcs-sheet .fhcs-item-use
+{
+   height: 24px;
+   margin: 0;
+   padding: 0;
+   border: 0;
+   border-radius: 4px;
+   background: none;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-item-use img
+{
+   display: block;
+   width: 24px;
+   height: 24px;
+   border: 0;
+   border-radius: 4px;
+   object-fit: cover;
+}
+
+.fhcs-sheet .fhcs-item-use:hover img { box-shadow: 0 0 0 2px var(--fhcs-ink); }
+
+.fhcs-sheet .fhcs-item-name
+{
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s2);
+   min-height: var(--fhcs-control);
+   margin: 0;
+   padding: 0;
+   border: 0;
+   background: none;
+   color: inherit;
+   font-family: inherit;
+   text-align: left;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-expand { display: none; }
+.fhcs-sheet :is(.fhcs-item-title, .fhcs-item-sub) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fhcs-sheet .fhcs-item-sub { flex: none; max-width: 40%; }
+
+.fhcs-sheet .fhcs-inventory .fhcs-input { width: 100%; padding: 0 var(--fhcs-s1); }
+.fhcs-sheet .fhcs-inventory .fhcs-uses-input { width: 32px; text-align: center; }
+.fhcs-sheet .fhcs-inventory .fhcs-quantity-input { text-align: center; border-color: var(--fhcs-line-soft); }
+
+/* Equip, attune, edit and delete: square controls of one size. */
+.fhcs-sheet .fhcs-toggle
+{
+   display: inline-flex;
+   align-items: center;
+   justify-content: center;
+   width: var(--fhcs-control);
+   height: var(--fhcs-control);
+   margin: 0;
+   padding: 0;
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: none;
+   color: var(--fhcs-muted);
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-toggle-equip[aria-pressed="true"] { border-color: var(--fhcs-success); color: var(--fhcs-success); }
+.fhcs-sheet .fhcs-toggle-equip[aria-pressed="true"] .fhcs-icon { stroke-width: 2.8; }
+.fhcs-sheet .fhcs-toggle-attune[aria-pressed="true"] { border-color: var(--fhcs-adv); color: var(--fhcs-adv); }
+.fhcs-sheet .fhcs-toggle-attune[aria-pressed="true"] .fhcs-icon { fill: currentColor; }
+.fhcs-sheet .fhcs-toggle[aria-disabled="true"] { cursor: default; }
+.fhcs-sheet .fhcs-toggle:hover:not([aria-disabled="true"]) { color: var(--fhcs-ink); }
+
+/* dnd5e's summary, put in here when a row opens. */
+.fhcs-sheet .fhcs-item.collapsed .fhcs-item-details { display: none; }
+.fhcs-sheet .fhcs-item-details > .wrapper { padding: 0 var(--fhcs-s2) var(--fhcs-s2) calc(24px + var(--fhcs-s2) * 2); }
+.fhcs-sheet .fhcs-item-details :is(p, ul, ol) { margin: 0 0 var(--fhcs-s1); }
+
+/* The footer: attunement and money in one row, carried weight under it. */
+.fhcs-sheet .fhcs-inventory-foot
+{
+   display: flex;
+   flex-direction: column;
+   gap: var(--fhcs-s2);
+   padding-top: var(--fhcs-s2);
+   border-top: 1px solid var(--fhcs-line);
+}
+
+.fhcs-sheet .fhcs-inventory-money
+{
+   display: flex;
+   flex-wrap: wrap;
+   align-items: center;
+   justify-content: space-between;
+   gap: var(--fhcs-s2);
+}
+
+.fhcs-sheet .fhcs-attunement
+{
+   display: inline-flex;
+   align-items: center;
+   gap: var(--fhcs-s1);
+   min-height: var(--fhcs-control);
+   padding: 0 var(--fhcs-s2);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+}
+
+.fhcs-sheet .fhcs-attunement .fhcs-icon { color: var(--fhcs-adv); fill: currentColor; stroke: none; }
+.fhcs-sheet .fhcs-attunement.fhcs-over { border-color: var(--fhcs-failure); box-shadow: inset 0 0 0 1px var(--fhcs-failure); }
+.fhcs-sheet .fhcs-attunement .fhcs-attunement-max { width: 44px; text-align: center; }
+
+.fhcs-sheet .fhcs-currency
+{
+   display: flex;
+   flex-wrap: wrap;
+   gap: var(--fhcs-s2);
+}
+
+.fhcs-sheet .fhcs-coin
+{
+   display: inline-flex;
+   align-items: center;
+   gap: var(--fhcs-s1);
+}
+
+.fhcs-sheet .fhcs-coin .fhcs-input { width: 56px; }
+
+.fhcs-sheet .fhcs-carried
+{
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s2);
+}
+
+.fhcs-sheet .fhcs-carried-bar
+{
+   position: relative;
+   flex: 1;
+   height: 12px;
+   overflow: hidden;
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+}
+
+.fhcs-sheet .fhcs-carried-fill
+{
+   position: absolute;
+   inset: 0 auto 0 0;
+   background: var(--fhcs-ink);
+}
+
+/* The encumbered and heavily encumbered marks, from dnd5e's breakpoints: a gap in the surface's color with an edge,
+   so a mark shows on the fill and on the empty bar alike. */
+.fhcs-sheet .fhcs-carried-stop
+{
+   position: absolute;
+   top: 0;
+   bottom: 0;
+   width: 2px;
+   background: var(--fhcs-surface);
+   box-shadow: 0 0 0 1px var(--fhcs-muted);
+}
+
+.fhcs-sheet .fhcs-carried-text { white-space: nowrap; }
+
+/* dnd5e's add button sits at the tab's bottom right; the footer leaves it room. */
+.fhcs-sheet .fhcs-inventory-foot { padding-right: calc(var(--fhcs-control) + var(--fhcs-s2)); }

@@ -9,6 +9,7 @@ import { countingDie, d20Row, modeForSides } from '../src/chat/d20.js';
 import { diceMath } from '../src/chat/math.js';
 import { attributesView } from '../src/sheet/attributes.js';
 import { healUpdates, keepStable } from '../src/sheet/death.js';
+import { columnChoice, inventoryView } from '../src/sheet/inventory.js';
 import { headerMinWidth, headerView, levelOrder, levelTrack, signed, tabRow } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
@@ -271,10 +272,37 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    }
 }
 
+// Inventory: columns default to the user's choice (weight off), a saved choice wins, and a new column still shows.
+{
+   try { deepStrictEqual(columnChoice(null), { weight: false, uses: true, usage: true, quantity: true, equipped: true, attuned: true }); }
+   catch { problems.push(`default inventory columns: ${JSON.stringify(columnChoice(null))}`); }
+   const chosen = columnChoice({ weight: true, usage: false, gone: true });
+   if (!chosen.weight || chosen.usage || 'gone' in chosen || !chosen.attuned) { problems.push(`saved inventory columns: ${JSON.stringify(chosen)}`); }
+
+   const row = (name, over) => ({ id: name, uuid: name, name, img: '', ...over });
+   const base = {
+      sections: [
+         { id: 'weapons', label: 'Weapons', items: [row('Ring', { attune: { on: true } }), row('Wand', { attune: { on: false, need: 'Requires attunement' } }),
+            row('Rope', { equip: { on: false } })] },
+         { id: 'loot', label: 'Loot', items: [] }
+      ],
+      columns: null, editing: false, currency: [], attunement: { value: 1, max: 3 }, encumbrance: null
+   };
+   const view = inventoryView(base, { format, localize });
+   if (view.sections.map((s) => s.id).join() !== 'weapons') { problems.push('empty inventory sections still show'); }
+   // Attunement has three states: attuned, needs attuning, or none at all.
+   const states = view.sections[0].items.map((i) => (i.attune ? `${i.attune.pressed}:${i.attune.label}` : 'none'));
+   try { deepStrictEqual(states, ['true:Attuned', 'false:Requires attunement', 'none']); }
+   catch { problems.push(`attunement states: ${JSON.stringify(states)}`); }
+   if (view.sections[0].items[2].equip?.label !== 'Not equipped') { problems.push('an unequipped item does not say so'); }
+   if (view.columnToggles.length) { problems.push('the column menu shows in play mode'); }
+   if (inventoryView({ ...base, editing: true }, { format, localize }).columnToggles.length !== 6) { problems.push('the column menu is missing in edit mode'); }
+}
+
 // Each extra ability (honor, sanity) widens the minimum by one column and its gap.
 if (headerMinWidth(7) - headerMinWidth(6) !== 56) { problems.push('the sheet minimum does not grow by one ability column'); }
 
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
 console.log(`${CASES.length} outcome lines, ${PART_CASES.length} card layouts, ${ROW_CASES.length} d20 rows, `
    + `${DAMAGE_CASES.length} damage bands, ${SAVE_CASES.length} save rows, ${KEEP_CASES.length} late adds and `
-   + `${MATH_CASES.length} dice sums read as expected; ${ORDER_CASES.length} level orders and the milestone track hold.`);
+   + `${MATH_CASES.length} dice sums read as expected; ${ORDER_CASES.length} level orders, the milestone track and the inventory view hold.`);

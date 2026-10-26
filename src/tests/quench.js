@@ -210,6 +210,56 @@ export function registerQuenchTests(quench)
             // dnd5e uses a copy of the item (activity/mixin.mjs:229), so compare IDs.
             assert.strictEqual(activity.item.id, item.id);
          });
+
+         /** Waits until a condition holds, or fails the test after HOOK_WAIT_MS. */
+         const until = async (condition, what) =>
+         {
+            for (let waited = 0; !condition() && waited < HOOK_WAIT_MS; waited += 50)
+            {
+               await new Promise((resolve) => { setTimeout(resolve, 50); });
+            }
+            assert.isTrue(!!condition(), what);
+         };
+
+         it('equips, attunes, counts and opens items on the Inventory tab', async function ()
+         {
+            const [ring] = await actor.createEmbeddedDocuments('Item', [{
+               name: 'FHCS test ring', type: 'equipment',
+               system: { attunement: 'required', equipped: false, attuned: false, quantity: 1 }
+            }]);
+            await sheet.render();
+            const row = () => sheet.element.querySelector(`.fhcs-inventory [data-item-id="${ring.id}"]`);
+            assert.ok(row(), 'the item has a row in our Inventory tab');
+            row().querySelector('[data-action="equip"]').click();
+            await until(() => ring.system.equipped, 'the equip toggle equipped it');
+            await until(() => row()?.querySelector('[data-action="attune"]'), 'the row redrew');
+            row().querySelector('[data-action="attune"]').click();
+            await until(() => ring.system.attuned, 'the attune toggle attuned it');
+            await until(() => row()?.querySelector('[data-name="system.quantity"]'), 'the row redrew');
+            const quantity = row().querySelector('[data-name="system.quantity"]');
+            quantity.value = '+2';
+            quantity.dispatchEvent(new Event('change', { bubbles: true }));
+            await until(() => ring.system.quantity === 3, 'quantity takes a +2');
+            await until(() => row()?.querySelector('[data-action="toggleExpand"]'), 'the row redrew');
+            row().querySelector('[data-action="toggleExpand"]').click();
+            await until(() => row()?.querySelector('.item-summary'), 'the name opens dnd5e\'s summary');
+            await ring.delete();
+         });
+
+         it('shows and hides Inventory columns from edit mode, for this player', async function ()
+         {
+            const before = game.settings.get(MODULE_ID, 'inventoryColumns');
+            assert.notOk(sheet.element.querySelector('[data-action="fhcsToggleColumn"]'), 'no column menu in play mode');
+            sheet.element.querySelector('.fhcs-tabs [data-action="changeMode"]').click();
+            await until(() => sheet.isEditMode && sheet.element.querySelector('[data-action="fhcsToggleColumn"]'), 'edit mode shows the column menu');
+            const weight = () => !!sheet.element.querySelector('.fhcs-inventory .fhcs-item-head .fhcs-col-weight');
+            const had = weight();
+            sheet.element.querySelector('[data-action="fhcsToggleColumn"][data-column="weight"]').click();
+            await until(() => weight() !== had, 'the weight column switched');
+            await game.settings.set(MODULE_ID, 'inventoryColumns', before);
+            sheet.element.querySelector('.fhcs-tabs [data-action="changeMode"]').click();
+            await until(() => !sheet.isEditMode, 'back to play mode');
+         });
       });
    }, { displayName: 'Fallhammer Character Sheet: core' });
 

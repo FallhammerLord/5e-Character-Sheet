@@ -27,6 +27,10 @@
         "Hint": "What the sheet header shows large in each ability column: the modifier you roll with, or the score.",
         "Modifier": "Modifier large, score small",
         "Score": "Score large, modifier small"
+      },
+      "InventoryColumns": {
+        "Name": "Inventory columns",
+        "Hint": "Which columns the Inventory tab shows. Change them from the tab's Columns menu in edit mode."
       }
     },
     "Chat": {
@@ -157,6 +161,36 @@
       "ResourceLabel": "{title} {value} of {max}",
       "Senses": "Senses",
       "Languages": "Languages"
+    },
+    "Inventory": {
+      "Search": "Search inventory",
+      "Columns": "Columns",
+      "Column": {
+        "weight": "Weight",
+        "uses": "Uses",
+        "usage": "Usage",
+        "quantity": "Qty",
+        "equipped": "Equipped",
+        "attuned": "Attuned"
+      },
+      "Other": "Other",
+      "Empty": "Nothing carried yet. Drag items onto the sheet to add them.",
+      "UseLabel": "Use {name}",
+      "ViewLabel": "Open {name}",
+      "DetailsLabel": "Show or hide {name} details",
+      "UsesLabel": "{name} uses left",
+      "QuantityLabel": "{name} quantity",
+      "EditLabel": "Edit {name}",
+      "DeleteLabel": "Delete {name}",
+      "Equipped": "Equipped",
+      "NotEquipped": "Not equipped",
+      "Attuned": "Attuned",
+      "NotAttuned": "Not attuned",
+      "AttunementLabel": "Attuned to {value} of {max} items",
+      "AttunementMax": "Most items you can attune",
+      "CurrencyLabel": "{name}",
+      "Carried": "Carried",
+      "CarriedLabel": "Carrying {value} of {max} {units}"
     }
   }
 }

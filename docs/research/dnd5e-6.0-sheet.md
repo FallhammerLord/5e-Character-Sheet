@@ -72,6 +72,16 @@ Actions read their target from nearby data attributes:
 - `togglePip`: `[data-n]` and `[data-prop]` (the actor property to set). Pips for spell slots, hit dice, death saves can use this directly.
 - `deleteFavorite`: `[data-favorite-id]`.
 
+## Inventory element and list controls (checked 2026-10-26)
+
+`dnd5e-inventory` (components/inventory.mjs) binds on connect, inside itself: `.item-action[data-action]` clicks (`use`, `view`, `equip`, `attune`, `toggleExpand`, `edit`, `delete`, `duplicate`, `prepare`, `recharge`, `currency`), the context menu on `[data-item-id]`, `.adjustment-button`, and numeric inputs. Rows need `[data-item-id]`, `[data-uuid]` and `[data-entry-id]`; drag starts on `[data-item-id] > .item-row` with class `draggable` (base-actor-sheet.mjs:1680). `toggleExpand` flips classes on `[data-action="toggleExpand"] > i` (it throws without that `<i>`), toggles `collapsed` on the row, and renders `items/parts/item-summary.hbs` into `:scope > .item-description > .wrapper`. Numeric fields with `inputmode="numeric"` and `data-name` go through the sheet's `_onChangeInputDelta` (base-actor-sheet.mjs:1295), which looks for `.inventory-element` around them.
+
+`item-list-controls` (components/item-list-controls.mjs) builds its own search field and buttons from `<datalist data-list="filters|sort|group">`, finds its list by `[data-item-list="<for>"]`, hides `.item-list .item` rows by `data-entry-id` and empty `.items-section`s, and sorts rows within their parent. With a `group` datalist it moves rows into sections by `data-group-<key>`; we leave grouping out and place rows by type ourselves.
+
+dnd5e renders every inventory item into one hidden union section and sorts rows into sections in the browser; `context.sections` arrive empty. The character sheet drops containers from `itemCategories.inventory` (character-sheet.mjs:507) and lists them in `context.containers`.
+
+After every render the character sheet calls `_renderAttunement` (base-actor-sheet.mjs:1002), which appends into `[data-application-part="inventory"] .middle`; our markup has none, so we override it (our footer draws the counter).
+
 ## Favorites
 
 Stored on the actor as `system.favorites`: an array of `{ id, type, sort }`, where `id` is a relative UUID and `type` is `item`, `effect`, `activity`, `skill`, `tool`, `slots` or `facility`. Change them only through `actor.system.addFavorite(...)` / `removeFavorite(id)` (`data/actor/character.mjs:323–363`). `_prepareFavorites` (`character-sheet.mjs:633`) turns them into display rows and puts legacy resources (`system.resources`) first. Hidden items and inactive dependent effects are skipped.

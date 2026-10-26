@@ -75,6 +75,18 @@ Keep the layout players know; fix what costs attention:
 - **Targets at least 24px**, three text sizes, tooltips two to four words. On chat cards, our tooltips wait 1.5 s, open above the button and clear on a click (user, 2026-10-24).
 - **Pinned header:** HP, AC and conditions never scroll away.
 
+### 4.6 Inventory tab
+
+Classic's layout (Tidy source, `src/sheets/classic/actor/tabs/ActorInventoryTab.svelte`, `InventoryList.svelte`): a search bar, then one section per item type (Weapons, Equipment, Consumables, Tools, Containers, Loot), each a table with a count; attunement, currency and carried weight in a footer.
+
+Inventory decisions (user, 2026-10-26; mockup https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, Inventory boards):
+- **What matters at the table:** uses, usage, equipped, and attunement. Weight is mostly unimportant: nothing enforces 5e weight rules, and this isn't a video game.
+- **Players choose the columns:** Weight, Uses, Usage, Qty, Equipped, Attuned. Default: all but Weight. A client setting, so the choice follows the player to every character. The Columns menu shows only in edit mode, since it's a setting.
+- **Attunement has three states:** filled star (attuned), outline star (needs attuning; click to attune), blank (not required). Its own column, like the equip toggle.
+- **Equipped:** a 28px toggle per row, plus the green tint and left edge. Edit and delete show only in edit mode.
+- **The carried-weight bar follows dnd5e's encumbrance world setting:** hidden when the GM has it off. We add no setting of our own.
+- **The picture uses the item; the name opens its details** (Classic's split).
+
 ## 5. ADHD rules carried over
 
 Typography and spacing (user, 2026-10-24): three text styles across the module (display, body, label), two spacing steps, one control height; every panel uses space economically, folded and open: a band's heading, total and open mark share one line; the card header is one label line (actor · details) over the title.

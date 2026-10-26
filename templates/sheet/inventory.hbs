@@ -1,0 +1,171 @@
+{{!-- The Inventory tab (SCOPE §4.6): Classic's sections and columns on dnd5e's own inventory element. The element
+      binds its rows by class and data attribute: item-action buttons (use, equip, attune, toggleExpand, edit,
+      delete), numeric inputs by data-name, the context menu and drag on each [data-item-id] > .item-row, and the
+      list controls' search, filter and sort on [data-item-list]. It takes dnd5e's "inventory" part ID. --}}
+<section class="tab fhcs-inventory {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
+   {{#with fhcsInventory}}
+   <dnd5e-inventory class="inventory-element fhcs-inventory-element">
+      <div class="fhcs-inventory-bar">
+         <item-list-controls for="inventory" collection="items" label="{{ text.search }}">
+            {{#if filters.length}}
+            <datalist data-list="filters">
+               {{#each filters}}<option value="{{ key }}" data-group="{{ group }}">{{ label }}</option>{{/each}}
+            </datalist>
+            {{/if}}
+            {{#if sorting.length}}
+            <datalist data-list="sort">
+               {{#each sorting}}<option value="{{ key }}" data-icon="{{ icon }}">{{ label }}</option>{{/each}}
+            </datalist>
+            {{/if}}
+         </item-list-controls>
+         {{#if columnToggles.length}}
+         <details class="fhcs-fold fhcs-columns" data-fold-key="inventory-columns">
+            <summary class="fhcs-button fhcs-label">{{ text.columns }}</summary>
+            <div class="fhcs-tray fhcs-columns-tray">
+               {{#each columnToggles}}
+               <button type="button" class="fhcs-button fhcs-body fhcs-column-toggle" data-action="fhcsToggleColumn"
+                       data-column="{{ key }}" aria-pressed="{{#if pressed}}true{{else}}false{{/if}}">
+                  <svg class="fhcs-icon fhcs-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>{{ label }}
+               </button>
+               {{/each}}
+            </div>
+         </details>
+         {{/if}}
+      </div>
+
+      <section class="items-list inventory-list fhcs-items" data-item-list="inventory">
+         {{#each sections}}
+         <div class="items-section fhcs-section" data-fhcs-section="{{ id }}">
+            <div class="items-header fhcs-item-head">
+               <span class="fhcs-col-img" aria-hidden="true"></span>
+               <span class="fhcs-col-name"><span class="fhcs-label">{{ label }}</span> <span class="fhcs-label fhcs-muted">{{ count }}</span></span>
+               {{#if ../columns.weight}}<span class="fhcs-label fhcs-muted fhcs-col-weight">{{ ../text.head.weight }}</span>{{/if}}
+               {{#if ../columns.uses}}<span class="fhcs-label fhcs-muted fhcs-col-uses">{{ ../text.head.uses }}</span>{{/if}}
+               {{#if ../columns.usage}}<span class="fhcs-label fhcs-muted fhcs-col-usage">{{ ../text.head.usage }}</span>{{/if}}
+               {{#if ../columns.quantity}}<span class="fhcs-label fhcs-muted fhcs-col-quantity">{{ ../text.head.quantity }}</span>{{/if}}
+               {{#if ../columns.equipped}}<span class="fhcs-muted fhcs-col-toggle" role="img" aria-label="{{ ../text.head.equipped }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span>{{/if}}
+               {{#if ../columns.attuned}}<span class="fhcs-muted fhcs-col-toggle" role="img" aria-label="{{ ../text.head.attuned }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.4 6.1L21 12l-6.6 2.9L12 21l-2.4-6.1L3 12l6.6-2.9z"/></svg></span>{{/if}}
+               {{#if ../editing}}<span class="fhcs-col-edit" aria-hidden="true"></span>{{/if}}
+            </div>
+            <ol class="item-list fhcs-item-list">
+               {{#each items}}
+               <li class="item collapsible fhcs-item{{#unless expanded}} collapsed{{/unless}}{{#if equipped}} fhcs-equipped{{/if}}"
+                   data-uuid="{{ uuid }}" data-item-id="{{ id }}" data-entry-id="{{ id }}" data-item-name="{{ name }}">
+                  <div class="item-row draggable fhcs-item-row">
+                     <button type="button" class="item-action fhcs-col-img fhcs-item-use {{ @root.rollableClass }}"
+                             data-action="{{ useAction }}" aria-label="{{ useLabel }}">
+                        <img src="{{ img }}" alt="">
+                     </button>
+                     {{!-- dnd5e's expand flips the classes on this button's <i>, so it must have one. --}}
+                     <button type="button" class="item-action fhcs-col-name fhcs-item-name" data-action="toggleExpand"
+                             aria-label="{{ detailsLabel }}">
+                        <i class="fhcs-expand" aria-hidden="true"></i>
+                        <span class="fhcs-body fhcs-item-title">{{ name }}</span>
+                        {{#if sub}}<span class="fhcs-label fhcs-muted fhcs-item-sub">{{ sub }}</span>{{/if}}
+                     </button>
+                     {{#if ../../columns.weight}}<span class="fhcs-body fhcs-col-weight">{{ weight }}</span>{{/if}}
+                     {{#if ../../columns.uses}}
+                     <span class="fhcs-col-uses">
+                        {{#if uses}}
+                        <input type="text" class="fhcs-input fhcs-body fhcs-uses-input" value="{{ uses.value }}" placeholder="0"
+                               data-dtype="Number" data-name="{{ uses.prop }}" inputmode="numeric" pattern="[+=\-]?\d*"
+                               aria-label="{{ uses.label }}">
+                        <span class="fhcs-body fhcs-muted">/ {{ uses.max }}</span>
+                        {{/if}}
+                     </span>
+                     {{/if}}
+                     {{#if ../../columns.usage}}<span class="fhcs-body fhcs-col-usage">{{ usage }}</span>{{/if}}
+                     {{#if ../../columns.quantity}}
+                     <span class="fhcs-col-quantity">
+                        {{#if quantity includeZero=true}}
+                        <input type="text" class="fhcs-input fhcs-body fhcs-quantity-input" value="{{ quantity }}" placeholder="0"
+                               data-dtype="Number" data-name="system.quantity" inputmode="numeric" pattern="^[+=\-]?\d*" min="0"
+                               aria-label="{{ quantityLabel }}">
+                        {{/if}}
+                     </span>
+                     {{/if}}
+                     {{#if ../../columns.equipped}}
+                     <span class="fhcs-col-toggle">
+                        {{#if equip}}
+                        <button type="button" class="item-action fhcs-toggle fhcs-toggle-equip" data-action="equip"
+                                aria-pressed="{{#if equip.pressed}}true{{else}}false{{/if}}" aria-label="{{ equip.label }}"
+                                data-fhcs-tip="{{ equip.label }}"{{#if equip.disabled}} aria-disabled="true"{{/if}}>
+                           <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true">{{#if equip.pressed}}<path d="M5 12l5 5 9-10"/>{{else}}<path d="M8 12h8"/>{{/if}}</svg>
+                        </button>
+                        {{/if}}
+                     </span>
+                     {{/if}}
+                     {{#if ../../columns.attuned}}
+                     <span class="fhcs-col-toggle">
+                        {{#if attune}}
+                        <button type="button" class="item-action fhcs-toggle fhcs-toggle-attune" data-action="attune"
+                                aria-pressed="{{#if attune.pressed}}true{{else}}false{{/if}}" aria-label="{{ attune.label }}"
+                                data-fhcs-tip="{{ attune.label }}"{{#if attune.disabled}} aria-disabled="true"{{/if}}>
+                           <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.4 6.1L21 12l-6.6 2.9L12 21l-2.4-6.1L3 12l6.6-2.9z"/></svg>
+                        </button>
+                        {{/if}}
+                     </span>
+                     {{/if}}
+                     {{#if ../../editing}}
+                     <span class="fhcs-col-edit">
+                        <button type="button" class="item-action fhcs-toggle" data-action="edit" aria-label="{{ editLabel }}" data-fhcs-tip="{{ editLabel }}">
+                           <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>
+                        </button>
+                        <button type="button" class="item-action fhcs-toggle" data-action="delete" aria-label="{{ deleteLabel }}" data-fhcs-tip="{{ deleteLabel }}">
+                           <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></svg>
+                        </button>
+                     </span>
+                     {{/if}}
+                  </div>
+                  <div class="item-description collapsible-content fhcs-item-details">
+                     <div class="wrapper fhcs-body">{{{ summary }}}</div>
+                  </div>
+               </li>
+               {{/each}}
+            </ol>
+         </div>
+         {{/each}}
+         {{#if empty}}<p class="fhcs-body fhcs-muted fhcs-empty">{{ text.empty }}</p>{{/if}}
+      </section>
+
+      <div class="fhcs-inventory-foot">
+         <div class="fhcs-inventory-money">
+            {{#if attunement}}
+            <span class="fhcs-attunement{{#if attunement.over}} fhcs-over{{/if}}" role="group" aria-label="{{ attunement.label }}">
+               <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.4 6.1L21 12l-6.6 2.9L12 21l-2.4-6.1L3 12l6.6-2.9z"/></svg>
+               <span class="fhcs-label">{{ text.attuned }}</span>
+               {{#if editing}}
+               <span class="fhcs-body">{{ attunement.value }} /</span>
+               <input type="number" class="fhcs-input fhcs-body fhcs-attunement-max" name="system.attributes.attunement.max"
+                      value="{{ attunement.sourceMax }}" min="0" step="1" aria-label="{{ attunement.maxLabel }}">
+               {{else}}
+               <span class="fhcs-body">{{ attunement.text }}</span>
+               {{/if}}
+            </span>
+            {{/if}}
+            <span class="fhcs-currency">
+               {{#each currency}}
+               <label class="fhcs-coin">
+                  <span class="fhcs-label">{{ abbr }}</span>
+                  <input type="text" class="fhcs-input fhcs-body" name="{{ prop }}" value="{{ value }}" data-dtype="Number"
+                         inputmode="numeric" pattern="^[+=\-]?\d*" aria-label="{{ label }}">
+               </label>
+               {{/each}}
+            </span>
+         </div>
+         {{#if encumbrance}}
+         <div class="fhcs-carried">
+            <span class="fhcs-label">{{ text.carried }}</span>
+            <span class="fhcs-carried-bar" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ encumbrance.pct }}"
+                  aria-label="{{ encumbrance.label }}">
+               <span class="fhcs-carried-fill" style="width: {{ encumbrance.pct }}%"></span>
+               {{#if encumbrance.low}}<span class="fhcs-carried-stop" style="left: {{ encumbrance.low }}%"></span>{{/if}}
+               {{#if encumbrance.high}}<span class="fhcs-carried-stop" style="left: {{ encumbrance.high }}%"></span>{{/if}}
+            </span>
+            <span class="fhcs-body fhcs-carried-text">{{ encumbrance.text }}</span>
+         </div>
+         {{/if}}
+      </div>
+   </dnd5e-inventory>
+   {{/with}}
+</section>

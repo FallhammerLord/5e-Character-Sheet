@@ -1,5 +1,6 @@
 import { MODULE_ID, SHEET_CLASS_NAME } from './constants.js';
 import { rerenderSheets } from './compat.js';
+import { DEFAULT_COLUMNS } from './sheet/inventory.js';
 
 /** Our settings. Client ones each player chooses; world ones the GM sets for the table. */
 export function registerSettings()
@@ -26,6 +27,17 @@ export function registerSettings()
          score: 'FHCS.Settings.AbilityEmphasis.Score'
       },
       default: 'modifier',
+      onChange: () => rerenderSheets(SHEET_CLASS_NAME)
+   });
+
+   // Which Inventory columns show (user, 2026-10-26: each player's choice, made from the tab in edit mode).
+   game.settings.register(MODULE_ID, 'inventoryColumns', {
+      name: 'FHCS.Settings.InventoryColumns.Name',
+      hint: 'FHCS.Settings.InventoryColumns.Hint',
+      scope: 'client',
+      config: false,
+      type: Object,
+      default: { ...DEFAULT_COLUMNS },
       onChange: () => rerenderSheets(SHEET_CLASS_NAME)
    });
 

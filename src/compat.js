@@ -179,6 +179,95 @@ export async function attributesFacts(sheet, context, { passives, folded })
    return { skills, traits, favorites, resources, slots, editing: sheet.isEditMode, passives, folded };
 }
 
+/** dnd5e's summary of an expanded item (inventory.mjs `_onToggleExpand`), drawn again when the sheet re-renders. */
+const ITEM_SUMMARY = 'systems/dnd5e/templates/items/parts/item-summary.hbs';
+
+/** @returns {string} A weight or capacity unit's abbreviation (`DND5E.weightUnits`), or the key itself. */
+const weightUnit = (key) => game.i18n.localize(CONFIG.DND5E.weightUnits?.[key]?.abbreviation ?? key ?? '');
+
+/** @returns {string} A number rounded to one decimal place, in the user's language. */
+const tenths = (n) => (Math.round((Number(n) || 0) * 10) / 10).toLocaleString(game.i18n.lang);
+
+/**
+ * Plain facts for the Inventory tab (src/sheet/inventory.js), from what dnd5e's `_prepareInventoryContext` and
+ * `_prepareItems` put on the context (base-actor-sheet.mjs:311, 463; character-sheet.mjs:506, 874). dnd5e renders
+ * every item into one hidden list and moves rows into sections in the browser; we place them here instead, by the
+ * item type each section groups (`inventorySection.groups.type`).
+ */
+export async function inventoryFacts(sheet, context, { columns })
+{
+   const actor = sheet.actor;
+   const config = CONFIG.DND5E;
+   const ctxs = context.itemContext ?? {};
+   const sections = (context.sections ?? [])
+      .filter((s) => s.groups?.type)
+      .map((s) => ({ id: s.id, type: s.groups.type, label: game.i18n.localize(s.label), items: [] }));
+   const other = { id: 'other', type: null, label: game.i18n.localize('FHCS.Inventory.Other'), items: [] };
+
+   // dnd5e keeps containers out of the character's inventory list (they head its tab); here they are rows too.
+   const items = [...(context.itemCategories?.inventory ?? []), ...(context.containers ?? [])]
+      .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
+   for (const item of items)
+   {
+      const ctx = ctxs[item.id] ?? {};
+      const uses = ctx.uses?.hasUses ? { value: ctx.uses.value ?? 0, max: ctx.uses.max, prop: ctx.uses.prop } : null;
+      let sub = '';
+      if (ctx.capacity)
+      {
+         const max = Number.isFinite(ctx.capacity.max) ? tenths(ctx.capacity.max) : '∞';
+         sub = `${tenths(ctx.capacity.value)} / ${max} ${weightUnit(ctx.capacity.units)}`.trim();
+      }
+      const fact = {
+         id: item.id,
+         uuid: item.uuid,
+         name: item.name,
+         img: item.img,
+         sub,
+         useAction: ctx.clickAction === 'view' ? 'view' : 'use',
+         expanded: !!ctx.isExpanded,
+         summary: ctx.isExpanded && ctx.expanded ? await renderTemplate(ITEM_SUMMARY, ctx.expanded) : '',
+         weight: ctx.totalWeight ? `${tenths(ctx.totalWeight)} ${weightUnit(item.system.weight?.units)}`.trim() : '',
+         uses,
+         usage: item.isActive ? (item.labels?.activation ?? '') : '',
+         quantity: item.system.quantity ?? null,
+         equip: ctx.equip?.applicable ? { on: !!item.system.equipped, disabled: !!ctx.equip.disabled } : null,
+         attune: ctx.attunement?.applicable ? {
+            on: !!item.system.attuned,
+            disabled: !!ctx.attunement.disabled,
+            need: game.i18n.localize(ctx.attunement.title ?? '')
+         } : null
+      };
+      (sections.find((s) => s.type === item.type) ?? other).items.push(fact);
+   }
+
+   const encumbrance = game.settings.get('dnd5e', 'encumbrance') === 'none' ? null : (() =>
+   {
+      const enc = actor.system.attributes?.encumbrance ?? {};
+      return { value: tenths(enc.value), max: Number.isFinite(enc.max) ? tenths(enc.max) : '∞',
+         pct: enc.pct ?? 0, stops: enc.stops ?? {}, units: weightUnit(enc.units) };
+   })();
+   const controls = context.listControls ?? {};
+   return {
+      sections: [...sections, other],
+      columns,
+      editing: sheet.isEditMode,
+      filters: (controls.filters ?? []).map((f) => ({ key: f.key, group: f.group ?? '', label: game.i18n.localize(f.label) })),
+      sorting: (controls.sorting ?? []).map((s) => ({ key: s.key, icon: s.dataset?.icon ?? '', label: game.i18n.localize(s.label) })),
+      currency: Object.entries(context.currency ?? {}).map(([key, value]) => ({
+         key, value, prop: `system.currency.${key}`,
+         abbr: game.i18n.localize(config.currencies?.[key]?.abbreviation ?? key),
+         name: game.i18n.localize(config.currencies?.[key]?.label ?? key)
+      })),
+      attunement: {
+         value: actor.system.attributes?.attunement?.value ?? 0,
+         max: actor.system.attributes?.attunement?.max ?? 0,
+         // The stored maximum, which edit mode lets the player change, as dnd5e's own counter does.
+         sourceMax: actor.system._source?.attributes?.attunement?.max ?? actor.system.attributes?.attunement?.max ?? 0
+      },
+      encumbrance
+   };
+}
+
 /**
  * After dnd5e's advancement finishes (`dnd5e.advancementManagerComplete`), records the order of class levels: the
  * recorded order, brought up to date by `reconcile` (src/sheet/header.js levelOrder).

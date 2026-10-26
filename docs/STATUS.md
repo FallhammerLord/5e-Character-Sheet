@@ -25,6 +25,8 @@ They wait only for a game where the user tries them; not work for a session to p
 
 ## In code, not yet verified
 
+- **Inventory tab (Phase 3, 2026-10-26).** Our `inventory` part on dnd5e's `dnd5e-inventory` and `item-list-controls`: sections by item type, equip and attune toggles, uses and quantity fields, expand on the name, use on the picture, edit and delete in edit mode, the Columns menu in edit mode, and the attunement, currency and carried-weight footer. Offline: lint, load, unit and layout (5 cases) pass. Two new Quench tests (equip, attune, quantity, expand; the column menu). Not yet run in Foundry: the search, filter and sort controls, context menus and drag are dnd5e's and untested with our markup. Waiting on the user: Quench, then a look in play.
+
 - **Chat log scrolling, third try (2026-10-24).** The user saw new cards stop short by exactly the Apply section: dnd5e builds its tray lists after the card is placed. Apply now starts folded, and while following a new card a `ResizeObserver` on it scrolls again on every size change.
 - **Chat log scrolling (2026-10-24, second try).** First try (blocking `scrollBottom`, following only if `isAtBottom`) made no difference in the user's world. Now from Foundry 14's types (`@league-of-foundry-developers/foundry-vtt-types` 14.366 beta: `postOne(message, { notify, scroll })`): folded rolls post with `scroll: false`, no notification; the player's own new card posts with `scroll: true` and redraws of it scroll to the bottom for 8 s unless the player scrolls, clicks or types in the log. Load check covers it. Waiting on the user.
 
@@ -32,6 +34,6 @@ They wait only for a game where the user tries them; not work for a session to p
 
 Track R and Phases 0–2 are done and verified; don't rerun Quench or rework them unless the user reports a problem.
 
-1. **Phase 3, Inventory** (user agreed 2026-10-24). Start with dnd5e's shared list controls (`item-list-controls`: search, filter, sort), which Inventory, Spellbook and Features all use; then item rows on `dnd5e-inventory` (24px controls, equip, attune, quantity, context menus, drag); then encumbrance as a bar and currency as a row. Replace dnd5e's `inventory` part (same ID). Each part gets a layout case and a Quench click test.
-2. **Exhaustion display mismatch** (user's screenshot, 2026-10-24): at exhaustion 6 the header shows Init and saves with −12, the Attributes tab shows skills without it. Check how dnd5e 6.0 applies the 2024 penalty (roll bonus or prepared total) and make both show the same thing.
-3. Then Spellbook (Phase 4), reusing the Inventory rows.
+1. **Inventory in Foundry** (in code 2026-10-26): the user runs Quench (both batches; 28 tests in core and cards) and tries the tab. Fix what they report. Then the pinned filter buttons and containers (ROADMAP Phase 3).
+2. **Exhaustion display mismatch** (user's screenshot, 2026-10-24): at exhaustion 6 the header shows Init and saves with −12, the Attributes tab shows skills without it. Read so far (dnd5e 6.0.6 source, 2026-10-26): dnd5e puts `conditionRollReduction` into skills, saves, Init and passives alike (creature.mjs:307, common.mjs:321, attributes.mjs:523), and our skills read the same prepared `skill.total`. No code cause found. Waiting on the user's console check: on the sheet's actor, `system.attributes.exhaustion`, `conditionRollReduction`, `system.skills.ath.total`, `system.attributes.init.total`, `system.abilities.str.save.value`.
+3. Then Spellbook (Phase 4), reusing the Inventory rows and list controls.

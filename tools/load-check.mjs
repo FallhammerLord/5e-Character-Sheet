@@ -17,6 +17,7 @@ class SystemCharacterSheet
       header: { template: 'systems/dnd5e/templates/actors/character-header.hbs' },
       sidebar: { container: { classes: ['main-content'], id: 'main' }, template: 'systems/dnd5e/templates/actors/character-sidebar.hbs' },
       details: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/character-details.hbs' },
+      inventory: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/character-inventory.hbs', scrollable: [''] },
       abilityScores: { template: 'systems/dnd5e/templates/actors/character-ability-scores.hbs' },
       warnings: { template: 'systems/dnd5e/templates/shared/sheet-warnings-dialog.hbs' },
       tabs: { id: 'tabs', classes: ['tabs-right'], template: 'systems/dnd5e/templates/shared/sidebar-tabs.hbs' }
@@ -115,7 +116,7 @@ else
    if (options?.makeDefault) { problems.push('sheet must not make itself the default'); }
    // Our header and tab row come first, in place of dnd5e's; its ability scores and sidebar are gone; its tab bodies stay.
    const parts = sheet.PARTS ?? {};
-   const expected = 'header,tabs,details,warnings';
+   const expected = 'header,tabs,details,inventory,warnings';
    if (Object.keys(parts).join() !== expected) { problems.push(`sheet parts are ${Object.keys(parts).join()}, not ${expected}`); }
    if (parts.tabs?.classes) { problems.push('our tab row still carries dnd5e\'s tab classes'); }
    // None of dnd5e's look reaches our window.
@@ -129,6 +130,11 @@ else
    }
    for (const id of ['header', 'tabs']) { if (!parts[id]?.template.startsWith('modules/fhcs/')) { problems.push(`the ${id} part is still dnd5e's`); } }
    if (parts.details?.container?.id !== 'tabs') { problems.push('dnd5e\'s tab bodies lost their container'); }
+   if (!parts.inventory?.template.startsWith('modules/fhcs/')) { problems.push('the inventory part is still dnd5e\'s'); }
+   // The item list scrolls, not the tab, so Foundry keeps its place when an equip or quantity change re-renders.
+   if (parts.inventory?.scrollable?.join() !== '.fhcs-items') { problems.push('the inventory part does not keep its item list\'s scroll'); }
+   // dnd5e adds its attunement counter into markup ours lacks; without our override every render throws.
+   if (!Object.hasOwn(sheet.prototype, '_renderAttunement')) { problems.push('dnd5e\'s attunement counter is not replaced'); }
 }
 for (const name of ['dnd5e.rollDeathSaveV2', 'preUpdateActor'])
 {

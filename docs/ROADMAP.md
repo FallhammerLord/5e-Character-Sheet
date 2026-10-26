@@ -36,12 +36,15 @@ Classic layout: skills and saves column; resources; favorites; traits (senses, l
 
 ## Phase 3: Inventory
 
-Built on dnd5e's `dnd5e-inventory` element. Equip, attune, quantity, weight and encumbrance, containers, currency, drag and drop, context menus. Next up (2026-10-24).
+Built on dnd5e's `dnd5e-inventory` element. Equip, attune, quantity, weight and encumbrance, containers, currency, drag and drop, context menus. In progress (2026-10-26).
 
-- [ ] Shared list controls (search, filter, sort), styled once for Inventory, Spellbook and Features
-- [ ] Item rows: 24px controls, equip, attune, quantity, context menus, drag
-- [ ] Encumbrance bar and currency row
-- [ ] Containers
+- [x] Mockup approved with answers (2026-10-26): player-chosen columns, three-state attunement, encumbrance follows dnd5e's setting (SCOPE §4.6)
+- [ ] Shared list controls (search, filter, sort), styled once for Inventory, Spellbook and Features (in code 2026-10-26)
+- [ ] Item rows: equip and attune toggles, uses, usage, quantity, expand, edit and delete in edit mode; context menus and drag from dnd5e (in code 2026-10-26)
+- [ ] Column menu in edit mode, each player's choice (in code 2026-10-26)
+- [ ] Attunement, currency and carried-weight footer (in code 2026-10-26)
+- [ ] Pinned filter buttons beside the search (Action, Bonus, Equipped), as in the mockup
+- [ ] Containers: Classic's container panel, and items inside containers
 
 ## Phase 4: Spellbook
 

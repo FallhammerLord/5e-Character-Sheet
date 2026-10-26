@@ -1,6 +1,7 @@
 import { MODULE_ID, MODULE_PATH } from '../constants.js';
-import { attributesFacts, headerFacts } from '../compat.js';
+import { attributesFacts, headerFacts, inventoryFacts } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
+import { columnChoice, inventoryView } from '../sheet/inventory.js';
 import { headerMinWidth, headerView, tabRow } from '../sheet/header.js';
 import { delayTips, keepFolds } from '../chat/card.js';
 
@@ -9,8 +10,15 @@ export const SHEET_PARTS = {
    header: `${MODULE_PATH}/templates/sheet/header.hbs`,
    tabs: `${MODULE_PATH}/templates/sheet/tabs.hbs`,
    // The Attributes tab takes dnd5e's Details tab: same ID, so dnd5e's tab handling still applies.
-   details: `${MODULE_PATH}/templates/sheet/attributes.hbs`
+   details: `${MODULE_PATH}/templates/sheet/attributes.hbs`,
+   inventory: `${MODULE_PATH}/templates/sheet/inventory.hbs`
 };
+
+/**
+ * Part settings of ours that differ from dnd5e's. The Inventory tab scrolls its item list, not the whole tab, so the
+ * currency and carried weight stay in view; Foundry keeps the list's scroll place across re-renders.
+ */
+const PART_OPTIONS = { inventory: { scrollable: ['.fhcs-items'] } };
 
 /** Each player's own choices, kept on their user so they follow them to every character and device. */
 const PREFS = { passives: 'passives', folded: 'foldedFavorites' };
@@ -37,6 +45,15 @@ async function toggleGroup(event, target)
    await game.user.setFlag(MODULE_ID, PREFS.folded, [...folded]);
 }
 
+/** Shows or hides one Inventory column for this player (user, 2026-10-26); the setting re-renders our sheets. */
+async function toggleColumn(event, target)
+{
+   const key = target.dataset.column;
+   const columns = columnChoice(game.settings.get(MODULE_ID, 'inventoryColumns'));
+   if (!(key in columns)) { return; }
+   await game.settings.set(MODULE_ID, 'inventoryColumns', { ...columns, [key]: !columns[key] });
+}
+
 /**
  * dnd5e parts we drop: our header holds the ability scores; the sidebar's portrait, HP and AC are in the header, its
  * favorites move to the Attributes tab and its death saves to the header.
@@ -61,7 +78,7 @@ function ourParts(baseParts)
       .map(([id, part]) =>
       {
          if (!SHEET_PARTS[id]) { return [id, part]; }
-         const kept = { ...part, template: SHEET_PARTS[id] };
+         const kept = { ...part, template: SHEET_PARTS[id], ...PART_OPTIONS[id] };
          delete kept.classes;
          delete kept.templates;
          return [id, kept];
@@ -75,7 +92,7 @@ function ourParts(baseParts)
  * since a module can't import from the system by path. dnd5e keeps every mechanic; the look is ours alone.
  *
  * Phase 1: our header. Phase 2: our frame, tab row and Attributes tab in place of dnd5e's sidebar, vertical tabs
- * and Details tab.
+ * and Details tab. Phase 3: our Inventory tab.
  */
 export function makeCharacterSheet(Base)
 {
@@ -83,7 +100,7 @@ export function makeCharacterSheet(Base)
    {
       static DEFAULT_OPTIONS = {
          classes: ['fhcs-sheet'],
-         actions: { fhcsTogglePassives: togglePassives, fhcsToggleGroup: toggleGroup }
+         actions: { fhcsTogglePassives: togglePassives, fhcsToggleGroup: toggleGroup, fhcsToggleColumn: toggleColumn }
       };
 
       static PARTS = ourParts(Base.PARTS);
@@ -114,11 +131,25 @@ export function makeCharacterSheet(Base)
             };
             context.fhcsAttributes = attributesView(await attributesFacts(this, context, prefs), i18n);
          }
+         if (partId === 'inventory')
+         {
+            const columns = columnChoice(game.settings.get(MODULE_ID, 'inventoryColumns'));
+            context.fhcsInventory = inventoryView(await inventoryFacts(this, context, { columns }), i18n);
+         }
          if (partId === 'tabs')
          {
             context.fhcsTabs = tabRow(context.tabs, { canEdit: this.isEditable, editing: this.isEditMode }, i18n.localize);
          }
          return context;
+      }
+
+      /**
+       * dnd5e adds its attunement counter into its own inventory markup (`.middle`, base-actor-sheet.mjs:1002) after
+       * each render; ours has no such slot, and our Inventory footer draws the counter itself.
+       */
+      _renderAttunement()
+      {
+         // Drawn by templates/sheet/inventory.hbs.
       }
 
       /** Never narrower than the ability row needs, so it never wraps. */
