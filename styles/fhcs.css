@@ -1792,8 +1792,12 @@
    --proficiency-cycle-enabled-color: var(--fhcs-ink);
    --proficiency-cycle-disabled-color: var(--fhcs-muted);
    display: inline-block;
+   box-sizing: border-box;
    width: 24px;
    height: 24px;
+   /* dnd5e draws the ring 3px inside the content box: 4px of padding makes it play mode's 10px dot, and the target
+      stays 24px (user's screenshots, 2026-10-27: the circles jumped size). */
+   padding: 4px;
    cursor: pointer;
 }
 

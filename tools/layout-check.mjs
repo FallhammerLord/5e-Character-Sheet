@@ -106,6 +106,16 @@ function findProblems()
       const r = el.getBoundingClientRect();
       if (r.width && Math.abs(r.width - r.height) > 1) { issues.push(`checkbox is ${Math.round(r.width)}×${Math.round(r.height)}: ${el.name}`); }
    }
+   // dnd5e's proficiency cycle draws its ring 3px inside its content box (proficiency-cycle.mjs CSS); edit mode's
+   // ring must match play mode's 10px dot (user's screenshots, 2026-10-27: the circles jumped size).
+   for (const el of app.querySelectorAll('.window-content proficiency-cycle'))
+   {
+      const cs = getComputedStyle(el);
+      const content = el.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - parseFloat(cs.borderLeftWidth) - parseFloat(cs.borderRightWidth);
+      const dot = app.querySelector('.fhcs-prof-mark');
+      const want = dot ? dot.getBoundingClientRect().width : 10;
+      if (Math.abs(content - 6 - want) > 1) { issues.push(`proficiency cycle draws a ${Math.round(content - 6)}px ring; play mode's dot is ${Math.round(want)}px`); }
+   }
    // A round control stays round: Foundry's button sizes once made our pips oval (user, 2026-10-24).
    for (const el of app.querySelectorAll('.window-content :is(button, span, div)'))
    {
