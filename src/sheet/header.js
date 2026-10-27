@@ -2,6 +2,7 @@
  * The sheet header's display values (SCOPE §4.1), from plain facts about the actor. Pure, so the unit check and the
  * layout fixtures use the same code the sheet does. `compat.headerFacts` gathers the facts from dnd5e.
  */
+import { levelUpChoices, originCards } from './origins.js';
 
 /** Pips on the milestone track: 4 rows of 5 (user, 2026-10-24). More appear if a character passes 20. */
 export const TRACK_PIPS = 20;
@@ -85,15 +86,19 @@ const percent = (value, max) => (max > 0 ? Math.max(0, Math.min(100, Math.round(
  */
 export function headerView(facts, { format, localize })
 {
-   const classes = [...facts.classes].sort((a, b) => b.levels - a.levels);
-   const classLine = classes.map((c) => [`${c.name} ${c.levels}`, c.subclass].filter(Boolean).join(' · ')).join(' / ');
+   // The ability grid: AC, Init, then each ability; the class, species and background cards share its columns.
+   const columns = facts.abilities.length + 2;
+   const i18n = { format, localize };
    const { hp, xp } = facts;
    const milestones = facts.leveling === 'noxp';
    const level = format('FHCS.Header.Level', { level: facts.level });
    return {
       name: facts.name,
       portrait: facts.portrait,
-      classLine,
+      columns,
+      cards: facts.originCards ? originCards(facts.originCards, columns, i18n) : [],
+      levelUp: facts.originCards ? levelUpChoices(facts.originCards, i18n) : null,
+      levelUpLabel: format('FHCS.Header.LevelUpLabel', { level }),
       origin: facts.origin.filter(Boolean).join(' · '),
       speed: facts.speed,
       prof: signed(facts.prof),

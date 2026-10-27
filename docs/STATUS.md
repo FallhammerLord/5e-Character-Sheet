@@ -4,8 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-0. **Header mockup review** (canvas row "Phase 5 · origin cards in the header", 2026-10-26). Proposed by the user: the class, species and background cards move from Features into the header, under the abilities, on the ability row's 8-column grid (one class spans 4; two classes 2 each; species and background 2), so they scale with the columns; the class line and species and background leave the header text; Level up moves into the level pill's tray (one button per class, and New class), in XP and milestone mode. On approval: record in SCOPE §4.1 and §4.8, build before the Quench run (it changes Features). Phase 6 items the user raised (editable name, scores, AC, portrait; an HP calculator) wait for Phase 6.
-1. **Phase 5 in Quench and play** (user). All three tabs are built and the first-look fixes are in (2026-10-26: cards alike with art underlays and a remove in edit mode, effects keep their place, biography fields edit in place, ledger rows on every list). Ask for a Quench run (core gains five tests), then a look at a real character: a multiclass with a subclass due; Level up into dnd5e's wizard; removing and choosing a background in edit mode; the By source switch; an effect switched off and on (it stays put); a condition and exhaustion (right-click lowers it); writing in the biography with the sheet locked; the ledger rows on Inventory and Spellbook too.
+1. **Phase 5 in Quench and play** (user). Built: Features, Effects, Biography, the first-look fixes (2026-10-26) and the header cards with the level tray (2026-10-27). Ask for a Quench run (core gains five tests), then a look at a real character: a multiclass with a subclass due; the cards under the abilities at 644px and wider; Level up from the level pill (each class, New class) into dnd5e's wizard; removing and choosing a background in edit mode; the By source switch; an effect switched off and on (it stays put); a condition and exhaustion (right-click lowers it); writing in the biography with the sheet locked; the ledger rows on Inventory and Spellbook too.
 2. **Then:** fix what play finds (expect one styling pass), tick ROADMAP Phase 5, write its BUILT entry, ask before pushing to `main`.
 
 The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.
@@ -14,7 +13,8 @@ The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't reru
 
 In code, not yet seen in Foundry:
 
-- **Phase 5a Features tab** (2026-10-26): offline checks pass (load, unit, layout; screenshots checked). Quench has two new core tests (grouping, use and favorite; Level up and Choose).
+- **Phase 5a Features tab** (2026-10-26): offline checks pass (load, unit, layout; screenshots checked). Quench has a new core test (grouping, use and favorite).
+- **Phase 5d header cards and level tray** (2026-10-27): offline checks pass (screenshots checked at 644, 740, 900). Quench has a new core test (the card, Level up from the tray, Choose and New class).
 - **Phase 5b Effects tab** (2026-10-26): offline checks pass (screenshots checked). Quench has one new core test (switch, favorite, a condition). The layout check now fails when a short fixed word (a condition, a card label, a class name) is cut short.
 - **Phase 5c Biography tab** (2026-10-26): offline checks pass (screenshots checked; the editor itself only renders in Foundry). Quench has one new core test (read in play, write in edit mode).
 

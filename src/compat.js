@@ -62,7 +62,6 @@ export async function headerFacts(sheet, context, moduleId, emphasis)
    const classes = Object.entries(actor.classes ?? {}).map(([id, item]) => ({
       id, name: item.name, levels: item.system.levels, img: item.img, subclass: item.subclass?.name ?? ''
    }));
-   const named = (value) => (typeof value === 'string' ? value : value?.name) ?? '';
    const speeds = attributes.movement?.speeds ?? {};
    const walk = speeds.walk ?? Math.max(0, ...Object.values(speeds).filter(Number.isFinite));
    const units = attributes.movement?.units ?? config.defaultUnits?.length?.imperial ?? 'ft';
@@ -82,8 +81,10 @@ export async function headerFacts(sheet, context, moduleId, emphasis)
       origin: [
          config.actorSizes?.[traits.size]?.label ?? traits.size,
          details.type?.label ?? config.creatureTypes?.[details.type?.value]?.label ?? '',
-         named(details.race), named(details.background), details.alignment
+         details.alignment
       ],
+      // Species and background are cards under the abilities now (SCOPE §4.1), not words in this line.
+      originCards: originFacts(sheet),
       speed: `${walk} ${config.movementUnits?.[units]?.abbreviation ?? units}`,
       prof: attributes.prof,
       ac: attributes.ac?.value,
@@ -572,6 +573,39 @@ export async function levelUpClass(sheet, classId)
 }
 
 /**
+ * Plain facts for the class, species and background cards in the header (src/sheet/origins.js): each class with its
+ * subclass, whether a subclass is due (dnd5e's own test, character-sheet.mjs:400), and the species and background
+ * items (dnd5e keeps a plain string there when there is none).
+ */
+export function originFacts(sheet)
+{
+   const actor = sheet.actor;
+   const classes = Object.values(actor.classes ?? {}).map((cls) =>
+   {
+      const step = cls.advancement?.byType?.Subclass?.[0];
+      return {
+         ...docFacts(cls),
+         identifier: cls.identifier,
+         level: cls.system.levels,
+         subclass: cls.subclass ? docFacts(cls.subclass) : null,
+         needsSubclass: !cls.subclass && !!step && step.level <= cls.system.levels
+      };
+   });
+   const xp = actor.system.details?.xp ?? {};
+   return {
+      classes,
+      origins: [
+         { kind: 'species', item: originItem(actor.system.details?.race) },
+         { kind: 'background', item: originItem(actor.system.details?.background) }
+      ],
+      maxLevel: CONFIG.DND5E.maxLevel ?? 20,
+      xp: game.settings.get('dnd5e', 'levelingMode') === 'noxp' ? null : { value: xp.value ?? 0, max: Number.isFinite(xp.max) ? xp.max : 0 },
+      canEdit: sheet.isEditable,
+      editing: sheet.isEditMode
+   };
+}
+
+/**
  * Plain facts for the Features tab (src/sheet/features.js), from what dnd5e's `_prepareFeaturesContext` puts on the
  * context (character-sheet.mjs:394: classes, sections with their groups, list controls) and its feature row context
  * (`_prepareItemFeature`, :850: each row's origin and activation group).
@@ -609,19 +643,6 @@ export async function featuresFacts(sheet, context, { columns })
 
    const controls = context.listControls ?? {};
    return {
-      classes: (context.classes ?? []).map((cls) => ({
-         ...docFacts(cls),
-         identifier: cls.identifier,
-         level: cls.system.levels,
-         subclass: cls.subclass ? docFacts(cls.subclass) : null,
-         needsSubclass: !!ctxs[cls.id]?.needsSubclass
-      })),
-      origins: [
-         { kind: 'species', item: originItem(actor.system.details?.race) },
-         { kind: 'background', item: originItem(actor.system.details?.background) }
-      ],
-      maxLevel: CONFIG.DND5E.maxLevel ?? 20,
-      canEdit: sheet.isEditable,
       sections,
       features,
       columns,

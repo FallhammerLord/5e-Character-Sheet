@@ -525,24 +525,27 @@ export function registerQuenchTests(quench)
             await actor.deleteEmbeddedDocuments('Item', [rage.id, tough.id]);
          });
 
-         it('levels a class up from its card, and offers to choose what is missing', async function ()
+         it('shows the class card in the header, levels it up from the level tray, and offers to choose what is missing', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 4);
             const [cls] = await actor.createEmbeddedDocuments('Item', [
                { name: 'FHCS test class', type: 'class', system: { identifier: 'fhcs-test', levels: 1 } }
             ]);
             await settled();
-            const card = () => sheet.element.querySelector(`.fhcs-features .fhcs-class-card[data-item-id="${cls.id}"]`);
-            await until(() => card()?.querySelector('[data-action="fhcsLevelUp"]'), 'the class has a card with Level up');
+            const card = () => sheet.element.querySelector(`.fhcs-header .fhcs-origin-card[data-item-id="${cls.id}"]`);
+            await until(() => card()?.querySelector('[data-action="showDocument"]'), 'the class has a card under the abilities that opens it');
+            assert.notOk(sheet.element.querySelector('.fhcs-features .fhcs-origin-card'), 'the Features tab no longer holds the cards');
             for (const type of ['race', 'background'])
             {
                if (actor.system.details[type] && typeof actor.system.details[type] === 'object') { continue; }
-               assert.ok(sheet.element.querySelector(`.fhcs-features [data-action="findItem"][data-item-type="${type}"]`),
+               assert.ok(sheet.element.querySelector(`.fhcs-header [data-action="findItem"][data-item-type="${type}"]`),
                   `a missing ${type} offers dnd5e's Choose`);
             }
+            assert.ok(sheet.element.querySelector('.fhcs-header .fhcs-level-up [data-action="findItem"][data-item-type="class"]'),
+               'the level tray offers New class');
             const Manager = globalThis.dnd5e.applications.advancement.AdvancementManager;
             const wizard = () => [...foundry.applications.instances.values()].find((app) => app instanceof Manager && app.actor === actor);
-            await click(`.fhcs-features .fhcs-class-card[data-item-id="${cls.id}"] [data-action="fhcsLevelUp"]`);
+            await click(`.fhcs-header .fhcs-level-up [data-action="fhcsLevelUp"][data-item-id="${cls.id}"]`);
             // With advancement steps, dnd5e's wizard opens; with none (or advancements off), the level just goes up.
             await until(() => wizard() || cls.system.levels === 2,
                () => `Level up opens dnd5e's wizard or raises the level; the class is level ${cls.system.levels}`);

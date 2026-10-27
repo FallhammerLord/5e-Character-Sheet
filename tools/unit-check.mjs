@@ -12,6 +12,7 @@ import { healUpdates, keepStable } from '../src/sheet/death.js';
 import { columnChoice, inventoryView } from '../src/sheet/inventory.js';
 import { canCast, prepState, spellbookView, spellColumnChoice, spellKind } from '../src/sheet/spellbook.js';
 import { featureColumnChoice, featuresView, groupingOf } from '../src/sheet/features.js';
+import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js';
 import { effectsView } from '../src/sheet/effects.js';
 import { biographyView, paragraphs } from '../src/sheet/biography.js';
 import { pinView } from '../src/sheet/lists.js';
@@ -369,7 +370,7 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    if (view.classes[0].prepared !== '5' || view.concentration.save !== '-1' || !view.concentration.on) { problems.push(`casting strip: ${JSON.stringify([view.classes[0].prepared, view.concentration])}`); }
 }
 
-// Features (SCOPE §4.8): rows placed by the grouping in force, the cards' marks, level up, recharge.
+// Features (SCOPE §4.8): rows placed by the grouping in force, recharge.
 {
    const f = (id, origin, activation, over) => ({ id, uuid: id, name: id, img: '', origin, activation, ...over });
    const facts = (over) => ({
@@ -400,21 +401,42 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const byActivation = featuresView(facts({ grouping: 'activation' }), { format, localize });
    if (shape(byActivation) !== 'cleric:! other:! active:Turn+Breath passive:Gone') { problems.push(`features by activation: ${shape(byActivation)}`); }
    if (groupingOf('nonsense') !== 'origin' || byActivation.groupLabel !== 'Active or passive') { problems.push('the grouping falls back wrongly or is unnamed'); }
-   const [cleric, warlock] = byOrigin.classes;
-   const marks = [!!cleric.chooseSubclass, warlock.chooseSubclass?.identifier, !!cleric.levelUp, byOrigin.origins[1].choose?.type,
-      byOrigin.origins[0].choose, byOrigin.sections[1].items[1].recharge?.text, byOrigin.chooseClass];
-   try { deepStrictEqual(marks, [false, 'warlock', true, 'background', null, 'Recharge', null]); }
-   catch { problems.push(`feature cards: ${JSON.stringify(marks)}`); }
-   // At level 20 in total, no Level up; without edit rights, no buttons at all.
-   const capped = featuresView(facts({ classes: [{ ...facts().classes[0], level: 19 }, facts().classes[1]] }), { format, localize });
-   if (capped.classes[0].levelUp) { problems.push('Level up shows at level 20'); }
-   const viewer = featuresView(facts({ canEdit: false }), { format, localize });
-   if (viewer.classes.some((k) => k.levelUp || k.chooseSubclass) || viewer.origins.some((o) => o.choose)) { problems.push('a viewer without edit rights gets level up or choose buttons'); }
-   const blank = featuresView(facts({ classes: [], features: [] }), { format, localize });
-   if (!blank.chooseClass || blank.classBasis !== 240 || !blank.empty) { problems.push(`no class: ${JSON.stringify([blank.chooseClass, blank.classBasis, blank.empty])}`); }
-   if (byOrigin.classBasis !== 488) { problems.push(`two class cards take ${byOrigin.classBasis}px`); }
+   if (byOrigin.sections[1].items[1].recharge?.text !== 'Recharge') { problems.push('a spent recharge is not offered'); }
    try { deepStrictEqual(featureColumnChoice({ usage: false, gone: true }), { uses: true, usage: false, recovery: true, favorite: true }); }
    catch { problems.push(`feature columns: ${JSON.stringify(featureColumnChoice({ usage: false }))}`); }
+}
+
+// Header cards and Level up (SCOPE §4.1, §4.8): spans on the ability grid, the marks, the tray's choices.
+{
+   const facts = (over) => ({
+      classes: [
+         { id: 'w', uuid: 'w', name: 'Warlock', img: '', identifier: 'warlock', level: 1, subclass: null, needsSubclass: true },
+         { id: 'c', uuid: 'c', name: 'Cleric', img: '', identifier: 'cleric', level: 9, subclass: { id: 's', uuid: 's', name: 'Life', img: '' }, needsSubclass: false }
+      ],
+      origins: [{ kind: 'species', item: { id: 'd', uuid: 'd', name: 'Dwarf', img: '' } }, { kind: 'background', item: null }],
+      maxLevel: 20, xp: { value: 100, max: 300 }, canEdit: true, editing: false,
+      ...over
+   });
+   const spans = [classSpans(8, 1), classSpans(8, 2), classSpans(8, 3), classSpans(9, 2), classSpans(9, 1)].map((x) => x.join('+'));
+   // One class takes the 4 columns left by species and background; two share them; three can't, so they wrap at 2.
+   try { deepStrictEqual(spans, ['4', '2+2', '2+2+2', '3+2', '5']); }
+   catch { problems.push(`card spans: ${JSON.stringify(spans)}`); }
+   const cards = originCards(facts(), 8, { format, localize });
+   const shape = cards.map((k) => `${k.kind}:${k.item?.name ?? ''}${k.level ? ` ${k.level}` : ''}${k.sub ? `/${k.sub.name}` : ''}${k.choose ? `+${k.choose.type}` : ''}${k.item?.clear ? 'x' : ''}@${k.span}`);
+   // Highest level first; a subclass due offers Subclass; a missing background offers Choose; no removes outside edit mode.
+   try { deepStrictEqual(shape, ['Class:Cleric 9/Life@2', 'Class:Warlock 1+subclass@2', 'Species:Dwarf@2', 'Background:+background@2']); }
+   catch { problems.push(`header cards: ${JSON.stringify(shape)}`); }
+   const editing = originCards(facts({ editing: true }), 8, { format, localize });
+   if (!editing[0].item.clear || !editing[0].sub.clear || !editing[2].item.clear) { problems.push('edit mode does not offer to remove cards'); }
+   const viewer = originCards(facts({ canEdit: false }), 8, { format, localize });
+   if (viewer.some((k) => k.choose || k.item?.clear)) { problems.push('a viewer without edit rights gets Choose or remove'); }
+   const blank = originCards(facts({ classes: [] }), 8, { format, localize });
+   if (blank[0].choose?.type !== 'class' || blank[0].span !== 4) { problems.push(`no class: ${JSON.stringify(blank[0])}`); }
+   const up = levelUpChoices(facts(), { format, localize });
+   if (up.classes.map((k) => `${k.name}${k.next}`).join() !== 'Cleric10,Warlock2' || up.ready) { problems.push(`level up: ${JSON.stringify(up)}`); }
+   if (!levelUpChoices(facts({ xp: { value: 300, max: 300 } }), { format, localize }).ready) { problems.push('enough XP does not mark the level pill'); }
+   if (levelUpChoices(facts({ classes: [{ ...facts().classes[1], level: 20 }] }), { format, localize })) { problems.push('Level up shows at level 20'); }
+   if (levelUpChoices(facts({ canEdit: false }), { format, localize })) { problems.push('a viewer gets Level up'); }
 }
 
 // Effects (SCOPE §4.8): empty categories hidden, the switch, concentration's C, conditions with levels.

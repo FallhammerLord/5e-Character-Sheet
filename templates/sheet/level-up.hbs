@@ -1,0 +1,15 @@
+{{!-- The Level up section of the level pill's tray (user, 2026-10-26), in XP and milestone mode: one button per class
+      (fhcsLevelUp: dnd5e's level-up wizard) and New class (dnd5e's findItem: its class browser; adding a class runs
+      the wizard). Takes the header view's `levelUp`. --}}
+<div class="fhcs-level-up">
+   <span class="fhcs-label">{{ title }}</span>
+   {{#each classes}}
+   <button type="button" class="fhcs-button fhcs-body fhcs-level-up-class" data-action="fhcsLevelUp" data-item-id="{{ id }}" aria-label="{{ label }}">
+      <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+      <span class="fhcs-level-up-name">{{ name }}</span><span class="fhcs-muted">{{ from }} → {{ next }}</span>
+   </button>
+   {{/each}}
+   <button type="button" class="fhcs-button fhcs-body fhcs-choose fhcs-level-up-new" data-action="findItem" data-item-type="class">
+      <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>{{ newClass }}
+   </button>
+</div>

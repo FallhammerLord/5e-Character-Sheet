@@ -38,7 +38,6 @@ export function featuresView(facts, { format, localize })
 {
    const columns = featureColumnChoice(facts.columns);
    const grouping = groupingOf(facts.grouping);
-   const open = (doc) => ({ ...doc, openLabel: format('FHCS.Features.OpenLabel', { name: doc.name }) });
 
    const row = (f) => ({
       id: f.id,
@@ -77,53 +76,7 @@ export function featuresView(facts, { format, localize })
       return { id: s.id, label: s.label, group: s.group, value: s.value, items, hidden: !items.length };
    });
 
-   const canEdit = !!facts.canEdit;
-   // Removing is a setting, not play: like the gear icons, only in edit mode (SCOPE §4.5). dnd5e's delete asks first.
-   const canClear = canEdit && !!facts.editing;
-   const clear = (doc) => (canClear ? { uuid: doc.uuid, label: format('FHCS.Features.ClearLabel', { name: doc.name }) } : null);
-   const totalLevel = (facts.classes ?? []).reduce((n, k) => n + (Number(k.level) || 0), 0);
-   const classes = (facts.classes ?? []).map((k) => ({
-      ...open(k),
-      kind: localize('FHCS.Features.Class'),
-      level: String(k.level),
-      levelLabel: format('FHCS.Features.LevelLabel', { name: k.name, level: k.level }),
-      clear: clear(k),
-      subclass: k.subclass ? { ...open(k.subclass), clear: clear(k.subclass) } : null,
-      // A subclass due: dnd5e's own check, its Subclass advancement reached and none owned (character-sheet.mjs:400).
-      chooseSubclass: !k.subclass && k.needsSubclass && canEdit ? {
-         identifier: k.identifier,
-         label: format('FHCS.Features.ChooseSubclassLabel', { name: k.name })
-      } : null,
-      levelUp: canEdit && totalLevel < (facts.maxLevel ?? 20) ? {
-         label: format('FHCS.Features.LevelUpLabel', { name: k.name })
-      } : null
-   }));
-
-   // No class yet: a card to choose one, as dnd5e offers in play too (`showClassDrop`, character-sheet.mjs:463).
-   const chooseClass = !classes.length && canEdit ? {
-      label: format('FHCS.Features.ChooseLabel', { kind: localize('FHCS.Features.Class') }),
-      kind: localize('FHCS.Features.Class')
-   } : null;
-   // Each class card takes about 240px and the species and background pair about 308px, so the row wraps (the pair
-   // dropping together) only when the cards would squeeze their labels (SCOPE §4.8).
-   const cards = classes.length || (chooseClass ? 1 : 0);
-   const classBasis = cards ? cards * 240 + (cards - 1) * 8 : 0;
-   const origins = (facts.origins ?? []).map((o) => ({
-      kind: o.kind,
-      label: localize(`FHCS.Features.Origin.${o.kind}`),
-      item: o.item ? { ...open(o.item), clear: clear(o.item) } : null,
-      // dnd5e allows one species and one background (`singleton`): to change one, remove it, then choose.
-      choose: !o.item && canEdit ? {
-         type: o.kind === 'species' ? 'race' : o.kind,
-         label: format('FHCS.Features.ChooseLabel', { kind: localize(`FHCS.Features.Origin.${o.kind}`) })
-      } : null
-   }));
-
    return {
-      classes,
-      chooseClass,
-      classBasis,
-      origins,
       sections,
       columns,
       grouping,
@@ -140,10 +93,6 @@ export function featuresView(facts, { format, localize })
       text: {
          search: localize('FHCS.Features.Search'),
          columns: localize('FHCS.Inventory.Columns'),
-         level: localize('FHCS.Features.Level'),
-         levelUp: localize('FHCS.Features.LevelUp'),
-         subclass: localize('FHCS.Features.Subclass'),
-         choose: localize('FHCS.Features.Choose'),
          group: localize('FHCS.Features.GroupLabel'),
          empty: localize('FHCS.Features.Empty'),
          head: Object.fromEntries(FEATURE_COLUMNS.map((key) => [key, localize(`FHCS.Features.Column.${key}`)]))

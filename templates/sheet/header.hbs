@@ -97,7 +97,18 @@
                  aria-label="{{ xp.text }}"><span style="width: {{ xp.pct }}%"></span></div>
             <span class="fhcs-body fhcs-muted">{{ xp.text }}</span>
          </div>
+         {{#if levelUp}}
+         {{!-- The level pill opens Level up (user, 2026-10-26); solid with an arrow once the XP is there. --}}
+         <details class="fhcs-fold fhcs-level" data-fold-key="level-up">
+            <summary class="fhcs-pill fhcs-label{{#if levelUp.ready}} fhcs-ready{{/if}}" aria-label="{{ levelUpLabel }}">
+               {{#if levelUp.ready}}<svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>{{/if}}{{ level }}
+               <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+            </summary>
+            <div class="fhcs-tray fhcs-track">{{> "modules/fhcs/templates/sheet/level-up.hbs" levelUp }}</div>
+         </details>
+         {{else}}
          <span class="fhcs-pill fhcs-label">{{ level }}</span>
+         {{/if}}
          {{/if}}
          {{#if milestones}}
          <details class="fhcs-fold fhcs-level" data-fold-key="milestones">
@@ -116,18 +127,19 @@
                   <span class="fhcs-body"><img src="{{ img }}" alt="">{{ text }}</span>
                   {{/each}}
                </div>
+               {{#if levelUp}}{{> "modules/fhcs/templates/sheet/level-up.hbs" levelUp }}{{/if}}
             </div>
          </details>
          {{/if}}
       </div>
-      <span class="fhcs-body fhcs-line">{{ classLine }}</span>
       <div class="fhcs-header-row">
          <span class="fhcs-label fhcs-muted fhcs-line">{{ origin }}{{#if origin}} · {{/if}}{{ speed }}</span>
          <span class="fhcs-label fhcs-nowrap">{{ text.proficiency }} {{ prof }}</span>
       </div>
 
       {{!-- One row, never wrapped (user, 2026-10-24): columns grow and shrink between limits; the sheet has a minimum width. --}}
-      <div class="fhcs-abilities{{#if scoreFirst}} fhcs-score-first{{/if}}">
+      {{!-- The class, species and background cards share the grid's columns, under the abilities (user, 2026-10-26). --}}
+      <div class="fhcs-abilities{{#if scoreFirst}} fhcs-score-first{{/if}}" style="--fhcs-columns: {{ columns }}">
          <div class="fhcs-ability">
             <span class="fhcs-label fhcs-muted">{{ text.ac }}</span>
             <span class="fhcs-shield" data-attribution="attributes.ac" data-attribution-caption="DND5E.ArmorClass">
@@ -150,6 +162,35 @@
                <span class="fhcs-prof{{#if proficient}} fhcs-on{{/if}}" aria-hidden="true"></span>{{ save }}
             </button>
             <span class="fhcs-label fhcs-muted">{{#if ../scoreFirst}}{{ mod }}{{else}}{{ score }}{{/if}}</span>
+         </div>
+         {{/each}}
+         {{#each cards}}
+         {{!-- Each card alike (SCOPE §4.8): the kind as a label, then the name, which opens the item; the item's art as a
+               faded underlay; a dashed Subclass or Choose (dnd5e's findItem) where something is missing; in edit mode a
+               remove (dnd5e's deleteDocument, which asks first). --}}
+         <div class="fhcs-origin-card{{#if isClass}} fhcs-class-card{{/if}}" style="grid-column: span {{ span }}"{{#if item}} data-item-id="{{ item.id }}" data-uuid="{{ item.uuid }}"{{/if}}>
+            {{#if art}}<img class="fhcs-origin-underlay" src="{{ art }}" alt="">{{/if}}
+            <span class="fhcs-origin-text">
+               <span class="fhcs-label fhcs-muted">{{ kind }}</span>
+               <span class="fhcs-origin-line">
+                  {{#if item}}
+                  <button type="button" class="fhcs-origin-name fhcs-body" data-action="showDocument" aria-label="{{ item.openLabel }}">{{ item.name }}{{#if level}} {{ level }}{{/if}}</button>
+                  {{#if item.clear}}<button type="button" class="fhcs-toggle fhcs-origin-clear" data-action="deleteDocument" data-uuid="{{ item.clear.uuid }}" aria-label="{{ item.clear.label }}" data-fhcs-tip="{{ item.clear.label }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>{{/if}}
+                  {{/if}}
+                  {{#if sub}}
+                  <span class="fhcs-origin-sub" data-uuid="{{ sub.uuid }}">
+                     <button type="button" class="fhcs-origin-name fhcs-body" data-action="showDocument" aria-label="{{ sub.openLabel }}">{{ sub.name }}</button>
+                     {{#if sub.clear}}<button type="button" class="fhcs-toggle fhcs-origin-clear" data-action="deleteDocument" data-uuid="{{ sub.clear.uuid }}" aria-label="{{ sub.clear.label }}" data-fhcs-tip="{{ sub.clear.label }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>{{/if}}
+                  </span>
+                  {{/if}}
+                  {{#if choose}}
+                  <button type="button" class="fhcs-button fhcs-body fhcs-choose" data-action="findItem" data-item-type="{{ choose.type }}"
+                          {{#if choose.identifier}}data-class-identifier="{{ choose.identifier }}" {{/if}}aria-label="{{ choose.label }}">
+                     <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>{{ choose.text }}
+                  </button>
+                  {{/if}}
+               </span>
+            </span>
          </div>
          {{/each}}
       </div>

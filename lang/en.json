@@ -129,7 +129,10 @@
       "InitLabel": "Roll initiative {mod}",
       "DeathRoll": "Roll a death save",
       "DeathSuccess": "Death save success {n}",
-      "DeathFailure": "Death save failure {n}"
+      "DeathFailure": "Death save failure {n}",
+      "LevelUpClass": "Level up {name} to {level}",
+      "NewClass": "New class",
+      "LevelUpLabel": "{level}: show level up"
     },
     "Tabs": {
       "Label": "Sheet tabs",
@@ -274,10 +277,7 @@
         "species": "Species",
         "background": "Background"
       },
-      "Level": "Level",
       "LevelUp": "Level up",
-      "LevelLabel": "{name}, level {level}",
-      "LevelUpLabel": "Level up {name}",
       "Subclass": "Subclass",
       "ChooseSubclassLabel": "Choose a subclass for {name}",
       "Choose": "Choose",

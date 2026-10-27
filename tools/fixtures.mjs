@@ -112,6 +112,14 @@ const ROUND = art(300, 300, '<circle cx="150" cy="150" r="146" fill="#8f7d55"/><
 const TALL = art(300, 450, '<rect width="300" height="450" fill="#8f7d55"/><circle cx="150" cy="150" r="56" fill="#d9ccae"/>');
 const CLASS_ICON = (fill) => art(64, 64, `<circle cx="32" cy="32" r="32" fill="${fill}"/>`);
 
+/** The header's class, species and background cards, as compat.originFacts gathers them, with overrides. */
+const originDoc = (name, fill) => ({ id: name.replace(/\W/g, ''), uuid: `Actor.x.Item.${name}`, name, img: CLASS_ICON(fill) });
+const originFacts = (over = {}) => ({
+   classes: [{ ...originDoc('Cleric', '#c9a227'), identifier: 'cleric', level: 12, subclass: originDoc('Life Domain', '#3a8a5a'), needsSubclass: false }],
+   origins: [{ kind: 'species', item: originDoc('Dragonborn', '#8a5a3a') }, { kind: 'background', item: originDoc('Acolyte', '#7a5ab8') }],
+   maxLevel: 20, xp: { value: 6500, max: 14000 }, canEdit: true, editing: false,
+   ...over
+});
 /** A header's facts as compat.headerFacts gathers them, with overrides. */
 const headerFacts = (over = {}) => ({
    name: 'Kira Ashvale',
@@ -119,7 +127,8 @@ const headerFacts = (over = {}) => ({
    classes: [{ id: 'cleric', name: 'Cleric', levels: 12, img: CLASS_ICON('#c9a227'), subclass: 'Life Domain' }],
    levelOrder: [], originalClass: 'cleric', level: 12, leveling: 'xp',
    xp: { value: 6500, max: 14000, pct: 46, valueLabel: '6,500', maxLabel: '14,000' },
-   origin: ['Medium', 'Humanoid', 'Dragonborn', 'Acolyte', 'Chaotic Good'], speed: '30 ft',
+   origin: ['Medium', 'Humanoid', 'Chaotic Good'], speed: '30 ft',
+   originCards: originFacts(),
    prof: 4, ac: 16, init: 0, hp: { value: 87, max: 87, temp: 0 }, inspiration: false,
    exhaustion: { value: 0, max: 6 }, hd: { value: 12, max: 12 }, showRests: true,
    restTypes: [{ key: 'short', label: 'Short Rest' }, { key: 'long', label: 'Long Rest' }], emphasis: 'modifier',
@@ -136,7 +145,15 @@ const MULTICLASS = {
       { id: 'fighter', name: 'Fighter', levels: 3, img: CLASS_ICON('#7a2e2e'), subclass: '' }
    ],
    levelOrder: ['cleric', 'fighter', 'fighter', 'cleric', 'cleric', 'cleric', 'cleric', 'cleric', 'cleric', 'fighter'],
-   leveling: 'noxp'
+   leveling: 'noxp',
+   originCards: originFacts({
+      classes: [
+         { ...originDoc('Cleric', '#c9a227'), identifier: 'cleric', level: 9, subclass: originDoc('Life Domain', '#3a8a5a'), needsSubclass: false },
+         { ...originDoc('Fighter', '#7a2e2e'), identifier: 'fighter', level: 3, subclass: null, needsSubclass: true }
+      ],
+      origins: [{ kind: 'species', item: originDoc('Aasimar of the Radiant Dawn', '#e0c060') }, { kind: 'background', item: null }],
+      xp: null
+   })
 };
 
 /** dnd5e's tabs as `_getTabs` gives them, dnd5e's order and labels. */
@@ -506,6 +523,12 @@ export const CASES = [
    { name: 'header-exhaustion-open', template: 'sheet/header', open: ['exhaustion'], context: header({ exhaustion: { value: 3, max: 6 } }) },
    { name: 'header-dying', template: 'sheet/header', context: header({ hp: { value: 0, max: 87, temp: 0 }, death: { success: 1, failure: 2 } }) },
    { name: 'header-rest-open', template: 'sheet/header', open: ['rest'], context: header() },
+   {
+      name: 'header-level-up', template: 'sheet/header', open: ['level-up'],
+      context: header({ xp: { value: 14200, max: 14000, pct: 100, valueLabel: '14,200', maxLabel: '14,000' },
+         originCards: originFacts({ xp: { value: 14200, max: 14000 }, editing: true }) })
+   },
+   { name: 'header-viewer', template: 'sheet/header', context: header({ originCards: originFacts({ canEdit: false, origins: [{ kind: 'species', item: null }, { kind: 'background', item: null }] }) }) },
    {
       name: 'card-attack-full-side',
       template: 'chat/usage-card',
