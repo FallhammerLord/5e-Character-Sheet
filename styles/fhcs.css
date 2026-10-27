@@ -1776,22 +1776,25 @@
    cursor: pointer;
 }
 
-/* The ability reads as play mode's text; in edit mode a dashed underline says it opens choices. */
-.fhcs-sheet select.fhcs-skill-ability
+/* The ability reads as play mode's text, in the same place; a 6px triangle under it, in the cell's foot, says it opens
+   choices without moving the word (user, 2026-10-27). Its tray of chips opens below. */
+/* The tray hangs from the row (the details stays unpositioned), its right edge on the row's. */
+.fhcs-sheet .fhcs-ability-pick { position: static; }
+/* The open tray's row draws above the rows after it. */
+.fhcs-sheet .fhcs-skill:has(.fhcs-ability-pick[open]) { z-index: 3; }
+.fhcs-sheet .fhcs-ability-pick > summary
 {
-   width: 100%;
+   position: relative;
+   display: flex;
+   align-items: center;
    height: 24px;
-   min-height: 24px;
-   margin: 0;
-   padding: 0;
-   border: 0;
-   border-bottom: 1px dashed var(--fhcs-line);
-   border-radius: 0;
-   background: none;
-   appearance: none;
-   text-align: left;
+   list-style: none;
    cursor: pointer;
 }
+
+.fhcs-sheet .fhcs-ability-pick > summary::-webkit-details-marker { display: none; }
+.fhcs-sheet .fhcs-pick-mark { position: absolute; bottom: 1px; left: 8px; width: 6px; height: 3px; fill: currentColor; }
+.fhcs-sheet .fhcs-ability-pick > .fhcs-tray { left: auto; right: 0; }
 
 .fhcs-sheet .fhcs-skill-roll
 {

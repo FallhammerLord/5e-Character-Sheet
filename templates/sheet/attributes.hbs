@@ -30,9 +30,17 @@
                <button type="button" class="fhcs-skill-roll fhcs-body {{ @root.rollableClass }}" data-action="roll" data-type="skill"
                        aria-label="{{ rollLabel }}"><span class="fhcs-skill-name">{{ label }}</span></button>
                {{#if ../editing}}
-               <select class="fhcs-label fhcs-muted fhcs-skill-ability" name="system.skills.{{ key }}.ability" aria-label="{{ abilityLabel }}">
-                  {{#each abilities}}<option value="{{ key }}"{{#if selected}} selected{{/if}}>{{ abbr }}</option>{{/each}}
-               </select>
+               {{!-- The ability opens a tray of our chips (user, 2026-10-27: the native dropdown failed contrast and its
+                     dashed underline moved the text). A small triangle under the word marks it. --}}
+               <details class="fhcs-fold fhcs-skill-ability fhcs-ability-pick" data-fold-key="skill-ability-{{ key }}">
+                  <summary class="fhcs-label fhcs-muted" aria-label="{{ abilityLabel }}" data-fhcs-tip="{{ abilityLabel }}">{{ abbr }}<svg class="fhcs-pick-mark" viewBox="0 0 8 4" aria-hidden="true"><path d="M0 0h8L4 4z"/></svg></summary>
+                  <div class="fhcs-tray fhcs-tray-row">
+                     {{#each abilities}}
+                     <button type="button" class="fhcs-chip fhcs-label{{#if selected}} fhcs-on{{/if}}" data-action="fhcsSkillAbility" data-fhcs-ability="{{ key }}"
+                             aria-pressed="{{#if selected}}true{{else}}false{{/if}}">{{ abbr }}</button>
+                     {{/each}}
+                  </div>
+               </details>
                {{else}}
                <span class="fhcs-label fhcs-muted fhcs-skill-ability">{{ abbr }}</span>
                {{/if}}

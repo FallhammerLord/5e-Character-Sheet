@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH } from '../constants.js';
-import { attributesFacts, biographyFacts, changeHp, cycleListGrouping, savePortraitFrame, savePortraitShape, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, changeHp, cycleListGrouping, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
@@ -135,6 +135,14 @@ function levelUp(event, target)
 function portraitShape(event, target)
 {
    return savePortraitShape(this.actor, MODULE_ID, target.getAttribute('aria-pressed') === 'true' ? 'square' : 'round');
+}
+
+/** A skill's ability, from its tray in edit mode (user, 2026-10-27: the native dropdown failed contrast). The tray
+ *  closes first, so the redraw doesn't reopen it. */
+function skillAbility(event, target)
+{
+   target.closest('details')?.removeAttribute('open');
+   return saveSkillAbility(this.actor, target.closest('[data-key]')?.dataset.key, target.dataset.fhcsAbility);
 }
 
 /** Level down, from the level tray in edit mode (SCOPE §4.9). */
@@ -298,7 +306,8 @@ export function makeCharacterSheet(Base)
          actions: { fhcsToggleGroup: toggleGroup, fhcsToggleColumn: toggleColumn,
             fhcsToggleContainer: toggleContainer, fhcsPinFilter: pinFilter, fhcsOpenConcentration: openConcentration,
             fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails,
-            fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange, fhcsFrame: frame, fhcsLevelDown: levelDown, fhcsPortraitShape: portraitShape }
+            fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange, fhcsFrame: frame, fhcsLevelDown: levelDown, fhcsPortraitShape: portraitShape,
+            fhcsSkillAbility: skillAbility }
       };
 
       static PARTS = ourParts(Base.PARTS);

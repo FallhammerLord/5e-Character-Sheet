@@ -556,6 +556,7 @@ export const CASES = [
    { name: 'attributes', template: 'sheet/attributes', context: attributes(), rows: '.fhcs-skills > li', marks: '.fhcs-skill-name, .fhcs-skill-mod' },
    { name: 'attributes-folded', template: 'sheet/attributes', context: attributes({ folded: ['inventory', 'spell-1'] }) },
    { name: 'attributes-editing', template: 'sheet/attributes', context: attributes({ editing: true }), rows: '.fhcs-skills > li', marks: '.fhcs-skill-name, .fhcs-skill-mod', sameRowsAs: 'attributes' },
+   { name: 'attributes-ability-tray', template: 'sheet/attributes', open: ['skill-ability-ath'], context: attributes({ editing: true }) },
    { name: 'attributes-empty', template: 'sheet/attributes', context: attributes({ favorites: [], resources: [], traits: [] }) },
    { name: 'tabs', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }) },
    { name: 'tabs-editing', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: true }) },

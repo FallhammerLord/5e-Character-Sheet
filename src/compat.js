@@ -61,6 +61,12 @@ export function savePortraitShape(actor, moduleId, shape)
    return actor.setFlag(moduleId, SHAPE_FLAG, shape === 'round' ? 'round' : 'square');
 }
 
+/** Sets the ability a skill rolls with (dnd5e's `system.skills.<key>.ability`), from the skill's ability tray. */
+export function saveSkillAbility(actor, skill, ability)
+{
+   return actor.update({ [`system.skills.${skill}.ability`]: ability });
+}
+
 /** Saves the portrait's framing, with the image it belongs to (user, 2026-10-27). */
 export function savePortraitFrame(actor, moduleId, src, frame)
 {

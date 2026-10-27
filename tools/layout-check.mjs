@@ -135,7 +135,8 @@ function findProblems()
    for (const el of app.querySelectorAll(`.window-content :is(${HOLDS_ICON})`))
    {
       // The control's own icon: a direct child, or in a direct child span (drawings deeper in, like a card's d20s, aren't).
-      const icon = el.querySelector(':scope > svg, :scope > span > svg');
+      // A mark under a word (the ability tray's triangle) is not the control's icon.
+      const icon = el.querySelector(':scope > svg:not(.fhcs-pick-mark), :scope > span > svg');
       if (!icon || icon.closest(HOLDS_ICON) !== el) { continue; }
       const cs = getComputedStyle(el);
       if (cs.display === 'none' || cs.visibility === 'hidden' || !el.getClientRects().length || getComputedStyle(icon).display === 'none') { continue; }

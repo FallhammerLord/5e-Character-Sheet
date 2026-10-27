@@ -417,7 +417,8 @@ export function registerQuenchTests(quench)
             // dnd5e's cycle steps none → full → expertise → half → none on a click.
             await click('.fhcs-attributes [data-key="prc"] proficiency-cycle');
             await until(() => skill().value !== before.value, () => `a click cycles Perception's proficiency; it holds ${skill().value}`);
-            await enter('.fhcs-attributes [name="system.skills.prc.ability"]', 'int');
+            await click('.fhcs-attributes [data-key="prc"] .fhcs-ability-pick > summary');
+            await click('.fhcs-attributes [data-key="prc"] [data-action="fhcsSkillAbility"][data-fhcs-ability="int"]');
             await until(() => skill().ability === 'int', () => `Perception's ability saves; it holds ${skill().ability}`);
             const { SkillToolConfig, LanguagesConfig } = globalThis.dnd5e.applications.actor;
             const open = (Kind) => [...foundry.applications.instances.values()].find((app) => app instanceof Kind && app.document === actor);
