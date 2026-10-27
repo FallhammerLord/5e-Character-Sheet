@@ -19,7 +19,7 @@ export function registerQuenchTests(quench)
 {
    quench.registerBatch(`${MODULE_ID}.core`, (context) =>
    {
-      const { describe, it, assert, before, after } = context;
+      const { describe, it, assert, before, after, afterEach } = context;
       let actor = null;
       let sheet = null;
 
