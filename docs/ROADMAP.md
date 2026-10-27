@@ -86,7 +86,7 @@ Edit mode for every field; advancement and level-up; short and long rest; death 
 Already in place before the phase: portrait picker (edit mode), rests, death saves, Level up, transformation's Revert (dnd5e's ⋮ window control). Order agreed with the user (2026-10-27):
 
 - [x] Research dnd5e 6.0.6 edit mode (research note, "Edit mode and lifecycle", 2026-10-27)
-- [ ] Design questions and mockup: header in edit mode, the HP tray, Attributes in edit mode (light, dark, 644px)
+- [ ] Design questions and mockup: header in edit mode, the HP tray, Attributes in edit mode (light, dark, 644px). Questions answered (SCOPE §4.9, 2026-10-27); boards on the canvas, awaiting approval
 - [ ] Header: name, XP, ability scores, gears for AC, Init, speed, HP and hit dice
 - [ ] HP tray from the HP number: Damage, Heal, Temp
 - [ ] Attributes: skill proficiency and ability, trait and sense gears

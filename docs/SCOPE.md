@@ -121,6 +121,18 @@ Research note, "Features, Effects, Biography, Journal". Every list matches Inven
 - **Biography:** Classic's layout (characteristics across the top; personality, ideals, bonds, flaws on the left; appearance and biography on the right). Every field always shows and edits where it stands, without unlocking the sheet (user, 2026-10-26, replacing "read in play, edit in edit mode"): fields read as text with a faint edge until hovered or focused; the biography is dnd5e's editor, toggled. A viewer without edit rights reads, empty fields hidden.
 - **Journal: dropped** (user, 2026-10-26). dnd5e has none; quests live in the quest log, notes in the biography. Tidy's Journal notes stay untouched in Tidy's flags on the actor.
 
+### 4.9 Phase 6: Edit mode (user, 2026-10-27)
+
+Research note, "Edit mode and lifecycle". dnd5e keeps the settings windows; we add the controls that open them, shown only in edit mode (§4.5).
+
+- **Values stay visible in edit mode,** with a gear beside the label (Init, speed, HP, hit dice, each trait group). dnd5e swaps the value for its gear, which hides the number while you edit.
+- **AC:** in edit mode the shield itself opens dnd5e's AC window (user, 2026-10-27: "a popout window for AC calc"); no separate gear. In play it keeps dnd5e's breakdown on hover.
+- **Ability scores:** in edit mode the big number is an input; the save stays a roll button; a gear on the label opens dnd5e's ability window.
+- **Name:** an input in edit mode only. **XP:** editable in play too, no unlock needed (user, 2026-10-27).
+- **HP tray** opens from the HP number in play mode (damage is play): an amount box, then Damage, Heal and Temp, through dnd5e's `applyDamage` (temp first) and `applyTempHP`. Setting HP to an exact number is edit mode.
+- **Skills in edit mode:** the dot becomes dnd5e's proficiency cycle (none, half, full, expertise); the ability label becomes a dropdown.
+- **Level down** sits in the level tray beside Level up, edit mode only, through dnd5e's confirm dialog.
+
 ## 5. ADHD rules carried over
 
 Typography and spacing (user, 2026-10-24): three text styles across the module (display, body, label), two spacing steps, one control height; every panel uses space economically, folded and open: a band's heading, total and open mark share one line; the card header is one label line (actor · details) over the title.
