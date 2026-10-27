@@ -146,6 +146,35 @@ From the quest log and Initiative: three text sizes; targets at least 24px; tool
 
 Don't say a thing twice: a mark that shows its own state needs no count beside it (user, 2026-10-26: the slot pips lost their "3 / 4").
 
+### 5.2 Sheet styling rules (proposed 2026-10-27, awaiting the user's approval)
+
+One set of rules for every tab and both modes (user, 2026-10-27: "apply as uniformly as we can, now that everything is where it should be"). The layout check enforces what it can (marked *check*).
+
+**Layout and alignment**
+1. **Edges that meet line up.** A region is a grid; neighbouring parts share its lines. The header: the portrait card spans two rows; the HP band and the cards share the second, so both their tops and bottoms align (the user's screenshot, 2026-10-27). *check*
+2. **Ratios hold at every width:** chips square or pill, round controls round, the shield and cards keep their shape. *check (round, square)*
+3. **Narrow padding, clear boundaries:** `--fhcs-s1` inside controls and rows, `--fhcs-s2` between regions; every region shows its edge (a 1px line or a fill), never space alone.
+
+**Controls and icons**
+4. **Icon buttons:** one rule for all. The box is a control (28px) or the 24px target; the icon 16px (the gear 14px), centred both ways, never shrunk. *check*
+5. **Text buttons read from the left** (Foundry centres them); icon, then text.
+
+**Play and edit**
+6. **Same geometry in both modes.** Edit mode keeps every row's height and columns: a control takes the place of the mark it edits (the skill dot becomes the proficiency cycle, the ability stays its text and opens its choices), and a gear takes a column play mode leaves empty or quiet. Fields may show their edge; nothing reshapes. *check (row heights)*
+
+**Colour, focus and attention** (WCAG 2.2; ADHD rules, §5)
+7. **Never colour alone** (WCAG 1.4.1): every tint has an icon, mark or word (§5.1).
+8. **Colours told apart differ in lightness, not hue alone;** no pair that only red against green separates (death saves keep tick and cross).
+9. **Contrast:** text 4.5:1, large text 3:1 (WCAG 1.4.3) *check*; a control's edge and an icon 3:1 against what they sit on (WCAG 1.4.11).
+10. **Focus shows** on every control, in both themes (WCAG 2.4.7).
+11. **No motion** beyond a state change; reduced motion respected.
+12. **Same thing, same place, same look** across tabs: search bar, pins, Columns menu, row layout, empty lines.
+13. **Empty states** are one short line in body, muted (a new sheet's empty favorites is normal, user 2026-10-27).
+
+**Window**
+14. **No title band** (user, 2026-10-27): the window's controls float at the top right over the header, as dnd5e's sheet does; the name row leaves them room.
+15. **Round or square portrait,** the player's choice in edit mode, saved on the character (user, 2026-10-27).
+
 ### 5.1 Icons and colors on the sheet (one meaning each)
 
 Check here before choosing a mark, and add new ones. Every tint has an icon, mark or word beside it; never color alone. Colors are tokens with light and dark values (`styles/fhcs.css`).
