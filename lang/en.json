@@ -286,9 +286,6 @@
       "UseLabel": "Use {name}",
       "Recharge": "Recharge",
       "Charged": "Charged",
-      "Other": "Other features",
-      "Active": "Active",
-      "Passive": "Passive",
       "Empty": "No features yet. Drag features onto the sheet to add them.",
       "Class": "Class",
       "ClearLabel": "Remove {name}"

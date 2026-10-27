@@ -12,7 +12,7 @@ This file holds how we work and the rules. Everything else lives in `docs/`:
 | `docs/BUILT.md` | How finished, verified parts work, for changing them later. |
 | `docs/research/dnd5e-6.0-sheet.md`, `…-chat.md` | dnd5e internals we rely on (sheet; chat cards and rolls). |
 
-Mockups: one Design canvas, https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, a row of boards per phase (header, Attributes, Inventory, Spellbook). Add new boards there.
+Mockups: one Design canvas, https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, a row of boards per phase (header, Attributes, Inventory, Spellbook, Features, Effects, Biography, header cards). Add new boards there.
 
 ## Session start
 
@@ -30,7 +30,7 @@ Mockups: one Design canvas, https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, a
 
 ## How a phase goes
 
-Learned over Phases 1–4; follow it unless the user says otherwise.
+Learned over Phases 1–5; follow it unless the user says otherwise.
 
 1. **Research dnd5e's source first,** before any design. Clone the matching release into the scratchpad (`git clone --depth 1 --branch release-6.0.6 https://github.com/foundryvtt/dnd5e.git`). Read how its part builds context, which actions and classes its code looks for, and its quirks. Tidy Classic's source: tag `v13.0.0` of `kgar/foundry-vtt-tidy-5e-sheets` (`src/sheets/classic/`; gone from later tags). Write findings into the research note.
 2. **Ask the design questions,** then **mock up** on the canvas: light, dark, and the 644px minimum with a hard case. Record every answer in SCOPE with the date.
@@ -46,7 +46,8 @@ Learned over Phases 1–4; follow it unless the user says otherwise.
 npm run check   # lint + load + unit. Hooks run it before every git push; CI runs it on push.
 npm run load    # loads the module with Foundry and dnd5e mocked: sheet registration and parts, partials, overrides, chat hooks,
                 # settings, manifest files, lang keys, and the Quench redraw rule
-npm run unit    # pure view functions offline (roll outcomes, card bands, header, attributes, inventory, spellbook)
+npm run unit    # pure view functions offline (roll outcomes, card bands, header and its cards, attributes, inventory, spellbook,
+                # features, effects, biography)
 npm run layout  # renders templates (cases in tools/fixtures.mjs) in light and dark themes at sheet widths 644 (the minimum)–900 or chat widths 240–380;
                 # fails on overflow, overlapping siblings, text below WCAG contrast or a fourth text style; self-tests first.
                 # Imitates Foundry's button styles (min-height, centered content). Screenshots in tools/out/.
@@ -61,7 +62,7 @@ Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies insta
 
 ### Extending dnd5e
 
-- **Extend dnd5e, don't rebuild it.** Our sheet subclasses `CharacterActorSheet`, built at init by `makeCharacterSheet(Base)` (a module can't import the system by path). dnd5e keeps every mechanic; we own layout, templates and CSS. Our tabs take dnd5e's part IDs (`details`, `inventory`, `spells`) so its tab handling and context still apply.
+- **Extend dnd5e, don't rebuild it.** Our sheet subclasses `CharacterActorSheet`, built at init by `makeCharacterSheet(Base)` (a module can't import the system by path). dnd5e keeps every mechanic; we own layout, templates and CSS. Our tabs take dnd5e's part IDs (`details`, `inventory`, `spells`, `features`, `effects`, `biography`) so its tab handling and context still apply.
 - **Keep dnd5e's hooks into the markup:** `data-action` names and the class names its code looks for (listed in the research note). Rename one and a mechanic silently stops.
 - **Prefer dnd5e's custom elements** (`dnd5e-inventory`, `item-list-controls`, `dnd5e-effects`) over rebuilt lists: they bring context menus, drag, filters and item actions (`.item-action[data-action]`).
 - **When dnd5e draws into its own markup after render** (`_renderAttunement`, `_renderSpellbook`), override the method: ours draws it, and theirs would throw or duplicate.

@@ -335,10 +335,6 @@ const FEATURE_SECTIONS = (classes) => [
 ];
 const CLERIC = { ...doc('Cleric', '#c9a227'), identifier: 'cleric', level: 9, subclass: doc('Life Domain', '#3a8a5a'), needsSubclass: false };
 const featuresFacts = (over = {}) => ({
-   classes: [CLERIC],
-   origins: [{ kind: 'species', item: doc('Dwarf', '#8a6a4a') }, { kind: 'background', item: doc('Acolyte', '#7a5ab8') }],
-   maxLevel: 20,
-   canEdit: true,
    sections: FEATURE_SECTIONS([CLERIC]),
    features: [
       feat('Channel Divinity', '#c9a227', 'cleric', { uses: uses(1, 2), recovery: 'Short Rest', favorite: true, expanded: true,
@@ -477,14 +473,13 @@ export const CASES = [
    { name: 'features', template: 'sheet/features', context: features() },
    {
       name: 'features-multiclass', template: 'sheet/features',
-      context: features({ classes: MULTICLASS_FEATS, sections: FEATURE_SECTIONS(MULTICLASS_FEATS), features: MULTICLASS_FEATURES,
-         origins: [{ kind: 'species', item: doc('Aasimar of the Radiant Dawn', '#e0c060') }, { kind: 'background', item: null }] })
+      context: features({ sections: FEATURE_SECTIONS(MULTICLASS_FEATS), features: MULTICLASS_FEATURES })
    },
    { name: 'features-by-activation', template: 'sheet/features', context: features({ grouping: 'activation' }) },
    { name: 'features-editing', template: 'sheet/features', open: ['features-columns'], context: features({ editing: true, columns: ALL_FEATURE_COLUMNS }) },
    {
       name: 'features-empty', template: 'sheet/features',
-      context: features({ classes: [], sections: FEATURE_SECTIONS([]), features: [], origins: [{ kind: 'species', item: null }, { kind: 'background', item: null }] })
+      context: features({ sections: FEATURE_SECTIONS([]), features: [] })
    },
    { name: 'spellbook', template: 'sheet/spellbook', context: spellbook() },
    { name: 'spellbook-multiclass-idle', template: 'sheet/spellbook', context: spellbook({ classes: MULTICLASS_CASTER, concentration: { save: -1, spells: [] } }) },

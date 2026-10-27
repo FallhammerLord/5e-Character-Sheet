@@ -4,8 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 5 play check** (user). Built: Features, Effects, Biography, the first-look fixes (2026-10-26) and the header cards with the level tray (2026-10-27). Quench core passes (user, 2026-10-27). First play round fixed (2026-10-27): the header's small line is size and speed only; biography boxes lose the dead resize handle; the biography editor gets a full-height writing area while open (not yet seen in Foundry); dnd5e's summary tags spaced as pills. Left: a look at a real character: a multiclass with a subclass due; the cards under the abilities at 644px and wider; Level up from the level pill (each class, New class) into dnd5e's wizard; removing and choosing a background in edit mode; the By source switch; an effect switched off and on (it stays put); a condition and exhaustion (right-click lowers it); writing in the biography with the sheet locked; the ledger rows on Inventory and Spellbook too.
-2. **Then:** fix what play finds (expect one styling pass), tick ROADMAP Phase 5, write its BUILT entry, ask before pushing to `main`.
+1. **Ask the user what comes next.** Phase 6 (edit mode and lifecycle) is the next in ROADMAP and holds what they asked for on 2026-10-26: editable name, scores, AC and portrait, and an HP calculator. It starts with dnd5e research and a mockup (CLAUDE.md, "How a phase goes").
 
 The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.
 
@@ -13,29 +12,25 @@ The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't reru
 
 In code, not yet seen in Foundry:
 
-- **Phase 5a Features tab** (2026-10-26): offline checks pass (load, unit, layout; screenshots checked). Quench passes (2026-10-27).
-- **Phase 5d header cards and level tray** (2026-10-27): offline checks pass (screenshots checked at 644, 740, 900). Quench passes (2026-10-27).
-- **Phase 5b Effects tab** (2026-10-26): offline checks pass (screenshots checked). Quench passes (2026-10-27). The layout check now fails when a short fixed word (a condition, a card label, a class name) is cut short.
-- **Phase 5c Biography tab** (2026-10-26): offline checks pass (screenshots checked; the editor itself only renders in Foundry). Quench passes (2026-10-27).
-
 - **Chat log scrolling** (2026-10-24, third try). New cards stopped short by the Apply section, which dnd5e fills in after the card is placed. Folded rolls post with `scroll: false`; the player's own new card posts with `scroll: true`, and while following it (8 s, until the player scrolls, clicks or types in the log) a `ResizeObserver` scrolls again on every size change. Apply starts folded.
 - **Inventory sort button** lights only when a filter or search is on (dnd5e marks it active always).
 
 Play checks, when convenient (not work for a session to pick up):
 
 - **Header:** art fits (round, square, tall); both ability emphasis settings; the milestone track with dnd5e's leveling set to no XP.
+- **Phase 5, not yet tried in play:** Level up and New class from the level tray into dnd5e's wizard; removing and choosing a class, species or background in edit mode; the biography editor's writing area when open; an effect switched off and on; exhaustion lowered with a right-click.
 
 ## Verified
 
 In Foundry, by the user:
 
+- **Phase 5 Features, Effects, Biography and header cards** (2026-10-27, Quench core and play): features by source or active and passive; effects by kind with the switch and conditions; biography fields edited in place; class, species and background cards under the abilities with Level up in the level tray; ledger rows on every list.
 - **Phase 4 Spellbook** (2026-10-26, Quench core 35 of 35 and play): sections with slot pips (Pact Magic, item, ritual), the book, Can cast with slots spent, favorites and their glow, the concentration bar, filters and Columns menu, context menu and drag, Attributes favorites (innate and at will).
 - **Phase 3 Inventory** (2026-10-26, Quench 30 of 30 and play): sections, equip and attune toggles, uses and quantity, expand, Columns menu, footer, search, filter and sort, pinned filters, containers (drop in, fold, nest, search inside).
 - **Phase 2 Attributes, frame and tab row** (2026-10-24, Quench 26 of 26 and play): skills, passives, traits, favorites, slot pips, death saves in the header, tabs and lock.
 - **Phase 1 header** (2026-10-24, screenshot and Quench): portrait chips, HP, XP and level, origin line, AC, Init and the ability row, in the dark theme with none of dnd5e's look.
 - **Exhaustion penalty** (2026-10-26): skills, saves and Init show the same total at every level; nothing to fix.
 - **Track R, rolls and chat cards** (2026-10-24, Quench and play): bands, late adds, saves for selected tokens, Apply, standalone rolls, GM requests, settings.
-- **Features, Effects and Biography** still show Foundry's bare defaults; expected until their phase.
 
 Offline:
 

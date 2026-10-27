@@ -62,22 +62,22 @@ Built 2026-10-26; verified in Quench (core 35 of 35) and in play (user, 2026-10-
 - [x] Favorite toggle column on Inventory rows too, with the glow (user, 2026-10-26); names left-aligned (Foundry centered them)
 - [x] Filters: pinned Action, Bonus, Reaction, Conc., Prepared; Can cast and V, S, M added to dnd5e's menu
 
-## Phase 5: Features, Effects, Biography
+## Phase 5: Features, Effects, Biography (done; verified 2026-10-27)
 
 Journal dropped (user, 2026-10-26; SCOPE §4.8).
 
 - [x] Research: dnd5e 6.0.6 features, effects and biography parts; Tidy Classic's four tabs and its Journal (2026-10-26, research note)
 - [x] Design answers: grouping, class cards, columns, effects and conditions, biography, data carried over, no Journal (user, 2026-10-26; SCOPE §4.8)
-- [x] Mockup approved (user, 2026-10-26: "should be good"; canvas rows Features, Effects, Biography)
+- [x] Mockup approved (user, 2026-10-26: "should be good"; canvas rows Features, Effects, Biography; header cards row approved 2026-10-26)
+- [x] First look (user, 2026-10-26) and its fixes: cards alike with the art as an underlay and a remove in edit mode; effects keep their place when switched; every biography field edits in place; ledger rows on every list
+- [x] First play round (user, 2026-10-27) and its fixes: header line size and speed; biography editing room; summary tags spaced
 
-Built in slices; each box is ticked once seen in Quench and play:
+Verified in Quench (core, user, 2026-10-27) and play (user, 2026-10-27, "looks good"):
 
-First look (user, 2026-10-26) and its fixes: cards alike with the art as an underlay and a remove in edit mode; effects keep their place when switched; every biography field edits in place; ledger rows on every list.
-
-- [ ] 5a Features (built 2026-10-26): features by source or active and passive (dnd5e's grouping, named in words); Uses, Usage, Recovery, favorite; Columns menu; pins Action, Bonus, Reaction
-- [ ] 5b Effects (built 2026-10-26): dnd5e's categories (Temporary, Passive, Inactive, Suppressed when any) on its effects element, with Source, Duration, the on/off switch (a concentration shows its C) and the favorite bookmark; edit and delete in edit mode; the conditions grid (exhaustion counts up on a click, down on a right-click)
-- [ ] 5d Header cards (built 2026-10-27): class, species and background cards under the abilities on their grid (dashed Choose for what's missing; remove in edit mode); Level up in the level pill's tray, per class or a new class, in XP and milestone mode
-- [ ] 5c Biography (built 2026-10-26): characteristics, the five text boxes and the biography from dnd5e's fields, read in play with empty ones hidden; dnd5e's inputs and its toggled editor in edit mode
+- [x] 5a Features: features by source or active and passive (dnd5e's grouping, named in words); Uses, Usage, Recovery, favorite; Columns menu; pins Action, Bonus, Reaction
+- [x] 5b Effects: Temporary and Passive by kind (a switched-off effect stays put), Unavailable when any, on dnd5e's effects element, with Source, Duration, the on/off switch (a concentration shows its C) and the favorite bookmark; edit and delete in edit mode; the conditions grid (exhaustion counts up on a click, down on a right-click)
+- [x] 5c Biography: characteristics, the five text boxes and the biography from dnd5e's fields, each editable where it stands
+- [x] 5d Header cards: class, species and background cards under the abilities on their grid (dashed Choose for what's missing; remove in edit mode); Level up in the level pill's tray, per class or a new class, in XP and milestone mode
 
 ## Phase 6: Edit mode and lifecycle
 
