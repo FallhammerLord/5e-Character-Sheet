@@ -54,6 +54,21 @@ const LEVEL_ORDER_FLAG = 'levelOrder';
  * Plain facts for the sheet header (src/sheet/header.js), from dnd5e's prepared data and the sheet's own helpers
  * (`_preparePortrait`, `_prepareAbilities`; character-sheet.mjs:478, base-actor-sheet.mjs:445, 502).
  */
+/**
+ * The HP tray's three changes, through dnd5e's own functions (actor.mjs:785, :1061): damage takes temp first and stops
+ * at 0, and its hooks run (concentration saves); healing is negative damage, capped at the max; temp HP is set only
+ * when higher than the temp already there (it doesn't stack). Healing from 0 clears the death saves (dnd5e's
+ * `preUpdateHP`).
+ * @param {Actor} actor
+ * @param {'damage'|'heal'|'temp'} kind
+ * @param {number} amount  Whole and above 0.
+ */
+export function changeHp(actor, kind, amount)
+{
+   if (kind === 'temp') { return actor.applyTempHP(amount); }
+   return actor.applyDamage(kind === 'heal' ? -amount : amount);
+}
+
 export async function headerFacts(sheet, context, moduleId, emphasis)
 {
    const actor = sheet.actor;

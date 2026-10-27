@@ -83,7 +83,9 @@
          </div>
 
          <div class="fhcs-portrait-band">
-            {{!-- dnd5e's meter markup: a click on it shows the input (base-actor-sheet.mjs #toggleMeter). --}}
+            {{#if @root.editable}}
+            {{!-- Edit mode: dnd5e's meter markup; a click on it shows the field to set HP exactly (base-actor-sheet.mjs
+                  #toggleMeter). --}}
             <div class="fhcs-hp meter">
                <div class="fhcs-hp-meter" role="meter" aria-valuemin="0" aria-valuenow="{{ hp.value }}" aria-valuemax="{{ hp.max }}"
                     aria-label="{{ hp.label }}">
@@ -93,6 +95,41 @@
                          data-max="{{ hp.max }}" value="{{ hp.value }}" placeholder="0" hidden>
                </div>
             </div>
+            {{else if editable}}
+            {{!-- Play mode: the bar opens the HP tray (user, 2026-10-27). Not dnd5e's meter markup, so its click-to-edit
+                  stays out of the way. --}}
+            <details class="fhcs-fold fhcs-hp-fold" data-fold-key="hp">
+               <summary class="fhcs-hp-meter" aria-label="{{ hp.changeLabel }}">
+                  <span class="fhcs-hp-fill" style="width: {{ hp.pct }}%"></span>
+                  <span class="fhcs-hp-line"><span class="fhcs-label">{{ text.hp }}</span><span class="fhcs-display">{{ hp.text }}</span></span>
+               </summary>
+               <div class="fhcs-tray fhcs-hp-tray" data-hp="{{ hp.current }}" data-temp="{{ hp.tempValue }}">
+                  <label class="fhcs-hp-amount"><span class="fhcs-label">{{ text.amount }}</span>
+                     <input type="number" class="fhcs-input fhcs-display" min="1" step="1" autocomplete="off" data-fhcs-amount></label>
+                  <div class="fhcs-hp-actions">
+                     <button type="button" class="fhcs-button fhcs-body fhcs-hp-damage" data-action="fhcsHpChange" data-kind="damage"
+                             aria-label="{{ text.damageLabel }}" data-fhcs-tip="{{ text.damageLabel }}">
+                        <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/><path d="M12 7.4l-1.5 4 3 1.6-1.5 4"/></svg>{{ text.damage }}
+                     </button>
+                     <button type="button" class="fhcs-button fhcs-body" data-action="fhcsHpChange" data-kind="heal"
+                             aria-label="{{ text.healLabel }}" data-fhcs-tip="{{ text.healLabel }}">
+                        <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/><path d="M12 9.5v5M9.5 12h5"/></svg>{{ text.heal }}
+                     </button>
+                     <button type="button" class="fhcs-button fhcs-body" data-action="fhcsHpChange" data-kind="temp"
+                             aria-label="{{ text.tempLabel }}" data-fhcs-tip="{{ text.tempLabel }}">
+                        <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M12 9v6M9 12h6"/></svg>{{ text.giveTemp }}
+                     </button>
+                  </div>
+                  <span class="fhcs-body fhcs-muted fhcs-hp-preview" aria-live="polite">{{ hp.preview }}</span>
+               </div>
+            </details>
+            {{else}}
+            <div class="fhcs-hp-meter" role="meter" aria-valuemin="0" aria-valuenow="{{ hp.value }}" aria-valuemax="{{ hp.max }}"
+                 aria-label="{{ hp.label }}">
+               <span class="fhcs-hp-fill" style="width: {{ hp.pct }}%"></span>
+               <span class="fhcs-hp-line"><span class="fhcs-label">{{ text.hp }}</span><span class="fhcs-display">{{ hp.text }}</span></span>
+            </div>
+            {{/if}}
             <div class="fhcs-hp-fields">
                <label class="fhcs-label fhcs-muted" for="{{ @root.document.id }}-fhcs-temp">{{ text.temp }}</label>
                <input type="text" id="{{ @root.document.id }}-fhcs-temp" class="fhcs-input fhcs-body" name="system.attributes.hp.temp"

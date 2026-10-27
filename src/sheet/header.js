@@ -80,6 +80,23 @@ export function levelTrack(classes, order, originalId, format)
 const percent = (value, max) => (max > 0 ? Math.max(0, Math.min(100, Math.round(100 * value / max))) : 0);
 
 /**
+ * The HP tray's line under its buttons (user, 2026-10-27): what Damage would do with the amount typed, before the
+ * click. Damage takes temp first, as dnd5e's `applyDamage` does (actor.mjs:785), and stops at 0.
+ * @param {string|number} amount  As typed.
+ * @param {{value: number, temp: number}} hp
+ * @param {{format: Function, localize: Function}} i18n
+ * @returns {string}
+ */
+export function hpPreview(amount, hp, { format, localize })
+{
+   const n = Math.max(0, Math.floor(Number(amount)));
+   if (!n) { return localize('FHCS.Header.HpPreviewNone'); }
+   const fromTemp = Math.min(Math.max(0, hp.temp || 0), n);
+   const fromHp = Math.min(Math.max(0, hp.value), n - fromTemp);
+   return format('FHCS.Header.HpPreview', { temp: fromTemp, hp: fromHp, left: hp.value - fromHp });
+}
+
+/**
  * Everything the header template shows.
  * @param {object} facts  From compat.headerFacts (or a fixture).
  * @param {{format: Function, localize: Function}} i18n
@@ -118,7 +135,11 @@ export function headerView(facts, { format, localize })
          // A plain number: dnd5e reads a typed leading + or − as add or subtract (`_onChangeInputDelta`).
          maxMod: hp.tempmax ? String(hp.tempmax) : '',
          text: `${hp.value} / ${hp.max}`,
-         label: format('FHCS.Header.HPLabel', { value: hp.value, max: hp.max })
+         label: format('FHCS.Header.HPLabel', { value: hp.value, max: hp.max }),
+         // The HP tray (play mode, for whoever may edit the character): Damage, Heal, Temp.
+         changeLabel: format('FHCS.Header.HpChangeLabel', { value: hp.value, max: hp.max }),
+         current: hp.value, tempValue: hp.temp || 0,
+         preview: hpPreview('', hp, i18n)
       },
       ac: facts.ac ?? '—',
       init: signed(facts.init),
@@ -159,6 +180,9 @@ export function headerView(facts, { format, localize })
       text: {
          hp: localize('FHCS.Header.HP'), temp: localize('FHCS.Header.Temp'), maxMod: localize('FHCS.Header.MaxMod'),
          maxModLabel: localize('FHCS.Header.MaxModLabel'), exhaustionShow: localize('FHCS.Header.ExhaustionShow'),
+         amount: localize('FHCS.Header.HpAmount'), damage: localize('FHCS.Header.HpDamage'), heal: localize('FHCS.Header.HpHeal'),
+         giveTemp: localize('FHCS.Header.HpTemp'), damageLabel: localize('FHCS.Header.HpDamageLabel'),
+         healLabel: localize('FHCS.Header.HpHealLabel'), tempLabel: localize('FHCS.Header.HpTempLabel'),
          ac: localize('FHCS.Header.AC'),
          init: localize('FHCS.Header.Init'), proficiency: localize('FHCS.Header.Proficiency'),
          save: localize('FHCS.Header.Save'), inspiration: localize('FHCS.Header.Inspiration'),

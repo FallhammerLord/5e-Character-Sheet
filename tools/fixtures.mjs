@@ -139,7 +139,8 @@ const headerFacts = (over = {}) => ({
    })),
    ...over
 });
-const header = (over) => ({ editable: false, rollableClass: 'rollable', fhcs: headerView(headerFacts(over), { format, localize }) });
+const header = (over) => ({ editable: false, rollableClass: 'rollable',
+   fhcs: { ...headerView(headerFacts(over), { format, localize }), editable: over?.editable ?? true } });
 const MULTICLASS = {
    classes: [
       { id: 'cleric', name: 'Cleric', levels: 9, img: CLASS_ICON('#c9a227'), subclass: 'Life Domain' },
@@ -551,6 +552,8 @@ export const CASES = [
    { name: 'header-square-art', template: 'sheet/header', context: header({ portrait: { src: SQUARE, isVideo: false } }) },
    // Aid on: temp HP and a temporary change to max (Max ±), so both fields hold a value.
    { name: 'header-max-mod', template: 'sheet/header', context: header({ hp: { value: 82, max: 92, temp: 5, tempmax: 5 } }) },
+   // The HP tray open from the bar, Aid on (user, 2026-10-27); and a viewer's bar, which opens nothing.
+   { name: 'header-hp-tray', template: 'sheet/header', open: ['hp'], context: header({ hp: { value: 82, max: 92, temp: 5, tempmax: 5 } }) },
    // Four classes: two cards, "+2" opens the class tray (user, 2026-10-27).
    { name: 'header-classes-open', template: 'sheet/header', open: ['classes'], context: header({ originCards: FOUR_CLASSES() }) },
    { name: 'header-classes-editing', template: 'sheet/header', open: ['classes'], context: header({ originCards: FOUR_CLASSES({ editing: true }) }) },
@@ -559,7 +562,7 @@ export const CASES = [
       context: header({ xp: { value: 14200, max: 14000, pct: 100, valueLabel: '14,200', maxLabel: '14,000' },
          originCards: originFacts({ xp: { value: 14200, max: 14000 }, editing: true }) })
    },
-   { name: 'header-viewer', template: 'sheet/header', context: header({ originCards: originFacts({ canEdit: false, origins: [{ kind: 'species', item: null }, { kind: 'background', item: null }] }) }) },
+   { name: 'header-viewer', template: 'sheet/header', context: header({ editable: false, originCards: originFacts({ canEdit: false, origins: [{ kind: 'species', item: null }, { kind: 'background', item: null }] }) }) },
    {
       name: 'card-attack-full-side',
       template: 'chat/usage-card',

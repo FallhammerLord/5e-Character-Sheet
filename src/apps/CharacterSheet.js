@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH } from '../constants.js';
-import { attributesFacts, biographyFacts, cycleListGrouping, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelUpClass,
+import { attributesFacts, biographyFacts, changeHp, cycleListGrouping, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelUpClass,
    passesExtraFilters, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
@@ -8,7 +8,7 @@ import { featureColumnChoice, featuresView } from '../sheet/features.js';
 import { effectsView } from '../sheet/effects.js';
 import { biographyView } from '../sheet/biography.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
-import { headerMinWidth, headerView, tabRow } from '../sheet/header.js';
+import { headerMinWidth, headerView, hpPreview, tabRow } from '../sheet/header.js';
 import { delayTips, keepFolds } from '../chat/card.js';
 
 /** Our template parts, by dnd5e part ID. */
@@ -137,6 +137,38 @@ function levelUp(event, target)
    return levelUpClass(this, target.dataset.itemId);
 }
 
+/**
+ * The HP tray's Damage, Heal and Temp (user, 2026-10-27): the amount typed, through dnd5e's own functions. The tray
+ * closes first, so it doesn't stay open across the redraw the change brings.
+ */
+function hpChange(event, target)
+{
+   const tray = target.closest('.fhcs-hp-tray');
+   const amount = Math.floor(Number(tray?.querySelector('[data-fhcs-amount]')?.value));
+   if (!(amount > 0)) { return null; }
+   const fold = target.closest('details');
+   if (fold) { fold.open = false; }
+   return changeHp(this.actor, target.dataset.kind, amount);
+}
+
+/**
+ * The HP tray's amount field is not part of the sheet's form: its change must not submit the sheet (a redraw would
+ * drop what was typed), and Enter does nothing (each change has its own button). Typing updates the preview line.
+ */
+function wireHpTray(element)
+{
+   const field = element.querySelector('.fhcs-hp-tray [data-fhcs-amount]');
+   if (!field || field.dataset.fhcsWired) { return; }
+   field.dataset.fhcsWired = 'true';
+   const tray = field.closest('.fhcs-hp-tray');
+   const preview = tray.querySelector('.fhcs-hp-preview');
+   const hp = { value: Number(tray.dataset.hp) || 0, temp: Number(tray.dataset.temp) || 0 };
+   const i18n = { localize: (key) => game.i18n.localize(key), format: (key, data) => game.i18n.format(key, data) };
+   field.addEventListener('change', (event) => { event.stopPropagation(); });
+   field.addEventListener('keydown', (event) => { if (event.key === 'Enter') { event.preventDefault(); } });
+   field.addEventListener('input', () => { if (preview) { preview.textContent = hpPreview(field.value, hp, i18n); } });
+}
+
 /** The grouping button in words: steps dnd5e's own switch, which moves the rows, then names the grouping now in force. */
 async function cycleGroup(event, target)
 {
@@ -254,7 +286,7 @@ export function makeCharacterSheet(Base)
          actions: { fhcsTogglePassives: togglePassives, fhcsToggleGroup: toggleGroup, fhcsToggleColumn: toggleColumn,
             fhcsToggleContainer: toggleContainer, fhcsPinFilter: pinFilter, fhcsOpenConcentration: openConcentration,
             fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails,
-            fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup }
+            fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange }
       };
 
       static PARTS = ourParts(Base.PARTS);
@@ -355,6 +387,7 @@ export function makeCharacterSheet(Base)
          // The header's trays stay open across re-renders; its chips' tooltips wait like the cards' do.
          keepFolds(this.element, `sheet-${this.id}`);
          closeTraysOnClickOff();
+         wireHpTray(this.element);
          const items = this.element.querySelector('.fhcs-inventory .fhcs-items');
          if (items && !items.dataset.fhcsWatched)
          {

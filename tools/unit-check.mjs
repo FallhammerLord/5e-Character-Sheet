@@ -16,7 +16,7 @@ import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js
 import { effectsView } from '../src/sheet/effects.js';
 import { biographyView, paragraphs } from '../src/sheet/biography.js';
 import { pinView } from '../src/sheet/lists.js';
-import { headerMinWidth, headerView, levelOrder, levelTrack, signed, tabRow } from '../src/sheet/header.js';
+import { headerMinWidth, headerView, hpPreview, levelOrder, levelTrack, signed, tabRow } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
 const facts = (over) => ({
@@ -247,6 +247,19 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    catch { problems.push(`attributes: got ${JSON.stringify(got)}, expected ${JSON.stringify(expected)}`); }
    const editing = attributesView({ ...facts, editing: true }, { format, localize });
    if (editing.traits.map((t) => t.text).join() !== 'Common,\u2014') { problems.push('edit mode does not list empty traits'); }
+}
+
+// The HP tray's preview: damage takes temp first and stops at 0; nothing typed asks for an amount.
+{
+   const hp = { value: 20, temp: 5 };
+   const got = ['12', '3', '40', '', 'x', '-4'].map((n) => hpPreview(n, hp, { format, localize }));
+   try
+   {
+      deepStrictEqual(got, ['Damage: 5 from temp, 7 from HP, leaves 13', 'Damage: 3 from temp, 0 from HP, leaves 20',
+         'Damage: 5 from temp, 20 from HP, leaves 0', 'Type an amount, then choose', 'Type an amount, then choose',
+         'Type an amount, then choose']);
+   }
+   catch { problems.push(`HP preview: ${JSON.stringify(got)}`); }
 }
 
 // Death saves show only at 0 HP.

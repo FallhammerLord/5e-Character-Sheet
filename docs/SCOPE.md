@@ -174,6 +174,7 @@ Check here before choosing a mark, and add new ones. Every tint has an icon, mar
 | Small ringed dot | Exhaustion 0; rest on it to show the chip | The portrait card's top left (user, 2026-10-27) |
 | "+N" in a small box | N more classes, in the class tray | The last class card's label line (user, 2026-10-27) |
 | Light green fill inside the HP bar | HP left, with the numbers written over it | The portrait card's band (user, 2026-10-27) |
+| Heart with a crack; heart with a plus; shield with a plus | Damage; heal; temporary HP | The HP tray, each with its word; Damage solid as the main action (user, 2026-10-27) |
 
 Chat cards keep their own scheme (§6.6): the primary d20 black (white in dark themes), disadvantage dice red, advantage dice blue.
 

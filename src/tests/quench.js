@@ -290,6 +290,29 @@ export function registerQuenchTests(quench)
             assert.strictEqual(config.type, 'short');
          });
 
+         it('takes damage (temp first), heals and gives temp HP from the HP tray', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 6);
+            const hp = () => actor.system.attributes.hp;
+            const before = { value: hp().value, temp: hp().temp, max: actor.system._source.attributes.hp.max };
+            // A test character has no class; a max override gives it 20 HP to work with.
+            await actor.update({ 'system.attributes.hp.max': 20, 'system.attributes.hp.value': 20, 'system.attributes.hp.temp': 2 });
+            const change = async (kind, amount) =>
+            {
+               await enter('.fhcs-header .fhcs-hp-tray [data-fhcs-amount]', String(amount));
+               await click(`.fhcs-header .fhcs-hp-tray [data-action="fhcsHpChange"][data-kind="${kind}"]`);
+            };
+            await change('damage', 5);
+            await until(() => hp().temp === 0 && hp().value === 17, () => `5 damage takes the 2 temp first, then 3 HP; HP ${hp().value}, temp ${hp().temp}`);
+            await change('heal', 10);
+            await until(() => hp().value === 20, () => `healing stops at the max of 20; HP ${hp().value}`);
+            await change('temp', 4);
+            await until(() => hp().temp === 4, () => `Temp sets temporary HP to 4; temp ${hp().temp}`);
+            const fold = sheet.element.querySelector('.fhcs-header details.fhcs-hp-fold');
+            assert.isFalse(!!fold?.open, 'the tray closes after a change');
+            await actor.update({ 'system.attributes.hp.max': before.max, 'system.attributes.hp.value': before.value, 'system.attributes.hp.temp': before.temp });
+         });
+
          it('shows two class cards and folds further classes into the class tray', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 4);

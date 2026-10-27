@@ -1220,6 +1220,28 @@
 
 .fhcs-sheet .fhcs-hp-meter > input { position: relative; height: 100%; border: 0; text-align: center; }
 
+/* Play mode: the bar is the HP tray's handle (user, 2026-10-27). */
+.fhcs-sheet .fhcs-hp-fold { position: relative; }
+.fhcs-sheet .fhcs-hp-fold > summary { list-style: none; cursor: pointer; }
+.fhcs-sheet .fhcs-hp-fold > summary::-webkit-details-marker { display: none; }
+.fhcs-sheet .fhcs-hp-fold[open] > summary { border-color: currentColor; }
+
+.fhcs-sheet .fhcs-hp-tray { z-index: 3; width: 16.5rem; gap: var(--fhcs-s2); padding: var(--fhcs-s2); }
+.fhcs-sheet .fhcs-hp-amount { display: flex; align-items: center; justify-content: space-between; gap: var(--fhcs-s2); }
+.fhcs-sheet .fhcs-hp-amount .fhcs-input { width: 6rem; text-align: center; }
+
+.fhcs-sheet .fhcs-hp-actions
+{
+   display: grid;
+   grid-template-columns: repeat(3, minmax(0, 1fr));
+   gap: var(--fhcs-s1);
+}
+
+.fhcs-sheet .fhcs-hp-actions .fhcs-button { padding: 0 var(--fhcs-s1); }
+.fhcs-sheet .fhcs-hp-actions .fhcs-icon { flex: none; }
+/* Damage, the main action, is solid; color stays out of it (green already means equipped). */
+.fhcs-sheet .fhcs-hp-actions .fhcs-hp-damage { border-color: var(--fhcs-die-ink); background: var(--fhcs-die-ink); color: var(--fhcs-die-on-ink); }
+
 /* Temp and Max ± on one line: the labels never wrap; the two fields share what's left. */
 .fhcs-sheet .fhcs-hp-fields
 {

@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6, slice 1 (portrait card in play mode) waits on Quench and play** (Waiting on the user, below). After it passes, slice 2, the HP tray (ROADMAP Phase 6 lists the slices). Styling notes for slice 7, from the user's screenshots (2026-10-27): the sort button shows Foundry's orange active ring with no filter on; a blank band above the header; the empty Attributes favorites leave the right column bare; Hunter's Mark's "Additional Spells" row (Favored Enemy's free casts) shows no uses; the spell slot settings icon (`spellbook.hbs`) draws as a sun, not a gear (use the cog from the Phase 6 boards).
+1. **Phase 6: slices 1 and 2 built; slice 3, the edit-mode header, is next** (ROADMAP Phase 6 lists the slices; Quench and play for 1 and 2 wait on the user, below). Styling notes for slice 7, from the user's screenshots (2026-10-27): the sort button shows Foundry's orange active ring with no filter on; a blank band above the header; the empty Attributes favorites leave the right column bare; Hunter's Mark's "Additional Spells" row (Favored Enemy's free casts) shows no uses; the spell slot settings icon (`spellbook.hbs`) draws as a sun, not a gear (use the cog from the Phase 6 boards).
 
 The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.
 
@@ -12,6 +12,7 @@ The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't reru
 
 In code, not yet seen in Foundry:
 
+- **Phase 6 slice 2, the HP tray** (2026-10-27): play mode, a click on the HP bar opens it; type an amount, then Damage (temp first), Heal or Temp; the line under the buttons says what Damage would do. Quench "core": new test "takes damage (temp first), heals and gives temp HP from the HP tray". In edit mode a click on the bar still sets HP exactly (dnd5e's meter).
 - **Special Traits tab** (2026-10-27): dnd5e's form in our look; checkboxes 20px (Foundry's `--checkbox-size`; unverified that Foundry's own tick follows it). Look at it in edit mode.
 - **Portrait clicks** (2026-10-27): the chip layer had swallowed them; the art opens again (play: dnd5e's artwork; edit: the file picker).
 - **Phase 6 slice 1, the portrait card** (2026-10-27; Quench passes, user 2026-10-27; offline checks and layout screenshots pass). Run Quench "core": new tests "keeps Temp and Max ± as fields…" and "shows two class cards and folds further classes into the class tray". In play: round token, square and tall art in the 234px frame; Temp and Max ± typed; the exhaustion dot (rest on it 1.5 s); Short and Long rest chips; a character with three or more classes.
