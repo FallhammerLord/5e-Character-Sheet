@@ -257,6 +257,15 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const up = headerView({ ...base, hp: { value: 5, max: 10, temp: 0 } }, { format, localize });
    const down = headerView({ ...base, hp: { value: 0, max: 10, temp: 0 } }, { format, localize });
    if (up.death) { problems.push('death saves show above 0 HP'); }
+   // The portrait card: exhaustion 0 hides behind its dot; Max ± is tempmax as a plain number (dnd5e reads a typed
+   // sign as a delta); a token shows whole, other art fills the frame; one chip per rest.
+   const card = headerView({ ...base, portrait: { token: true }, showRests: true, hp: { value: 5, max: 15, temp: 2, tempmax: 5 },
+      restTypes: [{ key: 'short', label: 'Short' }, { key: 'long', label: 'Long' }] }, { format, localize });
+   const tired = headerView({ ...base, portrait: {}, exhaustion: { value: 2, max: 6 }, hp: { value: 5, max: 10, temp: 0, tempmax: -3 } }, { format, localize });
+   const got = [card.exhaustion.none, tired.exhaustion.none, card.hp.maxMod, tired.hp.maxMod, up.hp.maxMod, card.portrait.fit, tired.portrait.fit,
+      card.rests.map((r) => `${r.key}${r.short ? '*' : ''}`).join()];
+   try { deepStrictEqual(got, [true, false, '5', '-3', '', 'contain', 'cover', 'short*,long']); }
+   catch { problems.push(`portrait card: ${JSON.stringify(got)}`); }
    const marks = down.death ? [down.death.success.map((p) => p.filled), down.death.failure.map((p) => p.filled)] : null;
    try { deepStrictEqual(marks, [[true, true, false], [true, false, false]]); }
    catch { problems.push(`death saves at 0 HP: ${JSON.stringify(marks)}`); }
@@ -418,8 +427,9 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
       ...over
    });
    const spans = [classSpans(8, 1), classSpans(8, 2), classSpans(8, 3), classSpans(9, 2), classSpans(9, 1)].map((x) => x.join('+'));
-   // One class takes the 4 columns left by species and background; two share them; three can't, so they wrap at 2.
-   try { deepStrictEqual(spans, ['4', '2+2', '2+2+2', '3+2', '5']); }
+   // One class takes the 4 columns left by species and background; two share them; a third and more go to the class
+   // tray (user, 2026-10-27), so there are never more than two spans.
+   try { deepStrictEqual(spans, ['4', '2+2', '2+2', '3+2', '5']); }
    catch { problems.push(`card spans: ${JSON.stringify(spans)}`); }
    const cards = originCards(facts(), 8, { format, localize });
    const shape = cards.map((k) => `${k.kind}:${k.item?.name ?? ''}${k.level ? ` ${k.level}` : ''}${k.sub ? `/${k.sub.name}` : ''}${k.choose ? `+${k.choose.type}` : ''}${k.item?.clear ? 'x' : ''}@${k.span}`);
@@ -432,6 +442,16 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    if (viewer.some((k) => k.choose || k.item?.clear)) { problems.push('a viewer without edit rights gets Choose or remove'); }
    const blank = originCards(facts({ classes: [] }), 8, { format, localize });
    if (blank[0].choose?.type !== 'class' || blank[0].span !== 4) { problems.push(`no class: ${JSON.stringify(blank[0])}`); }
+   // Four classes: the two highest take cards; the last card's "+2" holds the rest, highest first.
+   const four = originCards(facts({ editing: true, classes: [
+      ...facts().classes,
+      { id: 'r', uuid: 'r', name: 'Rogue', img: '', identifier: 'rogue', level: 3, subclass: null, needsSubclass: true },
+      { id: 'f', uuid: 'f', name: 'Fighter', img: '', identifier: 'fighter', level: 2, subclass: null, needsSubclass: false }
+   ] }), 8, { format, localize });
+   const fourShape = four.filter((k) => k.isClass).map((k) => `${k.item.name}@${k.span}${k.more ? `${k.more.text}:${k.more.classes.map((m) => `${m.item.name}${m.choose ? '+' : ''}${m.item.clear ? 'x' : ''}`).join(',')}` : ''}`);
+   try { deepStrictEqual(fourShape, ['Cleric@2', 'Rogue@2+2:Fighterx,Warlock+x']); }
+   catch { problems.push(`four classes: ${JSON.stringify(fourShape)}`); }
+   if (cards.some((k) => k.more)) { problems.push('two classes get a "+N" chip'); }
    const up = levelUpChoices(facts(), { format, localize });
    if (up.classes.map((k) => `${k.name}${k.next}`).join() !== 'Cleric10,Warlock2' || up.ready) { problems.push(`level up: ${JSON.stringify(up)}`); }
    if (!levelUpChoices(facts({ xp: { value: 300, max: 300 } }), { format, localize }).ready) { problems.push('enough XP does not mark the level pill'); }

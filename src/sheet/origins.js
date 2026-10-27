@@ -3,6 +3,9 @@
  * pill's tray. Pure, like header.js: `compat.originFacts` gathers the facts from dnd5e.
  */
 
+/** Class cards shown on the sheet; further classes fold into the class tray on the last card. */
+export const MAX_CLASS_CARDS = 2;
+
 /**
  * How many ability-grid columns each card spans (user, 2026-10-26): the cards sit on the ability row's grid, so they
  * line up with it and scale with it. Species and background take 2 columns each; the classes share the rest, 2 at
@@ -14,6 +17,8 @@
 export function classSpans(columns, classes)
 {
    if (!classes) { return []; }
+   // Two class cards at most (user, 2026-10-27): the rest are in the class tray, so the cards always fit one row.
+   classes = Math.min(classes, MAX_CLASS_CARDS);
    const room = Math.max(2, columns - 4);
    if (classes * 2 > room) { return Array(classes).fill(2); }
    const base = Math.floor(room / classes);
@@ -36,19 +41,30 @@ export function originCards(facts, columns, { format, localize })
    const clear = (doc) => (canClear ? { uuid: doc.uuid, label: format('FHCS.Features.ClearLabel', { name: doc.name }) } : null);
    const classes = [...(facts.classes ?? [])].sort((a, b) => b.level - a.level);
    const spans = classSpans(columns, classes.length || (canEdit ? 1 : 0));
-   const cards = classes.map((k, i) => ({
+   const classCard = (k) => ({
       isClass: true,
       kind: localize('FHCS.Features.Class'),
-      span: spans[i],
       art: k.img,
       item: { ...open(k), clear: clear(k) },
       // The level beside the name ("Cleric 9"); Level up itself is in the level pill's tray.
       level: String(k.level),
+      // The subclass takes its own line (user, 2026-10-27: the cards reach the portrait card's foot, so there's room).
       sub: k.subclass ? { ...open(k.subclass), clear: clear(k.subclass) } : null,
       // A subclass due: its Subclass advancement reached and none owned, dnd5e's own test (character-sheet.mjs:400).
       choose: !k.subclass && k.needsSubclass && canEdit ? {
          type: 'subclass', identifier: k.identifier, text: localize('FHCS.Features.Subclass'),
          label: format('FHCS.Features.ChooseSubclassLabel', { name: k.name })
+      } : null
+   });
+   const shown = classes.slice(0, MAX_CLASS_CARDS);
+   const folded = classes.slice(MAX_CLASS_CARDS).map(classCard);
+   const cards = shown.map((k, i) => ({
+      ...classCard(k),
+      span: spans[i],
+      // The last card carries a "+N" chip that opens the class tray (user, 2026-10-27).
+      more: i === shown.length - 1 && folded.length ? {
+         text: `+${folded.length}`, label: format('FHCS.Header.MoreClasses', { n: folded.length }),
+         title: localize('FHCS.Header.MoreClassesTitle'), classes: folded
       } : null
    }));
    // No class yet: a card to choose one, as dnd5e offers in play too (`showClassDrop`, character-sheet.mjs:463).

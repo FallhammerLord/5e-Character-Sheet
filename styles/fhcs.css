@@ -51,6 +51,11 @@
    --fhcs-conc: #7a5a00;
    /* Spell slot pips: a soft blue, lighter than the prepared edge (user, 2026-10-26). */
    --fhcs-slot: #4a86c8;
+   /* The HP bar's fill: a light tint of success, so ink on it keeps 4.5:1 in both themes (the dark block's success and
+      surface feed it there). */
+   --fhcs-hp-fill: color-mix(in srgb, var(--fhcs-success) 28%, var(--fhcs-surface));
+   /* The portrait card: one height for every art shape (user, 2026-10-27). */
+   --fhcs-portrait-h: 234px;
 }
 
 .theme-dark .fhcs-sheet,
@@ -1004,11 +1009,16 @@
    stroke-width: 2;
 }
 
-/* Portrait: 160 wide, 160 to 240 tall, so round, square and tall art all fit (user, 2026-10-24). */
+/* The portrait card (SCOPE §4.1, user, 2026-10-27): one height for every art shape. The art fills the frame (a token
+   shows whole, at the top); the chips sit on the stage; HP, Temp and Max ± sit on a band over the frame's foot. Not
+   clipped, so the trays can open past its edge. */
 .fhcs-sheet .fhcs-portrait
 {
    position: relative;
+   display: flex;
+   flex-direction: column;
    width: 160px;
+   height: var(--fhcs-portrait-h);
    border: 1px solid var(--fhcs-line);
    border-radius: var(--fhcs-radius);
    background: var(--fhcs-fill);
@@ -1016,17 +1026,69 @@
 
 .fhcs-sheet .fhcs-portrait-art
 {
+   position: absolute;
+   inset: 0;
    display: block;
    width: 100%;
-   height: auto;
-   min-height: 158px;
-   max-height: 238px;
+   height: 100%;
    border: 0;
    border-radius: var(--fhcs-radius);
    object-fit: cover;
-   object-position: top;
+   object-position: 50% 0%;
    cursor: pointer;
 }
+
+.fhcs-sheet .fhcs-portrait-art.fhcs-fit-contain { object-fit: contain; object-position: top; }
+.fhcs-sheet .fhcs-portrait-stage { position: relative; flex: 1; min-height: 0; }
+
+.fhcs-sheet .fhcs-portrait-band
+{
+   position: relative;
+   display: flex;
+   flex-direction: column;
+   gap: var(--fhcs-s1);
+   padding: var(--fhcs-s1);
+   border-top: 1px solid var(--fhcs-line);
+   border-radius: 0 0 var(--fhcs-radius) var(--fhcs-radius);
+   background: var(--fhcs-surface);
+}
+
+/* Short and Long rest side by side at the stage's bottom left. */
+.fhcs-sheet .fhcs-rests { display: flex; gap: var(--fhcs-s1); }
+
+/* Exhaustion 0: a small dot; resting on it 1.5 s (like tips), focusing it or opening it shows the chip. Dot and chip
+   share one grid cell, so the target is the chip's size and nothing hangs outside it. */
+.fhcs-sheet .fhcs-exhaustion-dot
+{
+   display: inline-grid;
+   align-items: center;
+   min-width: var(--fhcs-control);
+   height: var(--fhcs-control);
+   list-style: none;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-exhaustion-dot::-webkit-details-marker { display: none; }
+.fhcs-sheet .fhcs-exhaustion-dot > * { grid-area: 1 / 1; }
+
+/* The dot, drawn by the summary itself in the chip's cell. */
+.fhcs-sheet .fhcs-exhaustion-dot::before
+{
+   content: '';
+   grid-area: 1 / 1;
+   justify-self: start;
+   width: 12px;
+   height: 12px;
+   margin-left: var(--fhcs-s1);
+   box-sizing: border-box;
+   border: 2px solid var(--fhcs-die-ink);
+   border-radius: 50%;
+   background: var(--fhcs-surface);
+}
+
+.fhcs-sheet .fhcs-dot-chip { visibility: hidden; }
+.fhcs-sheet .fhcs-exhaustion-dot:hover .fhcs-dot-chip { visibility: visible; transition: visibility 0s linear 1.5s; }
+.fhcs-sheet :is(.fhcs-exhaustion-dot:focus-visible, details[open] > .fhcs-exhaustion-dot) .fhcs-dot-chip { visibility: visible; }
 
 /* Chips: solid, the size of a control, on the portrait's corners. */
 .fhcs-sheet .fhcs-chip
@@ -1112,9 +1174,8 @@
 .fhcs-sheet .fhcs-input { background: transparent; text-align: right; }
 .fhcs-sheet .fhcs-input::placeholder { color: var(--fhcs-muted); opacity: 1; }
 
-/* Hit points: dnd5e's meter markup, our look. */
-.fhcs-sheet .fhcs-hp,
-.fhcs-sheet .fhcs-hp-meter
+/* Hit points: dnd5e's meter markup, our look: a bar with the numbers inside, its fill a light tint. */
+.fhcs-sheet .fhcs-hp
 {
    height: auto;
    margin: 0;
@@ -1124,17 +1185,50 @@
    box-shadow: none;
 }
 
-.fhcs-sheet .fhcs-hp-meter { cursor: text; }
+.fhcs-sheet .fhcs-hp-meter
+{
+   position: relative;
+   display: flex;
+   align-items: center;
+   height: calc(var(--fhcs-control) + var(--fhcs-s1));
+   margin: 0;
+   padding: 0;
+   overflow: hidden;
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-fill);
+   box-shadow: none;
+   cursor: text;
+}
+
+.fhcs-sheet .fhcs-hp-fill { position: absolute; inset: 0 auto 0 0; background: var(--fhcs-hp-fill); }
 
 .fhcs-sheet .fhcs-hp-line
 {
+   position: relative;
    display: flex;
-   align-items: baseline;
+   flex: 1;
+   align-items: center;
    justify-content: space-between;
    gap: var(--fhcs-s1);
-   min-height: var(--fhcs-control);
+   padding: 0 var(--fhcs-s1);
 }
 
+.fhcs-sheet .fhcs-hp-meter > input { position: relative; height: 100%; border: 0; text-align: center; }
+
+/* Temp and Max ± on one line: the labels never wrap; the two fields share what's left. */
+.fhcs-sheet .fhcs-hp-fields
+{
+   display: grid;
+   grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr);
+   align-items: center;
+   gap: var(--fhcs-s1);
+}
+
+.fhcs-sheet .fhcs-hp-fields label { white-space: nowrap; }
+.fhcs-sheet .fhcs-hp-fields .fhcs-input { min-width: 0; text-align: center; }
+
+/* The XP bar. */
 .fhcs-sheet .fhcs-bar
 {
    height: 4px;
@@ -1148,20 +1242,8 @@
    display: block;
    height: 100%;
    border-radius: 2px;
-   background: var(--fhcs-success);
+   background: currentColor;
 }
-
-.fhcs-sheet .fhcs-xp .fhcs-bar > span { background: currentColor; }
-
-.fhcs-sheet .fhcs-temp
-{
-   display: flex;
-   align-items: center;
-   justify-content: space-between;
-   gap: var(--fhcs-s2);
-}
-
-.fhcs-sheet .fhcs-temp .fhcs-input { width: 4rem; }
 
 /* XP, or the level pill with its milestone track. */
 .fhcs-sheet .fhcs-xp
@@ -1260,6 +1342,9 @@
    display: grid;
    /* AC, Init and each ability; the class, species and background cards follow on the next row, on these columns. */
    grid-template-columns: repeat(var(--fhcs-columns, 8), minmax(52px, 88px));
+   /* The cards reach the portrait card's foot (user, 2026-10-27): their row takes the column's spare height. */
+   grid-template-rows: auto 1fr;
+   flex: 1;
    gap: var(--fhcs-s1);
    margin-top: var(--fhcs-s1);
 }
@@ -2235,8 +2320,7 @@
    align-items: center;
    gap: var(--fhcs-s2);
    min-width: 0;
-   padding: var(--fhcs-s1) var(--fhcs-s2);
-   overflow: hidden;
+   padding: var(--fhcs-s1) var(--fhcs-s1) var(--fhcs-s1) var(--fhcs-s2);
    border: 1px solid var(--fhcs-line);
    border-radius: var(--fhcs-radius);
    background: var(--fhcs-surface);
@@ -2245,6 +2329,15 @@
 /* The item's art as an underlay at the card's right (user, 2026-10-26). Contrast: it fades in from nothing behind the
    label to 25% at the right edge, so ink sits on at least 75% surface: about 5.6:1 in the dark theme over pure white
    art and 8.7:1 in the light theme over pure black, above 4.5:1 either way. Muted labels stay where the art is nil. */
+.fhcs-sheet .fhcs-origin-art
+{
+   position: absolute;
+   inset: 0;
+   overflow: hidden;
+   border-radius: inherit;
+   pointer-events: none;
+}
+
 .fhcs-sheet .fhcs-origin-underlay
 {
    position: absolute;
@@ -2258,14 +2351,38 @@
    pointer-events: none;
 }
 
-.fhcs-sheet .fhcs-origin-card > :not(.fhcs-origin-underlay) { position: relative; }
+.fhcs-sheet .fhcs-origin-card > :not(.fhcs-origin-art) { position: relative; }
 
 /* Every card alike: the kind as a label, then a 24px line with the name (or a Choose button). */
 .fhcs-sheet .fhcs-origin-text { display: flex; flex: 1; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
 /* The line wraps rather than cut a class name: a card grows only while a subclass is due or in edit mode. */
 .fhcs-sheet .fhcs-origin-line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fhcs-s1); max-width: 100%; min-width: 0; min-height: 24px; }
-.fhcs-sheet .fhcs-origin-sub { display: flex; flex: 1 1 0; align-items: center; gap: var(--fhcs-s1); min-width: 48px; }
-.fhcs-sheet .fhcs-origin-sub::before { content: '·'; color: var(--fhcs-muted); }
+.fhcs-sheet .fhcs-origin-sub { display: flex; align-items: center; gap: var(--fhcs-s1); min-width: 0; }
+/* The kind, with a card's remove and the "+N" chip at its right. */
+.fhcs-sheet .fhcs-origin-head { display: flex; align-self: stretch; align-items: center; gap: var(--fhcs-s1); min-width: 0; }
+.fhcs-sheet .fhcs-origin-head > .fhcs-line { flex: 1; }
+
+/* "+N": more classes than the two cards; opens the class tray (user, 2026-10-27). */
+.fhcs-sheet .fhcs-more { position: relative; flex: none; }
+.fhcs-sheet .fhcs-more-chip { width: auto; min-width: var(--fhcs-control); padding: 0 var(--fhcs-s1); list-style: none; cursor: pointer; }
+.fhcs-sheet .fhcs-more-chip::-webkit-details-marker { display: none; }
+.fhcs-sheet .fhcs-more .fhcs-tray { left: auto; right: 0; z-index: 3; width: 15rem; }
+
+.fhcs-sheet .fhcs-class-row
+{
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s1);
+   min-height: var(--fhcs-control);
+   padding: 0 var(--fhcs-s1);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-surface);
+}
+
+.fhcs-sheet .fhcs-class-row > .fhcs-origin-name { flex: none; }
+.fhcs-sheet .fhcs-class-row > .fhcs-origin-sub { flex: 1; }
+.fhcs-sheet .fhcs-class-row > .fhcs-origin-sub::before { content: '·'; color: var(--fhcs-muted); }
 
 /* Names open the item; they read from the left (Foundry centers a button's content). */
 .fhcs-sheet .fhcs-origin-name

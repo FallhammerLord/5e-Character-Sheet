@@ -170,6 +170,10 @@ Check here before choosing a mark, and add new ones. Every tint has an icon, mar
 | Switch: filled track, knob right; outline track, knob left | On, off | Effects rows and conditions (user, 2026-10-26). Neutral ink, not green. |
 | Dashed button with a plus | Something to choose or add | Class cards (subclass), Species and Background cards (user, 2026-10-26) |
 | × in a square control | Remove this (asks first) | Class, subclass, species and background cards, edit mode only (user, 2026-10-26) |
+| Cup; bed | Short rest; long rest | Chips at the portrait card's bottom left (user, 2026-10-27) |
+| Small ringed dot | Exhaustion 0; rest on it to show the chip | The portrait card's top left (user, 2026-10-27) |
+| "+N" in a small box | N more classes, in the class tray | The last class card's label line (user, 2026-10-27) |
+| Light green fill inside the HP bar | HP left, with the numbers written over it | The portrait card's band (user, 2026-10-27) |
 
 Chat cards keep their own scheme (§6.6): the primary d20 black (white in dark themes), disadvantage dice red, advantage dice blue.
 

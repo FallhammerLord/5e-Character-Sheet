@@ -86,12 +86,14 @@ Edit mode for every field; advancement and level-up; short and long rest; death 
 Already in place before the phase: portrait picker (edit mode), rests, death saves, Level up, transformation's Revert (dnd5e's ⋮ window control). Order agreed with the user (2026-10-27):
 
 - [x] Research dnd5e 6.0.6 edit mode (research note, "Edit mode and lifecycle", 2026-10-27)
-- [ ] Design questions and mockup: header in edit mode, the HP tray, Attributes in edit mode (light, dark, 644px). Questions answered (SCOPE §4.9, 2026-10-27); boards on the canvas, awaiting approval
-- [ ] Header: name, XP, ability scores, gears for AC, Init, speed, HP and hit dice
-- [ ] HP tray from the HP number: Damage, Heal, Temp
-- [ ] Attributes: skill proficiency and ability, trait and sense gears
-- [ ] Spellcasting ability; level down
-- [ ] Styling and space pass (notes in STATUS)
+- [x] Design questions and mockup (SCOPE §4.1, §4.9; canvas rows "Phase 6 · portrait card (E)", "Portrait corner", "E · cards to the frame's foot"; approved by the user, 2026-10-27)
+- [ ] 1. Portrait card in play mode: one frame height, HP band with Temp and Max ±, Short and Long rest chips, HD chip, exhaustion dot; cards to the frame's foot; two class cards and the class tray (built 2026-10-27; Quench and play next)
+- [ ] 2. HP tray from the HP bar: Damage, Heal, Temp (check Max ± against active effects, and healing from 0)
+- [ ] 3. Edit-mode header: name, XP, ability scores, AC window, gears for Init, speed, HP and hit dice, Token switch
+- [ ] 4. Framing large art: zoom, pan, arrow keys (`flags.fhcs.portrait`, keyed by the image)
+- [ ] 5. Attributes in edit mode: skill proficiency and ability, trait and sense gears
+- [ ] 6. Spellcasting ability; level down
+- [ ] 7. Styling and space pass (notes in STATUS)
 - [ ] Limited and Observer views (if the user wants them in this phase)
 
 ## Phase 7: The ADHD layer

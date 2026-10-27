@@ -106,6 +106,11 @@
     "Header": {
       "HP": "HP",
       "Temp": "Temp",
+      "MaxMod": "Max ±",
+      "MaxModLabel": "Change to max hit points",
+      "MoreClasses": "{n} more classes: show them",
+      "MoreClassesTitle": "More classes",
+      "ExhaustionShow": "Exhaustion 0: show",
       "AC": "AC",
       "Init": "Init",
       "Proficiency": "Proficiency",

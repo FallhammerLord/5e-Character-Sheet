@@ -87,7 +87,7 @@ export async function headerFacts(sheet, context, moduleId, emphasis)
       ac: attributes.ac?.value,
       init: attributes.init?.total ?? attributes.init?.mod ?? 0,
       hp: { value: attributes.hp.value ?? 0, max: attributes.hp.effectiveMax ?? attributes.hp.max ?? 0,
-         temp: attributes.hp.temp ?? 0 },
+         temp: attributes.hp.temp ?? 0, tempmax: actor.system._source.attributes?.hp?.tempmax ?? 0 },
       inspiration: attributes.inspiration,
       death: { success: attributes.death?.success ?? 0, failure: attributes.death?.failure ?? 0 },
       exhaustion: { value: attributes.exhaustion ?? 0, max: config.conditionTypes?.exhaustion?.levels ?? 6 },

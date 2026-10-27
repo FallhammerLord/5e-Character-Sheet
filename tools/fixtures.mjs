@@ -110,6 +110,7 @@ const request = () => ({
 const art = (w, h, shape) => `data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">${shape}</svg>`)}`;
 const ROUND = art(300, 300, '<circle cx="150" cy="150" r="146" fill="#8f7d55"/><circle cx="150" cy="115" r="48" fill="#d9ccae"/>');
 const TALL = art(300, 450, '<rect width="300" height="450" fill="#8f7d55"/><circle cx="150" cy="150" r="56" fill="#d9ccae"/>');
+const SQUARE = art(400, 400, '<rect width="400" height="400" fill="#5a6e8c"/><circle cx="200" cy="150" r="70" fill="#d9ccae"/>');
 const CLASS_ICON = (fill) => art(64, 64, `<circle cx="32" cy="32" r="32" fill="${fill}"/>`);
 
 /** The header's class, species and background cards, as compat.originFacts gathers them, with overrides. */
@@ -123,7 +124,7 @@ const originFacts = (over = {}) => ({
 /** A header's facts as compat.headerFacts gathers them, with overrides. */
 const headerFacts = (over = {}) => ({
    name: 'Kira Ashvale',
-   portrait: { src: ROUND, isVideo: false, action: 'editImage', path: 'img', type: 'image' },
+   portrait: { src: ROUND, isVideo: false, action: 'editImage', path: 'img', type: 'image', token: true },
    classes: [{ id: 'cleric', name: 'Cleric', levels: 12, img: CLASS_ICON('#c9a227'), subclass: 'Life Domain' }],
    levelOrder: [], originalClass: 'cleric', level: 12, leveling: 'xp',
    xp: { value: 6500, max: 14000, pct: 46, valueLabel: '6,500', maxLabel: '14,000' },
@@ -155,6 +156,17 @@ const MULTICLASS = {
       xp: null
    })
 };
+
+/** Four classes, highest first after sorting: Cleric and Fighter take the cards, Rogue and Wizard the class tray. */
+const FOUR_CLASSES = (over = {}) => originFacts({
+   classes: [
+      { ...originDoc('Rogue', '#3a4a6a'), identifier: 'rogue', level: 2, subclass: null, needsSubclass: false },
+      { ...originDoc('Cleric', '#c9a227'), identifier: 'cleric', level: 6, subclass: originDoc('Life Domain', '#3a8a5a'), needsSubclass: false },
+      { ...originDoc('Wizard', '#3a6a5a'), identifier: 'wizard', level: 1, subclass: null, needsSubclass: false },
+      { ...originDoc('Fighter', '#7a2e2e'), identifier: 'fighter', level: 3, subclass: originDoc('Champion', '#8a3a2a'), needsSubclass: false }
+   ],
+   ...over
+});
 
 /** dnd5e's tabs as `_getTabs` gives them, dnd5e's order and labels. */
 const DND5E_TABS = Object.fromEntries(['details', 'inventory', 'features', 'spells', 'effects', 'biography', 'bastion', 'specialTraits']
@@ -517,7 +529,12 @@ export const CASES = [
    },
    { name: 'header-exhaustion-open', template: 'sheet/header', open: ['exhaustion'], context: header({ exhaustion: { value: 3, max: 6 } }) },
    { name: 'header-dying', template: 'sheet/header', context: header({ hp: { value: 0, max: 87, temp: 0 }, death: { success: 1, failure: 2 } }) },
-   { name: 'header-rest-open', template: 'sheet/header', open: ['rest'], context: header() },
+   { name: 'header-square-art', template: 'sheet/header', context: header({ portrait: { src: SQUARE, isVideo: false } }) },
+   // Aid on: temp HP and a temporary change to max (Max ±), so both fields hold a value.
+   { name: 'header-max-mod', template: 'sheet/header', context: header({ hp: { value: 82, max: 92, temp: 5, tempmax: 5 } }) },
+   // Four classes: two cards, "+2" opens the class tray (user, 2026-10-27).
+   { name: 'header-classes-open', template: 'sheet/header', open: ['classes'], context: header({ originCards: FOUR_CLASSES() }) },
+   { name: 'header-classes-editing', template: 'sheet/header', open: ['classes'], context: header({ originCards: FOUR_CLASSES({ editing: true }) }) },
    {
       name: 'header-level-up', template: 'sheet/header', open: ['level-up'],
       context: header({ xp: { value: 14200, max: 14000, pct: 100, valueLabel: '14,200', maxLabel: '14,000' },

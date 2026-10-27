@@ -94,7 +94,8 @@ export function headerView(facts, { format, localize })
    const level = format('FHCS.Header.Level', { level: facts.level });
    return {
       name: facts.name,
-      portrait: facts.portrait,
+      // The portrait card (SCOPE §4.1, user, 2026-10-27): art fills the frame; a token shows whole, at the top.
+      portrait: { ...facts.portrait, fit: facts.portrait?.token ? 'contain' : 'cover' },
       columns,
       cards: facts.originCards ? originCards(facts.originCards, columns, i18n) : [],
       levelUp: facts.originCards ? levelUpChoices(facts.originCards, i18n) : null,
@@ -113,6 +114,9 @@ export function headerView(facts, { format, localize })
       } : null,
       hp: {
          value: hp.value, max: hp.max, temp: hp.temp || '', pct: percent(hp.value, hp.max),
+         // Max ± is dnd5e's temporary change to max HP (`tempmax`: Aid, drains), not the max override (user, 2026-10-27).
+         // A plain number: dnd5e reads a typed leading + or − as add or subtract (`_onChangeInputDelta`).
+         maxMod: hp.tempmax ? String(hp.tempmax) : '',
          text: `${hp.value} / ${hp.max}`,
          label: format('FHCS.Header.HPLabel', { value: hp.value, max: hp.max })
       },
@@ -127,6 +131,8 @@ export function headerView(facts, { format, localize })
       } : null,
       exhaustion: {
          value: facts.exhaustion.value,
+         // At 0 the chip hides behind a small dot; resting on the dot shows it (user, 2026-10-27).
+         none: !facts.exhaustion.value,
          label: format('FHCS.Header.Exhaustion', { n: facts.exhaustion.value }),
          pips: Array.from({ length: facts.exhaustion.max }, (_, i) => ({
             n: i + 1, filled: facts.exhaustion.value > i, label: format('FHCS.Header.ExhaustionLevel', { n: i + 1 })
@@ -136,7 +142,8 @@ export function headerView(facts, { format, localize })
          text: format('FHCS.Header.HD', { n: facts.hd.value }),
          label: format('FHCS.Header.HDLabel', { value: facts.hd.value, max: facts.hd.max })
       },
-      rests: facts.showRests ? facts.restTypes : [],
+      // One chip per rest, one click each into dnd5e's rest dialog (user, 2026-10-27, replacing one chip with a tray).
+      rests: facts.showRests ? facts.restTypes.map((r) => ({ ...r, short: r.key === 'short' })) : [],
       scoreFirst: facts.emphasis === 'score',
       abilities: facts.abilities.map((a) => ({
          key: a.key,
@@ -150,7 +157,9 @@ export function headerView(facts, { format, localize })
             { ability: a.label, mod: signed(a.save) })
       })),
       text: {
-         hp: localize('FHCS.Header.HP'), temp: localize('FHCS.Header.Temp'), ac: localize('FHCS.Header.AC'),
+         hp: localize('FHCS.Header.HP'), temp: localize('FHCS.Header.Temp'), maxMod: localize('FHCS.Header.MaxMod'),
+         maxModLabel: localize('FHCS.Header.MaxModLabel'), exhaustionShow: localize('FHCS.Header.ExhaustionShow'),
+         ac: localize('FHCS.Header.AC'),
          init: localize('FHCS.Header.Init'), proficiency: localize('FHCS.Header.Proficiency'),
          save: localize('FHCS.Header.Save'), inspiration: localize('FHCS.Header.Inspiration'),
          rest: localize('FHCS.Header.Rest'), milestones: localize('FHCS.Header.Milestones'),

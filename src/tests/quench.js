@@ -271,6 +271,47 @@ export function registerQuenchTests(quench)
             assert.strictEqual(config.type, 'long');
          });
 
+         it('keeps Temp and Max ± as fields on the portrait card, and starts a short rest from its chip', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 4);
+            const source = () => actor.system._source.attributes.hp;
+            const before = { temp: source().temp, tempmax: source().tempmax };
+            await enter('.fhcs-header [name="system.attributes.hp.tempmax"]', '5');
+            await until(() => source().tempmax === 5, () => `Max ± writes dnd5e's tempmax; it holds ${source().tempmax}`);
+            await settled();
+            const line = () => sheet.element.querySelector('.fhcs-header .fhcs-hp-line')?.textContent ?? '';
+            await until(() => line().includes(`/ ${actor.system.attributes.hp.effectiveMax}`),
+               () => `the HP bar shows the max with Max ± in it (${actor.system.attributes.hp.effectiveMax}); it reads "${line().trim()}"`);
+            await enter('.fhcs-header [name="system.attributes.hp.temp"]', '3');
+            await until(() => source().temp === 3, () => `Temp writes dnd5e's temp; it holds ${source().temp}`);
+            await actor.update({ 'system.attributes.hp.temp': before.temp, 'system.attributes.hp.tempmax': before.tempmax });
+            const [rester, config] = await clickReaches('.fhcs-header .fhcs-rests [data-action="rest"][data-type="short"]', 'dnd5e.preShortRest');
+            assert.strictEqual(rester, actor);
+            assert.strictEqual(config.type, 'short');
+         });
+
+         it('shows two class cards and folds further classes into the class tray', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 4);
+            const [high, mid, low] = await createItems([
+               { name: 'FHCS test high', type: 'class', system: { identifier: 'fhcs-high', levels: 3 } },
+               { name: 'FHCS test mid', type: 'class', system: { identifier: 'fhcs-mid', levels: 2 } },
+               { name: 'FHCS test low', type: 'class', system: { identifier: 'fhcs-low', levels: 1 } }
+            ]);
+            const cards = () => [...sheet.element.querySelectorAll('.fhcs-header .fhcs-class-card')].map((c) => c.dataset.itemId);
+            const tray = () => [...sheet.element.querySelectorAll('.fhcs-header .fhcs-more .fhcs-class-row')].map((r) => r.dataset.itemId);
+            await until(() => cards().length === 2 && tray().length === 1,
+               () => `two class cards and one class in the tray; cards ${JSON.stringify(cards())}, tray ${JSON.stringify(tray())}`);
+            assert.deepEqual(cards(), [high.id, mid.id], 'the two highest-level classes take the cards, highest first');
+            assert.deepEqual(tray(), [low.id], 'the lowest-level class is in the tray');
+            const chip = sheet.element.querySelector('.fhcs-header .fhcs-more-chip')?.textContent.trim();
+            assert.strictEqual(chip, '+1', `the last card's chip counts the tray; it reads "${chip}"`);
+            await click(`.fhcs-header .fhcs-class-row[data-item-id="${low.id}"] [data-action="showDocument"]`);
+            await until(() => low.sheet?.rendered, 'the tray row opens the class');
+            await low.sheet.close();
+            await actor.deleteEmbeddedDocuments('Item', [high.id, mid.id, low.id]);
+         });
+
          it('uses an item from the sheet', async function ()
          {
             const [item] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test dagger', type: 'weapon' }]);
