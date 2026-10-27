@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 5 in Quench and play** (user). Built: Features, Effects, Biography, the first-look fixes (2026-10-26) and the header cards with the level tray (2026-10-27). Ask for a Quench run (core gains five tests), then a look at a real character: a multiclass with a subclass due; the cards under the abilities at 644px and wider; Level up from the level pill (each class, New class) into dnd5e's wizard; removing and choosing a background in edit mode; the By source switch; an effect switched off and on (it stays put); a condition and exhaustion (right-click lowers it); writing in the biography with the sheet locked; the ledger rows on Inventory and Spellbook too.
+1. **Phase 5 play check** (user). Built: Features, Effects, Biography, the first-look fixes (2026-10-26) and the header cards with the level tray (2026-10-27). Quench core passes (user, 2026-10-27). Left: a look at a real character: a multiclass with a subclass due; the cards under the abilities at 644px and wider; Level up from the level pill (each class, New class) into dnd5e's wizard; removing and choosing a background in edit mode; the By source switch; an effect switched off and on (it stays put); a condition and exhaustion (right-click lowers it); writing in the biography with the sheet locked; the ledger rows on Inventory and Spellbook too.
 2. **Then:** fix what play finds (expect one styling pass), tick ROADMAP Phase 5, write its BUILT entry, ask before pushing to `main`.
 
 The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.
@@ -13,10 +13,10 @@ The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't reru
 
 In code, not yet seen in Foundry:
 
-- **Phase 5a Features tab** (2026-10-26): offline checks pass (load, unit, layout; screenshots checked). Quench has a new core test (grouping, use and favorite).
-- **Phase 5d header cards and level tray** (2026-10-27): offline checks pass (screenshots checked at 644, 740, 900). Quench has a new core test (the card, Level up from the tray, Choose and New class).
-- **Phase 5b Effects tab** (2026-10-26): offline checks pass (screenshots checked). Quench has one new core test (switch, favorite, a condition). The layout check now fails when a short fixed word (a condition, a card label, a class name) is cut short.
-- **Phase 5c Biography tab** (2026-10-26): offline checks pass (screenshots checked; the editor itself only renders in Foundry). Quench has one new core test (read in play, write in edit mode).
+- **Phase 5a Features tab** (2026-10-26): offline checks pass (load, unit, layout; screenshots checked). Quench passes (2026-10-27).
+- **Phase 5d header cards and level tray** (2026-10-27): offline checks pass (screenshots checked at 644, 740, 900). Quench passes (2026-10-27).
+- **Phase 5b Effects tab** (2026-10-26): offline checks pass (screenshots checked). Quench passes (2026-10-27). The layout check now fails when a short fixed word (a condition, a card label, a class name) is cut short.
+- **Phase 5c Biography tab** (2026-10-26): offline checks pass (screenshots checked; the editor itself only renders in Foundry). Quench passes (2026-10-27).
 
 - **Chat log scrolling** (2026-10-24, third try). New cards stopped short by the Apply section, which dnd5e fills in after the card is placed. Folded rolls post with `scroll: false`; the player's own new card posts with `scroll: true`, and while following it (8 s, until the player scrolls, clicks or types in the log) a `ResizeObserver` scrolls again on every size change. Apply starts folded.
 - **Inventory sort button** lights only when a filter or search is on (dnd5e marks it active always).
