@@ -297,10 +297,16 @@ export function registerQuenchTests(quench)
             const before = { value: hp().value, temp: hp().temp, max: actor.system._source.attributes.hp.max };
             // A test character has no class; a max override gives it 20 HP to work with.
             await actor.update({ 'system.attributes.hp.max': 20, 'system.attributes.hp.value': 20, 'system.attributes.hp.temp': 2 });
+            // Type, then press, with no redraw between: click() waits for one, and a redraw replaces the tray, dropping
+            // what was typed (the first run of this test, 2026-10-27). The amount field is outside the form, so typing
+            // brings no redraw of its own.
             const change = async (kind, amount) =>
             {
-               await enter('.fhcs-header .fhcs-hp-tray [data-fhcs-amount]', String(amount));
-               await click(`.fhcs-header .fhcs-hp-tray [data-action="fhcsHpChange"][data-kind="${kind}"]`);
+               await settled();
+               const field = find('.fhcs-header .fhcs-hp-tray [data-fhcs-amount]');
+               field.value = String(amount);
+               field.dispatchEvent(new Event('input', { bubbles: true })); // redraw-safe: after settled()
+               find(`.fhcs-header .fhcs-hp-tray [data-action="fhcsHpChange"][data-kind="${kind}"]`).click(); // redraw-safe: after settled()
             };
             await change('damage', 5);
             await until(() => hp().temp === 0 && hp().value === 17, () => `5 damage takes the 2 temp first, then 3 HP; HP ${hp().value}, temp ${hp().temp}`);

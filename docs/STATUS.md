@@ -12,6 +12,7 @@ The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't reru
 
 In code, not yet seen in Foundry:
 
+- **Quench run, 2026-10-27:** all pass but the HP tray test, a test bug (its click waited for a redraw that dropped the typed amount); fixed, rerun pending.
 - **Phase 6 slice 3, the edit-mode header** (2026-10-27): unlock the sheet; the name and scores are fields; gears beside Init, each ability, speed and HP; the AC shield and the HD chip open dnd5e's windows; a Token switch at the portrait's top. XP is a field in play too. Quench "core": new test "edits XP in play, and name, scores, AC, hit dice and the token switch in edit mode".
 - **Phase 6 slice 2, the HP tray** (2026-10-27): play mode, a click on the HP bar opens it; type an amount, then Damage (temp first), Heal or Temp; the line under the buttons says what Damage would do. Quench "core": new test "takes damage (temp first), heals and gives temp HP from the HP tray". In edit mode a click on the bar still sets HP exactly (dnd5e's meter).
 - **Special Traits tab** (2026-10-27): dnd5e's form in our look; checkboxes 20px (Foundry's `--checkbox-size`; unverified that Foundry's own tick follows it). Look at it in edit mode.
