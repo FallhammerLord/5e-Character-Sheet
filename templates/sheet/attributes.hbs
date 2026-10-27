@@ -24,8 +24,14 @@
                      cycles none, half, full, expertise), the same name (still rolls), the ability as text that opens its
                      choices, the same total, and the skill's gear in the passive's place. --}}
                <div class="fhcs-skill fhcs-skill-edit">
-                  <proficiency-cycle class="fhcs-prof-cycle" type="skill" name="system.skills.{{ key }}.value" value="{{ source }}"
-                                     aria-label="{{ profLabel }}" data-fhcs-tip="{{ profLabel }}"></proficiency-cycle>
+                  {{!-- dnd5e's cycle draws itself in its own shadow DOM, out of our styles' reach, and its size moved with
+                        Foundry's (user's screenshots, 2026-10-27). So play mode's mark stays drawn, and the cycle lies
+                        over it unseen: it takes the click and saves the value; the redraw shows the new mark. --}}
+                  <span class="fhcs-prof-slot">
+                     <span class="fhcs-prof-mark fhcs-prof-{{ mark }}" aria-hidden="true"></span>
+                     <proficiency-cycle class="fhcs-prof-cycle" type="skill" name="system.skills.{{ key }}.value" value="{{ source }}"
+                                        aria-label="{{ profLabel }}" data-fhcs-tip="{{ profLabel }}"></proficiency-cycle>
+                  </span>
                   <button type="button" class="fhcs-skill-roll fhcs-body {{ @root.rollableClass }}" data-action="roll" data-type="skill"
                           aria-label="{{ rollLabel }}"><span class="fhcs-skill-name">{{ label }}</span></button>
                   <select class="fhcs-label fhcs-muted fhcs-skill-ability" name="system.skills.{{ key }}.ability" aria-label="{{ abilityLabel }}">

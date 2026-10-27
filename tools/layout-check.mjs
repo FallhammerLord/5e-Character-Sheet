@@ -50,7 +50,7 @@ const frame = (kind, width, theme, body) => `<section class="application ${FRAME
 const page = (html) => `<!doctype html><html><head><meta charset="utf-8">
    <style>body{margin:0;background:#444;font-family:sans-serif}*{box-sizing:border-box}button,input,select{font:inherit}
    /* Foundry core's control defaults, roughly (v13/v14 foundry.css): ours must override them. */
-   button{min-height:var(--button-size,2rem);padding:0 .5rem;line-height:1.5;justify-content:center}input[type=text]{height:var(--input-height,2rem)}
+   button{min-height:var(--button-size,2rem);padding:0 .5rem;line-height:1.5;justify-content:center}input[type=text],select{height:var(--input-height,2rem)}
    /* Foundry's form groups stretch each control across the row (the user's Special Traits screenshot, 2026-10-27). */
    .form-group{display:flex;flex-wrap:wrap;align-items:center;gap:4px}.form-group>label{flex:2}.form-fields{display:flex;flex:3;gap:4px}.form-fields>*{flex:1}.form-group>.hint{flex:0 0 100%}
    ${css}</style></head><body>${html}</body></html>`;
@@ -106,15 +106,17 @@ function findProblems()
       const r = el.getBoundingClientRect();
       if (r.width && Math.abs(r.width - r.height) > 1) { issues.push(`checkbox is ${Math.round(r.width)}×${Math.round(r.height)}: ${el.name}`); }
    }
-   // dnd5e's proficiency cycle draws its ring 3px inside its content box (proficiency-cycle.mjs CSS); edit mode's
-   // ring must match play mode's 10px dot (user's screenshots, 2026-10-27: the circles jumped size).
+   // dnd5e's proficiency cycle draws in its own shadow DOM, and its size followed Foundry's styles (user's screenshots,
+   // 2026-10-27, twice). It must lie unseen over play mode's mark, which stays drawn the same size.
    for (const el of app.querySelectorAll('.window-content proficiency-cycle'))
    {
-      const cs = getComputedStyle(el);
-      const content = el.getBoundingClientRect().width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - parseFloat(cs.borderLeftWidth) - parseFloat(cs.borderRightWidth);
-      const dot = app.querySelector('.fhcs-prof-mark');
-      const want = dot ? dot.getBoundingClientRect().width : 10;
-      if (Math.abs(content - 6 - want) > 1) { issues.push(`proficiency cycle draws a ${Math.round(content - 6)}px ring; play mode's dot is ${Math.round(want)}px`); }
+      const mark = el.parentElement?.querySelector(':scope > .fhcs-prof-mark');
+      if (Number(getComputedStyle(el).opacity) !== 0 || !mark) { issues.push('dnd5e\'s proficiency cycle is drawn; play mode\'s mark must show under it, the cycle unseen'); continue; }
+      const m = mark.getBoundingClientRect(), c = el.getBoundingClientRect();
+      if (Math.abs((m.left + m.right) / 2 - (c.left + c.right) / 2) > 1 || Math.abs((m.top + m.bottom) / 2 - (c.top + c.bottom) / 2) > 1)
+      {
+         issues.push('the proficiency cycle is off its mark');
+      }
    }
    // A round control stays round: Foundry's button sizes once made our pips oval (user, 2026-10-24).
    for (const el of app.querySelectorAll('.window-content :is(button, span, div)'))
@@ -373,7 +375,7 @@ function misaligned(pairs)
 }
 
 /**
- * Runs in the page: every element of ours in normal flow, keyed by its first fhcs class and its index among those, with
+ * Runs in the page: every element of ours in normal flow, keyed by its last fhcs class and its index among those, with
  * its height, its top within the window, and how many elements it holds. Edit mode must keep every one that both modes draw (SCOPE §5.2 rule 6).
  */
 function everyBox()
@@ -387,13 +389,20 @@ function everyBox()
       let floating = false;
       for (let n = el; n && n !== root && !floating; n = n.parentElement) { floating = ['absolute', 'fixed'].includes(getComputedStyle(n).position); }
       if (floating) { continue; }
-      const cls = [...el.classList].find((c) => c.startsWith('fhcs-'));
+      // Its most particular class: the last of ours that names a part, not a style (`fhcs-body fhcs-skill-name` and
+      // `fhcs-skill-name` pair up; `fhcs-muted` names nothing).
+      const STYLE = ['fhcs-body', 'fhcs-label', 'fhcs-display', 'fhcs-muted', 'fhcs-on', 'fhcs-nowrap', 'fhcs-icon'];
+      const cls = [...el.classList].filter((c) => c.startsWith('fhcs-') && !STYLE.includes(c)).pop();
       if (!cls) { continue; }
       const n = counts[cls] = (counts[cls] ?? 0) + 1;
       const r = el.getBoundingClientRect();
+      // Where its own words sit: edit mode's text once sat 4px low in rows of the same height (user, 2026-10-27).
+      const words = [...el.childNodes].find((t) => t.nodeType === Node.TEXT_NODE && t.textContent.trim());
+      let textTop = null;
+      if (words) { const range = document.createRange(); range.selectNodeContents(words); textTop = Math.round(range.getBoundingClientRect().top - top); }
       // The third number counts what it holds: a container that edit mode gives more to (the empty traits, shown to be
       // set) may grow at its end without moving anything.
-      boxes[`${cls}#${n}`] = [Math.round(r.height), Math.round(r.top - top), el.querySelectorAll('*').length];
+      boxes[`${cls}#${n}`] = [Math.round(r.height), Math.round(r.top - top), el.querySelectorAll('*').length, textTop];
    }
    return { boxes, counts };
 }
@@ -466,11 +475,12 @@ for (const c of CASES)
             const shifted = Object.keys(bm?.boxes ?? {}).filter((k) =>
             {
                const cls = k.split('#')[0], t = bt?.boxes[k], m = bm.boxes[k];
-               return t && bm.counts[cls] === bt.counts[cls] && ((m[2] === t[2] && Math.abs(m[0] - t[0]) > 1) || Math.abs(m[1] - t[1]) > 1);
+               return t && bm.counts[cls] === bt.counts[cls] && ((m[2] === t[2] && Math.abs(m[0] - t[0]) > 1) || Math.abs(m[1] - t[1]) > 1
+                  || (m[3] !== null && t[3] !== null && Math.abs(m[3] - t[3]) > 1));
             });
             if (shifted.length)
             {
-               const say = shifted.slice(0, 4).map((k) => `${k} ${bm.boxes[k][0]}px@${bm.boxes[k][1]}, was ${bt.boxes[k][0]}px@${bt.boxes[k][1]}`);
+               const say = shifted.slice(0, 4).map((k) => `${k} ${bm.boxes[k][0]}px@${bm.boxes[k][1]} text@${bm.boxes[k][3]}, was ${bt.boxes[k][0]}px@${bt.boxes[k][1]} text@${bt.boxes[k][3]}`);
                problems.push(`${id}: edit mode moves or resizes ${shifted.length} element(s): ${say.join('; ')}`);
             }
             const moved = (mine?.marks ?? []).findIndex((m, n) => theirs?.marks[n] && (Math.abs(m[0] - theirs.marks[n][0]) > 1 || Math.abs(m[1] - theirs.marks[n][1]) > 1));

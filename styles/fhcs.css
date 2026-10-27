@@ -1695,6 +1695,9 @@
    /* One grid in both modes (SCOPE §5.2 rule 6): the mark (a 24px target in edit mode), name, ability, total, passive
       or gear. */
    grid-template-columns: 24px minmax(0, 1fr) 28px 30px 24px;
+   /* One 24px track: a control Foundry draws taller can't stretch it and push the row's text down (user's
+      screenshots, 2026-10-27: edit mode's text sat 4px low). */
+   grid-template-rows: 24px;
    align-items: center;
    gap: var(--fhcs-s1);
    width: 100%;
@@ -1761,18 +1764,20 @@
 .fhcs-sheet .fhcs-skill.fhcs-skill-edit { cursor: default; }
 .fhcs-sheet .fhcs-skill-edit:hover { box-shadow: none; }
 
-/* dnd5e's element draws itself (a ring, half, full, a double ring); it takes its colour from these. */
+/* Edit mode's proficiency: play mode's own mark, with dnd5e's cycle laid over it unseen as the 24px target (user's
+   screenshots, 2026-10-27: dnd5e's drawing changed size with Foundry's styles). Focus shows on the slot. */
+.fhcs-sheet .fhcs-prof-slot { position: relative; display: grid; place-items: center; width: 24px; height: 24px; }
+.fhcs-sheet .fhcs-prof-slot:focus-within { outline: 2px solid var(--fhcs-ink); outline-offset: -2px; border-radius: 50%; }
+
 .fhcs-sheet .fhcs-prof-cycle
 {
-   --proficiency-cycle-enabled-color: var(--fhcs-ink);
-   --proficiency-cycle-disabled-color: var(--fhcs-muted);
-   display: inline-block;
+   position: absolute;
+   inset: 0;
    box-sizing: border-box;
    width: 24px;
    height: 24px;
-   /* dnd5e draws the ring 3px inside the content box: 4px of padding makes it play mode's 10px dot, and the target
-      stays 24px (user's screenshots, 2026-10-27: the circles jumped size). */
-   padding: 4px;
+   padding: 0;
+   opacity: 0;
    cursor: pointer;
 }
 
@@ -1799,7 +1804,8 @@
    align-items: center;
    justify-content: flex-start;
    min-width: 0;
-   min-height: 24px;
+   height: 24px;
+   min-height: 0;
    margin: 0;
    padding: 0;
    border: 0;
