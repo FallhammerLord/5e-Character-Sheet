@@ -33,7 +33,7 @@ Mockups: one Design canvas, https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, a
 Learned over Phases 1–5; follow it unless the user says otherwise.
 
 1. **Research dnd5e's source first,** before any design. Clone the matching release into the scratchpad (`git clone --depth 1 --branch release-6.0.6 https://github.com/foundryvtt/dnd5e.git`). Read how its part builds context, which actions and classes its code looks for, and its quirks. Tidy Classic's source: tag `v13.0.0` of `kgar/foundry-vtt-tidy-5e-sheets` (`src/sheets/classic/`; gone from later tags). Write findings into the research note.
-2. **Ask the design questions,** then **mock up** on the canvas: light, dark, and the 644px minimum with a hard case. Record every answer in SCOPE with the date.
+2. **Ask the design questions,** then **mock up** on the canvas: light, dark, and the 644px minimum with a hard case. Record every answer in SCOPE with the date. **Render the boards and look at them before presenting** (user, 2026-10-27): read the canvas's `artifact-type/dc-runtime.js`, serve the `project/*.dc.html` files beside it as `support.js`, screenshot with Playwright.
 3. **Build in slices,** each with its fixtures, unit cases and Quench test (below). Commit and push each; keep ROADMAP and STATUS current in the same commit.
 4. **Offline checks,** then **look at the layout screenshots yourself** (`tools/out/`): they catch what the checks can't (a name cut to "CL…").
 5. **Quench in the user's world.** When a test fails, follow "When a Quench test fails" below.
