@@ -117,6 +117,27 @@ function findProblems()
          issues.push(`round element is ${Math.round(r.width)}×${Math.round(r.height)}: ${el.tagName.toLowerCase()}.${[...el.classList].join('.')}`);
       }
    }
+   // An icon fits its button (SCOPE §5.2 rule 4, user 2026-10-27): inside its box, and centred both ways when it's
+   // the button's only content (vertically when text follows it). Concentration's icons sat off centre once.
+   for (const el of app.querySelectorAll('.window-content :is(button, summary, label.fhcs-chip, a[data-action])'))
+   {
+      const icon = el.querySelector('svg');
+      if (!icon || icon.closest('button, summary, label.fhcs-chip, a[data-action]') !== el) { continue; }
+      const cs = getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || !el.getClientRects().length || getComputedStyle(icon).display === 'none') { continue; }
+      const b = el.getBoundingClientRect(), i = icon.getBoundingClientRect();
+      if (!b.width || !i.width) { continue; }
+      const what = `${el.tagName.toLowerCase()}.${[...el.classList].join('.')}${el.dataset.action ? ` [${el.dataset.action}]` : ''}`;
+      if (i.left < b.left - 0.5 || i.right > b.right + 0.5 || i.top < b.top - 0.5 || i.bottom > b.bottom + 0.5)
+      {
+         issues.push(`icon spills out of its button (${Math.round(i.width)}×${Math.round(i.height)} in ${Math.round(b.width)}×${Math.round(b.height)}): ${what}`);
+         continue;
+      }
+      const alone = !(el.textContent || '').trim();
+      const dx = Math.abs((i.left + i.right) / 2 - (b.left + b.right) / 2), dy = Math.abs((i.top + i.bottom) / 2 - (b.top + b.bottom) / 2);
+      if ((alone && dx > 1) || dy > 1.5) { issues.push(`icon off centre by ${Math.round(dx)}px across, ${Math.round(dy)}px down: ${what}`); }
+   }
+
    // Every control takes its own clicks: at its centre the topmost element is the control or inside it. A layer drawn
    // over the portrait once swallowed its clicks (user, 2026-10-27). An open tray may cover what's under it.
    for (const el of app.querySelectorAll('.window-content [data-action]'))
@@ -232,21 +253,60 @@ const SELF_TEST = [
    { id: 'self-oval', expect: true, body: '<button style="width:40px;height:24px;min-height:0;border-radius:50%"></button>' },
    { id: 'self-tray', expect: false, body: '<div style="position:relative;width:40px"><div class="fhcs-tray" style="position:absolute;width:200px">A tray</div></div>' },
    { id: 'self-shape-contrast', expect: true, body: '<span style="position:relative;display:grid;color:#333"><svg style="position:absolute" width="40" height="40"><path d="M0 0h40v40H0z" fill="#222"/></svg><span>16</span></span>' },
+   { id: 'self-icon-off-centre', expect: true, body: '<button style="display:flex;align-items:flex-start;justify-content:flex-start;width:28px;height:28px;padding:0"><svg width="16" height="16"><path d="M0 0h16v16H0z"/></svg></button>' },
+   { id: 'self-icon-spills', expect: true, body: '<button style="display:grid;place-items:center;width:20px;height:20px;padding:0;overflow:visible"><svg width="28" height="28" style="flex:none"><path d="M0 0h28v28H0z"/></svg></button>' },
+   { id: 'self-icon-centred', expect: false, body: '<button style="display:grid;place-items:center;width:28px;height:28px;min-height:0;padding:0"><svg width="16" height="16"><path d="M0 0h16v16H0z"/></svg></button>' },
    { id: 'self-overlap', expect: true, body: '<div style="display:grid;grid-template-columns:40px 1fr"><span style="justify-self:start;white-space:nowrap">Runs into the next</span><span>x</span></div>' }
 ];
 
 const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
 const tab = await browser.newPage({ viewport: { width: 1100, height: HEIGHT + 40 } });
 
-/** Renders one page and returns its problems. */
-async function check(id, html, screenshot)
+/**
+ * Runs in the page: edges a case says must line up (SCOPE §5.2 rule 1): [selector, edge, selector, edge], each the
+ * first match's top, bottom, left or right.
+ */
+function misaligned(pairs)
+{
+   const issues = [];
+   const edge = (selector, side) => document.querySelector(`.window-content ${selector}`)?.getBoundingClientRect()[side];
+   for (const [a, sa, b, sb] of pairs)
+   {
+      const ea = edge(a, sa), eb = edge(b, sb);
+      if (ea === undefined || eb === undefined) { issues.push(`can't align ${a} ${sa} with ${b} ${sb}: one is missing`); continue; }
+      if (Math.abs(ea - eb) > 1) { issues.push(`${a} ${sa} is ${Math.round(ea - eb)}px off ${b} ${sb}`); }
+   }
+   return issues;
+}
+
+/**
+ * Runs in the page: the heights of everything `rows` finds, and the left and right edges of everything `marks` finds,
+ * for comparing play mode with edit mode.
+ */
+function heights({ rows, marks })
+{
+   const box = document.querySelector('.window-content').getBoundingClientRect();
+   const all = (selector) => [...document.querySelectorAll(`.window-content ${selector}`)];
+   return {
+      rows: all(rows).map((el) => Math.round(el.getBoundingClientRect().height)),
+      marks: marks ? all(marks).map((el) => { const r = el.getBoundingClientRect(); return [Math.round(r.left - box.left), Math.round(r.right - box.left)]; }) : []
+   };
+}
+
+/** Renders one page and returns its problems, and the row heights a case asks to compare. */
+async function check(id, html, screenshot, c = {})
 {
    writeFileSync(`${out}/${id}.html`, page(html));
    await tab.goto(`file://${out}/${id}.html`);
    const found = await tab.evaluate(findProblems);
+   if (c.align) { found.push(...await tab.evaluate(misaligned, c.align)); }
+   if (c.rows) { measured.set(`${c.name}|${id.slice(c.name.length)}`, await tab.evaluate(heights, { rows: c.rows, marks: c.marks })); }
    if (screenshot) { await tab.screenshot({ path: `${out}/${id}.png`, fullPage: true }); }
    return found;
 }
+
+/** Row heights by case and frame, for SCOPE §5.2 rule 6: edit mode keeps play mode's rows. */
+const measured = new Map();
 
 const problems = [];
 for (const t of SELF_TEST)
@@ -268,7 +328,22 @@ for (const c of CASES)
       for (const width of WIDTHS[kind])
       {
          const id = `${c.name}-${theme}-${width}`;
-         for (const issue of await check(id, frame(kind, width, theme, body), true)) { problems.push(`${id}: ${issue}`); }
+         for (const issue of await check(id, frame(kind, width, theme, body), true, c)) { problems.push(`${id}: ${issue}`); }
+         // `sameRowsAs` names the play-mode case this edit-mode one must match row for row (rule 6).
+         if (c.sameRowsAs)
+         {
+            const mine = measured.get(`${c.name}|${id.slice(c.name.length)}`), theirs = measured.get(`${c.sameRowsAs}|${id.slice(c.name.length)}`);
+            if (mine && theirs && JSON.stringify(mine.rows) !== JSON.stringify(theirs.rows))
+            {
+               const at = mine.rows.findIndex((h, n) => h !== theirs.rows[n]);
+               problems.push(`${id}: edit mode reshapes ${c.rows}: row ${at + 1} is ${mine.rows[at]}px, ${theirs.rows[at]}px in ${c.sameRowsAs}`);
+            }
+            const moved = (mine?.marks ?? []).findIndex((m, n) => theirs?.marks[n] && (Math.abs(m[0] - theirs.marks[n][0]) > 1 || Math.abs(m[1] - theirs.marks[n][1]) > 1));
+            if (moved >= 0)
+            {
+               problems.push(`${id}: edit mode moves ${c.marks} #${moved + 1}: ${mine.marks[moved].join('–')}px, ${theirs.marks[moved].join('–')}px in ${c.sameRowsAs}`);
+            }
+         }
          checked++;
       }
    }

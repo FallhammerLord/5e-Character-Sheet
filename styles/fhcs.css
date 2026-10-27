@@ -54,8 +54,8 @@
    /* The HP bar's fill: a light tint of success, so ink on it keeps 4.5:1 in both themes (the dark block's success and
       surface feed it there). */
    --fhcs-hp-fill: color-mix(in srgb, var(--fhcs-success) 28%, var(--fhcs-surface));
-   /* The portrait card: one height for every art shape (user, 2026-10-27). */
-   --fhcs-portrait-h: 234px;
+   /* Room for Foundry's window controls (menu, sheet, close) floating over the header's top right (rule 14). */
+   --fhcs-window-controls: 84px;
 }
 
 .theme-dark .fhcs-sheet,
@@ -838,18 +838,23 @@
    color: var(--fhcs-ink);
 }
 
-/* The title bar: a slim strip in the sheet's own colors, no divider. The name is in our header, so the title is
-   hidden but kept for screen readers; the window still drags from the strip and keeps Foundry's controls. */
-.fhcs-sheet > .window-header
+/* No title band (SCOPE §5.2 rule 14, user 2026-10-27: "bothersome since the beginning"): Foundry's window controls
+   float over the header's top right; the window drags from around them. The name is in our header, so the title is
+   hidden but kept for screen readers. Minimized, the window keeps Foundry's own bar, title and all. */
+.fhcs-sheet:not(.minimized) > .window-header
 {
+   position: absolute;
+   top: 0;
+   right: 0;
+   z-index: 5;
    min-height: var(--fhcs-control);
-   padding: 0 var(--fhcs-s1) 0 var(--fhcs-s2);
+   padding: 0 var(--fhcs-s1);
    border: 0;
-   background: var(--fhcs-surface);
+   background: transparent;
    color: var(--fhcs-muted);
 }
 
-.fhcs-sheet > .window-header :is(.window-title, .window-icon)
+.fhcs-sheet:not(.minimized) > .window-header :is(.window-title, .window-icon)
 {
    position: absolute;
    width: 1px;
@@ -857,8 +862,6 @@
    overflow: hidden;
    clip-path: inset(50%);
 }
-
-.fhcs-sheet > .window-header > :is(.window-title, .window-icon) + * { margin-left: auto; }
 
 .fhcs-sheet > .window-header .header-control
 {
@@ -946,27 +949,48 @@
 
 .fhcs-sheet .fhcs-header
 {
-   display: flex;
-   gap: var(--fhcs-s2);
+   display: grid;
+   grid-template-columns: 160px minmax(0, 1fr);
+   grid-template-rows: auto auto;
+   column-gap: var(--fhcs-s2);
    padding: var(--fhcs-s2);
    min-width: 0;
    border-bottom: 1px solid var(--fhcs-line-soft);
 }
 
+/* The portrait card takes both rows and their lines (subgrid): its stage in the first, its band in the second. */
 .fhcs-sheet .fhcs-header-side
 {
-   display: flex;
-   flex: none;
-   flex-direction: column;
-   gap: var(--fhcs-s1);
+   display: grid;
+   grid-row: 1 / 3;
+   grid-column: 1;
+   grid-template-rows: subgrid;
    width: 160px;
 }
 
-.fhcs-sheet .fhcs-header-main
+/* The name, size line and abilities; the space under them keeps the cards off the ability row. */
+.fhcs-sheet .fhcs-header-top
 {
    display: flex;
-   flex: 1;
+   grid-row: 1;
+   grid-column: 2;
    flex-direction: column;
+   gap: var(--fhcs-s1);
+   min-width: 0;
+   padding-bottom: var(--fhcs-s1);
+}
+
+/* The first line leaves room for Foundry's window controls, which float at the top right (rule 14). */
+.fhcs-sheet .fhcs-header-top > .fhcs-header-row:first-child { min-height: var(--fhcs-control); padding-right: var(--fhcs-window-controls); }
+.fhcs-sheet .fhcs-header-top > .fhcs-header-row { min-height: 24px; }
+
+/* The cards: the second row, on the abilities' columns; they stretch to the band's height. */
+.fhcs-sheet .fhcs-cards
+{
+   display: grid;
+   grid-row: 2;
+   grid-column: 2;
+   grid-template-columns: repeat(var(--fhcs-columns, 8), minmax(52px, 88px));
    gap: var(--fhcs-s1);
    min-width: 0;
 }
@@ -1017,10 +1041,10 @@
 .fhcs-sheet .fhcs-portrait
 {
    position: relative;
-   display: flex;
-   flex-direction: column;
+   display: grid;
+   grid-row: 1 / 3;
+   grid-template-rows: subgrid;
    width: 160px;
-   height: var(--fhcs-portrait-h);
    border: 1px solid var(--fhcs-line);
    border-radius: var(--fhcs-radius);
    background: var(--fhcs-fill);
@@ -1091,12 +1115,13 @@
 .fhcs-sheet .fhcs-portrait .fhcs-framing-reset { left: var(--fhcs-s1); background: var(--fhcs-surface); }
 .fhcs-sheet .fhcs-portrait .fhcs-framing-done { right: var(--fhcs-s1); border-color: var(--fhcs-die-ink); background: var(--fhcs-die-ink); color: var(--fhcs-die-on-ink); }
 /* The stage lets clicks through to the art (dnd5e's showArtwork, or editImage in edit mode); only its chips take them. */
-.fhcs-sheet .fhcs-portrait-stage { position: relative; flex: 1; min-height: 0; pointer-events: none; }
+.fhcs-sheet .fhcs-portrait-stage { position: relative; grid-row: 1; min-height: 120px; pointer-events: none; }
 .fhcs-sheet .fhcs-portrait-stage > * { pointer-events: auto; }
 
 .fhcs-sheet .fhcs-portrait-band
 {
    position: relative;
+   grid-row: 2;
    display: flex;
    flex-direction: column;
    gap: var(--fhcs-s1);
@@ -1515,9 +1540,6 @@
    display: grid;
    /* AC, Init and each ability; the class, species and background cards follow on the next row, on these columns. */
    grid-template-columns: repeat(var(--fhcs-columns, 8), minmax(52px, 88px));
-   /* The cards reach the portrait card's foot (user, 2026-10-27): their row takes the column's spare height. */
-   grid-template-rows: auto 1fr;
-   flex: 1;
    gap: var(--fhcs-s1);
    margin-top: var(--fhcs-s1);
 }
@@ -1685,7 +1707,9 @@
 .fhcs-sheet .fhcs-skill
 {
    display: grid;
-   grid-template-columns: 12px minmax(0, 1fr) 28px 30px 22px;
+   /* One grid in both modes (SCOPE §5.2 rule 6): the mark (a 24px target in edit mode), name, ability, total, passive
+      or gear. */
+   grid-template-columns: 24px minmax(0, 1fr) 28px 30px 24px;
    align-items: center;
    gap: var(--fhcs-s1);
    width: 100%;
@@ -1709,6 +1733,7 @@
 
 .fhcs-sheet .fhcs-prof-mark
 {
+   justify-self: center;
    width: 10px;
    height: 10px;
    border: 1.5px solid currentColor;
@@ -1747,7 +1772,7 @@
 /* ---------- Attributes in edit mode (SCOPE §4.9, user, 2026-10-27) ---------- */
 
 /* A skill row: dnd5e's proficiency cycle, the ability, the name (still rolls), the total, a gear. */
-.fhcs-sheet .fhcs-skill.fhcs-skill-edit { grid-template-columns: 24px 2.75rem minmax(0, 1fr) 30px 24px; cursor: default; }
+.fhcs-sheet .fhcs-skill.fhcs-skill-edit { cursor: default; }
 .fhcs-sheet .fhcs-skill-edit:hover { box-shadow: none; }
 
 /* dnd5e's element draws itself (a ring, half, full, a double ring); it takes its colour from these. */
@@ -1761,8 +1786,22 @@
    cursor: pointer;
 }
 
-/* The ability: a slim dropdown, its abbreviation only (the browser's arrow would take the skill name's room). */
-.fhcs-sheet .fhcs-skill-ability { height: 24px; min-height: 24px; padding: 0 2px; appearance: none; text-align: center; text-align-last: center; cursor: pointer; }
+/* The ability reads as play mode's text; a dashed underline says it opens choices. */
+.fhcs-sheet .fhcs-skill-ability
+{
+   width: 100%;
+   height: 24px;
+   min-height: 24px;
+   margin: 0;
+   padding: 0;
+   border: 0;
+   border-bottom: 1px dashed var(--fhcs-line);
+   border-radius: 0;
+   background: none;
+   appearance: none;
+   text-align: left;
+   cursor: pointer;
+}
 
 .fhcs-sheet .fhcs-skill-roll
 {
@@ -1782,6 +1821,8 @@
 }
 
 .fhcs-sheet .fhcs-skill-roll:hover .fhcs-skill-name { text-decoration: underline; }
+.fhcs-sheet .fhcs-skill-roll { width: 100%; }
+.fhcs-sheet .fhcs-skill-roll > .fhcs-skill-name { flex: 1; min-width: 0; text-align: left; }
 .fhcs-sheet .fhcs-trait-head { display: flex; align-items: center; justify-content: space-between; min-height: 24px; }
 
 /* Resources: counters above the favorites. */
@@ -2595,9 +2636,10 @@
 .fhcs-sheet .fhcs-origin-card > :not(.fhcs-origin-art) { position: relative; }
 
 /* Every card alike: the kind as a label, then a 24px line with the name (or a Choose button). */
-.fhcs-sheet .fhcs-origin-text { display: flex; flex: 1; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; }
+/* No gap between a card's lines: three lines (a name whose × wrapped, at 644px in edit mode) fit the band's height. */
+.fhcs-sheet .fhcs-origin-text { display: flex; flex: 1; flex-direction: column; align-items: flex-start; gap: 0; min-width: 0; }
 /* The line wraps rather than cut a class name: a card grows only while a subclass is due or in edit mode. */
-.fhcs-sheet .fhcs-origin-line { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fhcs-s1); max-width: 100%; min-width: 0; min-height: 24px; }
+.fhcs-sheet .fhcs-origin-line { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--fhcs-s1); max-width: 100%; min-width: 0; min-height: 24px; }
 .fhcs-sheet .fhcs-origin-sub { display: flex; align-items: center; gap: var(--fhcs-s1); min-width: 0; }
 /* The kind, with a card's remove and the "+N" chip at its right. */
 .fhcs-sheet .fhcs-origin-head { display: flex; align-self: stretch; align-items: center; gap: var(--fhcs-s1); min-width: 0; }

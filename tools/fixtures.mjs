@@ -158,6 +158,9 @@ const MULTICLASS = {
    })
 };
 
+/** The header's second row: the HP band and the cards share its top and bottom (SCOPE §5.2 rule 1). */
+const HEADER_ALIGN = [['.fhcs-portrait-band', 'top', '.fhcs-origin-card', 'top'], ['.fhcs-portrait-band', 'bottom', '.fhcs-origin-card', 'bottom']];
+
 /** Four classes, highest first after sorting: Cleric and Fighter take the cards, Rogue and Wizard the class tray. */
 const FOUR_CLASSES = (over = {}) => originFacts({
    classes: [
@@ -544,14 +547,14 @@ export const CASES = [
    },
    { name: 'inventory-containers-shut', template: 'sheet/inventory', context: inventory({ openContainers: [], editing: true, columns: ALL_COLUMNS }) },
    { name: 'inventory-empty', template: 'sheet/inventory', context: inventory({ sections: [], attunement: { value: 0, max: 0 }, encumbrance: null }) },
-   { name: 'attributes', template: 'sheet/attributes', context: attributes() },
+   { name: 'attributes', template: 'sheet/attributes', context: attributes(), rows: '.fhcs-skills > li', marks: '.fhcs-skill-name, .fhcs-skill-mod' },
    { name: 'attributes-key-passives-folded', template: 'sheet/attributes', context: attributes({ passives: 'key', folded: ['inventory', 'spell-1'] }) },
-   { name: 'attributes-editing', template: 'sheet/attributes', context: attributes({ editing: true }) },
+   { name: 'attributes-editing', template: 'sheet/attributes', context: attributes({ editing: true }), rows: '.fhcs-skills > li', marks: '.fhcs-skill-name, .fhcs-skill-mod', sameRowsAs: 'attributes' },
    { name: 'attributes-empty', template: 'sheet/attributes', context: attributes({ favorites: [], resources: [], traits: [] }) },
    { name: 'tabs', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }) },
    { name: 'tabs-editing', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: true }) },
    { name: 'special-traits', html: SPECIAL_TRAITS },
-   { name: 'header', template: 'sheet/header', context: header() },
+   { name: 'header', template: 'sheet/header', context: header(), align: HEADER_ALIGN, rows: '.fhcs-header, .fhcs-ability' },
    { name: 'header-tall-art', template: 'sheet/header', context: header({ portrait: { src: TALL, isVideo: false } }) },
    { name: 'header-score-first', template: 'sheet/header', context: header({ emphasis: 'score', inspiration: true, exhaustion: { value: 2, max: 6 } }) },
    {
@@ -571,7 +574,7 @@ export const CASES = [
       ] }) }), editable: true }
    },
    // Edit mode (SCOPE §4.9): name and scores as fields, gears, the AC window, the Token switch.
-   { name: 'header-editing', template: 'sheet/header', context: { ...header({ originCards: originFacts({ editing: true }) }), editable: true } },
+   { name: 'header-editing', template: 'sheet/header', context: { ...header({ originCards: originFacts({ editing: true }) }), editable: true }, align: HEADER_ALIGN, rows: '.fhcs-header, .fhcs-ability', sameRowsAs: 'header' },
    { name: 'header-editing-tall', template: 'sheet/header', context: { ...header({ portrait: { src: TALL, isVideo: false }, originCards: FOUR_CLASSES({ editing: true }) }), editable: true } },
    {
       name: 'header-editing-multiclass', template: 'sheet/header', open: ['level-up'],

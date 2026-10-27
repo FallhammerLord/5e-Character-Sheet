@@ -181,7 +181,9 @@
       </div>
    </div>
 
-   <div class="fhcs-header-main">
+   {{!-- The header is a grid of two rows (SCOPE §5.2 rule 1, user 2026-10-27): the portrait card spans both; the name,
+         size line and abilities fill the first; the HP band and the cards share the second, so their edges line up. --}}
+   <div class="fhcs-header-top">
       <div class="fhcs-header-row">
          {{#if @root.editable}}
          {{!-- Edit mode: the name is a field (SCOPE §4.9). --}}
@@ -292,6 +294,11 @@
             <span class="fhcs-label fhcs-muted">{{#if @root.editable}}{{ mod }}{{else}}{{#if ../scoreFirst}}{{ mod }}{{else}}{{ score }}{{/if}}{{/if}}</span>
          </div>
          {{/each}}
+      </div>
+   </div>
+
+   {{!-- The cards: their own grid on the abilities' columns, so they still line up with the ability row. --}}
+   <div class="fhcs-cards" style="--fhcs-columns: {{ columns }}">
          {{#each cards}}
          {{!-- Each card alike (SCOPE §4.8): the kind as a label, then the name, which opens the item, then a subclass on its
                own line; the item's art as a faded underlay; a dashed Subclass or Choose (dnd5e's findItem) where something
@@ -350,7 +357,6 @@
             </span>
          </div>
          {{/each}}
-      </div>
    </div>
    {{/with}}
 </header>

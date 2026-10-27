@@ -20,16 +20,17 @@
             {{!-- dnd5e's roll action reads the skill from the nearest data-key. --}}
             <li data-key="{{ key }}">
                {{#if ../editing}}
-               {{!-- Edit mode (SCOPE §4.9): dnd5e's proficiency cycle (click cycles none, half, full, expertise), the
-                     ability, the name still rolls, and a gear for the skill's window. The passive steps aside. --}}
+               {{!-- Edit mode keeps play mode's row (SCOPE §5.2 rule 6): dnd5e's proficiency cycle in the dot's place (click
+                     cycles none, half, full, expertise), the same name (still rolls), the ability as text that opens its
+                     choices, the same total, and the skill's gear in the passive's place. --}}
                <div class="fhcs-skill fhcs-skill-edit">
                   <proficiency-cycle class="fhcs-prof-cycle" type="skill" name="system.skills.{{ key }}.value" value="{{ source }}"
                                      aria-label="{{ profLabel }}" data-fhcs-tip="{{ profLabel }}"></proficiency-cycle>
-                  <select class="fhcs-input fhcs-label fhcs-skill-ability" name="system.skills.{{ key }}.ability" aria-label="{{ abilityLabel }}">
-                     {{#each abilities}}<option value="{{ key }}"{{#if selected}} selected{{/if}}>{{ abbr }}</option>{{/each}}
-                  </select>
                   <button type="button" class="fhcs-skill-roll fhcs-body {{ @root.rollableClass }}" data-action="roll" data-type="skill"
                           aria-label="{{ rollLabel }}"><span class="fhcs-skill-name">{{ label }}</span></button>
+                  <select class="fhcs-label fhcs-muted fhcs-skill-ability" name="system.skills.{{ key }}.ability" aria-label="{{ abilityLabel }}">
+                     {{#each abilities}}<option value="{{ key }}"{{#if selected}} selected{{/if}}>{{ abbr }}</option>{{/each}}
+                  </select>
                   <span class="fhcs-body fhcs-skill-mod">{{ mod }}</span>
                   <button type="button" class="fhcs-toggle fhcs-gear-button fhcs-muted" data-action="showConfiguration" data-config="skill"
                           aria-label="{{ configLabel }}" data-fhcs-tip="{{ configLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>
