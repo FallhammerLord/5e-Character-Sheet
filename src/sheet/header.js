@@ -111,6 +111,8 @@ export function headerView(facts, { format, localize })
    const level = format('FHCS.Header.Level', { level: facts.level });
    return {
       name: facts.name,
+      // Edit mode edits the name as stored, not as an effect or a token may show it.
+      nameSource: facts.nameSource ?? facts.name,
       // The portrait card (SCOPE §4.1, user, 2026-10-27): art fills the frame; a token shows whole, at the top.
       portrait: { ...facts.portrait, fit: facts.portrait?.token ? 'contain' : 'cover' },
       columns,
@@ -123,7 +125,8 @@ export function headerView(facts, { format, localize })
       level,
       xp: !milestones && xp ? {
          value: xp.value, max: xp.max, pct: xp.pct ?? percent(xp.value, xp.max),
-         text: format('FHCS.Header.XP', { value: xp.valueLabel ?? xp.value, max: xp.maxLabel ?? xp.max })
+         text: format('FHCS.Header.XP', { value: xp.valueLabel ?? xp.value, max: xp.maxLabel ?? xp.max }),
+         maxText: format('FHCS.Header.XPMax', { max: xp.maxLabel ?? xp.max })
       } : null,
       milestones: milestones ? {
          ...levelTrack(facts.classes, facts.levelOrder, facts.originalClass, format),
@@ -172,6 +175,10 @@ export function headerView(facts, { format, localize })
          mod: signed(a.mod),
          save: signed(a.save),
          score: a.value,
+         // The score as stored, for edit mode's field (effects may raise the score shown).
+         source: a.source ?? a.value,
+         scoreLabel: format('FHCS.Header.ScoreLabel', { ability: a.label }),
+         configLabel: format('FHCS.Header.AbilityConfig', { ability: a.label }),
          proficient: a.proficient > 0,
          checkLabel: format('FHCS.Header.CheckLabel', { ability: a.label, mod: signed(a.mod) }),
          saveLabel: format(a.proficient > 0 ? 'FHCS.Header.SaveProficient' : 'FHCS.Header.SaveLabel',
@@ -180,6 +187,10 @@ export function headerView(facts, { format, localize })
       text: {
          hp: localize('FHCS.Header.HP'), temp: localize('FHCS.Header.Temp'), maxMod: localize('FHCS.Header.MaxMod'),
          maxModLabel: localize('FHCS.Header.MaxModLabel'), exhaustionShow: localize('FHCS.Header.ExhaustionShow'),
+         name: localize('FHCS.Header.Name'), xpLabel: localize('FHCS.Header.XPLabel'),
+         speedConfig: localize('FHCS.Header.SpeedConfig'), acConfig: format('FHCS.Header.ACConfig', { ac: facts.ac ?? '—' }),
+         initConfig: localize('FHCS.Header.InitConfig'), hdConfig: localize('FHCS.Header.HDConfig'),
+         hpConfig: localize('FHCS.Header.HPConfig'), tokenSwitch: localize('FHCS.Header.TokenSwitch'),
          amount: localize('FHCS.Header.HpAmount'), damage: localize('FHCS.Header.HpDamage'), heal: localize('FHCS.Header.HpHeal'),
          giveTemp: localize('FHCS.Header.HpTemp'), damageLabel: localize('FHCS.Header.HpDamageLabel'),
          healLabel: localize('FHCS.Header.HpHealLabel'), tempLabel: localize('FHCS.Header.HpTempLabel'),

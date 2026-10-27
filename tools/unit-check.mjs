@@ -279,6 +279,12 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
       card.rests.map((r) => `${r.key}${r.short ? '*' : ''}`).join()];
    try { deepStrictEqual(got, [true, false, '5', '-3', '', 'contain', 'cover', 'short*,long']); }
    catch { problems.push(`portrait card: ${JSON.stringify(got)}`); }
+   // Edit mode edits what's stored: the name and score as saved, not as an effect shows them.
+   const stored = headerView({ ...base, name: 'Shown', nameSource: 'Stored', xp: { value: 10, max: 300 }, hp: { value: 5, max: 10, temp: 0 },
+      abilities: [{ key: 'str', abbr: 'Str', label: 'Strength', value: 18, source: 16, mod: 4, save: 4, proficient: 0 }] }, { format, localize });
+   const edited = [stored.nameSource, stored.abilities[0].source, stored.xp.maxText];
+   try { deepStrictEqual(edited, ['Stored', 16, '/ 300 XP']); }
+   catch { problems.push(`edit mode values: ${JSON.stringify(edited)}`); }
    const marks = down.death ? [down.death.success.map((p) => p.filled), down.death.failure.map((p) => p.filled)] : null;
    try { deepStrictEqual(marks, [[true, true, false], [true, false, false]]); }
    catch { problems.push(`death saves at 0 HP: ${JSON.stringify(marks)}`); }

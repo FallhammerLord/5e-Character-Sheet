@@ -313,6 +313,49 @@ export function registerQuenchTests(quench)
             await actor.update({ 'system.attributes.hp.max': before.max, 'system.attributes.hp.value': before.value, 'system.attributes.hp.temp': before.temp });
          });
 
+         it('edits XP in play, and name, scores, AC, hit dice and the token switch in edit mode', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 10);
+            const before = { name: actor._source.name, xp: actor.system.details.xp.value, str: actor.system._source.abilities.str.value,
+               token: actor.getFlag('dnd5e', 'showTokenPortrait') ?? false };
+            // XP is a field in play too (user, 2026-10-27), wherever dnd5e's leveling uses XP.
+            if (sheet.element.querySelector('.fhcs-header [name="system.details.xp.value"]'))
+            {
+               await enter('.fhcs-header [name="system.details.xp.value"]', '300');
+               await until(() => actor.system.details.xp.value === 300, () => `XP saves from play mode; it holds ${actor.system.details.xp.value}`);
+            }
+            assert.notOk(sheet.element.querySelector('.fhcs-header [name="name"]'), 'the name is not a field in play mode');
+            const mode = async (editing) =>
+            {
+               if (sheet.isEditMode === editing) { return; }
+               await click('.fhcs-tabs [data-action="changeMode"]');
+               await until(() => sheet.isEditMode === editing, `the lock switches to ${editing ? 'edit' : 'play'} mode`);
+            };
+            await mode(true);
+            await enter('.fhcs-header [name="name"]', 'FHCS renamed');
+            await until(() => actor._source.name === 'FHCS renamed', () => `the name saves; it holds "${actor._source.name}"`);
+            await enter('.fhcs-header [data-ability="str"] [name="system.abilities.str.value"]', '14');
+            await until(() => actor.system._source.abilities.str.value === 14, () => `the STR score saves; it holds ${actor.system._source.abilities.str.value}`);
+            const { ArmorClassConfig, HitDiceConfig, AbilityConfig } = globalThis.dnd5e.applications.actor;
+            const open = (Kind) => [...foundry.applications.instances.values()].find((app) => app instanceof Kind && app.document === actor);
+            for (const [selector, Kind, what] of [
+               ['.fhcs-header [data-action="showConfiguration"][data-config="armorClass"]', ArmorClassConfig, 'the AC shield opens dnd5e\'s AC window'],
+               ['.fhcs-header [data-action="showConfiguration"][data-config="hitDice"]', HitDiceConfig, 'the HD chip opens dnd5e\'s hit dice window'],
+               ['.fhcs-header [data-ability="dex"] [data-action="showConfiguration"][data-config="ability"]', AbilityConfig, 'the DEX gear opens dnd5e\'s ability window']
+            ])
+            {
+               await click(selector);
+               await until(() => open(Kind)?.rendered, what);
+               await open(Kind).close();
+            }
+            await click('.fhcs-header [name="flags.dnd5e.showTokenPortrait"]');
+            await until(() => (actor.getFlag('dnd5e', 'showTokenPortrait') ?? false) !== before.token,
+               () => `the Token switch flips dnd5e's flag; it holds ${actor.getFlag('dnd5e', 'showTokenPortrait')}`);
+            await mode(false);
+            await actor.update({ name: before.name, 'system.details.xp.value': before.xp, 'system.abilities.str.value': before.str,
+               'flags.dnd5e.showTokenPortrait': before.token });
+         });
+
          it('shows two class cards and folds further classes into the class tray', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 4);

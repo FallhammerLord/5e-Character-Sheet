@@ -57,7 +57,20 @@
             </div>
             {{/if}}
 
+            {{#if @root.editable}}
+            <button type="button" class="fhcs-chip fhcs-label fhcs-corner-br" data-action="showConfiguration" data-config="hitDice"
+                    aria-label="{{ text.hdConfig }}" data-fhcs-tip="{{ text.hdConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}{{ hd.text }}</button>
+            {{else}}
             <span class="fhcs-chip fhcs-chip-static fhcs-label fhcs-corner-br" role="img" aria-label="{{ hd.label }}">{{ hd.text }}</span>
+            {{/if}}
+
+            {{#if @root.editable}}
+            {{!-- Edit mode: show the token instead of the portrait (dnd5e's own switch, a flag on the actor). --}}
+            <label class="fhcs-chip fhcs-corner-tc{{#if portrait.token}} fhcs-on{{/if}}" data-fhcs-tip="{{ text.tokenSwitch }}">
+               <input type="checkbox" class="fhcs-sr-only" name="flags.dnd5e.showTokenPortrait" {{#if portrait.token}}checked{{/if}} aria-label="{{ text.tokenSwitch }}">
+               <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>
+            </label>
+            {{/if}}
 
             {{#if death}}
             {{!-- At 0 HP the death saves sit on the portrait, so the header keeps its size (user, 2026-10-24). --}}
@@ -86,6 +99,9 @@
             {{#if @root.editable}}
             {{!-- Edit mode: dnd5e's meter markup; a click on it shows the field to set HP exactly (base-actor-sheet.mjs
                   #toggleMeter). --}}
+            <div class="fhcs-hp-edit">
+            <button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="hitPoints"
+                    aria-label="{{ text.hpConfig }}" data-fhcs-tip="{{ text.hpConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>
             <div class="fhcs-hp meter">
                <div class="fhcs-hp-meter" role="meter" aria-valuemin="0" aria-valuenow="{{ hp.value }}" aria-valuemax="{{ hp.max }}"
                     aria-label="{{ hp.label }}">
@@ -94,6 +110,7 @@
                   <input type="text" class="fhcs-input fhcs-display" name="system.attributes.hp.value" data-dtype="Number"
                          data-max="{{ hp.max }}" value="{{ hp.value }}" placeholder="0" hidden>
                </div>
+            </div>
             </div>
             {{else if editable}}
             {{!-- Play mode: the bar opens the HP tray (user, 2026-10-27). Not dnd5e's meter markup, so its click-to-edit
@@ -145,12 +162,25 @@
 
    <div class="fhcs-header-main">
       <div class="fhcs-header-row">
+         {{#if @root.editable}}
+         {{!-- Edit mode: the name is a field (SCOPE §4.9). --}}
+         <input type="text" class="fhcs-input fhcs-display fhcs-name fhcs-name-input" name="name" value="{{ nameSource }}" aria-label="{{ text.name }}">
+         {{else}}
          <span class="fhcs-display fhcs-name">{{ name }}</span>
+         {{/if}}
          {{#if xp}}
          <div class="fhcs-xp">
             <div class="fhcs-bar" role="meter" aria-valuemin="0" aria-valuenow="{{ xp.value }}" aria-valuemax="{{ xp.max }}"
                  aria-label="{{ xp.text }}"><span style="width: {{ xp.pct }}%"></span></div>
+            {{#if editable}}
+            {{!-- XP is a field in play too, for whoever may edit the character (user, 2026-10-27). --}}
+            <span class="fhcs-body fhcs-muted fhcs-xp-line">
+               <input type="text" class="fhcs-input fhcs-body fhcs-xp-input" name="system.details.xp.value" data-dtype="Number"
+                      value="{{ xp.value }}" placeholder="0" aria-label="{{ text.xpLabel }}"><span>{{ xp.maxText }}</span>
+            </span>
+            {{else}}
             <span class="fhcs-body fhcs-muted">{{ xp.text }}</span>
+            {{/if}}
          </div>
          {{#if levelUp}}
          {{!-- The level pill opens Level up (user, 2026-10-26); solid with an arrow once the XP is there. --}}
@@ -188,7 +218,11 @@
          {{/if}}
       </div>
       <div class="fhcs-header-row">
-         <span class="fhcs-label fhcs-muted fhcs-line">{{ origin }}{{#if origin}} · {{/if}}{{ speed }}</span>
+         <span class="fhcs-origin-speed">
+            <span class="fhcs-label fhcs-muted fhcs-line">{{ origin }}{{#if origin}} · {{/if}}{{ speed }}</span>
+            {{#if @root.editable}}<button type="button" class="fhcs-toggle fhcs-gear-button fhcs-muted" data-action="showConfiguration" data-config="movement"
+                    aria-label="{{ text.speedConfig }}" data-fhcs-tip="{{ text.speedConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}
+         </span>
          <span class="fhcs-label fhcs-nowrap">{{ text.proficiency }} {{ prof }}</span>
       </div>
 
@@ -196,27 +230,45 @@
       {{!-- The class, species and background cards share the grid's columns, under the abilities (user, 2026-10-26). --}}
       <div class="fhcs-abilities{{#if scoreFirst}} fhcs-score-first{{/if}}" style="--fhcs-columns: {{ columns }}">
          <div class="fhcs-ability">
-            <span class="fhcs-label fhcs-muted">{{ text.ac }}</span>
+            <span class="fhcs-label fhcs-muted fhcs-ability-head">{{ text.ac }}</span>
+            {{#if @root.editable}}
+            {{!-- Edit mode: the shield opens dnd5e's AC window (user, 2026-10-27). --}}
+            <button type="button" class="fhcs-shield fhcs-shield-button" data-action="showConfiguration" data-config="armorClass"
+                    aria-label="{{ text.acConfig }}" data-fhcs-tip="{{ text.acConfig }}">
+               <svg viewBox="0 0 40 46" aria-hidden="true"><path d="M20 2l16 6v13c0 11-7 18-16 23C11 39 4 32 4 21V8z"/></svg>
+               <span class="fhcs-display">{{ ac }}</span>
+               <span class="fhcs-shield-gear" aria-hidden="true">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</span>
+            </button>
+            {{else}}
             <span class="fhcs-shield" data-attribution="attributes.ac" data-attribution-caption="DND5E.ArmorClass">
                <svg viewBox="0 0 40 46" aria-hidden="true"><path d="M20 2l16 6v13c0 11-7 18-16 23C11 39 4 32 4 21V8z"/></svg>
                <span class="fhcs-display">{{ ac }}</span>
             </span>
+            {{/if}}
          </div>
          <div class="fhcs-ability">
-            <span class="fhcs-label fhcs-muted">{{ text.init }}</span>
+            <span class="fhcs-label fhcs-muted fhcs-ability-head">{{ text.init }}{{#if @root.editable}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="initiative"
+                    aria-label="{{ text.initConfig }}" data-fhcs-tip="{{ text.initConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</span>
             <button type="button" class="fhcs-button fhcs-display {{ @root.rollableClass }}" data-action="roll" data-type="initiative"
                     aria-label="{{ text.initLabel }}">{{ init }}</button>
          </div>
          {{#each abilities}}
          <div class="fhcs-ability" data-ability="{{ key }}">
-            <span class="fhcs-label fhcs-muted">{{ abbr }}</span>
+            <span class="fhcs-label fhcs-muted fhcs-ability-head">{{ abbr }}{{#if @root.editable}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="ability"
+                    aria-label="{{ configLabel }}" data-fhcs-tip="{{ configLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</span>
+            {{#if @root.editable}}
+            {{!-- Edit mode: the score is a field (SCOPE §4.9); the check rolls from the label row's ability in play. --}}
+            <input type="text" class="fhcs-input fhcs-display fhcs-score-input" name="system.abilities.{{ key }}.value" data-dtype="Number"
+                   value="{{ source }}" placeholder="10" aria-label="{{ scoreLabel }}">
+            {{else}}
             <button type="button" class="fhcs-button fhcs-display ability-check {{ @root.rollableClass }}" data-action="roll"
                     data-type="ability" aria-label="{{ checkLabel }}">{{#if ../scoreFirst}}{{ score }}{{else}}{{ mod }}{{/if}}</button>
+            {{/if}}
             <button type="button" class="fhcs-button fhcs-body saving-throw {{ @root.rollableClass }}" data-action="roll"
                     data-type="ability" aria-label="{{ saveLabel }}" data-fhcs-tip="{{ saveLabel }}">
                <span class="fhcs-prof{{#if proficient}} fhcs-on{{/if}}" aria-hidden="true"></span>{{ save }}
             </button>
-            <span class="fhcs-label fhcs-muted">{{#if ../scoreFirst}}{{ mod }}{{else}}{{ score }}{{/if}}</span>
+            <span class="fhcs-label fhcs-muted">{{#if @root.editable}}{{ mod }}{{else}}{{#if ../scoreFirst}}{{ mod }}{{else}}{{ score }}{{/if}}{{/if}}</span>
          </div>
          {{/each}}
          {{#each cards}}

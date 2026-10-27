@@ -552,6 +552,13 @@ export const CASES = [
    { name: 'header-square-art', template: 'sheet/header', context: header({ portrait: { src: SQUARE, isVideo: false } }) },
    // Aid on: temp HP and a temporary change to max (Max ±), so both fields hold a value.
    { name: 'header-max-mod', template: 'sheet/header', context: header({ hp: { value: 82, max: 92, temp: 5, tempmax: 5 } }) },
+   // Edit mode (SCOPE §4.9): name and scores as fields, gears, the AC window, the Token switch.
+   { name: 'header-editing', template: 'sheet/header', context: { ...header({ originCards: originFacts({ editing: true }) }), editable: true } },
+   { name: 'header-editing-tall', template: 'sheet/header', context: { ...header({ portrait: { src: TALL, isVideo: false }, originCards: FOUR_CLASSES({ editing: true }) }), editable: true } },
+   {
+      name: 'header-editing-multiclass', template: 'sheet/header', open: ['level-up'],
+      context: { ...header({ ...MULTICLASS, leveling: 'xp', originCards: originFacts({ ...MULTICLASS.originCards, editing: true, xp: { value: 6500, max: 14000 } }) }), editable: true }
+   },
    // The HP tray open from the bar, Aid on (user, 2026-10-27); and a viewer's bar, which opens nothing.
    { name: 'header-hp-tray', template: 'sheet/header', open: ['hp'], context: header({ hp: { value: 82, max: 92, temp: 5, tempmax: 5 } }) },
    // Four classes: two cards, "+2" opens the class tray (user, 2026-10-27).

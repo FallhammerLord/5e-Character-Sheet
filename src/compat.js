@@ -83,6 +83,7 @@ export async function headerFacts(sheet, context, moduleId, emphasis)
    const xp = details.xp ?? {};
    return {
       name: actor.name,
+      nameSource: actor._source?.name ?? actor.name,
       portrait: await sheet._preparePortrait(context),
       editable: sheet.isEditable,
       classes,
@@ -112,6 +113,7 @@ export async function headerFacts(sheet, context, moduleId, emphasis)
       emphasis,
       abilities: sheet._prepareAbilities(context).map((a) => ({
          key: a.key, abbr: a.abbr, label: a.label, value: a.value, mod: a.mod,
+         source: actor.system._source.abilities?.[a.key]?.value ?? a.value,
          save: a.save?.value ?? abilities[a.key]?.save?.value ?? a.mod, proficient: a.proficient ?? 0
       }))
    };

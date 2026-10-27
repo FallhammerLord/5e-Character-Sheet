@@ -1271,6 +1271,94 @@
    background: currentColor;
 }
 
+/* ---------- Edit mode in the header (SCOPE §4.9, user, 2026-10-27) ---------- */
+
+/* A gear: opens one of dnd5e's settings windows; a 24px target around a 14px mark. */
+.fhcs-sheet .fhcs-gear-button
+{
+   display: inline-grid;
+   flex: none;
+   place-items: center;
+   width: 24px;
+   height: 24px;
+   min-height: 24px;
+   margin: 0;
+   padding: 0;
+   border: 0;
+   background: none;
+   color: inherit;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-gear { width: 14px; height: 14px; }
+.fhcs-sheet .fhcs-chip .fhcs-gear { width: 12px; height: 12px; }
+
+.fhcs-sheet .fhcs-name-input { flex: 1; min-width: 0; padding: 0 var(--fhcs-s1); text-align: left; }
+
+/* An ability's label row holds its gear in edit mode; the row keeps one height in both modes. */
+.fhcs-sheet .fhcs-ability-head { display: inline-flex; align-items: center; min-height: 24px; }
+.fhcs-sheet .fhcs-score-input { text-align: center; }
+
+/* In edit mode the shield is a button into dnd5e's AC window, with a gear on its corner. */
+.fhcs-sheet .fhcs-shield-button
+{
+   width: 40px;
+   height: 46px;
+   min-height: 0;
+   margin: 0;
+   padding: 0;
+   border: 0;
+   background: none;
+   line-height: normal;
+   cursor: pointer;
+}
+
+/* `.fhcs-shield > .fhcs-shield-gear`: outranks `.fhcs-shield > span`, which would put it back in the shield's grid. */
+.fhcs-sheet .fhcs-shield > .fhcs-shield-gear
+{
+   position: absolute;
+   right: -6px;
+   bottom: -4px;
+   display: grid;
+   place-items: center;
+   width: 20px;
+   height: 20px;
+   box-sizing: border-box;
+   border: 1.5px solid var(--fhcs-die-ink);
+   border-radius: 50%;
+   background: var(--fhcs-surface);
+   color: var(--fhcs-ink);
+}
+
+.fhcs-sheet .fhcs-shield-gear .fhcs-gear { width: 12px; height: 12px; }
+
+.fhcs-sheet .fhcs-origin-speed { display: flex; flex: 1; align-items: center; min-width: 0; }
+.fhcs-sheet .fhcs-origin-speed > .fhcs-line { flex: 0 1 auto; }
+.fhcs-sheet .fhcs-hp-edit { display: flex; align-items: center; gap: var(--fhcs-s1); }
+.fhcs-sheet .fhcs-hp-edit > .meter { flex: 1; min-width: 0; }
+
+/* The token switch: top centre of the portrait; a ring when on. */
+.fhcs-sheet .fhcs-corner-tc { position: absolute; top: var(--fhcs-s1); left: 50%; transform: translateX(-50%); }
+.fhcs-sheet .fhcs-corner-tc.fhcs-on { box-shadow: 0 0 0 2px var(--fhcs-surface), 0 0 0 4px var(--fhcs-die-ink); }
+
+.fhcs-sheet .fhcs-sr-only
+{
+   position: absolute;
+   width: 1px;
+   height: 1px;
+   margin: -1px;
+   padding: 0;
+   overflow: hidden;
+   clip-path: inset(50%);
+   border: 0;
+   white-space: nowrap;
+}
+
+/* XP: a field for whoever may edit the character, in play too (user, 2026-10-27); a faint edge until hovered. */
+.fhcs-sheet .fhcs-xp-line { display: flex; align-items: center; justify-content: flex-end; gap: var(--fhcs-s1); white-space: nowrap; }
+.fhcs-sheet .fhcs-xp-input { width: 4.5rem; min-height: 24px; text-align: center; border-color: var(--fhcs-line-soft); }
+.fhcs-sheet .fhcs-xp-input:is(:hover, :focus) { border-color: var(--fhcs-line); }
+
 /* XP, or the level pill with its milestone track. */
 .fhcs-sheet .fhcs-xp
 {
@@ -1278,7 +1366,7 @@
    flex: none;
    flex-direction: column;
    gap: var(--fhcs-s1);
-   width: 8.5rem;
+   min-width: 8.5rem;
    text-align: right;
 }
 
