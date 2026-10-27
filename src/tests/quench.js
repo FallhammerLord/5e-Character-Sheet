@@ -422,6 +422,39 @@ export function registerQuenchTests(quench)
             await until(() => !sheet.isEditMode, 'the lock switches back to play mode');
          });
 
+         it('levels a class down from the level tray and sets the main spellcasting ability, in edit mode', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 8);
+            const before = actor.system.attributes.spellcasting;
+            const [caster] = await createItems([{ name: 'FHCS test caster', type: 'class',
+               system: { identifier: 'fhcs-caster', levels: 3, spellcasting: { progression: 'full', ability: 'int' } } }]);
+            if (!sheet.isEditMode)
+            {
+               await click('.fhcs-tabs [data-action="changeMode"]');
+               await until(() => sheet.isEditMode, 'the lock switches to edit mode');
+            }
+            assert.ok(sheet.element.querySelector(`.fhcs-header [data-action="fhcsLevelDown"][data-item-id="${caster.id}"]`),
+               'edit mode offers Level down for a class above level 1');
+            const Confirm = globalThis.dnd5e.applications.advancement.AdvancementConfirmationDialog;
+            const asking = () => [...foundry.applications.instances.values()].find((app) => app instanceof Confirm);
+            await click(`.fhcs-header [data-action="fhcsLevelDown"][data-item-id="${caster.id}"]`);
+            // With advancements to undo, dnd5e asks first; with none, the class just loses a level.
+            await until(() => asking() || caster.system.levels === 2,
+               () => `Level down asks or lowers the level; the class is level ${caster.system.levels}`);
+            await asking()?.close();
+            await click('.fhcs-tabs [data-tab="spells"]');
+            const radio = `.fhcs-spellbook .fhcs-casting-class[data-ability="int"] [data-action="setSpellcastingAbility"]`;
+            await until(() => sheet.element.querySelector(radio), () => `the casting card offers its ability in edit mode; cards: ${[...sheet.element.querySelectorAll('.fhcs-casting-class')].map((c) => c.dataset.ability).join()}`);
+            await click(radio);
+            await until(() => actor.system.attributes.spellcasting === 'int',
+               () => `the radio sets the main spellcasting ability; it holds "${actor.system.attributes.spellcasting}"`);
+            await actor.update({ 'system.attributes.spellcasting': before });
+            await caster.delete();
+            await click('.fhcs-tabs [data-action="changeMode"]');
+            await until(() => !sheet.isEditMode, 'the lock switches back to play mode');
+            await click('.fhcs-tabs [data-tab="details"]');
+         });
+
          it('shows two class cards and folds further classes into the class tray', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 4);

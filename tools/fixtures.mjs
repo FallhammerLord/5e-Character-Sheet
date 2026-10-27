@@ -302,7 +302,7 @@ const spell = (name, fill, over = {}) => ({
 const level = (n, items, slots) => ({ id: `spell${n}`, method: 'spell', level: n, label: n ? `Level ${n}` : 'Cantrips',
    slots: slots ? { value: slots[0], max: slots[1] } : null, items });
 const spellbookFacts = (over = {}) => ({
-   classes: [{ label: 'Cleric Spellcasting', abbr: 'WIS', mod: 4, attack: 8, save: 16, prepared: { value: 11, max: 14 }, primary: true }],
+   classes: [{ label: 'Cleric Spellcasting', abbr: 'WIS', ability: 'wis', mod: 4, attack: 8, save: 16, prepared: { value: 11, max: 14 }, primary: true }],
    concentration: { save: 5, spells: [{ effectId: 'e1', itemId: 'SpiritGuardians', name: 'Spirit Guardians', img: ICON('#c9a227'), sub: '3rd Level' }] },
    sections: [
       level(0, [
@@ -516,6 +516,11 @@ export const CASES = [
    { name: 'spellbook', template: 'sheet/spellbook', context: spellbook() },
    { name: 'spellbook-multiclass-idle', template: 'sheet/spellbook', context: spellbook({ classes: MULTICLASS_CASTER, concentration: { save: -1, spells: [] } }) },
    { name: 'spellbook-editing', template: 'sheet/spellbook', open: ['spells-columns'], context: spellbook({ editing: true, columns: ALL_SPELL_COLUMNS }) },
+   // Two casting classes in edit mode: the radio dot picks the main spellcasting ability (user, 2026-10-27).
+   { name: 'spellbook-editing-two-casters', template: 'sheet/spellbook', context: spellbook({ editing: true, classes: [
+      { label: 'Cleric Spellcasting', abbr: 'WIS', ability: 'wis', mod: 4, attack: 8, save: 16, prepared: { value: 11, max: 14 }, primary: true },
+      { label: 'Warlock Spellcasting', abbr: 'CHA', ability: 'cha', mod: 3, attack: 7, save: 15, prepared: { value: 2, max: 4 }, primary: false }
+   ] }) },
    { name: 'spellbook-few-columns', template: 'sheet/spellbook', context: spellbook({ columns: { components: false, concentration: false, time: false, range: false } }) },
    {
       name: 'spellbook-two-concentrations', template: 'sheet/spellbook',
@@ -553,6 +558,13 @@ export const CASES = [
    { name: 'header-square-art', template: 'sheet/header', context: header({ portrait: { src: SQUARE, isVideo: false } }) },
    // Aid on: temp HP and a temporary change to max (Max ±), so both fields hold a value.
    { name: 'header-max-mod', template: 'sheet/header', context: header({ hp: { value: 82, max: 92, temp: 5, tempmax: 5 } }) },
+   {
+      name: 'header-level-down', template: 'sheet/header', open: ['level-up'],
+      context: { ...header({ originCards: originFacts({ editing: true, classes: [
+         { ...originDoc('Cleric', '#c9a227'), identifier: 'cleric', level: 17, subclass: originDoc('Life Domain', '#3a8a5a'), needsSubclass: false },
+         { ...originDoc('Fighter', '#7a2e2e'), identifier: 'fighter', level: 3, subclass: originDoc('Champion', '#8a3a2a'), needsSubclass: false }
+      ] }) }), editable: true }
+   },
    // Edit mode (SCOPE §4.9): name and scores as fields, gears, the AC window, the Token switch.
    { name: 'header-editing', template: 'sheet/header', context: { ...header({ originCards: originFacts({ editing: true }) }), editable: true } },
    { name: 'header-editing-tall', template: 'sheet/header', context: { ...header({ portrait: { src: TALL, isVideo: false }, originCards: FOUR_CLASSES({ editing: true }) }), editable: true } },

@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6: slices 1–5 built; slice 6, spellcasting ability and level down, is next** (ROADMAP Phase 6 lists the slices; Quench and play for 1 and 2 wait on the user, below). Styling notes for slice 7, from the user's screenshots (2026-10-27): the sort button shows Foundry's orange active ring with no filter on; a blank band above the header; the empty Attributes favorites leave the right column bare; Hunter's Mark's "Additional Spells" row (Favored Enemy's free casts) shows no uses; the spell slot settings icon (`spellbook.hbs`) draws as a sun, not a gear (use the cog from the Phase 6 boards).
+1. **Phase 6: slices 1–6 built; slice 7, the styling and space pass, is next** (ROADMAP Phase 6 lists the slices; Quench and play for 1 and 2 wait on the user, below). Styling notes for slice 7, from the user's screenshots (2026-10-27): the sort button shows Foundry's orange active ring with no filter on; a blank band above the header; the empty Attributes favorites leave the right column bare; Hunter's Mark's "Additional Spells" row (Favored Enemy's free casts) shows no uses; the spell slot settings icon (`spellbook.hbs`) draws as a sun, not a gear (use the cog from the Phase 6 boards).
 
 The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.
 
@@ -13,6 +13,7 @@ The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't reru
 In code, not yet seen in Foundry:
 
 - **Quench run, 2026-10-27:** all pass but the HP tray test, a test bug (its click waited for a redraw that dropped the typed amount); fixed, rerun pending.
+- **Phase 6 slice 6, level down and the main spellcasting ability** (2026-10-27): edit mode; the level tray lists Level down for each class above level 1 (dnd5e asks before undoing advancements; at level 20 the tray keeps Level down); each Spellbook casting card has a radio dot for the main spellcasting ability. Quench "core": new test "levels a class down…".
 - **Phase 6 slice 5, Attributes in edit mode** (2026-10-27): each skill gets dnd5e's proficiency cycle (click cycles it), a slim ability dropdown and a gear; the Skills heading's gear opens bonuses for every skill; each trait heading has a gear. dnd5e draws the cycle itself, so only Foundry shows it (the offline check can't). Skill names shorten at 644px in edit mode ("Animal Han…"; the name keeps its 96px). Quench "core": new test "cycles a skill's proficiency…".
 - **Phase 6 slice 4, framing large art** (2026-10-27): edit mode, non-token art: the Frame chip (top centre, beside the token switch); drag to pan, the strip zooms, arrows pan (Shift finer), + and − zoom, Enter is Done, Escape cancels; saved on the character with its image. Quench "core": new test "frames the portrait from the keyboard…". In play: drag feel, and a big painting framed on its face.
 - **Phase 6 slice 3, the edit-mode header** (2026-10-27): unlock the sheet; the name and scores are fields; gears beside Init, each ability, speed and HP; the AC shield and the HD chip open dnd5e's windows; a Token switch at the portrait's top. XP is a field in play too. Quench "core": new test "edits XP in play, and name, scores, AC, hit dice and the token switch in edit mode".

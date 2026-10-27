@@ -92,7 +92,7 @@ Already in place before the phase: portrait picker (edit mode), rests, death sav
 - [ ] 3. Edit-mode header: name, XP, ability scores, AC window, gears for Init, speed, HP and hit dice, Token switch (built 2026-10-27; Quench and play next)
 - [ ] 4. Framing large art: zoom, pan, arrow keys (`flags.fhcs.portrait`, keyed by the image) (built 2026-10-27; Quench and play next)
 - [ ] 5. Attributes in edit mode: skill proficiency and ability, trait and sense gears (built 2026-10-27; Quench and play next)
-- [ ] 6. Spellcasting ability; level down
+- [ ] 6. Spellcasting ability; level down (built 2026-10-27; Quench and play next)
 - [x] Special Traits tab in our look: dnd5e's form, name and control on a line, hint under (user's screenshot, 2026-10-27; built, play next)
 - [ ] 7. Styling and space pass (notes in STATUS)
 - [ ] Limited and Observer views (if the user wants them in this phase)

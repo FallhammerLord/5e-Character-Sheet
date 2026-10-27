@@ -101,11 +101,21 @@ export function originCards(facts, columns, { format, localize })
 export function levelUpChoices(facts, { format, localize })
 {
    const total = (facts.classes ?? []).reduce((n, k) => n + (Number(k.level) || 0), 0);
-   if (!facts.canEdit || total >= (facts.maxLevel ?? 20)) { return null; }
+   const canLevelUp = total < (facts.maxLevel ?? 20);
+   const sorted = [...(facts.classes ?? [])].sort((a, b) => b.level - a.level);
+   // Level down: edit mode only (SCOPE §4.9), for a class above level 1 (at 1 it goes by its card's ×).
+   const down = facts.editing ? sorted.filter((k) => k.level > 1).map((k) => ({
+      id: k.id, name: k.name, from: k.level, next: k.level - 1,
+      label: format('FHCS.Header.LevelDownClass', { name: k.name, level: k.level - 1 })
+   })) : [];
+   if (!facts.canEdit || (!canLevelUp && !down.length)) { return null; }
    const xp = facts.xp;
    return {
-      ready: !!xp && xp.max > 0 && xp.value >= xp.max,
-      classes: [...(facts.classes ?? [])].sort((a, b) => b.level - a.level).map((k) => ({
+      canLevelUp,
+      down,
+      downTitle: localize('FHCS.Header.LevelDown'),
+      ready: canLevelUp && !!xp && xp.max > 0 && xp.value >= xp.max,
+      classes: (canLevelUp ? sorted : []).map((k) => ({
          id: k.id,
          name: k.name,
          from: k.level,

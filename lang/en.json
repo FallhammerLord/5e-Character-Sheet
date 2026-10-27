@@ -164,6 +164,8 @@
       "DeathFailure": "Death save failure {n}",
       "LevelUpClass": "Level up {name} to {level}",
       "NewClass": "New class",
+      "LevelDown": "Level down",
+      "LevelDownClass": "Level down {name} to {level}",
       "LevelUpLabel": "{level}: show level up"
     },
     "Tabs": {
@@ -252,6 +254,8 @@
       "canCast": "Can cast"
     },
     "Spellbook": {
+      "SetPrimary": "Use {ability} as the main spellcasting ability",
+      "PrimaryOn": "{ability} is the main spellcasting ability",
       "Search": "Search spells",
       "Column": {
         "components": "Comp.",

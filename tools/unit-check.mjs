@@ -502,7 +502,13 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const up = levelUpChoices(facts(), { format, localize });
    if (up.classes.map((k) => `${k.name}${k.next}`).join() !== 'Cleric10,Warlock2' || up.ready) { problems.push(`level up: ${JSON.stringify(up)}`); }
    if (!levelUpChoices(facts({ xp: { value: 300, max: 300 } }), { format, localize }).ready) { problems.push('enough XP does not mark the level pill'); }
-   if (levelUpChoices(facts({ classes: [{ ...facts().classes[1], level: 20 }] }), { format, localize })) { problems.push('Level up shows at level 20'); }
+   if (levelUpChoices(facts({ classes: [{ ...facts().classes[1], level: 20 }] }), { format, localize })) { problems.push('the level tray shows at level 20 in play'); }
+   // Level down: edit mode only, classes above level 1; at level 20 the tray keeps Level down and drops Level up.
+   const downs = levelUpChoices(facts({ editing: true }), { format, localize }).down.map((k) => `${k.name}${k.next}`).join();
+   if (downs !== 'Cleric8') { problems.push(`level down: ${downs}`); }
+   const top = levelUpChoices(facts({ editing: true, classes: [{ ...facts().classes[1], level: 20 }] }), { format, localize });
+   if (!top || top.canLevelUp || top.classes.length || top.down[0]?.next !== 19) { problems.push(`level 20 in edit mode: ${JSON.stringify(top)}`); }
+   if (levelUpChoices(facts(), { format, localize }).down.length) { problems.push('Level down shows in play'); }
    if (levelUpChoices(facts({ canEdit: false }), { format, localize })) { problems.push('a viewer gets Level up'); }
 }
 

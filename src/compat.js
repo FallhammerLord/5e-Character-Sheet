@@ -526,6 +526,7 @@ export async function spellbookFacts(sheet, context, { columns })
    return {
       classes: (context.spellcasting ?? []).map((k) => ({
          label: k.label,
+         ability: k.ability?.ability ?? '',
          abbr: game.i18n.localize(config.abilities?.[k.ability?.ability]?.abbreviation ?? k.ability?.ability ?? ''),
          mod: k.ability?.mod ?? 0,
          attack: k.attack ?? 0,
@@ -595,6 +596,33 @@ export async function levelUpClass(sheet, classId)
       if (manager.steps.length) { return sheet._renderChild ? sheet._renderChild(manager) : manager.render({ force: true }); }
    }
    return item.update({ 'system.levels': item.system.levels + 1 });
+}
+
+/**
+ * Level down (edit mode, the level tray), as dnd5e's own level select does it (base-actor-sheet.mjs #changeLevel):
+ * with advancements to undo, dnd5e asks first (`AdvancementConfirmationDialog.forLevelDown`) and, if told to, runs
+ * its manager; otherwise, or if told to keep them, the class loses a level. A class at level 1 goes by its card's ×.
+ */
+export async function levelDownClass(sheet, classId)
+{
+   const actor = sheet.actor;
+   const item = actor.items.get(classId);
+   if (!item || item.type !== 'class' || item.system.levels <= 1) { return null; }
+   const advancement = globalThis.dnd5e?.applications?.advancement;
+   if (advancement?.AdvancementManager && !game.settings.get('dnd5e', 'disableAdvancements'))
+   {
+      const manager = advancement.AdvancementManager.forLevelChange(actor, classId, -1);
+      if (manager.steps.length)
+      {
+         try
+         {
+            const remove = await advancement.AdvancementConfirmationDialog.forLevelDown(item, { sheet });
+            if (remove) { return sheet._renderChild ? sheet._renderChild(manager) : manager.render({ force: true }); }
+         }
+         catch { return null; }
+      }
+   }
+   return item.update({ 'system.levels': item.system.levels - 1 });
 }
 
 /**

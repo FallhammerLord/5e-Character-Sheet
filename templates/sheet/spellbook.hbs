@@ -6,8 +6,10 @@
       {{#if classes.length}}
       <div class="fhcs-casting-classes">
          {{#each classes}}
-         <div class="fhcs-casting-class">
-            <span class="fhcs-label fhcs-casting-name">{{ label }}</span>
+         {{!-- dnd5e's setSpellcastingAbility reads the ability from the nearest [data-ability]. --}}
+         <div class="fhcs-casting-class{{#if primary}} fhcs-primary{{/if}}" data-ability="{{ ability }}">
+            <span class="fhcs-label fhcs-casting-name">{{#if ../editing}}<button type="button" class="fhcs-toggle fhcs-radio" data-action="setSpellcastingAbility"
+                    aria-pressed="{{#if primary}}true{{else}}false{{/if}}" aria-label="{{ primaryLabel }}" data-fhcs-tip="{{ primaryLabel }}"><span class="fhcs-radio-mark" aria-hidden="true"></span></button>{{/if}}{{ label }}</span>
             <span class="fhcs-stat"><span class="fhcs-label fhcs-muted">{{ abbr }}</span><span class="fhcs-display">{{ mod }}</span></span>
             <span class="fhcs-stat"><span class="fhcs-label fhcs-muted">{{ ../text.attack }}</span><span class="fhcs-display">{{ attack }}</span></span>
             <span class="fhcs-stat"><span class="fhcs-label fhcs-muted">{{ ../text.save }}</span><span class="fhcs-display">{{ save }}</span></span>

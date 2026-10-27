@@ -172,7 +172,10 @@ export function spellbookView(facts, { format, localize })
          save: String(k.save),
          prepared: k.prepared?.max ? `${k.prepared.value} / ${k.prepared.max}` : String(k.prepared?.value ?? 0),
          preparedLabel: k.prepared?.max ? format('FHCS.Spellbook.PreparedOf', k.prepared) : format('FHCS.Spellbook.PreparedCount', k.prepared ?? { value: 0 }),
-         primary: !!k.primary
+         primary: !!k.primary,
+         // Edit mode: which ability is the character's primary for spellcasting (dnd5e's setSpellcastingAbility).
+         ability: k.ability ?? '',
+         primaryLabel: format(k.primary ? 'FHCS.Spellbook.PrimaryOn' : 'FHCS.Spellbook.SetPrimary', { ability: k.abbr })
       })),
       concentration: {
          on: conc.spells.length > 0,

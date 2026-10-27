@@ -2356,6 +2356,26 @@
 }
 
 /* The class name on its own line, so two cards side by side keep it whole; the numbers share the line under it. */
+/* Edit mode: the main spellcasting ability, a radio dot (filled for the one in use) in a 24px target. */
+.fhcs-sheet .fhcs-casting-name:has(.fhcs-radio) { display: inline-flex; align-items: center; gap: var(--fhcs-s1); }
+.fhcs-sheet .fhcs-toggle.fhcs-radio
+{
+   display: inline-grid;
+   flex: none;
+   place-items: center;
+   width: 24px;
+   height: 24px;
+   min-height: 24px;
+   padding: 0;
+   border: 0;
+   background: none;
+   color: inherit;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-radio-mark { width: 12px; height: 12px; box-sizing: border-box; border: 2px solid currentColor; border-radius: 50%; }
+.fhcs-sheet .fhcs-radio[aria-pressed="true"] .fhcs-radio-mark { background: currentColor; box-shadow: inset 0 0 0 2px var(--fhcs-surface); }
+
 .fhcs-sheet .fhcs-casting-class
 {
    display: flex;

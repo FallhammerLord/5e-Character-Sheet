@@ -179,6 +179,8 @@ Check here before choosing a mark, and add new ones. Every tint has an icon, mar
 | Two opposed arrows; a ring when on | Show the token in place of the portrait | Edit mode, the portrait's top centre (dnd5e's own switch) |
 | Crop corners | Frame the portrait (pan and zoom) | Edit mode, beside the token switch; not for a token (user, 2026-10-27) |
 | Dashed edge on the portrait | Framing: drag the art | While framing (user, 2026-10-27) |
+| Radio dot: filled, ring | The main spellcasting ability; another | Edit mode, each casting card on the Spellbook (user, 2026-10-27) |
+| Down arrow | Level down | Edit mode, the level tray (user, 2026-10-27) |
 
 Chat cards keep their own scheme (§6.6): the primary d20 black (white in dark themes), disadvantage dice red, advantage dice blue.
 

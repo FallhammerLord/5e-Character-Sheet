@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH } from '../constants.js';
-import { attributesFacts, biographyFacts, changeHp, cycleListGrouping, savePortraitFrame, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelUpClass,
+import { attributesFacts, biographyFacts, changeHp, cycleListGrouping, savePortraitFrame, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
@@ -137,6 +137,12 @@ function showPins(controls)
 function levelUp(event, target)
 {
    return levelUpClass(this, target.dataset.itemId);
+}
+
+/** Level down, from the level tray in edit mode (SCOPE §4.9). */
+function levelDown(event, target)
+{
+   return levelDownClass(this, target.dataset.itemId);
 }
 
 /** Frame: positions the portrait in its frame (user, 2026-10-27); Done saves it with the image it belongs to. */
@@ -294,7 +300,7 @@ export function makeCharacterSheet(Base)
          actions: { fhcsTogglePassives: togglePassives, fhcsToggleGroup: toggleGroup, fhcsToggleColumn: toggleColumn,
             fhcsToggleContainer: toggleContainer, fhcsPinFilter: pinFilter, fhcsOpenConcentration: openConcentration,
             fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails,
-            fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange, fhcsFrame: frame }
+            fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange, fhcsFrame: frame, fhcsLevelDown: levelDown }
       };
 
       static PARTS = ourParts(Base.PARTS);
