@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6: slices 1–6 built; slice 7, the styling and space pass, is next** (ROADMAP Phase 6 lists the slices; Quench and play for 1 and 2 wait on the user, below). Styling notes for slice 7, from the user's screenshots (2026-10-27): the sort button shows Foundry's orange active ring with no filter on; a blank band above the header; the empty Attributes favorites leave the right column bare; Hunter's Mark's "Additional Spells" row (Favored Enemy's free casts) shows no uses; the spell slot settings icon (`spellbook.hbs`) draws as a sun, not a gear (use the cog from the Phase 6 boards).
+1. **Phase 6: slices 1–6 built, slice 7 (styling) under way; all wait on Quench and play** (Waiting on the user, below; ROADMAP Phase 6). Slice 7's last two notes need the user's look in Foundry: a blank band above the header (Foundry's window title bar, with dnd5e's `hidden-title` look stripped), and the empty Attributes favorites leaving the right column bare. Then Limited and Observer views, if wanted in this phase.
 
 The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.
 
@@ -23,7 +23,8 @@ In code, not yet seen in Foundry:
 - **Phase 6 slice 1, the portrait card** (2026-10-27; Quench passes, user 2026-10-27; offline checks and layout screenshots pass). Run Quench "core": new tests "keeps Temp and Max ± as fields…" and "shows two class cards and folds further classes into the class tray". In play: round token, square and tall art in the 234px frame; Temp and Max ± typed; the exhaustion dot (rest on it 1.5 s); Short and Long rest chips; a character with three or more classes.
 
 - **Chat log scrolling** (2026-10-24, third try). New cards stopped short by the Apply section, which dnd5e fills in after the card is placed. Folded rolls post with `scroll: false`; the player's own new card posts with `scroll: true`, and while following it (8 s, until the player scrolls, clicks or types in the log) a `ResizeObserver` scrolls again on every size change. Apply starts folded.
-- **Inventory sort button** lights only when a filter or search is on (dnd5e marks it active always). The user's screenshots (2026-10-27) show an orange ring on it on every tab with nothing on: Foundry's own `.active` style, which our rule doesn't clear. Fix in the styling slice.
+- **List sort button** lights only when a filter or search is on (dnd5e marks it active always). Foundry's own ring on it (orange, user's screenshots 2026-10-27) is cleared too now (2026-10-27): check Inventory, Spellbook and Features with nothing filtered.
+- **Slice 7 so far** (2026-10-27): the Spellbook's slot settings gear is the cog now (was a sun); a spell cast through another item (Favored Enemy's Hunter's Mark, under Additional Spells) shows that item's uses as "2 / 2", not a field.
 
 Play checks, when convenient (not work for a session to pick up):
 

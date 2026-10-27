@@ -94,7 +94,7 @@ Already in place before the phase: portrait picker (edit mode), rests, death sav
 - [ ] 5. Attributes in edit mode: skill proficiency and ability, trait and sense gears (built 2026-10-27; Quench and play next)
 - [ ] 6. Spellcasting ability; level down (built 2026-10-27; Quench and play next)
 - [x] Special Traits tab in our look: dnd5e's form, name and control on a line, hint under (user's screenshot, 2026-10-27; built, play next)
-- [ ] 7. Styling and space pass (notes in STATUS)
+- [ ] 7. Styling and space pass (notes in STATUS): sort button ring, slot gear, Additional Spells uses done 2026-10-27; header band and empty favorites wait on the user's look
 - [ ] Limited and Observer views (if the user wants them in this phase)
 
 ## Phase 7: The ADHD layer

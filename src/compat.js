@@ -490,7 +490,11 @@ export async function spellbookFacts(sheet, context, { columns })
             range: rangeLabel(ctx, item),
             school: game.i18n.localize(config.spellSchools?.[item.system.school]?.label ?? ''),
             target: item.labels?.target ?? '',
-            uses: ctx.uses?.hasUses ? { value: ctx.uses.value ?? 0, max: ctx.uses.max, prop: ctx.uses.prop } : null
+            // A spell cast through another item's activity (Favored Enemy's Hunter's Mark) counts that item's or
+            // activity's uses: dnd5e's `ctx.linkedUses` (base-actor-sheet.mjs:854). They belong to the other item,
+            // so the row shows them and doesn't offer them as a field.
+            uses: ctx.uses?.hasUses ? { value: ctx.uses.value ?? 0, max: ctx.uses.max, prop: ctx.uses.prop }
+               : ctx.linkedUses?.max ? { value: ctx.linkedUses.value ?? 0, max: ctx.linkedUses.max, linked: true } : null
          });
       }
       sections.push({

@@ -330,6 +330,11 @@ const spellbookFacts = (over = {}) => ({
       ] },
       { id: 'atwill', method: 'atwill', level: null, label: 'At-Will', slots: null, items: [
          spell('Detect Magic', '#7a5ab8', { id: 'DetectMagic2', method: 'atwill', prepares: false, prepared: 0, concentration: true, range: 'Self', sub: 'Invocation' })
+      ] },
+      // Cast through another item's activity: its uses are the feature's, shown, not a field (user's screenshot, 2026-10-27).
+      { id: 'item', method: 'item', level: null, label: 'Additional Spells', slots: null, items: [
+         spell('Hunter\'s Mark', '#3a6a4a', { id: 'HuntersMark2', method: 'item', prepares: false, prepared: 0, level: 1, concentration: true,
+            components: 'V', time: '1 Bonus Action', range: '90 ft', sub: 'Favored Enemy', uses: { value: 2, max: 2, linked: true } })
       ] }
    ],
    columns: {},

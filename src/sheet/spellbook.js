@@ -120,7 +120,7 @@ export function spellbookView(facts, { format, localize })
          range: spell.range ?? '',
          school: spell.school ?? '',
          target: spell.target ?? '',
-         uses: spell.uses?.max ? { value: spell.uses.value, max: spell.uses.max, prop: spell.uses.prop,
+         uses: spell.uses?.max ? { value: spell.uses.value, max: spell.uses.max, prop: spell.uses.prop, linked: !!spell.uses.linked,
             label: format('FHCS.Inventory.UsesLabel', { name: spell.name }) } : null,
          // Three states, like attunement (SCOPE §4.7): a click flips prepared and not; always prepared can't be clicked.
          prep: state ? {

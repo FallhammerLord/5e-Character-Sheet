@@ -34,7 +34,7 @@ const LIST_BAR = `${MODULE_PATH}/templates/sheet/list-bar.hbs`;
 const PART_OPTIONS = {
    header: { templates: [`${MODULE_PATH}/templates/sheet/level-up.hbs`, `${MODULE_PATH}/templates/sheet/gear.hbs`] },
    inventory: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/item-row.hbs`, LIST_BAR] },
-   spells: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/spell-row.hbs`, LIST_BAR] },
+   spells: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/spell-row.hbs`, LIST_BAR, `${MODULE_PATH}/templates/sheet/gear.hbs`] },
    features: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/feature-row.hbs`, LIST_BAR] },
    effects: { scrollable: ['.fhcs-items'], templates: [LIST_BAR] },
    biography: { templates: [`${MODULE_PATH}/templates/sheet/bio-box.hbs`] },

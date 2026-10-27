@@ -32,7 +32,11 @@
       {{/with}}
       {{#if showUses}}
       <span class="fhcs-col-uses">
-         {{#if uses}}
+         {{#if uses.linked}}
+         {{!-- Uses of the item or activity that grants this spell: shown here, changed there. --}}
+         <span class="fhcs-body fhcs-uses-linked" role="img" aria-label="{{ uses.label }}">{{ uses.value }}</span>
+         <span class="fhcs-body fhcs-muted">/ {{ uses.max }}</span>
+         {{else if uses}}
          <input type="text" class="fhcs-input fhcs-body fhcs-uses-input" value="{{ uses.value }}" placeholder="0"
                 data-dtype="Number" data-name="{{ uses.prop }}" inputmode="numeric" pattern="[+=\-]?\d*"
                 aria-label="{{ uses.label }}">
