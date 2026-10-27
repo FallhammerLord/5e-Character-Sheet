@@ -510,7 +510,9 @@ export const CASES = [
    },
    { name: 'effects-editing', template: 'sheet/effects', context: effects({ editing: true }) },
    { name: 'effects-empty', template: 'sheet/effects', context: effects({ categories: [], conditions: conditionFacts() }) },
-   { name: 'features', template: 'sheet/features', context: features() },
+   { name: 'features', template: 'sheet/features', context: features(), rows: '.fhcs-list-bar, .fhcs-item-row' },
+   // Edit mode may slide columns left for its controls; heights and flow stay (SCOPE §5.2 rule 6, user 2026-10-27).
+   { name: 'features-editing-parity', template: 'sheet/features', context: features({ editing: true }), rows: '.fhcs-list-bar, .fhcs-item-row', sameRowsAs: 'features' },
    {
       name: 'features-multiclass', template: 'sheet/features',
       context: features({ sections: FEATURE_SECTIONS(MULTICLASS_FEATS), features: MULTICLASS_FEATURES })
@@ -521,9 +523,9 @@ export const CASES = [
       name: 'features-empty', template: 'sheet/features',
       context: features({ sections: FEATURE_SECTIONS([]), features: [] })
    },
-   { name: 'spellbook', template: 'sheet/spellbook', context: spellbook(), rows: '.fhcs-casting-class', marks: '.fhcs-casting-name, .fhcs-list-bar item-list-controls' },
+   { name: 'spellbook', template: 'sheet/spellbook', context: spellbook(), rows: '.fhcs-casting-class, .fhcs-list-bar, .fhcs-item-row', marks: '.fhcs-casting-name, .fhcs-list-bar item-list-controls' },
    // Edit mode keeps the casting cards and the search field where play mode has them (SCOPE §5.2 rule 6).
-   { name: 'spellbook-editing-parity', template: 'sheet/spellbook', context: spellbook({ editing: true }), rows: '.fhcs-casting-class', marks: '.fhcs-casting-name, .fhcs-list-bar item-list-controls', sameRowsAs: 'spellbook' },
+   { name: 'spellbook-editing-parity', template: 'sheet/spellbook', context: spellbook({ editing: true }), rows: '.fhcs-casting-class, .fhcs-list-bar, .fhcs-item-row', marks: '.fhcs-casting-name, .fhcs-list-bar item-list-controls', sameRowsAs: 'spellbook' },
    { name: 'spellbook-multiclass-idle', template: 'sheet/spellbook', context: spellbook({ classes: MULTICLASS_CASTER, concentration: { save: -1, spells: [] } }) },
    { name: 'spellbook-editing', template: 'sheet/spellbook', open: ['spells-columns'], context: spellbook({ editing: true, columns: ALL_SPELL_COLUMNS }) },
    // Two casting classes in edit mode: the radio dot picks the main spellcasting ability (user, 2026-10-27).
@@ -540,7 +542,8 @@ export const CASES = [
       ] } })
    },
    { name: 'spellbook-empty', template: 'sheet/spellbook', context: spellbook({ classes: [], sections: [], concentration: { save: 2, spells: [] } }) },
-   { name: 'inventory', template: 'sheet/inventory', context: inventory() },
+   { name: 'inventory', template: 'sheet/inventory', context: inventory(), rows: '.fhcs-list-bar, .fhcs-item-row' },
+   { name: 'inventory-editing-parity', template: 'sheet/inventory', context: inventory({ editing: true }), rows: '.fhcs-list-bar, .fhcs-item-row', sameRowsAs: 'inventory' },
    { name: 'inventory-all-columns', template: 'sheet/inventory', context: inventory({ columns: ALL_COLUMNS }) },
    { name: 'inventory-editing', template: 'sheet/inventory', open: ['inventory-columns'], context: inventory({ editing: true, columns: ALL_COLUMNS }) },
    {
