@@ -71,6 +71,19 @@ export function registerQuenchTests(quench)
          return data.map((d) => made.find((item) => item.name === d.name));
       };
 
+      /** Back to play mode, waiting for the redraw: each edit-mode test ends here, passed or failed. */
+      const leaveEditMode = async () =>
+      {
+         if (!sheet.isEditMode) { return; }
+         await settled();
+         find('.fhcs-tabs [data-action="changeMode"]').click(); // redraw-safe: after settled()
+         for (let waited = 0; sheet.isEditMode && waited < HOOK_WAIT_MS; waited += 50)
+         {
+            await new Promise((resolve) => { setTimeout(resolve, 50); });
+         }
+         await settled();
+      };
+
       /** Waits until a condition holds, or fails the test after HOOK_WAIT_MS. */
       const until = async (condition, what) =>
       {
@@ -128,6 +141,12 @@ export function registerQuenchTests(quench)
          {
             await sheet?.close();
             await actor?.delete();
+         });
+
+         // A test that fails half way may leave the sheet unlocked; the next one starts in play mode regardless.
+         afterEach(async function ()
+         {
+            if (sheet?.rendered) { await leaveEditMode(); }
          });
 
          it('is offered for characters, and is not the default', function ()
@@ -428,13 +447,17 @@ export function registerQuenchTests(quench)
             const before = actor.system.attributes.spellcasting;
             const [caster] = await createItems([{ name: 'FHCS test caster', type: 'class',
                system: { identifier: 'fhcs-caster', levels: 3, spellcasting: { progression: 'full', ability: 'int' } } }]);
+            try
+            {
             if (!sheet.isEditMode)
             {
                await click('.fhcs-tabs [data-action="changeMode"]');
                await until(() => sheet.isEditMode, 'the lock switches to edit mode');
             }
-            assert.ok(sheet.element.querySelector(`.fhcs-header [data-action="fhcsLevelDown"][data-item-id="${caster.id}"]`),
-               'edit mode offers Level down for a class above level 1');
+            // The mode flips at once; the redraw that brings Level down comes after (the first run, 2026-10-27).
+            const down = `.fhcs-header [data-action="fhcsLevelDown"][data-item-id="${caster.id}"]`;
+            await until(() => sheet.element.querySelector(down),
+               () => `edit mode offers Level down for a class above level 1; the level tray holds ${[...sheet.element.querySelectorAll('.fhcs-header .fhcs-level-up [data-action]')].map((b) => b.dataset.action).join(', ') || 'nothing'}`);
             const Confirm = globalThis.dnd5e.applications.advancement.AdvancementConfirmationDialog;
             const asking = () => [...foundry.applications.instances.values()].find((app) => app instanceof Confirm);
             await click(`.fhcs-header [data-action="fhcsLevelDown"][data-item-id="${caster.id}"]`);
@@ -448,11 +471,14 @@ export function registerQuenchTests(quench)
             await click(radio);
             await until(() => actor.system.attributes.spellcasting === 'int',
                () => `the radio sets the main spellcasting ability; it holds "${actor.system.attributes.spellcasting}"`);
-            await actor.update({ 'system.attributes.spellcasting': before });
-            await caster.delete();
-            await click('.fhcs-tabs [data-action="changeMode"]');
-            await until(() => !sheet.isEditMode, 'the lock switches back to play mode');
-            await click('.fhcs-tabs [data-tab="details"]');
+            }
+            finally
+            {
+               // Put everything back even when a step fails, so the tests after this one start clean.
+               await actor.update({ 'system.attributes.spellcasting': before });
+               await actor.items.get(caster.id)?.delete();
+               await leaveEditMode();
+            }
          });
 
          it('shows two class cards and folds further classes into the class tray', async function ()
@@ -463,6 +489,8 @@ export function registerQuenchTests(quench)
                { name: 'FHCS test mid', type: 'class', system: { identifier: 'fhcs-mid', levels: 2 } },
                { name: 'FHCS test low', type: 'class', system: { identifier: 'fhcs-low', levels: 1 } }
             ]);
+            try
+            {
             const cards = () => [...sheet.element.querySelectorAll('.fhcs-header .fhcs-class-card')].map((c) => c.dataset.itemId);
             const tray = () => [...sheet.element.querySelectorAll('.fhcs-header .fhcs-more .fhcs-class-row')].map((r) => r.dataset.itemId);
             await until(() => cards().length === 2 && tray().length === 1,
@@ -474,7 +502,11 @@ export function registerQuenchTests(quench)
             await click(`.fhcs-header .fhcs-class-row[data-item-id="${low.id}"] [data-action="showDocument"]`);
             await until(() => low.sheet?.rendered, 'the tray row opens the class');
             await low.sheet.close();
-            await actor.deleteEmbeddedDocuments('Item', [high.id, mid.id, low.id]);
+            }
+            finally
+            {
+               await actor.deleteEmbeddedDocuments('Item', [high, mid, low].filter((k) => actor.items.get(k.id)).map((k) => k.id));
+            }
          });
 
          it('uses an item from the sheet', async function ()
