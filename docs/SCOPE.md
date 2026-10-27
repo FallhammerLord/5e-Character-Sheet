@@ -146,7 +146,7 @@ From the quest log and Initiative: three text sizes; targets at least 24px; tool
 
 Don't say a thing twice: a mark that shows its own state needs no count beside it (user, 2026-10-26: the slot pips lost their "3 / 4").
 
-### 5.2 Sheet styling rules (proposed 2026-10-27, awaiting the user's approval)
+### 5.2 Sheet styling rules (user, 2026-10-27)
 
 One set of rules for every tab and both modes (user, 2026-10-27: "apply as uniformly as we can, now that everything is where it should be"). The layout check enforces what it can (marked *check*).
 
@@ -156,7 +156,7 @@ One set of rules for every tab and both modes (user, 2026-10-27: "apply as unifo
 3. **Narrow padding, clear boundaries:** `--fhcs-s1` inside controls and rows, `--fhcs-s2` between regions; every region shows its edge (a 1px line or a fill), never space alone.
 
 **Controls and icons**
-4. **Icon buttons:** one rule for all. The box is a control (28px) or the 24px target; the icon 16px (the gear 14px), centred both ways, never shrunk. *check*
+4. **An icon fits its button** (user, 2026-10-27): buttons are sized to show Foundry's standard icons and ours clearly (a control, 28px, or the 24px target); the icon is centred both ways, and where a button is smaller, the icon shrinks to fit rather than spill or crowd. *check*
 5. **Text buttons read from the left** (Foundry centres them); icon, then text.
 
 **Play and edit**

@@ -320,10 +320,17 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
 
 // Death saves: the third success stays (healing above 0 clearing both rows is dnd5e's own, preUpdateHP).
 {
-   const details = { outcome: 'stable', updates: { 'system.attributes.death.success': 0, 'system.attributes.death.failure': 0 } };
-   keepStable([], details);
-   try { deepStrictEqual(details.updates, { 'system.attributes.death.success': 3 }); }
-   catch { problems.push(`third success: ${JSON.stringify(details.updates)}`); }
+   const reset = () => ({ 'system.attributes.death.success': 0, 'system.attributes.death.failure': 0 });
+   const sheet = (classes) => ({ sheet: { options: { classes } } });
+   const ours = { outcome: 'stable', updates: reset(), subject: sheet(['fhcs-sheet']) };
+   keepStable([], ours);
+   try { deepStrictEqual(ours.updates, { 'system.attributes.death.success': 3 }); }
+   catch { problems.push(`third success: ${JSON.stringify(ours.updates)}`); }
+   // Our sheet's rule only (user, 2026-10-27): on dnd5e's own sheet, dnd5e's reset stands.
+   const theirs = { outcome: 'stable', updates: reset(), subject: sheet(['dnd5e2']) };
+   keepStable([], theirs);
+   try { deepStrictEqual(theirs.updates, reset()); }
+   catch { problems.push(`third success on another sheet: ${JSON.stringify(theirs.updates)}`); }
 }
 
 // Inventory: columns default to the user's choice (weight off), a saved choice wins, and a new column still shows.
