@@ -196,7 +196,7 @@ function findProblems()
    // The sheet only: the chat cards' bands (a heading over its total) were settled in Phase 2.
    for (const el of app.querySelectorAll('.window-content :is(button, summary, [role="meter"], .fhcs-pill, label.fhcs-chip)'))
    {
-      if (!shown(el) || !el.closest('.fhcs-sheet') || el.matches('.fhcs-skill')) { continue; }
+      if (!shown(el) || !el.closest('.fhcs-sheet') || el.closest('.fhcs-skill')) { continue; }
       const sizes = new Set([el, ...el.querySelectorAll('*')].filter((n) => !n.ownerSVGElement && shown(n) && ownText(n)
          && n.closest('button, summary, [role="meter"], .fhcs-pill, label.fhcs-chip') === el).map((n) => getComputedStyle(n).fontSize));
       if (sizes.size > 1) { issues.push(`mixed text sizes (${[...sizes].join(', ')}) in one control: ${named(el)} "${el.textContent.trim().replace(/\s+/g, ' ').slice(0, 24)}"`); }

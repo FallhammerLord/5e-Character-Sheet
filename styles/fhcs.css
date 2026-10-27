@@ -841,13 +841,20 @@
 /* No title band (SCOPE §5.2 rule 14, user 2026-10-27: "bothersome since the beginning"): Foundry's window controls
    float over the header's top right; the window drags from around them. The name is in our header, so the title is
    hidden but kept for screen readers. Minimized, the window keeps Foundry's own bar, title and all. */
+/* The window header is a drag strip the sheet's full width, as tall as the header's top padding, so it covers nothing
+   (user, 2026-10-27: the grip was only the corner by the controls). The controls hang below it at the right. */
 .fhcs-sheet:not(.minimized) > .window-header
 {
    position: absolute;
    top: 0;
    right: 0;
+   left: 0;
    z-index: 5;
-   min-height: var(--fhcs-control);
+   align-items: flex-start;
+   justify-content: flex-end;
+   height: var(--fhcs-s2);
+   min-height: 0;
+   overflow: visible;
    padding: 0 var(--fhcs-s1);
    border: 0;
    background: transparent;
@@ -1380,6 +1387,8 @@
 .fhcs-sheet .fhcs-gear { width: 12px; height: 12px; }
 
 /* A gear inside a line of text keeps its 24px target without making the line taller than in play mode (rule 6). */
+/* A control in a line of text (a gear, the "+N" chip) keeps its 24px target without making the line taller than in
+   play mode or than its neighbours' (rule 6; user 2026-10-27: "+1" pushed the second class's name down). */
 .fhcs-sheet :is(.fhcs-trait dt, .fhcs-origin-speed, .fhcs-ability-head) > .fhcs-gear-button { margin-block: -5px; }
 
 .fhcs-sheet .fhcs-name-input { flex: 1; min-width: 0; padding: 0 var(--fhcs-s1); text-align: left; }
@@ -1678,19 +1687,11 @@
 
 .fhcs-sheet .fhcs-panel-head > .fhcs-label:first-child { flex: 1; }
 
-.fhcs-sheet .fhcs-passive-toggle
-{
-   width: auto;
-   height: var(--fhcs-control);
-   min-height: 0;
-   padding: 0 var(--fhcs-s2);
-}
-
-.fhcs-sheet .fhcs-passive-toggle[aria-pressed="false"] { border-style: dashed; }
-
-/* Skills: each row one roll button; the proficiency mark carries proficiency, not bold text. */
+/* Skills: one row in both modes, dnd5e's way (its .skill-prof): fixed cells, each 24px tall, so what a cell holds can
+   change between modes and nothing moves. The proficiency mark carries proficiency, not bold text. */
 .fhcs-sheet .fhcs-skill
 {
+   position: relative;
    display: grid;
    /* One grid in both modes (SCOPE §5.2 rule 6): the mark (a 24px target in edit mode), name, ability, total, passive
       or gear. */
@@ -1700,24 +1701,22 @@
    grid-template-rows: 24px;
    align-items: center;
    gap: var(--fhcs-s1);
-   width: 100%;
    /* 24px: the smallest target (user, 2026-10-24: rows were too tall). */
    height: 24px;
-   margin: 0;
    padding: 0 var(--fhcs-s1);
-   border: 0;
    border-radius: var(--fhcs-radius);
-   background: none;
-   color: inherit;
-   font-family: inherit;
-   text-align: left;
-   cursor: pointer;
 }
 
-.fhcs-sheet .fhcs-skills > li:nth-child(odd) .fhcs-skill { background: var(--fhcs-fill); }
-.fhcs-sheet .fhcs-skill:hover { box-shadow: inset 0 0 0 1px var(--fhcs-line); }
+.fhcs-sheet .fhcs-skill > * { height: 24px; }
+.fhcs-sheet .fhcs-skill > span:not(.fhcs-prof-slot) { display: flex; align-items: center; min-width: 0; }
+.fhcs-sheet .fhcs-skills > .fhcs-skill:nth-child(odd) { background: var(--fhcs-fill); }
+.fhcs-sheet .fhcs-skill-play:hover { box-shadow: inset 0 0 0 1px var(--fhcs-line); }
+
+/* In play the whole row rolls: the name's button reaches over the row. */
+.fhcs-sheet .fhcs-skill-play .fhcs-skill-roll::after { content: ''; position: absolute; inset: 0; border-radius: var(--fhcs-radius); }
+.fhcs-sheet .fhcs-skill-play:hover .fhcs-skill-name { text-decoration: underline; }
 .fhcs-sheet .fhcs-skill-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.fhcs-sheet :is(.fhcs-skill-mod, .fhcs-skill-passive) { text-align: right; }
+.fhcs-sheet :is(.fhcs-skill-mod, .fhcs-skill-passive) { justify-content: flex-end; text-align: right; }
 
 .fhcs-sheet .fhcs-prof-mark
 {
@@ -1760,10 +1759,6 @@
 
 /* ---------- Attributes in edit mode (SCOPE §4.9, user, 2026-10-27) ---------- */
 
-/* A skill row: dnd5e's proficiency cycle, the ability, the name (still rolls), the total, a gear. */
-.fhcs-sheet .fhcs-skill.fhcs-skill-edit { cursor: default; }
-.fhcs-sheet .fhcs-skill-edit:hover { box-shadow: none; }
-
 /* Edit mode's proficiency: play mode's own mark, with dnd5e's cycle laid over it unseen as the 24px target (user's
    screenshots, 2026-10-27: dnd5e's drawing changed size with Foundry's styles). Focus shows on the slot. */
 .fhcs-sheet .fhcs-prof-slot { position: relative; display: grid; place-items: center; width: 24px; height: 24px; }
@@ -1781,8 +1776,8 @@
    cursor: pointer;
 }
 
-/* The ability reads as play mode's text; a dashed underline says it opens choices. */
-.fhcs-sheet .fhcs-skill-ability
+/* The ability reads as play mode's text; in edit mode a dashed underline says it opens choices. */
+.fhcs-sheet select.fhcs-skill-ability
 {
    width: 100%;
    height: 24px;
@@ -1800,6 +1795,7 @@
 
 .fhcs-sheet .fhcs-skill-roll
 {
+   position: static;
    display: flex;
    align-items: center;
    justify-content: flex-start;
@@ -2654,8 +2650,9 @@
 .fhcs-sheet .fhcs-origin-head > .fhcs-line { flex: 1; }
 
 /* "+N": more classes than the two cards; opens the class tray (user, 2026-10-27). */
-.fhcs-sheet .fhcs-more { position: relative; flex: none; }
-.fhcs-sheet .fhcs-more-chip { width: auto; min-width: var(--fhcs-control); padding: 0 var(--fhcs-s1); list-style: none; cursor: pointer; }
+/* 24px in a 14px label line: it hangs into the card's top padding and below, so the kind line keeps every card's height. */
+.fhcs-sheet .fhcs-more { position: relative; flex: none; margin-block: calc(0px - var(--fhcs-s1)) -6px; }
+.fhcs-sheet .fhcs-more-chip { width: auto; min-width: 24px; height: 24px; min-height: 0; padding: 0 var(--fhcs-s1); list-style: none; cursor: pointer; }
 .fhcs-sheet .fhcs-more-chip::-webkit-details-marker { display: none; }
 .fhcs-sheet .fhcs-more .fhcs-tray { left: auto; right: 0; z-index: 3; width: 15rem; }
 

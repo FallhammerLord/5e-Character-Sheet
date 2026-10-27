@@ -129,6 +129,7 @@ const headerFacts = (over = {}) => ({
    levelOrder: [], originalClass: 'cleric', level: 12, leveling: 'xp',
    xp: { value: 6500, max: 14000, pct: 46, valueLabel: '6,500', maxLabel: '14,000' },
    origin: ['Medium'], speed: '30 ft',
+   speeds: [{ key: 'walk', label: 'Speed', value: 30 }, { key: 'fly', label: 'Fly', value: 60 }, { key: 'swim', label: 'Swim', value: 30 }], speedUnits: 'ft',
    originCards: originFacts(),
    prof: 4, ac: 16, init: 0, hp: { value: 87, max: 87, temp: 0 }, inspiration: false,
    exhaustion: { value: 0, max: 6 }, hd: { value: 12, max: 12 }, showRests: true,
@@ -237,7 +238,7 @@ const attributesFacts = (over = {}) => ({
    ],
    resources: [{ id: 'resources.primary', title: 'Harness Divine Power', value: 1, max: 1 }],
    slots: { 1: { value: 3, max: 4 }, 3: { value: 3, max: 3 } },
-   editing: false, passives: 'all', folded: [], ...over
+   editing: false, folded: [], ...over
 });
 const attributes = (over) => ({
    tab: { id: 'details', group: 'primary', cssClass: 'active' }, rollableClass: 'rollable',
@@ -553,7 +554,7 @@ export const CASES = [
    { name: 'inventory-containers-shut', template: 'sheet/inventory', context: inventory({ openContainers: [], editing: true, columns: ALL_COLUMNS }) },
    { name: 'inventory-empty', template: 'sheet/inventory', context: inventory({ sections: [], attunement: { value: 0, max: 0 }, encumbrance: null }) },
    { name: 'attributes', template: 'sheet/attributes', context: attributes(), rows: '.fhcs-skills > li', marks: '.fhcs-skill-name, .fhcs-skill-mod' },
-   { name: 'attributes-key-passives-folded', template: 'sheet/attributes', context: attributes({ passives: 'key', folded: ['inventory', 'spell-1'] }) },
+   { name: 'attributes-folded', template: 'sheet/attributes', context: attributes({ folded: ['inventory', 'spell-1'] }) },
    { name: 'attributes-editing', template: 'sheet/attributes', context: attributes({ editing: true }), rows: '.fhcs-skills > li', marks: '.fhcs-skill-name, .fhcs-skill-mod', sameRowsAs: 'attributes' },
    { name: 'attributes-empty', template: 'sheet/attributes', context: attributes({ favorites: [], resources: [], traits: [] }) },
    { name: 'tabs', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }) },
@@ -593,6 +594,9 @@ export const CASES = [
    // The HP tray open from the bar, Aid on (user, 2026-10-27); and a viewer's bar, which opens nothing.
    { name: 'header-hp-tray', template: 'sheet/header', open: ['hp'], context: header({ hp: { value: 82, max: 92, temp: 5, tempmax: 5 } }) },
    // Four classes: two cards, "+2" opens the class tray (user, 2026-10-27).
+   // Every card's first line sits level, the "+N" card's too (user's screenshot, 2026-10-27).
+   { name: 'header-four-classes', template: 'sheet/header', context: header({ originCards: FOUR_CLASSES() }),
+      align: [1, 2, 3].map((n) => ['.fhcs-cards > :nth-child(1) .fhcs-origin-line', 'top', `.fhcs-cards > :nth-child(${n + 1}) .fhcs-origin-line`, 'top']) },
    { name: 'header-classes-open', template: 'sheet/header', open: ['classes'], context: header({ originCards: FOUR_CLASSES() }) },
    { name: 'header-classes-editing', template: 'sheet/header', open: ['classes'], context: header({ originCards: FOUR_CLASSES({ editing: true }) }) },
    {

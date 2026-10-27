@@ -222,7 +222,7 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    if (names[0] !== 'Attributes' || names[2] !== 'Spellbook') { problems.push(`tab names: ${names.join()}`); }
 }
 
-// Attributes: key passives, empty traits hidden in play, favorites grouped in Classic's order with slot pips.
+// Attributes: every passive, empty traits hidden in play, favorites grouped in Classic's order with slot pips.
 {
    const skill = (key, prof) => ({ key, label: key, abbr: 'Wis', total: 2, passive: 12, prof });
    const row = (title, group, level = null) => ({ id: title, title, group, level, uses: null, quantity: 0, state: null });
@@ -230,7 +230,7 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
       skills: [skill('prc', 1), skill('ath', 0.5), skill('ste', 2)],
       traits: [{ key: 'languages', title: 'Languages', values: ['Common'] }, { key: 'di', title: 'Immunities', values: [] }],
       favorites: [row('Fireball', 'spell', 3), row('Mace', 'inventory'), row('Light', 'spell', 0), row('Bless', 'spell', 1), row('Rage', 'features')],
-      resources: [], slots: { 1: { value: 1, max: 2 } }, editing: false, passives: 'key', folded: ['inventory']
+      resources: [], slots: { 1: { value: 1, max: 2 } }, editing: false, folded: ['inventory']
    };
    const view = attributesView(facts, { format, localize });
    const got = {
@@ -239,7 +239,7 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
       open: view.favorites.map((g) => g.open), pips: view.favorites.find((g) => g.slots)?.slots.pips.map((p) => p.filled)
    };
    const expected = {
-      passives: [12, '', ''], marks: ['full', 'half', 'expert'], traits: ['languages'],
+      passives: [12, 12, 12], marks: ['full', 'half', 'expert'], traits: ['languages'],
       groups: ['Inventory', 'Features', 'Cantrips', 'Spell level 1', 'Spell level 3'],
       open: [false, true, true, true, true], pips: [true, false]
    };
@@ -288,6 +288,16 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
          'Type an amount, then choose']);
    }
    catch { problems.push(`HP preview: ${JSON.stringify(got)}`); }
+}
+
+// Every speed with a value shows, walking first and bare (user, 2026-10-27).
+{
+   const base = { name: 'K', portrait: {}, classes: [], levelOrder: [], level: 1, leveling: 'xp', xp: null, origin: [],
+      prof: 2, ac: 10, init: 0, inspiration: false, exhaustion: { value: 0, max: 6 }, hd: { value: 1, max: 1 },
+      showRests: false, restTypes: [], abilities: [], hp: { value: 5, max: 10, temp: 0 }, speedUnits: 'ft',
+      speeds: [{ key: 'walk', label: 'Speed', value: 30 }, { key: 'fly', label: 'Fly', value: 60 }] };
+   const got = headerView(base, { format, localize }).speed;
+   if (got !== '30 ft · Fly 60 ft') { problems.push(`speeds: got "${got}"`); }
 }
 
 // Death saves show only at 0 HP.

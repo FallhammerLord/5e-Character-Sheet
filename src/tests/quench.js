@@ -257,18 +257,10 @@ export function registerQuenchTests(quench)
             await flip();
          });
 
-         it('rolls a skill from the Attributes tab, and toggles passives and folds groups for this player', async function ()
+         it('rolls a skill from the Attributes tab', async function ()
          {
             const [skill] = await clickReaches('.fhcs-attributes [data-key="prc"] [data-action="roll"]', 'dnd5e.preRollSkill');
             assert.strictEqual(skill.skill, 'prc');
-            const before = game.user.getFlag(MODULE_ID, 'passives') ?? 'all';
-            await click('.fhcs-attributes [data-action="fhcsTogglePassives"]');
-            for (let waited = 0; (game.user.getFlag(MODULE_ID, 'passives') ?? 'all') === before && waited < HOOK_WAIT_MS; waited += 50)
-            {
-               await new Promise((resolve) => { setTimeout(resolve, 50); });
-            }
-            assert.notStrictEqual(game.user.getFlag(MODULE_ID, 'passives'), before, 'the passive toggle switched');
-            await game.user.setFlag(MODULE_ID, 'passives', before);
          });
 
          it('shows death saves in the header at 0 HP, and rolls one from there', async function ()
@@ -422,7 +414,6 @@ export function registerQuenchTests(quench)
                await until(() => sheet.isEditMode, 'the lock switches to edit mode');
             }
             await click('.fhcs-tabs [data-tab="details"]');
-            assert.notOk(sheet.element.querySelector('.fhcs-attributes [data-action="fhcsTogglePassives"]'), 'the passive toggle steps aside in edit mode');
             // dnd5e's cycle steps none → full → expertise → half → none on a click.
             await click('.fhcs-attributes [data-key="prc"] proficiency-cycle');
             await until(() => skill().value !== before.value, () => `a click cycles Perception's proficiency; it holds ${skill().value}`);

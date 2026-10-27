@@ -179,14 +179,11 @@
     },
     "Attributes": {
       "Skills": "Skills",
-      "Passive": "Passive",
       "SkillsConfig": "Bonuses for every skill",
       "SkillAbility": "{skill}: ability",
       "SkillProf": "{skill}: proficiency (click to change)",
       "SkillConfig": "{skill} settings",
       "TraitConfig": "{trait} settings",
-      "PassiveKey": "Show key passives only",
-      "PassiveAll": "Show every passive",
       "SkillLabel": "{skill} check {mod}, passive {passive}, {prof}",
       "Prof": {
         "none": "not proficient",

@@ -62,7 +62,7 @@ Planned, not built: the Actions tab (§4.4, backburner); players choosing and or
 
 Attributes decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, Attributes boards):
 - **Skills:** one 28px roll button per skill. Proficiency is a mark, not bold text: empty circle none, half-filled half (Jack of All Trades), filled proficient, ringed expertise.
-- **Passive scores:** a toggle in the Skills heading switches between every skill's passive and only Perception, Insight and Investigation; each player's choice is remembered.
+- **Passive scores:** every skill shows its passive, in play mode, in the row's last cell (user, 2026-10-27: the key-only toggle in the Skills heading did little and broke the rows' flow; replaced the 2026-10-24 toggle).
 - **Traits:** empty ones hidden in play, all shown in edit mode.
 - **Favorites:** each group folds, and stays as the player left it. Rows carry their home tab's marks (§5.1); slot pips sit in each spell level's heading.
 - **Resources:** counters above the favorites, only when the character has any.
@@ -160,7 +160,7 @@ One set of rules for every tab and both modes (user, 2026-10-27: "apply as unifo
 5. **Text buttons read from the left** (Foundry centres them); icon, then text.
 
 **Play and edit**
-6. **Same heights and flow in both modes** (user, 2026-10-27: "its ok if they move left, but its not ok for the heights and flow to change"). Columns may slide left to make room for edit mode's controls (a row's edit and delete); no row, card or bar changes height, and nothing below moves. Within that: a control takes the place of the mark it edits (the skill dot stays drawn and dnd5e's proficiency cycle lies over it unseen, since its own drawing changed size with Foundry's styles; the ability stays its text and opens its choices), and a gear takes a column play mode leaves empty or quiet. Fields may show their edge; nothing reshapes. Text stays where it sits in play mode. Content edit mode adds at a column's end (the empty traits, shown so they can be set) may extend it. *check (row heights; every element both modes draw keeps its height, place and text position)*
+6. **Same heights and flow in both modes** (user, 2026-10-27: "its ok if they move left, but its not ok for the heights and flow to change"). Columns may slide left to make room for edit mode's controls (a row's edit and delete); no row, card or bar changes height, and nothing below moves. Within that: a control takes the place of the mark it edits (a skill is one row in both modes, dnd5e's way: fixed 24px cells whose contents change, never the row; the dot stays drawn and dnd5e's proficiency cycle lies over it unseen, since its own drawing changed size with Foundry's styles; the ability stays its text and opens its choices), and a gear takes a column play mode leaves empty or quiet. Fields may show their edge; nothing reshapes. Text stays where it sits in play mode. Content edit mode adds at a column's end (the empty traits, shown so they can be set) may extend it. *check (row heights; every element both modes draw keeps its height, place and text position)*
 
 **Colour, focus and attention** (WCAG 2.2; ADHD rules, §5)
 7. **Never colour alone** (WCAG 1.4.1): every tint has an icon, mark or word (§5.1).
@@ -172,13 +172,13 @@ One set of rules for every tab and both modes (user, 2026-10-27: "apply as unifo
 13. **Empty states** are one short line in body, muted (a new sheet's empty favorites is normal, user 2026-10-27).
 
 **Window**
-14. **No title band** (user, 2026-10-27): the window's controls float at the top right over the header, as dnd5e's sheet does; the name row leaves them room.
+14. **No title band** (user, 2026-10-27): the window's controls float at the top right over the header, as dnd5e's sheet does; the name row leaves them room. The window drags from a strip the sheet's full width, as tall as the header's top padding (user, 2026-10-27: the grip was only the controls' corner).
 15. **Round or square portrait,** the player's choice in edit mode, saved on the character (user, 2026-10-27).
 
 **Like elements alike** (user, 2026-10-27: "HP is different sized than the hp value itself", "the portrait buttons are … different size than the inspiration button")
 16. **Chips of one place match:** every chip on the portrait is the Inspiration chip's size (an icon-only chip square), chips side by side share a row with a gap, and "on" shows as solid against outline, never as a ring that enlarges a chip. *check*
 17. **One text size inside one control:** a label and the value it names share a size ("HP 87 / 87" all display). A row drawn as one button (a skill) is a table row: its columns keep their column's style. *check*
-18. **A button's words are body style, not capitals** (user, 2026-10-27: "we are mixing all caps in the spellbook buttons with regular text"): Columns, Passive, Con save, the Level pill, a row name's subtitle ("Life Domain", muted). Abbreviations (Str, Dex) and headings that fold (favorites groups) keep the label style. *check*
+18. **A button's words are body style, not capitals** (user, 2026-10-27: "we are mixing all caps in the spellbook buttons with regular text"): Columns, Con save, the Level pill, a row name's subtitle ("Life Domain", muted). Abbreviations (Str, Dex) and headings that fold (favorites groups) keep the label style. *check*
 19. **A gear is no larger than the words beside it:** 12px beside labels, the same gear on every label (AC included, centred with its word); alone in a chip, a chip icon's size. A gear in a line of text keeps its 24px target without making the line taller. *check*
 
 ### 5.1 Icons and colors on the sheet (one meaning each)

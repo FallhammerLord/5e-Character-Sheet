@@ -159,7 +159,10 @@ export function headerView(facts, { format, localize })
       levelUp: facts.originCards ? levelUpChoices(facts.originCards, i18n) : null,
       levelUpLabel: format('FHCS.Header.LevelUpLabel', { level }),
       origin: facts.origin.filter(Boolean).join(' · '),
-      speed: facts.speed,
+      // Walking speed bare, the others named ("30 ft · Fly 60 ft"); facts without the list keep their one speed.
+      speed: facts.speeds?.length
+         ? facts.speeds.map((s) => (s.key === 'walk' ? `${s.value} ${facts.speedUnits}` : `${s.label} ${s.value} ${facts.speedUnits}`)).join(' · ')
+         : facts.speed,
       prof: signed(facts.prof),
       level,
       xp: !milestones && xp ? {

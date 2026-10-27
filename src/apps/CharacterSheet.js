@@ -52,15 +52,7 @@ const COLUMN_SETTINGS = {
 const LIST_PINS = { inventory: INVENTORY_PINS, spells: SPELL_PINS, features: FEATURE_PINS };
 
 /** Each player's own choices, kept on their user so they follow them to every character and device. */
-const PREFS = { passives: 'passives', folded: 'foldedFavorites', openContainers: 'openContainers' };
-
-/** Shows every passive, or only the key ones (Perception, Insight, Investigation). */
-async function togglePassives()
-{
-   const current = game.user.getFlag(MODULE_ID, PREFS.passives) ?? 'all';
-   await game.user.setFlag(MODULE_ID, PREFS.passives, current === 'all' ? 'key' : 'all');
-   this.render();
-}
+const PREFS = { folded: 'foldedFavorites', openContainers: 'openContainers' };
 
 /** Folds or opens a favorites group, and remembers it. */
 async function toggleGroup(event, target)
@@ -303,7 +295,7 @@ export function makeCharacterSheet(Base)
    {
       static DEFAULT_OPTIONS = {
          classes: ['fhcs-sheet'],
-         actions: { fhcsTogglePassives: togglePassives, fhcsToggleGroup: toggleGroup, fhcsToggleColumn: toggleColumn,
+         actions: { fhcsToggleGroup: toggleGroup, fhcsToggleColumn: toggleColumn,
             fhcsToggleContainer: toggleContainer, fhcsPinFilter: pinFilter, fhcsOpenConcentration: openConcentration,
             fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails,
             fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange, fhcsFrame: frame, fhcsLevelDown: levelDown, fhcsPortraitShape: portraitShape }
@@ -332,7 +324,6 @@ export function makeCharacterSheet(Base)
          if (partId === 'details')
          {
             const prefs = {
-               passives: game.user.getFlag(MODULE_ID, PREFS.passives) ?? 'all',
                folded: game.user.getFlag(MODULE_ID, PREFS.folded) ?? [],
                open: this.fhcsOpenFavorites ?? new Set()
             };

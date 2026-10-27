@@ -4,9 +4,6 @@
  */
 import { signed } from './header.js';
 
-/** The passives shown when a player keeps only the key ones (user, 2026-10-24). */
-export const KEY_PASSIVES = ['prc', 'ins', 'inv'];
-
 /** Favorite groups in Classic's order; spell levels sit between features and effects. */
 const GROUP_ORDER = ['inventory', 'features', 'spell', 'effects', 'skills', 'other'];
 
@@ -31,7 +28,7 @@ function groupRank(key)
  */
 export function attributesView(facts, { format, localize })
 {
-   const showAll = facts.passives !== 'key';
+   // Every skill shows its passive (user, 2026-10-27: the key-only toggle broke the rows' flow for little use).
    const skills = facts.skills.map((s) =>
    {
       const mark = PROF_MARKS[s.prof] ?? 'full';
@@ -41,7 +38,7 @@ export function attributesView(facts, { format, localize })
          label: s.label,
          abbr: s.abbr,
          mod,
-         passive: (showAll || KEY_PASSIVES.includes(s.key)) ? s.passive : '',
+         passive: s.passive,
          mark,
          markLabel: localize(`FHCS.Attributes.Prof.${mark}`),
          rollLabel: format('FHCS.Attributes.SkillLabel', { skill: s.label, mod, passive: s.passive,
@@ -111,12 +108,9 @@ export function attributesView(facts, { format, localize })
       favorites,
       editing: !!facts.editing,
       resources: facts.resources.map((r) => ({ ...r, label: format('FHCS.Attributes.ResourceLabel', r) })),
-      showAllPassives: showAll,
       text: {
          skills: localize('FHCS.Attributes.Skills'),
-         passive: localize('FHCS.Attributes.Passive'),
          skillsConfig: localize('FHCS.Attributes.SkillsConfig'),
-         passiveToggle: localize(showAll ? 'FHCS.Attributes.PassiveKey' : 'FHCS.Attributes.PassiveAll'),
          favorites: localize('FHCS.Attributes.Favorites'),
          noFavorites: localize('FHCS.Attributes.NoFavorites')
       }

@@ -114,6 +114,10 @@ export async function headerFacts(sheet, context, moduleId, emphasis)
       // Species and background are cards under the abilities now (SCOPE §4.1), not words in this line.
       originCards: originFacts(sheet),
       speed: `${walk} ${config.movementUnits?.[units]?.abbreviation ?? units}`,
+      // Every speed with a value, in dnd5e's order, walking first (user, 2026-10-27).
+      speeds: Object.entries(config.movementTypes ?? {}).filter(([key]) => key === 'walk' || speeds[key] > 0)
+         .map(([key, type]) => ({ key, label: game.i18n.localize(type.label), value: key === 'walk' ? walk : speeds[key] })),
+      speedUnits: config.movementUnits?.[units]?.abbreviation ?? units,
       prof: attributes.prof,
       ac: attributes.ac?.value,
       init: attributes.init?.total ?? attributes.init?.mod ?? 0,
@@ -145,7 +149,7 @@ const plainSubtitle = (html) => String(html ?? '').replace(/\s*&bull;\s*/g, ' \u
  * helpers (`_prepareSenses`, `_prepareTraits`, `_prepareSkillsTools`, `_prepareFavorites`;
  * base-actor-sheet.mjs:541, 662; character-sheet.mjs:627).
  */
-export async function attributesFacts(sheet, context, { passives, folded, open = new Set() })
+export async function attributesFacts(sheet, context, { folded, open = new Set() })
 {
    const actor = sheet.actor;
    const config = CONFIG.DND5E;
@@ -217,7 +221,7 @@ export async function attributesFacts(sheet, context, { passives, folded, open =
       if (slot?.max) { slots[level] = { value: slot.value ?? 0, max: slot.max }; }
    }
    const abilities = Object.entries(config.abilities ?? {}).map(([key, a]) => ({ key, abbr: a.abbreviation ?? key }));
-   return { skills, abilities, traits, favorites, resources, slots, editing: sheet.isEditMode, passives, folded };
+   return { skills, abilities, traits, favorites, resources, slots, editing: sheet.isEditMode, folded };
 }
 
 /** dnd5e's summary of an expanded item (inventory.mjs `_onToggleExpand`), drawn again when the sheet re-renders. */
