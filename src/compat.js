@@ -78,11 +78,8 @@ export async function headerFacts(sheet, context, moduleId, emphasis)
       xp: { value: xp.value ?? 0, max: Number.isFinite(xp.max) ? xp.max : xp.value ?? 0, pct: xp.pct ?? 0,
          valueLabel: (xp.value ?? 0).toLocaleString(game.i18n.lang),
          maxLabel: Number.isFinite(xp.max) ? xp.max.toLocaleString(game.i18n.lang) : '\u2014' },
-      origin: [
-         config.actorSizes?.[traits.size]?.label ?? traits.size,
-         details.type?.label ?? config.creatureTypes?.[details.type?.value]?.label ?? '',
-         details.alignment
-      ],
+      // Size and speed only (user, 2026-10-27): type and alignment were noise here; alignment is on the Biography.
+      origin: [config.actorSizes?.[traits.size]?.label ?? traits.size],
       // Species and background are cards under the abilities now (SCOPE §4.1), not words in this line.
       originCards: originFacts(sheet),
       speed: `${walk} ${config.movementUnits?.[units]?.abbreviation ?? units}`,

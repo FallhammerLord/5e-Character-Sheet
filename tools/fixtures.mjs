@@ -127,7 +127,7 @@ const headerFacts = (over = {}) => ({
    classes: [{ id: 'cleric', name: 'Cleric', levels: 12, img: CLASS_ICON('#c9a227'), subclass: 'Life Domain' }],
    levelOrder: [], originalClass: 'cleric', level: 12, leveling: 'xp',
    xp: { value: 6500, max: 14000, pct: 46, valueLabel: '6,500', maxLabel: '14,000' },
-   origin: ['Medium', 'Humanoid', 'Chaotic Good'], speed: '30 ft',
+   origin: ['Medium'], speed: '30 ft',
    originCards: originFacts(),
    prof: 4, ac: 16, init: 0, hp: { value: 87, max: 87, temp: 0 }, inspiration: false,
    exhaustion: { value: 0, max: 6 }, hd: { value: 12, max: 12 }, showRests: true,
@@ -342,7 +342,7 @@ const featuresFacts = (over = {}) => ({
    sections: FEATURE_SECTIONS([CLERIC]),
    features: [
       feat('Channel Divinity', '#c9a227', 'cleric', { uses: uses(1, 2), recovery: 'Short Rest', favorite: true, expanded: true,
-         summary: '<div class="item-summary"><p>Channel divine energy for one of your Channel Divinity options.</p></div>' }),
+         summary: '<div class="item-summary"><p>Channel divine energy for one of your Channel Divinity options.</p><div class="item-properties pills"><span class="tag pill transparent">Bonus Action</span><span class="tag pill transparent">1 Hour</span><span class="tag pill transparent">90 ft</span><span class="tag pill transparent">1 Creature</span></div></div>' }),
       feat('Turn Undead', '#4a4a5a', 'cleric', act('1 Action')),
       feat('Preserve Life', '#3a8a5a', 'cleric', act('1 Action')),
       feat('Blessed Healer', '#3a9a7a', 'cleric'),

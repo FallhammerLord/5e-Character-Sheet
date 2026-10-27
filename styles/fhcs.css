@@ -1894,6 +1894,11 @@
 .fhcs-sheet .fhcs-item:not(.collapsed) > .fhcs-item-row .fhcs-name-caret,
 .fhcs-sheet .fhcs-favorite-use[aria-expanded="true"] .fhcs-name-caret { transform: rotate(90deg); }
 
+/* dnd5e's summary under an open row: its tags (activation, duration, range) as separate small pills, not run
+   together (user, 2026-10-27: "Bonus Action1 Hour90 ft"). */
+.fhcs-sheet .item-summary .item-properties { display: flex; flex-wrap: wrap; gap: var(--fhcs-s1); margin-top: var(--fhcs-s1); }
+.fhcs-sheet .item-summary .item-properties .tag { padding: 0 var(--fhcs-s1); border: 1px solid var(--fhcs-line); border-radius: var(--fhcs-radius); }
+
 /* An open row: a faint panel round the row and its details, so one entry ends before the next begins. */
 /* Ledger rows (user, 2026-10-26): every other visible entry of a list takes a faint fill, like the skills, for an
    easier read across; rows hidden by a search or filter don't count. Kept light (:where) so a row's own tint or
@@ -2425,8 +2430,22 @@
    min-height: calc(var(--fhcs-control) * 2);
    padding: var(--fhcs-s1);
    white-space: pre-wrap;
-   resize: vertical;
-   /* Grows with what's written, where the browser can. */
+   /* Grows with what's written; no drag handle (user, 2026-10-27: it showed but did nothing). */
+   resize: none;
    field-sizing: content;
 }
-.fhcs-sheet .fhcs-bio-story prose-mirror { display: block; min-height: 160px; font-size: var(--fhcs-body-size); line-height: var(--fhcs-body-line); }
+/* dnd5e's editor, toggled: while writing, a full-height page to click into (user, 2026-10-27: it was too small to
+   use), its toolbar above. */
+.fhcs-sheet .fhcs-bio-story prose-mirror
+{
+   display: flex;
+   flex-direction: column;
+   min-height: 160px;
+   font-size: var(--fhcs-body-size);
+   line-height: var(--fhcs-body-line);
+}
+
+.fhcs-sheet .fhcs-bio-story prose-mirror[open],
+.fhcs-sheet .fhcs-bio-story prose-mirror.active { min-height: 360px; }
+.fhcs-sheet .fhcs-bio-story prose-mirror :is(.editor-content, .ProseMirror) { flex: 1; min-height: 120px; }
+.fhcs-sheet .fhcs-bio-story prose-mirror:is([open], .active) :is(.editor-content, .ProseMirror) { min-height: 300px; cursor: text; }
