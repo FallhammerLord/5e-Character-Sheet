@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Ask the user what comes next.** Phase 6 (edit mode and lifecycle) is the next in ROADMAP and holds what they asked for on 2026-10-26: editable name, scores, AC and portrait, and an HP calculator. It starts with dnd5e research and a mockup (CLAUDE.md, "How a phase goes").
+1. **Phase 6, step 2: design questions and mockup** (user, 2026-10-27, agreed order: research, mockup, header fields and HP tray, Attributes edit, spellcasting ability and level down, styling and space pass, then Limited and Observer views if wanted). Research is done (research note, "Edit mode and lifecycle"). Styling notes from the user's screenshots (2026-10-27) wait for the styling slice: the sort button shows Foundry's orange active ring with no filter on; a blank band above the header; the empty Attributes favorites leave the right column bare; Hunter's Mark's "Additional Spells" row (Favored Enemy's free casts) shows no uses.
 
 The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.
 
@@ -13,7 +13,7 @@ The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't reru
 In code, not yet seen in Foundry:
 
 - **Chat log scrolling** (2026-10-24, third try). New cards stopped short by the Apply section, which dnd5e fills in after the card is placed. Folded rolls post with `scroll: false`; the player's own new card posts with `scroll: true`, and while following it (8 s, until the player scrolls, clicks or types in the log) a `ResizeObserver` scrolls again on every size change. Apply starts folded.
-- **Inventory sort button** lights only when a filter or search is on (dnd5e marks it active always).
+- **Inventory sort button** lights only when a filter or search is on (dnd5e marks it active always). The user's screenshots (2026-10-27) show an orange ring on it on every tab with nothing on: Foundry's own `.active` style, which our rule doesn't clear. Fix in the styling slice.
 
 Play checks, when convenient (not work for a session to pick up):
 

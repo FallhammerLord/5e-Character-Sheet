@@ -83,6 +83,17 @@ Verified in Quench (core, user, 2026-10-27) and play (user, 2026-10-27, "looks g
 
 Edit mode for every field; advancement and level-up; short and long rest; death saves; transformation. Asked for by the user (2026-10-26): editable name, ability scores, AC and portrait (behind the lock); an HP calculator (Damage, Heal, Temp; damage takes temp first) opening from the HP number.
 
+Already in place before the phase: portrait picker (edit mode), rests, death saves, Level up, transformation's Revert (dnd5e's ⋮ window control). Order agreed with the user (2026-10-27):
+
+- [x] Research dnd5e 6.0.6 edit mode (research note, "Edit mode and lifecycle", 2026-10-27)
+- [ ] Design questions and mockup: header in edit mode, the HP tray, Attributes in edit mode (light, dark, 644px)
+- [ ] Header: name, XP, ability scores, gears for AC, Init, speed, HP and hit dice
+- [ ] HP tray from the HP number: Damage, Heal, Temp
+- [ ] Attributes: skill proficiency and ability, trait and sense gears
+- [ ] Spellcasting ability; level down
+- [ ] Styling and space pass (notes in STATUS)
+- [ ] Limited and Observer views (if the user wants them in this phase)
+
 ## Phase 7: The ADHD layer
 
 Skills column on every tab (user, 2026-10-26): the Attributes skills column stays beside every tab, as in Tidy's current sheet (its sidebar; Classic showed skills on Attributes only, checked in Tidy v13.0.0 source). Tab bodies then lose about 240px; recheck Inventory and Spellbook rows at 644px. Optional "Now" strip: action, bonus action, reaction and movement, with spent ones dimmed until the next turn. Favorites capped at five. Panels fold; HP, AC and conditions stay pinned.
