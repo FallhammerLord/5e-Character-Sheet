@@ -86,6 +86,8 @@ export function featuresView(facts, { format, localize })
       sorting: facts.sorting ?? [],
       groupings: GROUPINGS.map((key) => ({ key, label: localize(`FHCS.Features.Group.${key}`) })),
       pins: pinView(FEATURE_PINS, facts.activeFilters, localize),
+      // The Columns menu is edit mode's; play mode keeps its place, so the search field keeps one width (SCOPE §5.2 rule 6).
+      hasColumns: true,
       columnToggles: facts.editing ? FEATURE_COLUMNS.map((key) => ({
          key, pressed: columns[key], label: localize(`FHCS.Features.Column.${key}`)
       })) : [],

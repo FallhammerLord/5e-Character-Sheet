@@ -103,6 +103,8 @@ export function inventoryView(facts, { format, localize })
       sorting: facts.sorting ?? [],
       pins: pinView(INVENTORY_PINS, facts.activeFilters, localize),
       // The column menu is a setting, so it shows only in edit mode, like dnd5e's gear icons (user, 2026-10-26).
+      // The Columns menu is edit mode's; play mode keeps its place, so the search field keeps one width (SCOPE §5.2 rule 6).
+      hasColumns: true,
       columnToggles: facts.editing ? INVENTORY_COLUMNS.map((key) => ({
          key, pressed: columns[key], label: localize(`FHCS.Inventory.Column.${key}`)
       })) : [],

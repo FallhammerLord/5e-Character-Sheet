@@ -134,6 +134,7 @@ export function spellbookView(facts, { format, localize })
       };
    };
 
+   const anyUses = (facts.sections ?? []).some((s) => s.items.some((i) => i.uses?.max));
    const sections = [...facts.sections]
       .filter((s) => s.items.length)
       .sort((a, b) => sectionRank(a.method, a.level) - sectionRank(b.method, b.level))
@@ -157,7 +158,8 @@ export function spellbookView(facts, { format, localize })
                   label: format(s.method === 'pact' ? 'FHCS.Spellbook.PactSlotLabel' : 'FHCS.Attributes.SlotLabel', { n: i + 1, level: s.level })
                }))
             } : null,
-            showUses: s.items.some((i) => i.uses?.max),
+            // One Uses column for the whole tab, so every section's columns line up (SCOPE §5.2 rule 1).
+            showUses: anyUses,
             items: s.items.map(row)
          };
       });
@@ -193,6 +195,8 @@ export function spellbookView(facts, { format, localize })
       filters: facts.filters ?? [],
       sorting: facts.sorting ?? [],
       pins: pinView(SPELL_PINS, facts.activeFilters, localize),
+      // The Columns menu is edit mode's; play mode keeps its place, so the search field keeps one width (SCOPE §5.2 rule 6).
+      hasColumns: true,
       columnToggles: facts.editing ? SPELL_COLUMNS.map((key) => ({
          key, pressed: columns[key], label: localize(`FHCS.Spellbook.Column.${key}`)
       })) : [],

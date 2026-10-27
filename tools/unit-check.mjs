@@ -423,7 +423,8 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    if (pips !== '1,1,1t' || level1.slots.prop !== 'system.spells.spell1.value') { problems.push(`slot pips: ${pips} on ${level1.slots.prop}`); }
    if (!level1.items[0].conc?.holding) { problems.push('the spell held in concentration is not marked'); }
    if (view.sections[2].slots.pips[0].label !== 'Pact slot 1') { problems.push(`pact slot label: ${view.sections[2].slots.pips[0].label}`); }
-   if (!view.sections[3].showUses || view.sections[0].showUses) { problems.push('the uses column shows in the wrong sections'); }
+   // One Uses column for the whole tab when any spell has uses, so every section's columns line up (user, 2026-10-27).
+   if (!view.sections.every((sec) => sec.showUses)) { problems.push('the uses column is missing from some sections'); }
    if (view.sections[0].items[0].prep) { problems.push('a cantrip shows a prepare mark'); }
    if (view.classes[0].prepared !== '5' || view.concentration.save !== '-1' || !view.concentration.on) { problems.push(`casting strip: ${JSON.stringify([view.classes[0].prepared, view.concentration])}`); }
 }

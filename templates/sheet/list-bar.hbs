@@ -35,6 +35,9 @@
       <span class="fhcs-group-name">{{ groupLabel }}</span>
    </button>
    {{/if}}
+   {{#unless columnToggles.length}}{{#if hasColumns}}
+   <span class="fhcs-columns-space" aria-hidden="true"><span class="fhcs-button fhcs-label">{{ text.columns }}</span></span>
+   {{/if}}{{/unless}}
    {{#if columnToggles.length}}
    <details class="fhcs-fold fhcs-columns" data-fold-key="{{ list }}-columns">
       <summary class="fhcs-button fhcs-label">{{ text.columns }}</summary>

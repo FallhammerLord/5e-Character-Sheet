@@ -521,7 +521,9 @@ export const CASES = [
       name: 'features-empty', template: 'sheet/features',
       context: features({ sections: FEATURE_SECTIONS([]), features: [] })
    },
-   { name: 'spellbook', template: 'sheet/spellbook', context: spellbook() },
+   { name: 'spellbook', template: 'sheet/spellbook', context: spellbook(), rows: '.fhcs-casting-class', marks: '.fhcs-casting-name, .fhcs-list-bar item-list-controls' },
+   // Edit mode keeps the casting cards and the search field where play mode has them (SCOPE §5.2 rule 6).
+   { name: 'spellbook-editing-parity', template: 'sheet/spellbook', context: spellbook({ editing: true }), rows: '.fhcs-casting-class', marks: '.fhcs-casting-name, .fhcs-list-bar item-list-controls', sameRowsAs: 'spellbook' },
    { name: 'spellbook-multiclass-idle', template: 'sheet/spellbook', context: spellbook({ classes: MULTICLASS_CASTER, concentration: { save: -1, spells: [] } }) },
    { name: 'spellbook-editing', template: 'sheet/spellbook', open: ['spells-columns'], context: spellbook({ editing: true, columns: ALL_SPELL_COLUMNS }) },
    // Two casting classes in edit mode: the radio dot picks the main spellcasting ability (user, 2026-10-27).

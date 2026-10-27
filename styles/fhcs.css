@@ -2420,8 +2420,10 @@
 }
 
 /* The class name on its own line, so two cards side by side keep it whole; the numbers share the line under it. */
-/* Edit mode: the main spellcasting ability, a radio dot (filled for the one in use) in a 24px target. */
-.fhcs-sheet .fhcs-casting-name:has(.fhcs-radio) { display: inline-flex; align-items: center; gap: var(--fhcs-s1); }
+/* Edit mode: the main spellcasting ability, a radio dot (filled for the one in use) in a 24px target, in the card's
+   top right corner, so the name and the card's height don't move (SCOPE §5.2 rule 6). */
+.fhcs-sheet .fhcs-casting-class { position: relative; }
+.fhcs-sheet .fhcs-casting-class .fhcs-radio { position: absolute; top: 0; right: 0; }
 .fhcs-sheet .fhcs-toggle.fhcs-radio
 {
    display: inline-grid;
@@ -2939,3 +2941,6 @@
    background: var(--fhcs-fill);
    color: inherit;
 }
+
+/* Play mode keeps the Columns menu's place (it's edit mode's), so the search field keeps one width (rule 6). */
+.fhcs-sheet .fhcs-columns-space { flex: none; visibility: hidden; }
