@@ -39,7 +39,7 @@
                            <svg class="fhcs-switch-mark" viewBox="0 0 20 12" aria-hidden="true"><rect x="1" y="1" width="18" height="10" rx="5"/><circle cy="6" r="3"/></svg>
                         </button>
                         {{/if}}
-                        {{#if concentration}}<span class="fhcs-label fhcs-conc-mark fhcs-on" role="img" aria-label="{{ concentration.label }}">C</span>{{/if}}
+                        {{#if concentration}}<span class="fhcs-conc-mark fhcs-on" role="img" aria-label="{{ concentration.label }}">{{> "modules/fhcs/templates/sheet/conc-c.hbs" }}</span>{{/if}}
                      </span>
                      <span class="fhcs-col-toggle">
                         <button type="button" class="fhcs-toggle fhcs-toggle-fav" data-action="{{ favoriteAction }}"

@@ -119,10 +119,12 @@ function findProblems()
    }
    // An icon fits its button (SCOPE §5.2 rule 4, user 2026-10-27): inside its box, and centred both ways when it's
    // the button's only content (vertically when text follows it). Concentration's icons sat off centre once.
-   for (const el of app.querySelectorAll('.window-content :is(button, summary, label.fhcs-chip, a[data-action])'))
+   const HOLDS_ICON = 'button, summary, label.fhcs-chip, a[data-action], [role="img"]:not(svg)';
+   for (const el of app.querySelectorAll(`.window-content :is(${HOLDS_ICON})`))
    {
-      const icon = el.querySelector('svg');
-      if (!icon || icon.closest('button, summary, label.fhcs-chip, a[data-action]') !== el) { continue; }
+      // The control's own icon: a direct child, or in a direct child span (drawings deeper in, like a card's d20s, aren't).
+      const icon = el.querySelector(':scope > svg, :scope > span > svg');
+      if (!icon || icon.closest(HOLDS_ICON) !== el) { continue; }
       const cs = getComputedStyle(el);
       if (cs.display === 'none' || cs.visibility === 'hidden' || !el.getClientRects().length || getComputedStyle(icon).display === 'none') { continue; }
       const b = el.getBoundingClientRect(), i = icon.getBoundingClientRect();

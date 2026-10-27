@@ -22,7 +22,7 @@
       {{#if components}}<span class="fhcs-body fhcs-col-components">{{ ../components }}</span>{{/if}}
       {{#if concentration}}
       <span class="fhcs-col-conc">
-         {{#if ../conc}}<span class="fhcs-label fhcs-conc-mark{{#if ../conc.holding}} fhcs-on{{/if}}" role="img" aria-label="{{ ../conc.label }}">C</span>{{/if}}
+         {{#if ../conc}}<span class="fhcs-conc-mark{{#if ../conc.holding}} fhcs-on{{/if}}" role="img" aria-label="{{ ../conc.label }}">{{> "modules/fhcs/templates/sheet/conc-c.hbs" }}</span>{{/if}}
       </span>
       {{/if}}
       {{#if time}}<span class="fhcs-body fhcs-col-time">{{ ../time }}</span>{{/if}}

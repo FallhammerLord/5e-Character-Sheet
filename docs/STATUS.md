@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6: slices 1–6 built, slice 7 (styling) under way; all wait on Quench and play** (Waiting on the user, below; ROADMAP Phase 6). Slice 7's last two notes need the user's look in Foundry: a blank band above the header (Foundry's window title bar, with dnd5e's `hidden-title` look stripped), and the empty Attributes favorites leaving the right column bare. Then Limited and Observer views, if wanted in this phase.
+1. **Phase 6: the styling pass (SCOPE §5.2) waits on the user's look in Foundry**, then the play check and closing the phase (BUILT entry, ROADMAP, ask before `main`). Done offline, 2026-10-27: no title band; the header a two-row grid (band and cards aligned); edit mode keeping play mode's geometry (header, skills); round or square portrait; concentration's C drawn, not typed. Open: the user's screenshot of other buttons that sit out of line in Foundry (likely Foundry's font; the offline check uses another), and a padding review on screenshots. Limited view: skipped (user, 2026-10-27).
 
 The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.
 

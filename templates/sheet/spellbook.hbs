@@ -21,7 +21,7 @@
       {{!-- What the character is concentrating on, always in this place (user, 2026-10-26). The save rolls through
             dnd5e's roll action, which reads the ability from [data-ability]. --}}
       <div class="fhcs-concentration{{#if concentration.on}} fhcs-on{{/if}}" data-ability="concentration">
-         <span class="fhcs-label fhcs-conc-mark" role="img" aria-label="{{ text.concentration }}">C</span>
+         <span class="fhcs-conc-mark" role="img" aria-label="{{ text.concentration }}">{{> "modules/fhcs/templates/sheet/conc-c.hbs" }}</span>
          {{#each concentration.spells}}
          <span class="fhcs-conc-spell" data-effect-id="{{ effectId }}">
             <img class="fhcs-conc-img" src="{{ img }}" alt="">
