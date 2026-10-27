@@ -231,7 +231,7 @@ export function headerView(facts, { format, localize })
          initConfig: localize('FHCS.Header.InitConfig'), hdConfig: localize('FHCS.Header.HDConfig'),
          hpConfig: localize('FHCS.Header.HPConfig'), tokenSwitch: localize('FHCS.Header.TokenSwitch'),
          amount: localize('FHCS.Header.HpAmount'), damage: localize('FHCS.Header.HpDamage'), heal: localize('FHCS.Header.HpHeal'),
-         shapeRound: localize('FHCS.Header.ShapeRound'),
+         shapeRound: localize('FHCS.Header.ShapeRound'), portraitOptions: localize('FHCS.Header.PortraitOptions'),
          frame: localize('FHCS.Header.Frame'), frameDone: localize('FHCS.Header.FrameDone'),
          frameReset: localize('FHCS.Header.FrameReset'), zoomIn: localize('FHCS.Header.ZoomIn'),
          zoomOut: localize('FHCS.Header.ZoomOut'), zoom: localize('FHCS.Header.Zoom'),

@@ -88,13 +88,13 @@ Already in place before the phase: portrait picker (edit mode), rests, death sav
 - [x] Research dnd5e 6.0.6 edit mode (research note, "Edit mode and lifecycle", 2026-10-27)
 - [x] Design questions and mockup (SCOPE §4.1, §4.9; canvas rows "Phase 6 · portrait card (E)", "Portrait corner", "E · cards to the frame's foot"; approved by the user, 2026-10-27)
 - [ ] 1. Portrait card in play mode: one frame height, HP band with Temp and Max ±, Short and Long rest chips, HD chip, exhaustion dot; cards to the frame's foot; two class cards and the class tray (Quench passes, user 2026-10-27; play check next)
-- [ ] 2. HP tray from the HP bar: Damage, Heal, Temp (built 2026-10-27; Quench and play next). Checked in dnd5e: healing from 0 clears death saves itself; an effect on tempmax isn't locked, so Max ± shows the player's value and the bar the total
-- [ ] 3. Edit-mode header: name, XP, ability scores, AC window, gears for Init, speed, HP and hit dice, Token switch (built 2026-10-27; Quench and play next)
-- [ ] 4. Framing large art: zoom, pan, arrow keys (`flags.fhcs.portrait`, keyed by the image) (built 2026-10-27; Quench and play next)
-- [ ] 5. Attributes in edit mode: skill proficiency and ability, trait and sense gears (built 2026-10-27; Quench and play next)
-- [ ] 6. Spellcasting ability; level down (built 2026-10-27; Quench and play next)
+- [ ] 2. HP tray from the HP bar: Damage, Heal, Temp (built 2026-10-27; Quench passes, user 2026-10-27; play next). Checked in dnd5e: healing from 0 clears death saves itself; an effect on tempmax isn't locked, so Max ± shows the player's value and the bar the total
+- [ ] 3. Edit-mode header: name, XP, ability scores, AC window, gears for Init, speed, HP and hit dice, Token switch (built 2026-10-27; Quench passes, user 2026-10-27; play next)
+- [ ] 4. Framing large art: zoom, pan, arrow keys (`flags.fhcs.portrait`, keyed by the image) (built 2026-10-27; Quench passes, user 2026-10-27; play next)
+- [ ] 5. Attributes in edit mode: skill proficiency and ability, trait and sense gears (built 2026-10-27; Quench passes, user 2026-10-27; play next)
+- [ ] 6. Spellcasting ability; level down (built 2026-10-27; Quench passes, user 2026-10-27; play next)
 - [x] Special Traits tab in our look: dnd5e's form, name and control on a line, hint under (user's screenshot, 2026-10-27; built, play next)
-- [ ] 7. Styling and space pass, by SCOPE §5.2 (user, 2026-10-27): sort ring, slot gear, Additional Spells uses, title band, two-row header, mode parity, round or square portrait, drawn C done 2026-10-27; the user's look in Foundry next
+- [ ] 7. Styling and space pass, by SCOPE §5.2 (user, 2026-10-27): sort ring, slot gear, Additional Spells uses, title band, two-row header, mode parity, round or square portrait, drawn C, like elements alike (rules 16–19, every element compared across modes) done 2026-10-27; the user's look in Foundry next
 - ~~Limited and Observer views~~ skipped (user, 2026-10-27): Observers get our sheet read-only; Limited keeps dnd5e's small layout
 
 ## Phase 7: The ADHD layer

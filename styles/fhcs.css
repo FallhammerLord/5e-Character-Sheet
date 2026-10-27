@@ -1376,8 +1376,11 @@
    cursor: pointer;
 }
 
-.fhcs-sheet .fhcs-gear { width: 14px; height: 14px; }
-.fhcs-sheet .fhcs-chip .fhcs-gear { width: 12px; height: 12px; }
+/* 12px: no larger than the label text it sits beside (SCOPE §5.2 rule 19, user 2026-10-27). */
+.fhcs-sheet .fhcs-gear { width: 12px; height: 12px; }
+
+/* A gear inside a line of text keeps its 24px target without making the line taller than in play mode (rule 6). */
+.fhcs-sheet :is(.fhcs-trait dt, .fhcs-origin-speed, .fhcs-ability-head) > .fhcs-gear-button { margin-block: -5px; }
 
 .fhcs-sheet .fhcs-name-input { flex: 1; min-width: 0; padding: 0 var(--fhcs-s1); text-align: left; }
 
@@ -1385,56 +1388,25 @@
 .fhcs-sheet .fhcs-ability-head { display: inline-flex; align-items: center; min-height: 24px; }
 .fhcs-sheet .fhcs-score-input { text-align: center; }
 
-/* In edit mode the shield is a button into dnd5e's AC window, with a gear on its corner. */
-.fhcs-sheet .fhcs-shield-button
-{
-   width: 40px;
-   height: 46px;
-   min-height: 0;
-   margin: 0;
-   padding: 0;
-   border: 0;
-   background: none;
-   line-height: normal;
-   cursor: pointer;
-}
-
-/* `.fhcs-shield > .fhcs-shield-gear`: outranks `.fhcs-shield > span`, which would put it back in the shield's grid. */
-.fhcs-sheet .fhcs-shield > .fhcs-shield-gear
-{
-   position: absolute;
-   right: 0;
-   bottom: 0;
-   display: grid;
-   place-items: center;
-   width: 16px;
-   height: 16px;
-   box-sizing: border-box;
-   border: 1.5px solid var(--fhcs-die-ink);
-   border-radius: 50%;
-   background: var(--fhcs-surface);
-   color: var(--fhcs-ink);
-}
-
-.fhcs-sheet .fhcs-shield-gear .fhcs-gear { width: 10px; height: 10px; }
-
 .fhcs-sheet .fhcs-origin-speed { display: flex; flex: 1; align-items: center; min-width: 0; }
 .fhcs-sheet .fhcs-origin-speed > .fhcs-line { flex: 0 1 auto; }
 .fhcs-sheet .fhcs-hp-edit { display: flex; align-items: center; gap: var(--fhcs-s1); }
 .fhcs-sheet .fhcs-hp-edit > .meter { flex: 1; min-width: 0; }
 
-/* Edit mode's portrait chips, top centre: the token switch (a ring when on) and Frame. */
+/* Edit mode's portrait options, top centre: one gear chip, its tray of the token switch (a ring when on), round and
+   Frame opening below it, centred. */
 .fhcs-sheet .fhcs-portrait-edit
 {
    position: absolute;
    top: var(--fhcs-s1);
    left: 50%;
-   display: flex;
-   gap: var(--fhcs-s1);
    transform: translateX(-50%);
 }
 
-.fhcs-sheet .fhcs-portrait-edit .fhcs-on { box-shadow: 0 0 0 2px var(--fhcs-surface), 0 0 0 4px var(--fhcs-die-ink); }
+.fhcs-sheet .fhcs-portrait-edit > .fhcs-tray { left: 50%; transform: translateX(-50%); }
+/* Alone in its chip, the gear is a chip icon's size, like the star beside it. */
+.fhcs-sheet .fhcs-portrait-edit > .fhcs-chip > .fhcs-gear { width: 16px; height: 16px; }
+
 
 .fhcs-sheet .fhcs-sr-only
 {
@@ -1709,6 +1681,8 @@
 .fhcs-sheet .fhcs-passive-toggle
 {
    width: auto;
+   height: var(--fhcs-control);
+   min-height: 0;
    padding: 0 var(--fhcs-s2);
 }
 
@@ -1766,6 +1740,7 @@
    display: flex;
    flex-direction: column;
    gap: var(--fhcs-s2);
+   margin-top: var(--fhcs-s2);
    padding-top: var(--fhcs-s2);
    border-top: 1px solid var(--fhcs-line);
 }
@@ -2328,12 +2303,14 @@
    gap: var(--fhcs-s2);
 }
 
+/* One height in both modes (rule 6): edit mode's max field fits inside the box. */
 .fhcs-sheet .fhcs-attunement
 {
    display: inline-flex;
    align-items: center;
    gap: var(--fhcs-s1);
-   min-height: var(--fhcs-control);
+   box-sizing: border-box;
+   height: var(--fhcs-control);
    padding: 0 var(--fhcs-s2);
    border: 1px solid var(--fhcs-line);
    border-radius: var(--fhcs-radius);
@@ -2341,7 +2318,7 @@
 
 .fhcs-sheet .fhcs-attunement .fhcs-icon { color: var(--fhcs-adv); fill: currentColor; stroke: none; }
 .fhcs-sheet .fhcs-attunement.fhcs-over { border-color: var(--fhcs-failure); box-shadow: inset 0 0 0 1px var(--fhcs-failure); }
-.fhcs-sheet .fhcs-attunement .fhcs-attunement-max { width: 44px; text-align: center; }
+.fhcs-sheet .fhcs-attunement .fhcs-attunement-max { width: 44px; height: calc(var(--fhcs-control) - 6px); min-height: 0; text-align: center; }
 
 .fhcs-sheet .fhcs-currency
 {
@@ -2548,7 +2525,12 @@
 .fhcs-sheet .fhcs-conc-end { border-color: var(--fhcs-failure); color: var(--fhcs-failure); }
 
 /* Section headings: the level, then its slot pips (Attributes' pips) and slots left. */
+/* A level's heading stays one line in both modes (rule 6): its name and slot pips need 160px, so the name column keeps
+   that much and Time and Range give way first. With School and Target on too, 644px has no room: the pips wrap. */
 .fhcs-sheet .fhcs-spell-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fhcs-s2); }
+.fhcs-sheet .fhcs-spellbook:not(:has(.fhcs-col-school, .fhcs-col-target)) .fhcs-col-name { min-width: 160px; }
+/* Range keeps room for its heading uncut there too. */
+.fhcs-sheet .fhcs-spellbook:not(:has(.fhcs-col-school, .fhcs-col-target)) .fhcs-col-range { min-width: 48px; }
 .fhcs-sheet .fhcs-item-head .fhcs-spell-head { overflow: visible; }
 .fhcs-sheet .fhcs-slot.fhcs-temp::before { border-style: dotted; }
 
@@ -2614,11 +2596,12 @@
 
 /* ---------- Class, species and background cards: the header, under the abilities (SCOPE §4.1, §4.8) ---------- */
 
+/* Content from the top: a card that grows in edit mode (a remove button wrapping) grows downward, nothing moves. */
 .fhcs-sheet .fhcs-origin-card
 {
    position: relative;
    display: flex;
-   align-items: center;
+   align-items: flex-start;
    gap: var(--fhcs-s2);
    min-width: 0;
    padding: var(--fhcs-s1) var(--fhcs-s1) var(--fhcs-s1) var(--fhcs-s2);

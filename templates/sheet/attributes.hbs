@@ -10,7 +10,7 @@
             <button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="skills"
                     aria-label="{{ text.skillsConfig }}" data-fhcs-tip="{{ text.skillsConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>
             {{else}}
-            <button type="button" class="fhcs-button fhcs-label fhcs-passive-toggle" data-action="fhcsTogglePassives"
+            <button type="button" class="fhcs-button fhcs-body fhcs-passive-toggle" data-action="fhcsTogglePassives"
                     aria-pressed="{{#if showAllPassives}}true{{else}}false{{/if}}" aria-label="{{ text.passiveToggle }}"
                     data-fhcs-tip="{{ text.passiveToggle }}">{{ text.passive }}</button>
             {{/if}}

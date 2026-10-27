@@ -373,6 +373,8 @@ export function registerQuenchTests(quench)
                await until(() => open(Kind)?.rendered, what);
                await open(Kind).close();
             }
+            // The token switch sits in the portrait's options tray (one gear chip, user 2026-10-27).
+            if (!find('.fhcs-header .fhcs-portrait-edit')?.open) { await click('.fhcs-header .fhcs-portrait-edit > summary'); }
             await click('.fhcs-header [name="flags.dnd5e.showTokenPortrait"]');
             await until(() => (actor.getFlag('dnd5e', 'showTokenPortrait') ?? false) !== before.token,
                () => `the Token switch flips dnd5e's flag; it holds ${actor.getFlag('dnd5e', 'showTokenPortrait')}`);
@@ -392,6 +394,7 @@ export function registerQuenchTests(quench)
                await click('.fhcs-tabs [data-action="changeMode"]');
                await until(() => sheet.isEditMode, 'the lock switches to edit mode');
             }
+            if (!find('.fhcs-header .fhcs-portrait-edit')?.open) { await click('.fhcs-header .fhcs-portrait-edit > summary'); }
             await click('.fhcs-header [data-action="fhcsFrame"]');
             assert.isTrue(find('.fhcs-header .fhcs-portrait').classList.contains('fhcs-framing'), 'Frame starts framing');
             // Two presses down, one zoom in, then Enter: no redraw comes until Enter saves.

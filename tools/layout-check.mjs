@@ -150,6 +150,83 @@ function findProblems()
       if ((alone && dx > 1) || dy > 1.5) { issues.push(`icon off centre by ${Math.round(dx)}px across, ${Math.round(dy)}px down: ${what}`); }
    }
 
+   // Like elements look alike (SCOPE §5.2 rules 16–19, user 2026-10-27).
+   const shown = (el) => el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden' && !el.closest('[aria-hidden="true"], [hidden]');
+   const named = (el) => `${el.tagName.toLowerCase()}.${[...el.classList].join('.')}`;
+   const ownText = (el) => [...el.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent).join('').trim();
+   // 16: the portrait's chips are the inspiration chip's size (an icon-only chip square), and chips side by side
+   // share a row, never stacked.
+   const model = app.querySelector('.window-content .fhcs-portrait-stage [data-action="toggleInspiration"]');
+   if (model && shown(model))
+   {
+      const m = model.getBoundingClientRect();
+      for (const el of app.querySelectorAll('.window-content .fhcs-portrait-stage .fhcs-chip'))
+      {
+         if (el === model || !shown(el)) { continue; }
+         const r = el.getBoundingClientRect();
+         const iconOnly = !(el.textContent || '').trim();
+         // A ring drawn around a chip (box-shadow) makes it look larger than its neighbours: "on" was once a ring.
+         const ring = getComputedStyle(el).boxShadow !== getComputedStyle(model).boxShadow;
+         if (ring || Math.abs(r.height - m.height) > 1 || (iconOnly && Math.abs(r.width - m.width) > 1))
+         {
+            issues.push(`portrait chip is ${Math.round(r.width)}×${Math.round(r.height)}${ring ? ' with a ring' : ''}, inspiration ${Math.round(m.width)}×${Math.round(m.height)}: ${named(el)}`);
+         }
+      }
+      // The chips on the portrait keep a gap between them (a crowded top row once ran Frame into Inspiration).
+      const chips = [...app.querySelectorAll('.window-content .fhcs-portrait-stage .fhcs-chip')].filter((el) => shown(el) && !el.closest('.fhcs-tray'));
+      for (const [n, x] of chips.entries())
+      {
+         const rx = x.getBoundingClientRect();
+         for (const y of chips.slice(n + 1))
+         {
+            const ry = y.getBoundingClientRect();
+            if (rx.left < ry.right + 2 && ry.left < rx.right + 2 && rx.top < ry.bottom + 2 && ry.top < rx.bottom + 2) { issues.push(`portrait chips touch: ${named(x)} and ${named(y)}`); }
+         }
+      }
+      for (const group of app.querySelectorAll('.window-content .fhcs-portrait-stage :is(.fhcs-rests, .fhcs-portrait-edit > .fhcs-tray, .fhcs-framing-zoom)'))
+      {
+         const tops = [...group.children].filter(shown).map((el) => Math.round(el.getBoundingClientRect().top));
+         if (new Set(tops).size > 1) { issues.push(`portrait chips stacked, not side by side: ${named(group)}`); }
+      }
+   }
+   // 17: one text size inside one control ("HP" once sat smaller than its value). A row drawn as one button (a skill)
+   // is a table row: its columns follow their own styles.
+   // The sheet only: the chat cards' bands (a heading over its total) were settled in Phase 2.
+   for (const el of app.querySelectorAll('.window-content :is(button, summary, [role="meter"], .fhcs-pill, label.fhcs-chip)'))
+   {
+      if (!shown(el) || !el.closest('.fhcs-sheet') || el.matches('.fhcs-skill')) { continue; }
+      const sizes = new Set([el, ...el.querySelectorAll('*')].filter((n) => !n.ownerSVGElement && shown(n) && ownText(n)
+         && n.closest('button, summary, [role="meter"], .fhcs-pill, label.fhcs-chip') === el).map((n) => getComputedStyle(n).fontSize));
+      if (sizes.size > 1) { issues.push(`mixed text sizes (${[...sizes].join(', ')}) in one control: ${named(el)} "${el.textContent.trim().replace(/\s+/g, ' ').slice(0, 24)}"`); }
+   }
+   // 18: a button's words are body style, not capitals. An abbreviation (Str, Dex) may stay in capitals, and a heading
+   // that folds (a favorites group) keeps the headings' label style.
+   for (const el of app.querySelectorAll('.window-content :is(button, summary) *, .window-content :is(button, summary)'))
+   {
+      if (el.ownerSVGElement || !shown(el) || !el.closest('.fhcs-sheet')) { continue; }
+      const text = ownText(el);
+      if (/[a-z]/.test(text) && text.length > 3 && !el.closest('.fhcs-group-toggle') && getComputedStyle(el).textTransform === 'uppercase')
+      {
+         issues.push(`capitals in a button: ${named(el)} "${text.slice(0, 20)}"`);
+      }
+   }
+   // 19: a gear is no taller than the words it sits beside: the control's own, else its parent's (its line). A gear
+   // alone in a chip, with no words on its line, is a chip icon.
+   for (const gear of app.querySelectorAll('.window-content svg.fhcs-gear'))
+   {
+      // The drawing itself is aria-hidden; only its control's visibility counts.
+      if (!shown(gear.parentElement) || getComputedStyle(gear).display === 'none') { continue; }
+      const h = gear.getBoundingClientRect().height;
+      let words = null;
+      for (let n = gear.parentElement, up = 0; n && n !== app && !words && up < 2; n = n.parentElement, up++)
+      {
+         words = [n, ...n.querySelectorAll('*')].find((t) => !t.ownerSVGElement && !t.contains(gear) && shown(t) && ownText(t))
+            ?? (ownText(n) ? n : null);
+      }
+      const size = words ? parseFloat(getComputedStyle(words).fontSize) : 0;
+      if (size && h > size + 1) { issues.push(`gear ${Math.round(h)}px beside ${Math.round(size)}px text: ${named(gear.parentElement)}`); }
+   }
+
    // Every control takes its own clicks: at its centre the topmost element is the control or inside it. A layer drawn
    // over the portrait once swallowed its clicks (user, 2026-10-27). An open tray may cover what's under it.
    for (const el of app.querySelectorAll('.window-content [data-action]'))
@@ -269,6 +346,9 @@ const SELF_TEST = [
    { id: 'self-icon-off-centre', expect: true, body: '<button style="display:flex;align-items:flex-start;justify-content:flex-start;width:28px;height:28px;padding:0"><svg width="16" height="16"><path d="M0 0h16v16H0z"/></svg></button>' },
    { id: 'self-icon-spills', expect: true, body: '<button style="display:grid;place-items:center;width:20px;height:20px;padding:0;overflow:visible"><svg width="28" height="28" style="flex:none"><path d="M0 0h28v28H0z"/></svg></button>' },
    { id: 'self-icon-centred', expect: false, body: '<button style="display:grid;place-items:center;width:28px;height:28px;min-height:0;padding:0"><svg width="16" height="16"><path d="M0 0h16v16H0z"/></svg></button>' },
+   { id: 'self-mixed-sizes', expect: true, body: '<button style="display:flex;width:120px"><span style="font-size:12px">HP</span><span style="font-size:20px">8</span></button>' },
+   { id: 'self-capitals', expect: true, body: '<button style="text-transform:uppercase;width:120px">Columns</button>' },
+   { id: 'self-gear', expect: true, body: '<span style="display:flex;align-items:center;font-size:12px">Str<button style="display:grid;place-items:center;width:24px;height:24px;min-height:0;padding:0"><svg class="fhcs-gear" style="width:16px;height:16px"><path d="M0 0h16v16H0z"/></svg></button></span>' },
    { id: 'self-overlap', expect: true, body: '<div style="display:grid;grid-template-columns:40px 1fr"><span style="justify-self:start;white-space:nowrap">Runs into the next</span><span>x</span></div>' }
 ];
 
@@ -293,6 +373,32 @@ function misaligned(pairs)
 }
 
 /**
+ * Runs in the page: every element of ours in normal flow, keyed by its first fhcs class and its index among those, with
+ * its height, its top within the window, and how many elements it holds. Edit mode must keep every one that both modes draw (SCOPE §5.2 rule 6).
+ */
+function everyBox()
+{
+   const root = document.querySelector('.window-content'), top = root.getBoundingClientRect().top;
+   const boxes = {}, counts = {};
+   for (const el of root.querySelectorAll('[class*="fhcs-"]'))
+   {
+      if (!el.getClientRects().length || el.closest('[hidden], [aria-hidden="true"]')) { continue; }
+      // Laid over the page on purpose (trays, chips on the portrait): not part of the flow.
+      let floating = false;
+      for (let n = el; n && n !== root && !floating; n = n.parentElement) { floating = ['absolute', 'fixed'].includes(getComputedStyle(n).position); }
+      if (floating) { continue; }
+      const cls = [...el.classList].find((c) => c.startsWith('fhcs-'));
+      if (!cls) { continue; }
+      const n = counts[cls] = (counts[cls] ?? 0) + 1;
+      const r = el.getBoundingClientRect();
+      // The third number counts what it holds: a container that edit mode gives more to (the empty traits, shown to be
+      // set) may grow at its end without moving anything.
+      boxes[`${cls}#${n}`] = [Math.round(r.height), Math.round(r.top - top), el.querySelectorAll('*').length];
+   }
+   return { boxes, counts };
+}
+
+/**
  * Runs in the page: the heights of everything `rows` finds, and the left and right edges of everything `marks` finds,
  * for comparing play mode with edit mode.
  */
@@ -314,12 +420,15 @@ async function check(id, html, screenshot, c = {})
    const found = await tab.evaluate(findProblems);
    if (c.align) { found.push(...await tab.evaluate(misaligned, c.align)); }
    if (c.rows) { measured.set(`${c.name}|${id.slice(c.name.length)}`, await tab.evaluate(heights, { rows: c.rows, marks: c.marks })); }
+   if (c.rows) { boxes.set(`${c.name}|${id.slice(c.name.length)}`, await tab.evaluate(everyBox)); }
    if (screenshot) { await tab.screenshot({ path: `${out}/${id}.png`, fullPage: true }); }
    return found;
 }
 
 /** Row heights by case and frame, for SCOPE §5.2 rule 6: edit mode keeps play mode's rows. */
 const measured = new Map();
+/** Every element's box by case and frame, for the same rule. */
+const boxes = new Map();
 
 const problems = [];
 for (const t of SELF_TEST)
@@ -350,6 +459,19 @@ for (const c of CASES)
             {
                const at = mine.rows.findIndex((h, n) => h !== theirs.rows[n]);
                problems.push(`${id}: edit mode reshapes ${c.rows}: row ${at + 1} is ${mine.rows[at]}px, ${theirs.rows[at]}px in ${c.sameRowsAs}`);
+            }
+            // Every element both modes draw keeps its height and place; a class drawn a different number of times in
+            // each mode (edit mode's gears) can't be paired, so it's left to the rows above.
+            const bm = boxes.get(`${c.name}|${id.slice(c.name.length)}`), bt = boxes.get(`${c.sameRowsAs}|${id.slice(c.name.length)}`);
+            const shifted = Object.keys(bm?.boxes ?? {}).filter((k) =>
+            {
+               const cls = k.split('#')[0], t = bt?.boxes[k], m = bm.boxes[k];
+               return t && bm.counts[cls] === bt.counts[cls] && ((m[2] === t[2] && Math.abs(m[0] - t[0]) > 1) || Math.abs(m[1] - t[1]) > 1);
+            });
+            if (shifted.length)
+            {
+               const say = shifted.slice(0, 4).map((k) => `${k} ${bm.boxes[k][0]}px@${bm.boxes[k][1]}, was ${bt.boxes[k][0]}px@${bt.boxes[k][1]}`);
+               problems.push(`${id}: edit mode moves or resizes ${shifted.length} element(s): ${say.join('; ')}`);
             }
             const moved = (mine?.marks ?? []).findIndex((m, n) => theirs?.marks[n] && (Math.abs(m[0] - theirs.marks[n][0]) > 1 || Math.abs(m[1] - theirs.marks[n][1]) > 1));
             if (moved >= 0)

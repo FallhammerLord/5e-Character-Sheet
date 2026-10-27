@@ -29,7 +29,7 @@
             <button type="button" class="fhcs-conc-open" data-action="fhcsOpenConcentration" data-item-id="{{ itemId }}"
                     aria-label="{{ openLabel }}"{{#unless itemId}} disabled{{/unless}}>
                <span class="fhcs-body fhcs-conc-name">{{ name }}</span>
-               {{#if sub}}<span class="fhcs-label fhcs-muted">{{ sub }}</span>{{/if}}
+               {{#if sub}}<span class="fhcs-body fhcs-muted">{{ sub }}</span>{{/if}}
             </button>
             <button type="button" class="fhcs-button fhcs-body fhcs-conc-end" data-action="fhcsEndConcentration"
                     data-effect-id="{{ effectId }}" aria-label="{{ endLabel }}">{{ ../text.end }}</button>
@@ -38,7 +38,7 @@
          <span class="fhcs-body fhcs-conc-none">{{ text.none }}</span>
          {{/each}}
          <button type="button" class="fhcs-button fhcs-body fhcs-conc-save {{ @root.rollableClass }}" data-action="roll"
-                 data-type="ability" aria-label="{{ concentration.saveLabel }}"><span class="fhcs-label">{{ text.conSave }}</span>{{ concentration.save }}</button>
+                 data-type="ability" aria-label="{{ concentration.saveLabel }}">{{ text.conSave }} {{ concentration.save }}</button>
       </div>
    </div>
 
@@ -73,7 +73,7 @@
                {{#if ../editing}}
                <span class="fhcs-col-edit">
                   {{#if slots}}
-                  <button type="button" class="fhcs-toggle" data-action="showConfiguration" data-config="spellSlots"
+                  <button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="spellSlots"
                           aria-label="{{ ../text.slotsConfig }}" data-fhcs-tip="{{ ../text.slotsConfig }}">
                      {{> "modules/fhcs/templates/sheet/gear.hbs" }}
                   </button>

@@ -69,8 +69,11 @@
             {{/if}}
 
             {{#if @root.editable}}
-            {{!-- Edit mode: show the token instead of the portrait (dnd5e's own switch, a flag on the actor). --}}
-            <span class="fhcs-portrait-edit">
+            {{!-- Edit mode: one gear chip opens the portrait's options (user, 2026-10-27: five chips crowded the top row):
+                  show the token instead (dnd5e's own switch, a flag on the actor), round, and Frame. --}}
+            <details class="fhcs-fold fhcs-portrait-edit" data-fold-key="portrait-edit">
+            <summary class="fhcs-chip" aria-label="{{ text.portraitOptions }}" data-fhcs-tip="{{ text.portraitOptions }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</summary>
+            <div class="fhcs-tray fhcs-tray-row">
             <label class="fhcs-chip{{#if portrait.token}} fhcs-on{{/if}}" data-fhcs-tip="{{ text.tokenSwitch }}">
                <input type="checkbox" class="fhcs-sr-only" name="flags.dnd5e.showTokenPortrait" {{#if portrait.token}}checked{{/if}} aria-label="{{ text.tokenSwitch }}">
                <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>
@@ -84,7 +87,8 @@
                <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2v14a2 2 0 0 0 2 2h14M18 22V8a2 2 0 0 0-2-2H2"/></svg>
             </button>
             {{/if}}
-            </span>
+            </div>
+            </details>
             {{#if portrait.canFrame}}
             {{!-- Framing: drag the art, zoom on the strip; arrows pan, + and − zoom, Enter is Done, Escape cancels. --}}
             <div class="fhcs-framing-zoom">
@@ -131,7 +135,7 @@
                <div class="fhcs-hp-meter" role="meter" aria-valuemin="0" aria-valuenow="{{ hp.value }}" aria-valuemax="{{ hp.max }}"
                     aria-label="{{ hp.label }}">
                   <span class="fhcs-hp-fill" style="width: {{ hp.pct }}%"></span>
-                  <span class="label fhcs-hp-line"><span class="fhcs-label">{{ text.hp }}</span><span class="fhcs-display">{{ hp.text }}</span></span>
+                  <span class="label fhcs-hp-line"><span class="fhcs-display">{{ text.hp }}</span><span class="fhcs-display">{{ hp.text }}</span></span>
                   <input type="text" class="fhcs-input fhcs-display" name="system.attributes.hp.value" data-dtype="Number"
                          data-max="{{ hp.max }}" value="{{ hp.value }}" placeholder="0" hidden>
                </div>
@@ -143,7 +147,7 @@
             <details class="fhcs-fold fhcs-hp-fold" data-fold-key="hp">
                <summary class="fhcs-hp-meter" aria-label="{{ hp.changeLabel }}">
                   <span class="fhcs-hp-fill" style="width: {{ hp.pct }}%"></span>
-                  <span class="fhcs-hp-line"><span class="fhcs-label">{{ text.hp }}</span><span class="fhcs-display">{{ hp.text }}</span></span>
+                  <span class="fhcs-hp-line"><span class="fhcs-display">{{ text.hp }}</span><span class="fhcs-display">{{ hp.text }}</span></span>
                </summary>
                <div class="fhcs-tray fhcs-hp-tray" data-hp="{{ hp.current }}" data-temp="{{ hp.tempValue }}">
                   <label class="fhcs-hp-amount"><span class="fhcs-label">{{ text.amount }}</span>
@@ -169,7 +173,7 @@
             <div class="fhcs-hp-meter" role="meter" aria-valuemin="0" aria-valuenow="{{ hp.value }}" aria-valuemax="{{ hp.max }}"
                  aria-label="{{ hp.label }}">
                <span class="fhcs-hp-fill" style="width: {{ hp.pct }}%"></span>
-               <span class="fhcs-hp-line"><span class="fhcs-label">{{ text.hp }}</span><span class="fhcs-display">{{ hp.text }}</span></span>
+               <span class="fhcs-hp-line"><span class="fhcs-display">{{ text.hp }}</span><span class="fhcs-display">{{ hp.text }}</span></span>
             </div>
             {{/if}}
             <div class="fhcs-hp-fields">
@@ -199,19 +203,19 @@
          {{#if levelUp}}
          {{!-- The level pill opens Level up (user, 2026-10-26); solid with an arrow once the XP is there. --}}
          <details class="fhcs-fold fhcs-level" data-fold-key="level-up">
-            <summary class="fhcs-pill fhcs-label{{#if levelUp.ready}} fhcs-ready{{/if}}" aria-label="{{ levelUpLabel }}">
+            <summary class="fhcs-pill fhcs-body{{#if levelUp.ready}} fhcs-ready{{/if}}" aria-label="{{ levelUpLabel }}">
                {{#if levelUp.ready}}<svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>{{/if}}{{ level }}
                <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </summary>
             <div class="fhcs-tray fhcs-track">{{> "modules/fhcs/templates/sheet/level-up.hbs" levelUp }}</div>
          </details>
          {{else}}
-         <span class="fhcs-pill fhcs-label">{{ level }}</span>
+         <span class="fhcs-pill fhcs-body">{{ level }}</span>
          {{/if}}
          {{/if}}
          {{#if milestones}}
          <details class="fhcs-fold fhcs-level" data-fold-key="milestones">
-            <summary class="fhcs-pill fhcs-label" aria-label="{{ milestones.label }}">{{ level }}
+            <summary class="fhcs-pill fhcs-body" aria-label="{{ milestones.label }}">{{ level }}
                <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
             </summary>
             <div class="fhcs-tray fhcs-track">
@@ -261,21 +265,13 @@
       {{!-- The class, species and background cards share the grid's columns, under the abilities (user, 2026-10-26). --}}
       <div class="fhcs-abilities{{#if scoreFirst}} fhcs-score-first{{/if}}" style="--fhcs-columns: {{ columns }}">
          <div class="fhcs-ability">
-            <span class="fhcs-label fhcs-muted fhcs-ability-head">{{ text.ac }}</span>
-            {{#if @root.editable}}
-            {{!-- Edit mode: the shield opens dnd5e's AC window (user, 2026-10-27). --}}
-            <button type="button" class="fhcs-shield fhcs-shield-button" data-action="showConfiguration" data-config="armorClass"
-                    aria-label="{{ text.acConfig }}" data-fhcs-tip="{{ text.acConfig }}">
-               <svg viewBox="0 0 40 46" aria-hidden="true"><path d="M20 2l16 6v13c0 11-7 18-16 23C11 39 4 32 4 21V8z"/></svg>
-               <span class="fhcs-display">{{ ac }}</span>
-               <span class="fhcs-shield-gear" aria-hidden="true">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</span>
-            </button>
-            {{else}}
+            {{!-- Edit mode: AC's gear opens dnd5e's AC window, the same gear as every other label (user, 2026-10-27). --}}
+            <span class="fhcs-label fhcs-muted fhcs-ability-head">{{ text.ac }}{{#if @root.editable}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="armorClass"
+                    aria-label="{{ text.acConfig }}" data-fhcs-tip="{{ text.acConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</span>
             <span class="fhcs-shield" data-attribution="attributes.ac" data-attribution-caption="DND5E.ArmorClass">
                <svg viewBox="0 0 40 46" aria-hidden="true"><path d="M20 2l16 6v13c0 11-7 18-16 23C11 39 4 32 4 21V8z"/></svg>
                <span class="fhcs-display">{{ ac }}</span>
             </span>
-            {{/if}}
          </div>
          <div class="fhcs-ability">
             <span class="fhcs-label fhcs-muted fhcs-ability-head">{{ text.init }}{{#if @root.editable}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="initiative"

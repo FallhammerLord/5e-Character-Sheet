@@ -26,7 +26,7 @@ Target: Tidy 5e Classic, as in `docs/reference/` (screenshots) and its source at
 
 ### 4.1 Header
 
-- **Portrait** (round, about 150px) down the left edge. On it: exhaustion (top left, hidden at 0 behind a dot), inspiration (top right), Short and Long rest (bottom left), hit dice (bottom right). Under it, dnd5e's portrait card made compact (user, 2026-10-27: "clean presentation, just too large and spread out"): an HP meter, 32px, with "HP 87 / 87" inside the bar; then the Temp and Max ± fields. The bars' fills are light tints that keep ink text at 4.5:1. In edit mode the HP meter gets a gear at its left (dnd5e's HP window) and HP's current value becomes a field inside the bar; the portrait gets a Token switch (dnd5e's `flags.dnd5e.showTokenPortrait`).
+- **Portrait** (round, about 150px) down the left edge. On it: exhaustion (top left, hidden at 0 behind a dot), inspiration (top right), Short and Long rest (bottom left), hit dice (bottom right). Under it, dnd5e's portrait card made compact (user, 2026-10-27: "clean presentation, just too large and spread out"): an HP meter, 32px, with "HP 87 / 87" inside the bar; then the Temp and Max ± fields. The bars' fills are light tints that keep ink text at 4.5:1. In edit mode the HP meter gets a gear at its left (dnd5e's HP window) and HP's current value becomes a field inside the bar; the portrait gets one gear chip at its top centre, the portrait's options: its tray holds the Token switch (dnd5e's `flags.dnd5e.showTokenPortrait`), Round and Frame (user, 2026-10-27: separate chips crowded the top row and their "on" rings made them look larger than Inspiration).
 - **Beside it, in rows:**
   1. Name (large small caps); on the right: XP bar with current / next, level badge, ⋮ menu.
   2. Classes and subclasses ("Cleric 12 Life Domain").
@@ -36,7 +36,7 @@ Target: Tidy 5e Classic, as in `docs/reference/` (screenshots) and its source at
 
 Header decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf):
 - **Portrait card, one height for every art shape** (user, 2026-10-27, layout E of six on the canvas, replacing "160 wide, up to 240 tall, the header grows"): a 160 × 234 frame; the art fills it (cover), a round token sits whole at the top; HP, Temp and Max ± sit on a band over the frame's foot. The header keeps one height for every character.
-- **Framing large art** (user, 2026-10-27: not every tall portrait has its subject at the top): in edit mode a Frame chip (top centre) enters positioning; the other chips hide, the player drags the art, a strip at the top zooms (100–300%), Reset and Done take the bottom corners. Saved per character in `flags.fhcs.portrait` (focus x and y as percents of the art, zoom), drawn as the art's size and position; every viewer sees the same framing. Round tokens have nothing to position.
+- **Framing large art** (user, 2026-10-27: not every tall portrait has its subject at the top): in edit mode Frame (in the portrait's options tray, top centre) enters positioning; the other chips hide, the player drags the art, a strip at the top zooms (100–300%), Reset and Done take the bottom corners. Saved per character in `flags.fhcs.portrait` (focus x and y as percents of the art, zoom), drawn as the art's size and position; every viewer sees the same framing. Round tokens have nothing to position.
 - **Origin cards reach the portrait card's foot** (user, 2026-10-27): the right column stretches to the frame's height and the cards take the spare height, so the class card gives its subclass its own line at every width.
 - **Two class cards at most** (user, 2026-10-27): one class takes 4 of the grid's 8 columns, two or more show the two highest-level classes at 2 columns each. With three or more, a small "+N" chip in the second class card's corner (inside the card; nothing moves) opens the class tray: every further class as a dense row (name and level, which opens the item; subclass, or a dashed Subclass to choose; × in edit mode). The level tray still lists every class for Level up and Level down. Icons-only cards were weighed and dropped: class art is often generic, and a picture alone carries no word. In edit mode a card's × sits in its label line (beside "Class", with the "+N" chip), so the name keeps its line; a subclass keeps its own × beside it and is the one thing that shortens at 644px with two classes.
 - **Corner chips on the frame:** inspiration (top right); Short rest and Long rest as two chips at the bottom left, one click each into dnd5e's rest dialog (user, 2026-10-27, replacing the one rest chip with a tray); hit dice as a chip at the bottom right, "HD 12", which in edit mode carries a gear and opens dnd5e's hit dice window (user, 2026-10-27, replacing the hit dice bar). Exhaustion at 0 is hidden behind a small dot in the top left; resting on the dot (1.5 s, like tips) or clicking it shows the chip; above 0 the chip always shows (user, 2026-10-27). Chips anchor to the frame's corners, so they follow tall art.
@@ -160,7 +160,7 @@ One set of rules for every tab and both modes (user, 2026-10-27: "apply as unifo
 5. **Text buttons read from the left** (Foundry centres them); icon, then text.
 
 **Play and edit**
-6. **Same heights and flow in both modes** (user, 2026-10-27: "its ok if they move left, but its not ok for the heights and flow to change"). Columns may slide left to make room for edit mode's controls (a row's edit and delete); no row, card or bar changes height, and nothing below moves. Within that: a control takes the place of the mark it edits (the skill dot becomes the proficiency cycle, the ability stays its text and opens its choices), and a gear takes a column play mode leaves empty or quiet. Fields may show their edge; nothing reshapes. *check (row heights)*
+6. **Same heights and flow in both modes** (user, 2026-10-27: "its ok if they move left, but its not ok for the heights and flow to change"). Columns may slide left to make room for edit mode's controls (a row's edit and delete); no row, card or bar changes height, and nothing below moves. Within that: a control takes the place of the mark it edits (the skill dot becomes the proficiency cycle, the ability stays its text and opens its choices), and a gear takes a column play mode leaves empty or quiet. Fields may show their edge; nothing reshapes. Content edit mode adds at a column's end (the empty traits, shown so they can be set) may extend it. *check (row heights; every element both modes draw keeps its height and place)*
 
 **Colour, focus and attention** (WCAG 2.2; ADHD rules, §5)
 7. **Never colour alone** (WCAG 1.4.1): every tint has an icon, mark or word (§5.1).
@@ -174,6 +174,12 @@ One set of rules for every tab and both modes (user, 2026-10-27: "apply as unifo
 **Window**
 14. **No title band** (user, 2026-10-27): the window's controls float at the top right over the header, as dnd5e's sheet does; the name row leaves them room.
 15. **Round or square portrait,** the player's choice in edit mode, saved on the character (user, 2026-10-27).
+
+**Like elements alike** (user, 2026-10-27: "HP is different sized than the hp value itself", "the portrait buttons are … different size than the inspiration button")
+16. **Chips of one place match:** every chip on the portrait is the Inspiration chip's size (an icon-only chip square), chips side by side share a row with a gap, and "on" shows as solid against outline, never as a ring that enlarges a chip. *check*
+17. **One text size inside one control:** a label and the value it names share a size ("HP 87 / 87" all display). A row drawn as one button (a skill) is a table row: its columns keep their column's style. *check*
+18. **A button's words are body style, not capitals** (user, 2026-10-27: "we are mixing all caps in the spellbook buttons with regular text"): Columns, Passive, Con save, the Level pill, a row name's subtitle ("Life Domain", muted). Abbreviations (Str, Dex) and headings that fold (favorites groups) keep the label style. *check*
+19. **A gear is no larger than the words beside it:** 12px beside labels, the same gear on every label (AC included, centred with its word); alone in a chip, a chip icon's size. A gear in a line of text keeps its 24px target without making the line taller. *check*
 
 ### 5.1 Icons and colors on the sheet (one meaning each)
 
@@ -204,9 +210,10 @@ Check here before choosing a mark, and add new ones. Every tint has an icon, mar
 | "+N" in a small box | N more classes, in the class tray | The last class card's label line (user, 2026-10-27) |
 | Light green fill inside the HP bar | HP left, with the numbers written over it | The portrait card's band (user, 2026-10-27) |
 | Heart with a crack; heart with a plus; shield with a plus | Damage; heal; temporary HP | The HP tray, each with its word; Damage solid as the main action (user, 2026-10-27) |
-| Gear | Settings: opens one of dnd5e's settings windows | Edit mode only: beside Init, each ability, speed and HP; on the HD chip; on the AC shield's corner (user, 2026-10-27) |
-| Two opposed arrows; a ring when on | Show the token in place of the portrait | Edit mode, the portrait's top centre (dnd5e's own switch) |
-| Crop corners | Frame the portrait (pan and zoom) | Edit mode, beside the token switch; not for a token (user, 2026-10-27) |
+| Gear | Settings: opens one of dnd5e's settings windows, or a tray of settings | Edit mode only: beside AC, Init, each ability, speed, HP, skills and traits; on the HD chip; alone in a chip at the portrait's top centre (its options tray) (user, 2026-10-27) |
+| Two opposed arrows; solid when on, outline when off | Show the token in place of the portrait | Edit mode, the portrait's options tray (dnd5e's own switch) |
+| Circle; solid when on, outline when off | Round portrait | Edit mode, the portrait's options tray (user, 2026-10-27) |
+| Crop corners | Frame the portrait (pan and zoom) | Edit mode, the portrait's options tray; not for a token (user, 2026-10-27) |
 | Dashed edge on the portrait | Framing: drag the art | While framing (user, 2026-10-27) |
 | Radio dot: filled, ring | The main spellcasting ability; another | Edit mode, each casting card on the Spellbook (user, 2026-10-27) |
 | Down arrow | Level down | Edit mode, the level tray (user, 2026-10-27) |

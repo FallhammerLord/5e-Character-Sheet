@@ -36,11 +36,11 @@
    </button>
    {{/if}}
    {{#unless columnToggles.length}}{{#if hasColumns}}
-   <details class="fhcs-fold fhcs-columns fhcs-columns-space" aria-hidden="true" inert><summary class="fhcs-button fhcs-label">{{ text.columns }}</summary></details>
+   <details class="fhcs-fold fhcs-columns fhcs-columns-space" aria-hidden="true" inert><summary class="fhcs-button fhcs-body">{{ text.columns }}</summary></details>
    {{/if}}{{/unless}}
    {{#if columnToggles.length}}
    <details class="fhcs-fold fhcs-columns" data-fold-key="{{ list }}-columns">
-      <summary class="fhcs-button fhcs-label">{{ text.columns }}</summary>
+      <summary class="fhcs-button fhcs-body">{{ text.columns }}</summary>
       <div class="fhcs-tray fhcs-columns-tray">
          {{#each columnToggles}}
          <button type="button" class="fhcs-button fhcs-body fhcs-column-toggle" data-action="fhcsToggleColumn"
