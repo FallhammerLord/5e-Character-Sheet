@@ -264,6 +264,19 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    catch { problems.push(`portrait framing: ${JSON.stringify(got)}`); }
 }
 
+// Attributes in edit mode: each skill's ability marked, each trait's gear aimed at dnd5e's window (senses by config).
+{
+   const facts = { skills: [{ key: 'prc', label: 'Perception', abbr: 'Wis', total: 5, passive: 15, prof: 1, source: 1, ability: 'wis' }],
+      abilities: [{ key: 'str', abbr: 'STR' }, { key: 'wis', abbr: 'WIS' }],
+      traits: [{ key: 'senses', title: 'Senses', values: [] }, { key: 'languages', title: 'Languages', values: [] }],
+      favorites: [], resources: [], slots: {}, editing: true, passives: 'all', folded: [] };
+   const view = attributesView(facts, { format, localize });
+   const got = [view.editing, view.skills[0].abilities.filter((a) => a.selected).map((a) => a.key).join(),
+      view.traits.map((t) => `${t.key}:${t.config || `trait=${t.trait}`}`).join()];
+   try { deepStrictEqual(got, [true, 'wis', 'senses:senses,languages:trait=languages']); }
+   catch { problems.push(`attributes edit mode: ${JSON.stringify(got)}`); }
+}
+
 // The HP tray's preview: damage takes temp first and stops at 0; nothing typed asks for an amount.
 {
    const hp = { value: 20, temp: 5 };

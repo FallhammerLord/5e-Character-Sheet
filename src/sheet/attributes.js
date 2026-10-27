@@ -45,7 +45,13 @@ export function attributesView(facts, { format, localize })
          mark,
          markLabel: localize(`FHCS.Attributes.Prof.${mark}`),
          rollLabel: format('FHCS.Attributes.SkillLabel', { skill: s.label, mod, passive: s.passive,
-            prof: localize(`FHCS.Attributes.Prof.${mark}`) })
+            prof: localize(`FHCS.Attributes.Prof.${mark}`) }),
+         // Edit mode (SCOPE §4.9): dnd5e's proficiency cycle and the ability, as stored; a gear for the skill's window.
+         source: s.source ?? s.prof,
+         abilities: (facts.abilities ?? []).map((a) => ({ ...a, selected: a.key === s.ability })),
+         abilityLabel: format('FHCS.Attributes.SkillAbility', { skill: s.label }),
+         profLabel: format('FHCS.Attributes.SkillProf', { skill: s.label }),
+         configLabel: format('FHCS.Attributes.SkillConfig', { skill: s.label })
       };
    });
 
@@ -53,7 +59,12 @@ export function attributesView(facts, { format, localize })
    const traits = TRAIT_ORDER
       .map((key) => facts.traits.find((t) => t.key === key))
       .filter((t) => t && (t.values.length || facts.editing))
-      .map((t) => ({ key: t.key, title: t.title, text: t.values.length ? t.values.join(', ') : '—' }));
+      .map((t) => ({
+         key: t.key, title: t.title, text: t.values.length ? t.values.join(', ') : '—',
+         // Each trait's gear opens dnd5e's window for it; senses have their own (`data-config`), the rest go by trait.
+         config: t.key === 'senses' ? 'senses' : '', trait: t.key === 'senses' ? '' : t.key,
+         configLabel: format('FHCS.Attributes.TraitConfig', { trait: t.title })
+      }));
 
    const groups = new Map();
    for (const row of facts.favorites)
@@ -98,11 +109,13 @@ export function attributesView(facts, { format, localize })
       skills,
       traits,
       favorites,
+      editing: !!facts.editing,
       resources: facts.resources.map((r) => ({ ...r, label: format('FHCS.Attributes.ResourceLabel', r) })),
       showAllPassives: showAll,
       text: {
          skills: localize('FHCS.Attributes.Skills'),
          passive: localize('FHCS.Attributes.Passive'),
+         skillsConfig: localize('FHCS.Attributes.SkillsConfig'),
          passiveToggle: localize(showAll ? 'FHCS.Attributes.PassiveKey' : 'FHCS.Attributes.PassiveAll'),
          favorites: localize('FHCS.Attributes.Favorites'),
          noFavorites: localize('FHCS.Attributes.NoFavorites')

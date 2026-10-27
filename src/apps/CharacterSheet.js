@@ -37,7 +37,8 @@ const PART_OPTIONS = {
    spells: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/spell-row.hbs`, LIST_BAR] },
    features: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/feature-row.hbs`, LIST_BAR] },
    effects: { scrollable: ['.fhcs-items'], templates: [LIST_BAR] },
-   biography: { templates: [`${MODULE_PATH}/templates/sheet/bio-box.hbs`] }
+   biography: { templates: [`${MODULE_PATH}/templates/sheet/bio-box.hbs`] },
+   details: { templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`] }
 };
 
 /** Each list tab's column setting, by dnd5e's list name. */

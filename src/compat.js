@@ -147,7 +147,9 @@ export async function attributesFacts(sheet, context, { passives, folded, open =
       .map(([key, skill]) => ({
          key, label: game.i18n.localize(config.skills[key].label),
          abbr: config.abilities[skill.ability]?.abbreviation ?? skill.ability,
-         total: skill.total ?? skill.mod ?? 0, passive: skill.passive ?? '', prof: skill.value ?? skill.proficient ?? 0
+         total: skill.total ?? skill.mod ?? 0, passive: skill.passive ?? '', prof: skill.value ?? skill.proficient ?? 0,
+         // As stored, for edit mode's controls (effects may raise what's shown).
+         source: actor.system._source.skills?.[key]?.value ?? 0, ability: actor.system._source.skills?.[key]?.ability ?? skill.ability
       }))
       .sort((a, b) => a.label.localeCompare(b.label, game.i18n.lang));
 
@@ -207,7 +209,8 @@ export async function attributesFacts(sheet, context, { passives, folded, open =
       const slot = actor.system.spells?.[`spell${level}`];
       if (slot?.max) { slots[level] = { value: slot.value ?? 0, max: slot.max }; }
    }
-   return { skills, traits, favorites, resources, slots, editing: sheet.isEditMode, passives, folded };
+   const abilities = Object.entries(config.abilities ?? {}).map(([key, a]) => ({ key, abbr: a.abbreviation ?? key }));
+   return { skills, abilities, traits, favorites, resources, slots, editing: sheet.isEditMode, passives, folded };
 }
 
 /** dnd5e's summary of an expanded item (inventory.mjs `_onToggleExpand`), drawn again when the sheet re-renders. */

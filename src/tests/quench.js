@@ -389,6 +389,39 @@ export function registerQuenchTests(quench)
             await (before.flag ? actor.setFlag(MODULE_ID, 'portrait', before.flag) : actor.unsetFlag(MODULE_ID, 'portrait'));
          });
 
+         it('cycles a skill\'s proficiency, sets its ability and opens skill and trait windows in edit mode', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 8);
+            const skill = () => actor.system._source.skills.prc;
+            const before = { value: skill().value, ability: skill().ability };
+            if (!sheet.isEditMode)
+            {
+               await click('.fhcs-tabs [data-action="changeMode"]');
+               await until(() => sheet.isEditMode, 'the lock switches to edit mode');
+            }
+            await click('.fhcs-tabs [data-tab="details"]');
+            assert.notOk(sheet.element.querySelector('.fhcs-attributes [data-action="fhcsTogglePassives"]'), 'the passive toggle steps aside in edit mode');
+            // dnd5e's cycle steps none → full → expertise → half → none on a click.
+            await click('.fhcs-attributes [data-key="prc"] proficiency-cycle');
+            await until(() => skill().value !== before.value, () => `a click cycles Perception's proficiency; it holds ${skill().value}`);
+            await enter('.fhcs-attributes [name="system.skills.prc.ability"]', 'int');
+            await until(() => skill().ability === 'int', () => `Perception's ability saves; it holds ${skill().ability}`);
+            const { SkillToolConfig, LanguagesConfig } = globalThis.dnd5e.applications.actor;
+            const open = (Kind) => [...foundry.applications.instances.values()].find((app) => app instanceof Kind && app.document === actor);
+            for (const [selector, Kind, what] of [
+               ['.fhcs-attributes [data-key="prc"] [data-action="showConfiguration"][data-config="skill"]', SkillToolConfig, 'the skill gear opens dnd5e\'s skill window'],
+               ['.fhcs-attributes [data-action="showConfiguration"][data-trait="languages"]', LanguagesConfig, 'the Languages gear opens dnd5e\'s languages window']
+            ])
+            {
+               await click(selector);
+               await until(() => open(Kind)?.rendered, what);
+               await open(Kind).close();
+            }
+            await actor.update({ 'system.skills.prc.value': before.value, 'system.skills.prc.ability': before.ability });
+            await click('.fhcs-tabs [data-action="changeMode"]');
+            await until(() => !sheet.isEditMode, 'the lock switches back to play mode');
+         });
+
          it('shows two class cards and folds further classes into the class tray', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 4);

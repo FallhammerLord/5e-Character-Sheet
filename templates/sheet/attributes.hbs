@@ -6,14 +6,35 @@
       <div class="fhcs-panel">
          <div class="fhcs-panel-head">
             <span class="fhcs-label">{{ text.skills }}</span>
+            {{#if editing}}
+            <button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="skills"
+                    aria-label="{{ text.skillsConfig }}" data-fhcs-tip="{{ text.skillsConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>
+            {{else}}
             <button type="button" class="fhcs-button fhcs-label fhcs-passive-toggle" data-action="fhcsTogglePassives"
                     aria-pressed="{{#if showAllPassives}}true{{else}}false{{/if}}" aria-label="{{ text.passiveToggle }}"
                     data-fhcs-tip="{{ text.passiveToggle }}">{{ text.passive }}</button>
+            {{/if}}
          </div>
          <ul class="fhcs-skills">
             {{#each skills}}
             {{!-- dnd5e's roll action reads the skill from the nearest data-key. --}}
             <li data-key="{{ key }}">
+               {{#if ../editing}}
+               {{!-- Edit mode (SCOPE §4.9): dnd5e's proficiency cycle (click cycles none, half, full, expertise), the
+                     ability, the name still rolls, and a gear for the skill's window. The passive steps aside. --}}
+               <div class="fhcs-skill fhcs-skill-edit">
+                  <proficiency-cycle class="fhcs-prof-cycle" type="skill" name="system.skills.{{ key }}.value" value="{{ source }}"
+                                     aria-label="{{ profLabel }}" data-fhcs-tip="{{ profLabel }}"></proficiency-cycle>
+                  <select class="fhcs-input fhcs-label fhcs-skill-ability" name="system.skills.{{ key }}.ability" aria-label="{{ abilityLabel }}">
+                     {{#each abilities}}<option value="{{ key }}"{{#if selected}} selected{{/if}}>{{ abbr }}</option>{{/each}}
+                  </select>
+                  <button type="button" class="fhcs-skill-roll fhcs-body {{ @root.rollableClass }}" data-action="roll" data-type="skill"
+                          aria-label="{{ rollLabel }}"><span class="fhcs-skill-name">{{ label }}</span></button>
+                  <span class="fhcs-body fhcs-skill-mod">{{ mod }}</span>
+                  <button type="button" class="fhcs-toggle fhcs-gear-button fhcs-muted" data-action="showConfiguration" data-config="skill"
+                          aria-label="{{ configLabel }}" data-fhcs-tip="{{ configLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>
+               </div>
+               {{else}}
                <button type="button" class="fhcs-skill {{ @root.rollableClass }}" data-action="roll" data-type="skill"
                        aria-label="{{ rollLabel }}">
                   <span class="fhcs-prof-mark fhcs-prof-{{ mark }}" aria-hidden="true"></span>
@@ -22,6 +43,7 @@
                   <span class="fhcs-body fhcs-skill-mod">{{ mod }}</span>
                   <span class="fhcs-label fhcs-muted fhcs-skill-passive">{{ passive }}</span>
                </button>
+               {{/if}}
             </li>
             {{/each}}
          </ul>
@@ -31,7 +53,8 @@
       <dl class="fhcs-traits">
          {{#each traits}}
          <div class="fhcs-trait">
-            <dt class="fhcs-label fhcs-muted">{{ title }}</dt>
+            <dt class="fhcs-label fhcs-muted fhcs-trait-head">{{ title }}{{#if ../editing}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration"
+                    {{#if config}}data-config="{{ config }}"{{else}}data-trait="{{ trait }}"{{/if}} aria-label="{{ configLabel }}" data-fhcs-tip="{{ configLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</dt>
             <dd class="fhcs-body">{{ text }}</dd>
          </div>
          {{/each}}

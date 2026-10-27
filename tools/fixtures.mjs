@@ -199,7 +199,7 @@ const SKILLS = [['acr', 'Acrobatics', 'Dex', 0, 10, 0], ['ani', 'Animal Handling
    ['med', 'Medicine', 'Wis', 9, 19, 1], ['nat', 'Nature', 'Int', -1, 9, 0], ['prc', 'Perception', 'Wis', 13, 23, 2],
    ['prf', 'Performance', 'Cha', -1, 9, 0], ['per', 'Persuasion', 'Cha', -1, 9, 0], ['rel', 'Religion', 'Int', 3, 13, 1],
    ['slt', 'Sleight of Hand', 'Dex', 0, 10, 0], ['ste', 'Stealth', 'Dex', 0, 10, 0], ['sur', 'Survival', 'Wis', 5, 15, 0]]
-   .map(([key, label, abbr, total, passive, prof]) => ({ key, label, abbr, total, passive, prof }));
+   .map(([key, label, abbr, total, passive, prof]) => ({ key, label, abbr, total, passive, prof, source: prof, ability: abbr.toLowerCase() }));
 const ICON = (fill) => art(48, 48, `<rect width="48" height="48" rx="6" fill="${fill}"/>`);
 const fav = (title, group, over = {}) => ({
    id: `.Item.${title}`, type: 'item', title, subtitle: '', img: ICON('#6b5a3a'), uses: null, quantity: 0,
@@ -207,6 +207,7 @@ const fav = (title, group, over = {}) => ({
 });
 const attributesFacts = (over = {}) => ({
    skills: SKILLS,
+   abilities: ['str', 'dex', 'con', 'int', 'wis', 'cha'].map((key) => ({ key, abbr: key.toUpperCase() })),
    traits: [
       { key: 'senses', title: 'Senses', values: ['Darkvision 60 ft'] },
       { key: 'languages', title: 'Languages', values: ['Common', 'Draconic', 'Giant', 'Halfling'] },
