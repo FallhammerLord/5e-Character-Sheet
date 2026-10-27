@@ -164,10 +164,8 @@ else
    // dnd5e adds its attunement counter into markup ours lacks; without our override every render throws.
    if (!Object.hasOwn(sheet.prototype, '_renderAttunement')) { problems.push('dnd5e\'s attunement counter is not replaced'); }
 }
-for (const name of ['dnd5e.rollDeathSaveV2', 'preUpdateActor'])
-{
-   if (typeof hooks[name] !== 'function') { problems.push(`death saves are not hooked to ${name}`); }
-}
+// Three successes stay shown; dnd5e clears death saves itself on healing (preUpdateHP), so only the roll is hooked.
+if (typeof hooks['dnd5e.rollDeathSaveV2'] !== 'function') { problems.push('death saves are not hooked to dnd5e.rollDeathSaveV2'); }
 if (typeof hooks['dnd5e.advancementManagerComplete'] !== 'function') { problems.push('level order is not hooked to dnd5e.advancementManagerComplete'); }
 
 // The redraw rule (CLAUDE.md): in the sheet's Quench batch, every click or input waits for the sheet to settle first.

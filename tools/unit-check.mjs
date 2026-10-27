@@ -8,7 +8,7 @@ import { cardParts, damageBand, saveRow } from '../src/chat/card.js';
 import { countingDie, d20Row, modeForSides } from '../src/chat/d20.js';
 import { diceMath } from '../src/chat/math.js';
 import { attributesView } from '../src/sheet/attributes.js';
-import { healUpdates, keepStable } from '../src/sheet/death.js';
+import { keepStable } from '../src/sheet/death.js';
 import { columnChoice, inventoryView } from '../src/sheet/inventory.js';
 import { canCast, prepState, spellbookView, spellColumnChoice, spellKind } from '../src/sheet/spellbook.js';
 import { featureColumnChoice, featuresView, groupingOf } from '../src/sheet/features.js';
@@ -318,20 +318,12 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    catch { problems.push(`death saves at 0 HP: ${JSON.stringify(marks)}`); }
 }
 
-// Death saves: the third success stays; healing above 0 clears both rows.
+// Death saves: the third success stays (healing above 0 clearing both rows is dnd5e's own, preUpdateHP).
 {
    const details = { outcome: 'stable', updates: { 'system.attributes.death.success': 0, 'system.attributes.death.failure': 0 } };
    keepStable([], details);
    try { deepStrictEqual(details.updates, { 'system.attributes.death.success': 3 }); }
    catch { problems.push(`third success: ${JSON.stringify(details.updates)}`); }
-   const cleared = { 'system.attributes.death.success': 0, 'system.attributes.death.failure': 0 };
-   const HEAL_CASES = [[0, 5, { success: 3, failure: 1 }, cleared], [0, 0, { success: 3, failure: 0 }, null],
-      [4, 9, { success: 1, failure: 0 }, null], [0, 5, { success: 0, failure: 0 }, null]];
-   for (const [from, to, death, expected] of HEAL_CASES)
-   {
-      try { deepStrictEqual(healUpdates(from, to, death), expected); }
-      catch { problems.push(`heal ${from}→${to}: ${JSON.stringify(healUpdates(from, to, death))}`); }
-   }
 }
 
 // Inventory: columns default to the user's choice (weight off), a saved choice wins, and a new column still shows.
