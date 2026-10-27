@@ -1039,7 +1039,9 @@
 }
 
 .fhcs-sheet .fhcs-portrait-art.fhcs-fit-contain { object-fit: contain; object-position: top; }
-.fhcs-sheet .fhcs-portrait-stage { position: relative; flex: 1; min-height: 0; }
+/* The stage lets clicks through to the art (dnd5e's showArtwork, or editImage in edit mode); only its chips take them. */
+.fhcs-sheet .fhcs-portrait-stage { position: relative; flex: 1; min-height: 0; pointer-events: none; }
+.fhcs-sheet .fhcs-portrait-stage > * { pointer-events: auto; }
 
 .fhcs-sheet .fhcs-portrait-band
 {

@@ -109,6 +109,28 @@ function findProblems()
          issues.push(`round element is ${Math.round(r.width)}×${Math.round(r.height)}: ${el.tagName.toLowerCase()}.${[...el.classList].join('.')}`);
       }
    }
+   // Every control takes its own clicks: at its centre the topmost element is the control or inside it. A layer drawn
+   // over the portrait once swallowed its clicks (user, 2026-10-27). An open tray may cover what's under it.
+   for (const el of app.querySelectorAll('.window-content [data-action]'))
+   {
+      const cs = getComputedStyle(el);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || el.closest('[hidden], details:not([open]) > :not(summary)')) { continue; }
+      const r = el.getBoundingClientRect();
+      if (!r.width || !r.height) { continue; }
+      // A control scrolled or clipped out of sight (outside an ancestor that clips) is not covered, only hidden.
+      const x = r.left + r.width / 2, y = r.top + r.height / 2;
+      let clipped = false;
+      for (let n = el.parentElement; n && n !== app && !clipped; n = n.parentElement)
+      {
+         if (getComputedStyle(n).overflow === 'visible') { continue; }
+         const v = n.getBoundingClientRect();
+         clipped = y < v.top || y > v.bottom || x < v.left || x > v.right;
+      }
+      if (clipped) { continue; }
+      const hit = document.elementFromPoint(x, y);
+      if (!hit || el.contains(hit) || hit.closest('.fhcs-tray')) { continue; }
+      issues.push(`covered at its centre by ${hit.tagName.toLowerCase()}.${[...hit.classList].join('.')}: ${el.tagName.toLowerCase()}.${[...el.classList].join('.')} [${el.dataset.action}]`);
+   }
    // Contrast: each piece of text against what it is drawn on (a die's number against the die's fill).
    const parse = (value) =>
    {
