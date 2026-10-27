@@ -12,7 +12,9 @@ The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't reru
 
 In code, not yet seen in Foundry:
 
-- **Phase 6 slice 1, the portrait card** (2026-10-27; offline checks and layout screenshots pass). Run Quench "core": new tests "keeps Temp and Max ± as fields…" and "shows two class cards and folds further classes into the class tray". In play: round token, square and tall art in the 234px frame; Temp and Max ± typed; the exhaustion dot (rest on it 1.5 s); Short and Long rest chips; a character with three or more classes.
+- **Special Traits tab** (2026-10-27): dnd5e's form in our look; checkboxes 20px (Foundry's `--checkbox-size`; unverified that Foundry's own tick follows it). Look at it in edit mode.
+- **Portrait clicks** (2026-10-27): the chip layer had swallowed them; the art opens again (play: dnd5e's artwork; edit: the file picker).
+- **Phase 6 slice 1, the portrait card** (2026-10-27; Quench passes, user 2026-10-27; offline checks and layout screenshots pass). Run Quench "core": new tests "keeps Temp and Max ± as fields…" and "shows two class cards and folds further classes into the class tray". In play: round token, square and tall art in the 234px frame; Temp and Max ± typed; the exhaustion dot (rest on it 1.5 s); Short and Long rest chips; a character with three or more classes.
 
 - **Chat log scrolling** (2026-10-24, third try). New cards stopped short by the Apply section, which dnd5e fills in after the card is placed. Folded rolls post with `scroll: false`; the player's own new card posts with `scroll: true`, and while following it (8 s, until the player scrolls, clicks or types in the log) a `ResizeObserver` scrolls again on every size change. Apply starts folded.
 - **Inventory sort button** lights only when a filter or search is on (dnd5e marks it active always). The user's screenshots (2026-10-27) show an orange ring on it on every tab with nothing on: Foundry's own `.active` style, which our rule doesn't clear. Fix in the styling slice.

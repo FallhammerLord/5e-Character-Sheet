@@ -98,6 +98,7 @@
 
 /* Body: everything read as text. */
 .fhcs-sheet .fhcs-body,
+.fhcs-sheet .tab[data-tab="specialTraits"] :is(.form-group > label, .hint, input, select),
 .fhcs-chat .fhcs-card,
 .fhcs-chat :is(.fhcs-band-text, .fhcs-band-prompt, .fhcs-band-words, .fhcs-band-parts, .fhcs-band-math, .fhcs-band-note,
    .fhcs-button, .fhcs-bonus-input, .fhcs-row-who, .fhcs-row-verdict, .fhcs-card-description, .fhcs-card-flavor,
@@ -112,6 +113,7 @@
 
 /* Label: band headings, panel titles, the actor line, tags, the badge on a die; on the sheet, field names and chips. */
 .fhcs-sheet .fhcs-label,
+.fhcs-sheet .tab[data-tab="specialTraits"] legend,
 .fhcs-chat :is(.fhcs-band-heading, .fhcs-card-line, .fhcs-card-details > summary, .fhcs-card-tags, .fhcs-slot-badge)
 {
    font-size: var(--fhcs-label-size);
@@ -2568,3 +2570,76 @@
 .fhcs-sheet .fhcs-bio-story prose-mirror.active { min-height: 360px; }
 .fhcs-sheet .fhcs-bio-story prose-mirror :is(.editor-content, .ProseMirror) { flex: 1; min-height: 120px; }
 .fhcs-sheet .fhcs-bio-story prose-mirror:is([open], .active) :is(.editor-content, .ProseMirror) { min-height: 300px; cursor: text; }
+
+/* ---------- Special Traits (edit mode only): dnd5e's form as Foundry draws it, in our look ---------- */
+
+/* Each setting: its name and control on one line, the hint under them; Foundry would stretch every control across
+   the row and draw a checkbox as a bar (user's screenshot, 2026-10-27). */
+.fhcs-sheet .tab[data-tab="specialTraits"].active
+{
+   display: flex;
+   flex-direction: column;
+   gap: var(--fhcs-s2);
+   padding: var(--fhcs-s2);
+}
+
+.fhcs-sheet .tab[data-tab="specialTraits"] fieldset
+{
+   display: flex;
+   flex-direction: column;
+   min-width: 0;
+   margin: 0;
+   padding: var(--fhcs-s1) var(--fhcs-s2) var(--fhcs-s2);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-surface);
+}
+
+.fhcs-sheet .tab[data-tab="specialTraits"] legend { padding: 0 var(--fhcs-s1); }
+
+.fhcs-sheet .tab[data-tab="specialTraits"] .form-group
+{
+   display: grid;
+   grid-template-columns: minmax(0, 1fr) auto;
+   align-items: center;
+   gap: 0 var(--fhcs-s2);
+   margin: 0;
+   padding: var(--fhcs-s1) 0;
+   border-bottom: 1px solid var(--fhcs-line-soft);
+}
+
+.fhcs-sheet .tab[data-tab="specialTraits"] .form-group:last-child { border-bottom: 0; }
+.fhcs-sheet .tab[data-tab="specialTraits"] .form-group > label { min-width: 0; margin: 0; }
+
+.fhcs-sheet .tab[data-tab="specialTraits"] .form-fields
+{
+   display: flex;
+   flex: none;
+   align-items: center;
+   justify-content: flex-end;
+   gap: var(--fhcs-s1);
+   min-width: 0;
+}
+
+.fhcs-sheet .tab[data-tab="specialTraits"] .form-fields > * { flex: none; }
+.fhcs-sheet .tab[data-tab="specialTraits"] .hint { grid-column: 1 / -1; margin: 0; color: var(--fhcs-muted); }
+
+.fhcs-sheet .tab[data-tab="specialTraits"] input[type="checkbox"]
+{
+   --checkbox-size: 20px;
+   width: 20px;
+   height: 20px;
+   margin: 2px;
+}
+
+.fhcs-sheet .tab[data-tab="specialTraits"] :is(input:not([type="checkbox"]), select)
+{
+   width: 9rem;
+   min-height: var(--fhcs-control);
+   margin: 0;
+   padding: 0 var(--fhcs-s1);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-fill);
+   color: inherit;
+}

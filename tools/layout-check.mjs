@@ -51,6 +51,8 @@ const page = (html) => `<!doctype html><html><head><meta charset="utf-8">
    <style>body{margin:0;background:#444;font-family:sans-serif}*{box-sizing:border-box}button,input,select{font:inherit}
    /* Foundry core's control defaults, roughly (v13/v14 foundry.css): ours must override them. */
    button{min-height:var(--button-size,2rem);padding:0 .5rem;line-height:1.5;justify-content:center}input[type=text]{height:var(--input-height,2rem)}
+   /* Foundry's form groups stretch each control across the row (the user's Special Traits screenshot, 2026-10-27). */
+   .form-group{display:flex;flex-wrap:wrap;align-items:center;gap:4px}.form-group>label{flex:2}.form-fields{display:flex;flex:3;gap:4px}.form-fields>*{flex:1}.form-group>.hint{flex:0 0 100%}
    ${css}</style></head><body>${html}</body></html>`;
 
 /** Runs in the page: lists everything that overflows, and text fields inside width containers. */
@@ -97,6 +99,12 @@ function findProblems()
       }
       // Short fixed words may never be cut short, ellipsis or not: "Exhaus…" passed once (2026-10-26).
       if (clipsOnPurpose && wider > 1 && el.matches(WHOLE)) { issues.push(`cut short by ${wider}px: ${label}`); }
+   }
+   // A checkbox stays square: Foundry's form groups stretched one into a bar across the row (user, 2026-10-27).
+   for (const el of app.querySelectorAll('.window-content input[type=checkbox]'))
+   {
+      const r = el.getBoundingClientRect();
+      if (r.width && Math.abs(r.width - r.height) > 1) { issues.push(`checkbox is ${Math.round(r.width)}×${Math.round(r.height)}: ${el.name}`); }
    }
    // A round control stays round: Foundry's button sizes once made our pips oval (user, 2026-10-24).
    for (const el of app.querySelectorAll('.window-content :is(button, span, div)'))
@@ -251,8 +259,9 @@ let checked = 0;
 for (const c of CASES)
 {
    // `open` lists folded panels to draw open, by their data-fold-key.
+   // A case gives a template and its context, or `html`: markup Foundry draws for dnd5e (its form helpers aren't here).
    const body = (c.open ?? []).reduce((html, key) => html.replace(`data-fold-key="${key}"`, `data-fold-key="${key}" open`),
-      template(c.template)(c.context));
+      c.html ?? template(c.template)(c.context));
    const kind = c.frame ?? 'sheet';
    for (const theme of c.theme ? [c.theme] : Object.keys(THEMES))
    {

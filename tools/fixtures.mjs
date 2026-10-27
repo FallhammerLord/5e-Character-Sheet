@@ -168,6 +168,24 @@ const FOUR_CLASSES = (over = {}) => originFacts({
    ...over
 });
 
+/**
+ * dnd5e's Special Traits tab as Foundry draws it (creature-special-traits.hbs: fieldsets of `formField` groups, each a
+ * label, the control in .form-fields and a hint), for the layout check: our styles must hold it without dnd5e's.
+ */
+const field = (label, control, hint) => `<div class="form-group"><label>${label}</label><div class="form-fields">${control}</div>${hint ? `<p class="hint">${hint}</p>` : ''}</div>`;
+const SPECIAL_TRAITS = `<section class="tab active" data-tab="specialTraits" data-group="primary">
+   <fieldset class="card"><legend>Class</legend>
+      ${field('Original Class', '<select name="system.details.originalClass"><option>Ranger</option><option>Rogue</option></select>', 'First class taken by character used to determine certain class traits when multiclassing.')}
+   </fieldset>
+   <fieldset class="card"><legend>Feats</legend>
+      ${field('Diamond Soul', '<input type="checkbox" name="flags.dnd5e.diamondSoul">', 'Gain proficiency to all saving throws.')}
+      ${field('Alert Feat', '<input type="checkbox" name="flags.dnd5e.initiativeAlert" checked>', 'Proficient in Initiative rolls.')}
+      ${field('Jack of All Trades', '<input type="checkbox" name="flags.dnd5e.jackOfAllTrades">', 'Half-Proficiency to Ability Checks in which you are not already Proficient.')}
+      ${field('Weapon Critical Hit Threshold', '<input type="number" name="flags.dnd5e.weaponCriticalThreshold" placeholder="20">', 'An integer for the minimum natural roll which is a critical hit.')}
+      ${field('Melee Critical Damage Dice', '<input type="text" name="flags.dnd5e.meleeCriticalDamageDice" value="1">', '')}
+   </fieldset>
+</section>`;
+
 /** dnd5e's tabs as `_getTabs` gives them, dnd5e's order and labels. */
 const DND5E_TABS = Object.fromEntries(['details', 'inventory', 'features', 'spells', 'effects', 'biography', 'bastion', 'specialTraits']
    .map((id, i) => [id, { id, label: ['Details', 'Inventory', 'Features', 'Spells', 'Effects', 'Biography', 'Bastion', 'Special Traits'][i], active: id === 'details' }]));
@@ -520,6 +538,7 @@ export const CASES = [
    { name: 'attributes-empty', template: 'sheet/attributes', context: attributes({ favorites: [], resources: [], traits: [] }) },
    { name: 'tabs', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }) },
    { name: 'tabs-editing', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: true }) },
+   { name: 'special-traits', html: SPECIAL_TRAITS },
    { name: 'header', template: 'sheet/header', context: header() },
    { name: 'header-tall-art', template: 'sheet/header', context: header({ portrait: { src: TALL, isVideo: false } }) },
    { name: 'header-score-first', template: 'sheet/header', context: header({ emphasis: 'score', inspiration: true, exhaustion: { value: 2, max: 6 } }) },
