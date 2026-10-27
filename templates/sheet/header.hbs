@@ -3,18 +3,22 @@
    <div class="fhcs-header-side">
       {{!-- The portrait card (SCOPE §4.1, user, 2026-10-27): one frame height for every art shape; the art fills it, and
             HP, Temp and Max ± sit on a band over its foot. The chips sit on the stage above the band. --}}
-      <div class="fhcs-portrait{{#if death}} fhcs-dying{{/if}}">
-         {{#with portrait}}
-         {{#if isVideo}}
-         <video class="fhcs-portrait-art fhcs-fit-{{ fit }}" src="{{ src }}" autoplay muted disablepictureinpicture loop playsinline
-                {{#if @root.editable}}data-action="{{ action }}"{{else}}data-action="showArtwork"{{/if}}
-                {{#if @root.editable}}{{#if path}}data-edit="{{ path }}" data-type="{{ type }}"{{/if}}{{/if}}></video>
-         {{else}}
-         <img class="fhcs-portrait-art fhcs-fit-{{ fit }}" src="{{ src }}" alt="{{ ../name }}"
-              {{#if @root.editable}}data-action="{{ action }}"{{else}}data-action="showArtwork"{{/if}}
-              {{#if @root.editable}}{{#if path}}data-edit="{{ path }}" data-type="{{ type }}"{{/if}}{{/if}}>
-         {{/if}}
-         {{/with}}
+      <div class="fhcs-portrait{{#if death}} fhcs-dying{{/if}}{{#if portrait.framing}} fhcs-framing{{/if}}"
+           data-src="{{ portrait.src }}" data-fx="{{ portrait.frame.x }}" data-fy="{{ portrait.frame.y }}" data-zoom="{{ portrait.frame.zoom }}">
+         {{!-- The art, at the character's framing (focus point and zoom; user, 2026-10-27), clipped to the frame. --}}
+         <div class="fhcs-portrait-clip" style="{{ portrait.frameStyle }}">
+            {{#with portrait}}
+            {{#if isVideo}}
+            <video class="fhcs-portrait-art fhcs-fit-{{ fit }}" src="{{ src }}" autoplay muted disablepictureinpicture loop playsinline
+                   {{#if @root.editable}}data-action="{{ action }}"{{else}}data-action="showArtwork"{{/if}}
+                   {{#if @root.editable}}{{#if path}}data-edit="{{ path }}" data-type="{{ type }}"{{/if}}{{/if}}></video>
+            {{else}}
+            <img class="fhcs-portrait-art fhcs-fit-{{ fit }}" src="{{ src }}" alt="{{ ../name }}"
+                 {{#if @root.editable}}data-action="{{ action }}"{{else}}data-action="showArtwork"{{/if}}
+                 {{#if @root.editable}}{{#if path}}data-edit="{{ path }}" data-type="{{ type }}"{{/if}}{{/if}}>
+            {{/if}}
+            {{/with}}
+         </div>
 
          <div class="fhcs-portrait-stage">
             {{!-- Corner chips. At exhaustion 0 the chip hides behind a dot until hovered (user, 2026-10-27). --}}
@@ -66,10 +70,27 @@
 
             {{#if @root.editable}}
             {{!-- Edit mode: show the token instead of the portrait (dnd5e's own switch, a flag on the actor). --}}
-            <label class="fhcs-chip fhcs-corner-tc{{#if portrait.token}} fhcs-on{{/if}}" data-fhcs-tip="{{ text.tokenSwitch }}">
+            <span class="fhcs-portrait-edit">
+            <label class="fhcs-chip{{#if portrait.token}} fhcs-on{{/if}}" data-fhcs-tip="{{ text.tokenSwitch }}">
                <input type="checkbox" class="fhcs-sr-only" name="flags.dnd5e.showTokenPortrait" {{#if portrait.token}}checked{{/if}} aria-label="{{ text.tokenSwitch }}">
                <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>
             </label>
+            {{#if portrait.canFrame}}
+            <button type="button" class="fhcs-chip" data-action="fhcsFrame" aria-label="{{ text.frame }}" data-fhcs-tip="{{ text.frame }}">
+               <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2v14a2 2 0 0 0 2 2h14M18 22V8a2 2 0 0 0-2-2H2"/></svg>
+            </button>
+            {{/if}}
+            </span>
+            {{#if portrait.canFrame}}
+            {{!-- Framing: drag the art, zoom on the strip; arrows pan, + and − zoom, Enter is Done, Escape cancels. --}}
+            <div class="fhcs-framing-zoom">
+               <button type="button" class="fhcs-chip" data-fhcs-zoom="-1" aria-label="{{ text.zoomOut }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+               <input type="range" min="100" max="300" step="10" value="100" aria-label="{{ text.zoom }}" data-fhcs-zoom-range>
+               <button type="button" class="fhcs-chip" data-fhcs-zoom="1" aria-label="{{ text.zoomIn }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+            </div>
+            <button type="button" class="fhcs-button fhcs-body fhcs-framing-reset" data-fhcs-frame-reset>{{ text.frameReset }}</button>
+            <button type="button" class="fhcs-button fhcs-body fhcs-framing-done" data-fhcs-frame-done>{{ text.frameDone }}</button>
+            {{/if}}
             {{/if}}
 
             {{#if death}}

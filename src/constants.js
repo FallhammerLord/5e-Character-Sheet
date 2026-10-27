@@ -14,3 +14,6 @@ export const SYSTEM_ACTIONS = [
    'deleteFavorite', 'deleteOccupant', 'findItem', 'setSpellcastingAbility', 'showDocument', 'deleteDocument', 'toggleDeathTray', 'toggleInspiration',
    'useFacility', 'useFavorite'
 ];
+
+/** The actor flag holding the portrait's framing (user, 2026-10-27): { src, x, y, zoom }, x and y in percent. */
+export const PORTRAIT_FLAG = 'portrait';

@@ -6,6 +6,7 @@
 import { countingDie, MAX_PER_SIDE, modeForSides } from './chat/d20.js';
 import { diceMath } from './chat/math.js';
 import { canCast, spellKind } from './sheet/spellbook.js';
+import { PORTRAIT_FLAG } from './constants.js';
 
 /** dnd5e's own character sheet, which ours extends so every mechanic keeps working. Set by dnd5e before init. */
 export function systemCharacterSheet()
@@ -54,6 +55,12 @@ const LEVEL_ORDER_FLAG = 'levelOrder';
  * Plain facts for the sheet header (src/sheet/header.js), from dnd5e's prepared data and the sheet's own helpers
  * (`_preparePortrait`, `_prepareAbilities`; character-sheet.mjs:478, base-actor-sheet.mjs:445, 502).
  */
+/** Saves the portrait's framing, with the image it belongs to (user, 2026-10-27). */
+export function savePortraitFrame(actor, moduleId, src, frame)
+{
+   return actor.setFlag(moduleId, PORTRAIT_FLAG, { src, x: frame.x, y: frame.y, zoom: frame.zoom });
+}
+
 /**
  * The HP tray's three changes, through dnd5e's own functions (actor.mjs:785, :1061): damage takes temp first and stops
  * at 0, and its hooks run (concentration saves); healing is negative damage, capped at the max; temp HP is set only
@@ -85,6 +92,7 @@ export async function headerFacts(sheet, context, moduleId, emphasis)
       name: actor.name,
       nameSource: actor._source?.name ?? actor.name,
       portrait: await sheet._preparePortrait(context),
+      frame: actor.getFlag(moduleId, PORTRAIT_FLAG) ?? null,
       editable: sheet.isEditable,
       classes,
       levelOrder: actor.getFlag(moduleId, LEVEL_ORDER_FLAG) ?? [],

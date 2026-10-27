@@ -559,6 +559,9 @@ export const CASES = [
       name: 'header-editing-multiclass', template: 'sheet/header', open: ['level-up'],
       context: { ...header({ ...MULTICLASS, leveling: 'xp', originCards: originFacts({ ...MULTICLASS.originCards, editing: true, xp: { value: 6500, max: 14000 } }) }), editable: true }
    },
+   // Framing (user, 2026-10-27): positioning in edit mode; a framed painting in play (zoom 2, focus low).
+   { name: 'header-framing', template: 'sheet/header', context: { ...header({ portrait: { src: TALL, isVideo: false, framing: true } }), editable: true } },
+   { name: 'header-framed', template: 'sheet/header', context: header({ portrait: { src: TALL, isVideo: false }, frame: { src: TALL, x: 50, y: 60, zoom: 2 } }) },
    // The HP tray open from the bar, Aid on (user, 2026-10-27); and a viewer's bar, which opens nothing.
    { name: 'header-hp-tray', template: 'sheet/header', open: ['hp'], context: header({ hp: { value: 82, max: 92, temp: 5, tempmax: 5 } }) },
    // Four classes: two cards, "+2" opens the class tray (user, 2026-10-27).

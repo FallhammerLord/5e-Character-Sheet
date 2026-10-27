@@ -1026,6 +1026,16 @@
    background: var(--fhcs-fill);
 }
 
+.fhcs-sheet .fhcs-portrait-clip
+{
+   position: absolute;
+   inset: 0;
+   overflow: hidden;
+   border-radius: var(--fhcs-radius);
+}
+
+/* The art at the character's framing (user, 2026-10-27): the focus point picks the part shown, and the zoom grows the
+   art around that same point, so the point stays put. */
 .fhcs-sheet .fhcs-portrait-art
 {
    position: absolute;
@@ -1034,13 +1044,52 @@
    width: 100%;
    height: 100%;
    border: 0;
-   border-radius: var(--fhcs-radius);
    object-fit: cover;
-   object-position: 50% 0%;
+   object-position: var(--fhcs-fx, 50%) var(--fhcs-fy, 0%);
+   transform: scale(var(--fhcs-zoom, 1));
+   transform-origin: var(--fhcs-fx, 50%) var(--fhcs-fy, 0%);
    cursor: pointer;
 }
 
-.fhcs-sheet .fhcs-portrait-art.fhcs-fit-contain { object-fit: contain; object-position: top; }
+.fhcs-sheet .fhcs-portrait-art.fhcs-fit-contain { object-fit: contain; object-position: top; transform: none; }
+
+/* Framing: the art moves under the pointer; the other chips step aside for the framing tools. */
+/* The dashed edge is a layer over the art: the zoomed art would cover an outline. */
+.fhcs-sheet .fhcs-framing .fhcs-portrait-clip::after
+{
+   content: '';
+   position: absolute;
+   inset: 0;
+   border: 2px dashed var(--fhcs-die-ink);
+   border-radius: var(--fhcs-radius);
+   pointer-events: none;
+}
+.fhcs-sheet .fhcs-framing .fhcs-portrait-art { cursor: move; touch-action: none; }
+/* `.fhcs-portrait` in these selectors outranks the general button rule further on. */
+.fhcs-sheet .fhcs-portrait :is(.fhcs-framing-zoom, .fhcs-framing-reset, .fhcs-framing-done) { display: none; }
+.fhcs-sheet .fhcs-framing .fhcs-portrait-stage > :not(.fhcs-framing-zoom, .fhcs-framing-reset, .fhcs-framing-done) { display: none; }
+.fhcs-sheet .fhcs-portrait.fhcs-framing :is(.fhcs-framing-reset, .fhcs-framing-done) { display: inline-flex; width: auto; }
+
+.fhcs-sheet .fhcs-portrait.fhcs-framing .fhcs-framing-zoom
+{
+   position: absolute;
+   top: var(--fhcs-s1);
+   right: var(--fhcs-s1);
+   left: var(--fhcs-s1);
+   display: flex;
+   align-items: center;
+   gap: var(--fhcs-s1);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-die-ink);
+   color: var(--fhcs-die-on-ink);
+}
+
+.fhcs-sheet .fhcs-framing-zoom .fhcs-chip { flex: none; border-color: transparent; background: transparent; color: inherit; }
+.fhcs-sheet .fhcs-framing-zoom input[type="range"] { flex: 1; min-width: 0; margin: 0; accent-color: var(--fhcs-die-on-ink); }
+
+.fhcs-sheet :is(.fhcs-framing-reset, .fhcs-framing-done) { position: absolute; bottom: var(--fhcs-s1); width: auto; }
+.fhcs-sheet .fhcs-portrait .fhcs-framing-reset { left: var(--fhcs-s1); background: var(--fhcs-surface); }
+.fhcs-sheet .fhcs-portrait .fhcs-framing-done { right: var(--fhcs-s1); border-color: var(--fhcs-die-ink); background: var(--fhcs-die-ink); color: var(--fhcs-die-on-ink); }
 /* The stage lets clicks through to the art (dnd5e's showArtwork, or editImage in edit mode); only its chips take them. */
 .fhcs-sheet .fhcs-portrait-stage { position: relative; flex: 1; min-height: 0; pointer-events: none; }
 .fhcs-sheet .fhcs-portrait-stage > * { pointer-events: auto; }
@@ -1317,12 +1366,12 @@
 .fhcs-sheet .fhcs-shield > .fhcs-shield-gear
 {
    position: absolute;
-   right: -6px;
-   bottom: -4px;
+   right: 0;
+   bottom: 0;
    display: grid;
    place-items: center;
-   width: 20px;
-   height: 20px;
+   width: 16px;
+   height: 16px;
    box-sizing: border-box;
    border: 1.5px solid var(--fhcs-die-ink);
    border-radius: 50%;
@@ -1330,16 +1379,25 @@
    color: var(--fhcs-ink);
 }
 
-.fhcs-sheet .fhcs-shield-gear .fhcs-gear { width: 12px; height: 12px; }
+.fhcs-sheet .fhcs-shield-gear .fhcs-gear { width: 10px; height: 10px; }
 
 .fhcs-sheet .fhcs-origin-speed { display: flex; flex: 1; align-items: center; min-width: 0; }
 .fhcs-sheet .fhcs-origin-speed > .fhcs-line { flex: 0 1 auto; }
 .fhcs-sheet .fhcs-hp-edit { display: flex; align-items: center; gap: var(--fhcs-s1); }
 .fhcs-sheet .fhcs-hp-edit > .meter { flex: 1; min-width: 0; }
 
-/* The token switch: top centre of the portrait; a ring when on. */
-.fhcs-sheet .fhcs-corner-tc { position: absolute; top: var(--fhcs-s1); left: 50%; transform: translateX(-50%); }
-.fhcs-sheet .fhcs-corner-tc.fhcs-on { box-shadow: 0 0 0 2px var(--fhcs-surface), 0 0 0 4px var(--fhcs-die-ink); }
+/* Edit mode's portrait chips, top centre: the token switch (a ring when on) and Frame. */
+.fhcs-sheet .fhcs-portrait-edit
+{
+   position: absolute;
+   top: var(--fhcs-s1);
+   left: 50%;
+   display: flex;
+   gap: var(--fhcs-s1);
+   transform: translateX(-50%);
+}
+
+.fhcs-sheet .fhcs-portrait-edit .fhcs-on { box-shadow: 0 0 0 2px var(--fhcs-surface), 0 0 0 4px var(--fhcs-die-ink); }
 
 .fhcs-sheet .fhcs-sr-only
 {

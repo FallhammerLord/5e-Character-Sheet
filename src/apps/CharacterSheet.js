@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH } from '../constants.js';
-import { attributesFacts, biographyFacts, changeHp, cycleListGrouping, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelUpClass,
+import { attributesFacts, biographyFacts, changeHp, cycleListGrouping, savePortraitFrame, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelUpClass,
    passesExtraFilters, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
@@ -10,6 +10,7 @@ import { biographyView } from '../sheet/biography.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
 import { headerMinWidth, headerView, hpPreview, tabRow } from '../sheet/header.js';
 import { delayTips, keepFolds } from '../chat/card.js';
+import { startFraming } from './framing.js';
 
 /** Our template parts, by dnd5e part ID. */
 export const SHEET_PARTS = {
@@ -135,6 +136,12 @@ function showPins(controls)
 function levelUp(event, target)
 {
    return levelUpClass(this, target.dataset.itemId);
+}
+
+/** Frame: positions the portrait in its frame (user, 2026-10-27); Done saves it with the image it belongs to. */
+function frame()
+{
+   startFraming(this.element, (place, src) => savePortraitFrame(this.actor, MODULE_ID, src, place));
 }
 
 /**
@@ -286,7 +293,7 @@ export function makeCharacterSheet(Base)
          actions: { fhcsTogglePassives: togglePassives, fhcsToggleGroup: toggleGroup, fhcsToggleColumn: toggleColumn,
             fhcsToggleContainer: toggleContainer, fhcsPinFilter: pinFilter, fhcsOpenConcentration: openConcentration,
             fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails,
-            fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange }
+            fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange, fhcsFrame: frame }
       };
 
       static PARTS = ourParts(Base.PARTS);

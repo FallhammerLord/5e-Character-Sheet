@@ -77,7 +77,43 @@ export function levelTrack(classes, order, originalId, format)
 }
 
 /** @returns {number} A whole percentage, 0–100. */
+/**
+ * The portrait as drawn: a token whole at the top; other art filling the frame at its framing, which edit mode can
+ * change (a token has nothing to frame).
+ */
+function framedPortrait(facts)
+{
+   const token = !!facts.portrait?.token;
+   const frame = token ? { ...FRAME_DEFAULT } : portraitFrame(facts.frame, facts.portrait?.src);
+   return { ...facts.portrait, fit: token ? 'contain' : 'cover', canFrame: !token, frame, frameStyle: frameStyle(frame) };
+}
+
 const percent = (value, max) => (max > 0 ? Math.max(0, Math.min(100, Math.round(100 * value / max))) : 0);
+
+/** Framing limits: the focus point in percent of the art, the zoom from whole (1) to three times. */
+export const FRAME_ZOOM = { min: 1, max: 3, step: 0.1 };
+export const FRAME_DEFAULT = { x: 50, y: 0, zoom: 1 };
+
+/**
+ * The portrait's framing (user, 2026-10-27: a large portrait's subject isn't always at the top), kept inside its
+ * limits. A framing belongs to one image: saved with its path, it applies only while that image is the portrait.
+ * @param {{src?: string, x?: number, y?: number, zoom?: number}|null} flag  As saved on the actor.
+ * @param {string} src  The portrait shown now.
+ * @returns {{x: number, y: number, zoom: number}}
+ */
+export function portraitFrame(flag, src)
+{
+   if (!flag || flag.src !== src) { return { ...FRAME_DEFAULT }; }
+   const clamp = (v, lo, hi, fallback) => (Number.isFinite(Number(v)) ? Math.min(hi, Math.max(lo, Number(v))) : fallback);
+   return {
+      x: clamp(flag.x, 0, 100, FRAME_DEFAULT.x),
+      y: clamp(flag.y, 0, 100, FRAME_DEFAULT.y),
+      zoom: Math.round(clamp(flag.zoom, FRAME_ZOOM.min, FRAME_ZOOM.max, FRAME_DEFAULT.zoom) * 10) / 10
+   };
+}
+
+/** @returns {string} A framing as the art's CSS variables. */
+export const frameStyle = ({ x, y, zoom }) => `--fhcs-fx: ${x}%; --fhcs-fy: ${y}%; --fhcs-zoom: ${zoom}`;
 
 /**
  * The HP tray's line under its buttons (user, 2026-10-27): what Damage would do with the amount typed, before the
@@ -114,7 +150,7 @@ export function headerView(facts, { format, localize })
       // Edit mode edits the name as stored, not as an effect or a token may show it.
       nameSource: facts.nameSource ?? facts.name,
       // The portrait card (SCOPE §4.1, user, 2026-10-27): art fills the frame; a token shows whole, at the top.
-      portrait: { ...facts.portrait, fit: facts.portrait?.token ? 'contain' : 'cover' },
+      portrait: framedPortrait(facts),
       columns,
       cards: facts.originCards ? originCards(facts.originCards, columns, i18n) : [],
       levelUp: facts.originCards ? levelUpChoices(facts.originCards, i18n) : null,
@@ -192,6 +228,9 @@ export function headerView(facts, { format, localize })
          initConfig: localize('FHCS.Header.InitConfig'), hdConfig: localize('FHCS.Header.HDConfig'),
          hpConfig: localize('FHCS.Header.HPConfig'), tokenSwitch: localize('FHCS.Header.TokenSwitch'),
          amount: localize('FHCS.Header.HpAmount'), damage: localize('FHCS.Header.HpDamage'), heal: localize('FHCS.Header.HpHeal'),
+         frame: localize('FHCS.Header.Frame'), frameDone: localize('FHCS.Header.FrameDone'),
+         frameReset: localize('FHCS.Header.FrameReset'), zoomIn: localize('FHCS.Header.ZoomIn'),
+         zoomOut: localize('FHCS.Header.ZoomOut'), zoom: localize('FHCS.Header.Zoom'),
          giveTemp: localize('FHCS.Header.HpTemp'), damageLabel: localize('FHCS.Header.HpDamageLabel'),
          healLabel: localize('FHCS.Header.HpHealLabel'), tempLabel: localize('FHCS.Header.HpTempLabel'),
          ac: localize('FHCS.Header.AC'),

@@ -362,6 +362,33 @@ export function registerQuenchTests(quench)
                'flags.dnd5e.showTokenPortrait': before.token });
          });
 
+         it('frames the portrait from the keyboard in edit mode, and saves the framing with its image', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 6);
+            const before = { img: actor._source.img, flag: actor.getFlag(MODULE_ID, 'portrait') ?? null, token: actor.getFlag('dnd5e', 'showTokenPortrait') ?? false };
+            // Portrait art, not the token: a token shows whole and has nothing to frame.
+            await actor.update({ img: 'icons/svg/aura.svg', 'flags.dnd5e.showTokenPortrait': false });
+            if (!sheet.isEditMode)
+            {
+               await click('.fhcs-tabs [data-action="changeMode"]');
+               await until(() => sheet.isEditMode, 'the lock switches to edit mode');
+            }
+            await click('.fhcs-header [data-action="fhcsFrame"]');
+            assert.isTrue(find('.fhcs-header .fhcs-portrait').classList.contains('fhcs-framing'), 'Frame starts framing');
+            // Two presses down, one zoom in, then Enter: no redraw comes until Enter saves.
+            for (const key of ['ArrowDown', 'ArrowDown', '+', 'Enter'])
+            {
+               find('.fhcs-header .fhcs-portrait-clip').dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true })); // redraw-safe: framing holds the sheet still until Enter
+            }
+            const flag = () => actor.getFlag(MODULE_ID, 'portrait');
+            await until(() => flag()?.y === 10, () => `the framing saves; it holds ${JSON.stringify(flag())}`);
+            assert.deepEqual(flag(), { src: 'icons/svg/aura.svg', x: 50, y: 10, zoom: 1.1 }, 'the framing is saved with its image');
+            await click('.fhcs-tabs [data-action="changeMode"]');
+            await until(() => !sheet.isEditMode, 'the lock switches back to play mode');
+            await actor.update({ img: before.img, 'flags.dnd5e.showTokenPortrait': before.token });
+            await (before.flag ? actor.setFlag(MODULE_ID, 'portrait', before.flag) : actor.unsetFlag(MODULE_ID, 'portrait'));
+         });
+
          it('shows two class cards and folds further classes into the class tray', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 4);

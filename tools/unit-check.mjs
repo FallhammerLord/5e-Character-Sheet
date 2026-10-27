@@ -16,7 +16,7 @@ import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js
 import { effectsView } from '../src/sheet/effects.js';
 import { biographyView, paragraphs } from '../src/sheet/biography.js';
 import { pinView } from '../src/sheet/lists.js';
-import { headerMinWidth, headerView, hpPreview, levelOrder, levelTrack, signed, tabRow } from '../src/sheet/header.js';
+import { headerMinWidth, headerView, hpPreview, levelOrder, levelTrack, portraitFrame, signed, tabRow } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
 const facts = (over) => ({
@@ -247,6 +247,21 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    catch { problems.push(`attributes: got ${JSON.stringify(got)}, expected ${JSON.stringify(expected)}`); }
    const editing = attributesView({ ...facts, editing: true }, { format, localize });
    if (editing.traits.map((t) => t.text).join() !== 'Common,\u2014') { problems.push('edit mode does not list empty traits'); }
+}
+
+// Framing belongs to one image, stays inside its limits, and a token has none.
+{
+   const got = [
+      portraitFrame({ src: 'a.webp', x: 30, y: 70, zoom: 2.04 }, 'a.webp'),
+      portraitFrame({ src: 'a.webp', x: 30, y: 70, zoom: 2 }, 'b.webp'),
+      portraitFrame({ src: 'a.webp', x: -5, y: 140, zoom: 9 }, 'a.webp'),
+      portraitFrame(null, 'a.webp')
+   ];
+   try
+   {
+      deepStrictEqual(got, [{ x: 30, y: 70, zoom: 2 }, { x: 50, y: 0, zoom: 1 }, { x: 0, y: 100, zoom: 3 }, { x: 50, y: 0, zoom: 1 }]);
+   }
+   catch { problems.push(`portrait framing: ${JSON.stringify(got)}`); }
 }
 
 // The HP tray's preview: damage takes temp first and stops at 0; nothing typed asks for an amount.

@@ -90,7 +90,7 @@ Already in place before the phase: portrait picker (edit mode), rests, death sav
 - [ ] 1. Portrait card in play mode: one frame height, HP band with Temp and Max ±, Short and Long rest chips, HD chip, exhaustion dot; cards to the frame's foot; two class cards and the class tray (Quench passes, user 2026-10-27; play check next)
 - [ ] 2. HP tray from the HP bar: Damage, Heal, Temp (built 2026-10-27; Quench and play next). Checked in dnd5e: healing from 0 clears death saves itself; an effect on tempmax isn't locked, so Max ± shows the player's value and the bar the total
 - [ ] 3. Edit-mode header: name, XP, ability scores, AC window, gears for Init, speed, HP and hit dice, Token switch (built 2026-10-27; Quench and play next)
-- [ ] 4. Framing large art: zoom, pan, arrow keys (`flags.fhcs.portrait`, keyed by the image)
+- [ ] 4. Framing large art: zoom, pan, arrow keys (`flags.fhcs.portrait`, keyed by the image) (built 2026-10-27; Quench and play next)
 - [ ] 5. Attributes in edit mode: skill proficiency and ability, trait and sense gears
 - [ ] 6. Spellcasting ability; level down
 - [x] Special Traits tab in our look: dnd5e's form, name and control on a line, hint under (user's screenshot, 2026-10-27; built, play next)

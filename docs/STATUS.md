@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6: slices 1–3 built; slice 4, framing large art, is next** (ROADMAP Phase 6 lists the slices; Quench and play for 1 and 2 wait on the user, below). Styling notes for slice 7, from the user's screenshots (2026-10-27): the sort button shows Foundry's orange active ring with no filter on; a blank band above the header; the empty Attributes favorites leave the right column bare; Hunter's Mark's "Additional Spells" row (Favored Enemy's free casts) shows no uses; the spell slot settings icon (`spellbook.hbs`) draws as a sun, not a gear (use the cog from the Phase 6 boards).
+1. **Phase 6: slices 1–4 built; slice 5, Attributes in edit mode, is next** (ROADMAP Phase 6 lists the slices; Quench and play for 1 and 2 wait on the user, below). Styling notes for slice 7, from the user's screenshots (2026-10-27): the sort button shows Foundry's orange active ring with no filter on; a blank band above the header; the empty Attributes favorites leave the right column bare; Hunter's Mark's "Additional Spells" row (Favored Enemy's free casts) shows no uses; the spell slot settings icon (`spellbook.hbs`) draws as a sun, not a gear (use the cog from the Phase 6 boards).
 
 The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't rerun Quench or rework Track R or Phases 0–4 unless the user reports a problem.
 
@@ -13,6 +13,7 @@ The Actions tab is on the backburner (user, 2026-10-26; SCOPE §4.4). Don't reru
 In code, not yet seen in Foundry:
 
 - **Quench run, 2026-10-27:** all pass but the HP tray test, a test bug (its click waited for a redraw that dropped the typed amount); fixed, rerun pending.
+- **Phase 6 slice 4, framing large art** (2026-10-27): edit mode, non-token art: the Frame chip (top centre, beside the token switch); drag to pan, the strip zooms, arrows pan (Shift finer), + and − zoom, Enter is Done, Escape cancels; saved on the character with its image. Quench "core": new test "frames the portrait from the keyboard…". In play: drag feel, and a big painting framed on its face.
 - **Phase 6 slice 3, the edit-mode header** (2026-10-27): unlock the sheet; the name and scores are fields; gears beside Init, each ability, speed and HP; the AC shield and the HD chip open dnd5e's windows; a Token switch at the portrait's top. XP is a field in play too. Quench "core": new test "edits XP in play, and name, scores, AC, hit dice and the token switch in edit mode".
 - **Phase 6 slice 2, the HP tray** (2026-10-27): play mode, a click on the HP bar opens it; type an amount, then Damage (temp first), Heal or Temp; the line under the buttons says what Damage would do. Quench "core": new test "takes damage (temp first), heals and gives temp HP from the HP tray". In edit mode a click on the bar still sets HP exactly (dnd5e's meter).
 - **Special Traits tab** (2026-10-27): dnd5e's form in our look; checkboxes 20px (Foundry's `--checkbox-size`; unverified that Foundry's own tick follows it). Look at it in edit mode.
