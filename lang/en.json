@@ -118,6 +118,7 @@
       "HDConfig": "Hit dice settings",
       "HPConfig": "Hit point settings",
       "TokenSwitch": "Show the token",
+      "ShapeRound": "Round portrait",
       "Frame": "Position the portrait",
       "FrameDone": "Done",
       "FrameReset": "Reset",

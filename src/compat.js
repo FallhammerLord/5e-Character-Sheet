@@ -6,7 +6,7 @@
 import { countingDie, MAX_PER_SIDE, modeForSides } from './chat/d20.js';
 import { diceMath } from './chat/math.js';
 import { canCast, spellKind } from './sheet/spellbook.js';
-import { PORTRAIT_FLAG } from './constants.js';
+import { PORTRAIT_FLAG, SHAPE_FLAG } from './constants.js';
 
 /** dnd5e's own character sheet, which ours extends so every mechanic keeps working. Set by dnd5e before init. */
 export function systemCharacterSheet()
@@ -55,6 +55,12 @@ const LEVEL_ORDER_FLAG = 'levelOrder';
  * Plain facts for the sheet header (src/sheet/header.js), from dnd5e's prepared data and the sheet's own helpers
  * (`_preparePortrait`, `_prepareAbilities`; character-sheet.mjs:478, base-actor-sheet.mjs:445, 502).
  */
+/** Saves the portrait's shape, round or square (user, 2026-10-27). */
+export function savePortraitShape(actor, moduleId, shape)
+{
+   return actor.setFlag(moduleId, SHAPE_FLAG, shape === 'round' ? 'round' : 'square');
+}
+
 /** Saves the portrait's framing, with the image it belongs to (user, 2026-10-27). */
 export function savePortraitFrame(actor, moduleId, src, frame)
 {
@@ -93,6 +99,7 @@ export async function headerFacts(sheet, context, moduleId, emphasis)
       nameSource: actor._source?.name ?? actor.name,
       portrait: await sheet._preparePortrait(context),
       frame: actor.getFlag(moduleId, PORTRAIT_FLAG) ?? null,
+      shape: actor.getFlag(moduleId, SHAPE_FLAG) ?? null,
       editable: sheet.isEditable,
       classes,
       levelOrder: actor.getFlag(moduleId, LEVEL_ORDER_FLAG) ?? [],

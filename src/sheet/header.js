@@ -85,7 +85,10 @@ function framedPortrait(facts)
 {
    const token = !!facts.portrait?.token;
    const frame = token ? { ...FRAME_DEFAULT } : portraitFrame(facts.frame, facts.portrait?.src);
-   return { ...facts.portrait, fit: token ? 'contain' : 'cover', canFrame: !token, frame, frameStyle: frameStyle(frame) };
+   // Round or square, the player's choice (user, 2026-10-27); until chosen, a token is round and other art square.
+   const shape = facts.shape === 'round' || facts.shape === 'square' ? facts.shape : token ? 'round' : 'square';
+   return { ...facts.portrait, fit: token && shape === 'square' ? 'contain' : 'cover', canFrame: !token, frame, frameStyle: frameStyle(frame),
+      shape, round: shape === 'round' };
 }
 
 const percent = (value, max) => (max > 0 ? Math.max(0, Math.min(100, Math.round(100 * value / max))) : 0);
@@ -228,6 +231,7 @@ export function headerView(facts, { format, localize })
          initConfig: localize('FHCS.Header.InitConfig'), hdConfig: localize('FHCS.Header.HDConfig'),
          hpConfig: localize('FHCS.Header.HPConfig'), tokenSwitch: localize('FHCS.Header.TokenSwitch'),
          amount: localize('FHCS.Header.HpAmount'), damage: localize('FHCS.Header.HpDamage'), heal: localize('FHCS.Header.HpHeal'),
+         shapeRound: localize('FHCS.Header.ShapeRound'),
          frame: localize('FHCS.Header.Frame'), frameDone: localize('FHCS.Header.FrameDone'),
          frameReset: localize('FHCS.Header.FrameReset'), zoomIn: localize('FHCS.Header.ZoomIn'),
          zoomOut: localize('FHCS.Header.ZoomOut'), zoom: localize('FHCS.Header.Zoom'),

@@ -157,7 +157,8 @@ function findProblems()
       }
       if (clipped) { continue; }
       const hit = document.elementFromPoint(x, y);
-      if (!hit || el.contains(hit) || hit.closest('.fhcs-tray')) { continue; }
+      // An open tray, or a panel marked as laid over on purpose (the death saves over the portrait), may cover.
+      if (!hit || el.contains(hit) || hit.closest('.fhcs-tray, [data-fhcs-overlay]')) { continue; }
       issues.push(`covered at its centre by ${hit.tagName.toLowerCase()}.${[...hit.classList].join('.')}: ${el.tagName.toLowerCase()}.${[...el.classList].join('.')} [${el.dataset.action}]`);
    }
    // Contrast: each piece of text against what it is drawn on (a die's number against the die's fill).

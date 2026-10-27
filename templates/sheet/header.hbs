@@ -3,7 +3,7 @@
    <div class="fhcs-header-side">
       {{!-- The portrait card (SCOPE §4.1, user, 2026-10-27): one frame height for every art shape; the art fills it, and
             HP, Temp and Max ± sit on a band over its foot. The chips sit on the stage above the band. --}}
-      <div class="fhcs-portrait{{#if death}} fhcs-dying{{/if}}{{#if portrait.framing}} fhcs-framing{{/if}}"
+      <div class="fhcs-portrait fhcs-shape-{{ portrait.shape }}{{#if death}} fhcs-dying{{/if}}{{#if portrait.framing}} fhcs-framing{{/if}}"
            data-src="{{ portrait.src }}" data-fx="{{ portrait.frame.x }}" data-fy="{{ portrait.frame.y }}" data-zoom="{{ portrait.frame.zoom }}">
          {{!-- The art, at the character's framing (focus point and zoom; user, 2026-10-27), clipped to the frame. --}}
          <div class="fhcs-portrait-clip" style="{{ portrait.frameStyle }}">
@@ -75,6 +75,10 @@
                <input type="checkbox" class="fhcs-sr-only" name="flags.dnd5e.showTokenPortrait" {{#if portrait.token}}checked{{/if}} aria-label="{{ text.tokenSwitch }}">
                <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3"/></svg>
             </label>
+            <button type="button" class="fhcs-chip{{#if portrait.round}} fhcs-on{{/if}}" data-action="fhcsPortraitShape"
+                    aria-pressed="{{#if portrait.round}}true{{else}}false{{/if}}" aria-label="{{ text.shapeRound }}" data-fhcs-tip="{{ text.shapeRound }}">
+               <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/></svg>
+            </button>
             {{#if portrait.canFrame}}
             <button type="button" class="fhcs-chip" data-action="fhcsFrame" aria-label="{{ text.frame }}" data-fhcs-tip="{{ text.frame }}">
                <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2v14a2 2 0 0 0 2 2h14M18 22V8a2 2 0 0 0-2-2H2"/></svg>
@@ -95,7 +99,7 @@
 
             {{#if death}}
             {{!-- At 0 HP the death saves sit on the portrait, so the header keeps its size (user, 2026-10-24). --}}
-            <div class="fhcs-death" role="group" aria-label="{{ death.rollLabel }}">
+            <div class="fhcs-death" role="group" aria-label="{{ death.rollLabel }}" data-fhcs-overlay>
                <span class="fhcs-death-pips fhcs-death-success" data-prop="system.attributes.death.success">
                   {{#each death.success}}
                   <button type="button" class="fhcs-death-pip{{#if filled}} fhcs-on{{/if}}" data-action="togglePip" data-n="{{ n }}"
@@ -192,19 +196,6 @@
          <span class="fhcs-display fhcs-name">{{ name }}</span>
          {{/if}}
          {{#if xp}}
-         <div class="fhcs-xp">
-            <div class="fhcs-bar" role="meter" aria-valuemin="0" aria-valuenow="{{ xp.value }}" aria-valuemax="{{ xp.max }}"
-                 aria-label="{{ xp.text }}"><span style="width: {{ xp.pct }}%"></span></div>
-            {{#if editable}}
-            {{!-- XP is a field in play too, for whoever may edit the character (user, 2026-10-27). --}}
-            <span class="fhcs-body fhcs-muted fhcs-xp-line">
-               <input type="text" class="fhcs-input fhcs-body fhcs-xp-input" name="system.details.xp.value" data-dtype="Number"
-                      value="{{ xp.value }}" placeholder="0" aria-label="{{ text.xpLabel }}"><span>{{ xp.maxText }}</span>
-            </span>
-            {{else}}
-            <span class="fhcs-body fhcs-muted">{{ xp.text }}</span>
-            {{/if}}
-         </div>
          {{#if levelUp}}
          {{!-- The level pill opens Level up (user, 2026-10-26); solid with an arrow once the XP is there. --}}
          <details class="fhcs-fold fhcs-level" data-fold-key="level-up">
@@ -246,6 +237,23 @@
             {{#if @root.editable}}<button type="button" class="fhcs-toggle fhcs-gear-button fhcs-muted" data-action="showConfiguration" data-config="movement"
                     aria-label="{{ text.speedConfig }}" data-fhcs-tip="{{ text.speedConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}
          </span>
+         {{!-- XP sits on the size line (user, 2026-10-27): the first line keeps its width for the name and the window's
+               controls. --}}
+         {{#if xp}}
+         <div class="fhcs-xp">
+            <div class="fhcs-bar" role="meter" aria-valuemin="0" aria-valuenow="{{ xp.value }}" aria-valuemax="{{ xp.max }}"
+                 aria-label="{{ xp.text }}"><span style="width: {{ xp.pct }}%"></span></div>
+            {{#if editable}}
+            {{!-- XP is a field in play too, for whoever may edit the character (user, 2026-10-27). --}}
+            <span class="fhcs-body fhcs-muted fhcs-xp-line">
+               <input type="text" class="fhcs-input fhcs-body fhcs-xp-input" name="system.details.xp.value" data-dtype="Number"
+                      value="{{ xp.value }}" placeholder="0" aria-label="{{ text.xpLabel }}"><span>{{ xp.maxText }}</span>
+            </span>
+            {{else}}
+            <span class="fhcs-body fhcs-muted">{{ xp.text }}</span>
+            {{/if}}
+         </div>
+         {{/if}}
          <span class="fhcs-label fhcs-nowrap">{{ text.proficiency }} {{ prof }}</span>
       </div>
 

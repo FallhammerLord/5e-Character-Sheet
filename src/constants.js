@@ -17,3 +17,6 @@ export const SYSTEM_ACTIONS = [
 
 /** The actor flag holding the portrait's framing (user, 2026-10-27): { src, x, y, zoom }, x and y in percent. */
 export const PORTRAIT_FLAG = 'portrait';
+
+/** The actor flag holding the portrait's shape (user, 2026-10-27): 'round' or 'square'; unset, a token is round. */
+export const SHAPE_FLAG = 'portraitShape';
