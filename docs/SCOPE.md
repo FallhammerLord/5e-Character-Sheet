@@ -26,7 +26,7 @@ Target: Tidy 5e Classic, as in `docs/reference/` (screenshots) and its source at
 
 ### 4.1 Header
 
-- **Portrait** (round, about 150px) down the left edge. On it: exhaustion (top left, hidden at 0 behind a dot), inspiration (top right), rest button (bottom left). Under it: HP, the HP bar with hit dice at its right, then Temp and Max HP as fields (user, 2026-10-27).
+- **Portrait** (round, about 150px) down the left edge. On it: exhaustion (top left, hidden at 0 behind a dot), inspiration (top right), rest button (bottom left). Under it, dnd5e's portrait card made compact (user, 2026-10-27: "clean presentation, just too large and spread out"): an HP meter, 32px, with "HP 87 / 87" inside the bar and Temp as a field built into its right end behind a dashed divider; then a hit dice meter, 24px, "HD 12 / 12" inside. The bars' fills are light tints that keep ink text at 4.5:1. In edit mode each meter gets a gear at its left (dnd5e's HP and hit dice windows) and HP's current and max become fields inside the bar; the portrait gets a Token switch (dnd5e's `flags.dnd5e.showTokenPortrait`).
 - **Beside it, in rows:**
   1. Name (large small caps); on the right: XP bar with current / next, level badge, ⋮ menu.
   2. Classes and subclasses ("Cleric 12 Life Domain").
@@ -36,7 +36,7 @@ Target: Tidy 5e Classic, as in `docs/reference/` (screenshots) and its source at
 
 Header decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf):
 - **Portrait frame 160 wide, up to 240 tall:** round, square and tall art all fit; the header grows with tall art and nothing else moves. HP, its bar and Temp sit under the frame.
-- **Corner chips on the frame:** inspiration, rest. Exhaustion at 0 is hidden behind a small dot in the top left; resting on the dot (1.5 s, like tips) or clicking it shows the chip; above 0 the chip always shows (user, 2026-10-27). Hit dice moved to the HP bar's line, "HD 12 / 12" at its right end (user, 2026-10-27, replacing the bottom-right chip).
+- **Corner chips on the frame:** inspiration, rest. Exhaustion at 0 is hidden behind a small dot in the top left; resting on the dot (1.5 s, like tips) or clicking it shows the chip; above 0 the chip always shows (user, 2026-10-27). Hit dice moved off the frame into their own meter under HP (user, 2026-10-27).
 - **Ability emphasis is a per-player choice** (client setting): modifier large with the score small (our default), or Classic's large score.
 - **Leveling follows dnd5e's `levelingMode` world setting** (the GM's choice; we add no setting of our own). XP modes show the usual XP bar. Milestone mode (`noxp`) puts a Level button where the bar was; it folds out a tray of 20 pips (4 rows of 5). Each class level fills the next pip with that class's icon, in the order the levels were gained; empty pips show levels not reached. A pip fills when the player levels up through dnd5e, after its advancement finishes. Nothing to add by hand.
   - dnd5e stores levels per class, not their order, so we record the order in an actor flag after each advancement (`dnd5e.advancementManagerComplete`); characters from before that fill class by class, original class first. Icons: the class item's own image, so any source's classes work.
@@ -129,7 +129,7 @@ Research note, "Edit mode and lifecycle". dnd5e keeps the settings windows; we a
 - **AC:** in edit mode the shield itself opens dnd5e's AC window (user, 2026-10-27: "a popout window for AC calc"); no separate gear. In play it keeps dnd5e's breakdown on hover.
 - **Ability scores:** in edit mode the big number is an input; the save stays a roll button; a gear on the label opens dnd5e's ability window.
 - **Name:** an input in edit mode only. **XP:** editable in play too, no unlock needed (user, 2026-10-27).
-- **Temp and Max HP are always fields** under the HP bar, side by side, in play and edit (user, 2026-10-27). Max writes dnd5e's max override (`system.attributes.hp.max`); the HP gear keeps dnd5e's window for bonuses and clearing the override. In edit mode HP's current value is a field too.
+- **Temp is always a field,** built into the HP bar (dnd5e's layout). **Max** is a field inside the bar in edit mode, beside the current value; it writes dnd5e's max override (`system.attributes.hp.max`), and the HP gear keeps dnd5e's window for bonuses and clearing the override (user, 2026-10-27, after comparing with dnd5e's sidebar; replaces "Temp and Max always fields under the bar").
 - **Traits run down the left column under the skills** in edit mode, every group with its gear; favorites keep the right column (user, 2026-10-27: extend downwards, don't cover information).
 - **HP tray** opens from the HP number in play mode (damage is play): an amount box, then Damage, Heal and Temp, through dnd5e's `applyDamage` (temp first) and `applyTempHP`. Setting HP to an exact number is edit mode.
 - **Skills in edit mode:** the dot becomes dnd5e's proficiency cycle (none, half, full, expertise); the ability label becomes a dropdown.
