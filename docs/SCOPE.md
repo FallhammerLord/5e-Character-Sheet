@@ -153,7 +153,7 @@ One set of rules for every tab and both modes (user, 2026-10-27: "apply as unifo
 **Layout and alignment**
 1. **Edges that meet line up.** A region is a grid; neighbouring parts share its lines. Every heading is one fixed height whatever it holds, so headings side by side share their line (user's screenshot, 2026-10-28: Traits' heading, holding its fold button, sat lower than Skills'). The header: the portrait card spans two rows; the HP band and the cards share the second, so both their tops and bottoms align (the user's screenshot, 2026-10-27). *check*
 2. **Ratios hold at every width:** chips square or pill, round controls round, the shield and cards keep their shape. *check (round, square)*
-3. **Narrow padding, clear boundaries:** `--fhcs-s1` inside controls and rows, `--fhcs-s2` between regions; every region shows its edge (a 1px line or a fill), never space alone.
+3. **Narrow padding, clear boundaries:** `--fhcs-s1` (4px) inside controls and rows, `--fhcs-s2` (8px) between regions, and no other spacing (user, 2026-10-28, after comparing the strict version with the loose one on the canvas: the 2, 3 and 6px values went to 4). Not spacing, so allowed: a hang (rule 21), an indent that lines text up with a column, the screen-reader clip. Every region shows its edge (a 1px line or a fill), never space alone. *check*
 
 **Controls and icons**
 4. **An icon fits its button** (user, 2026-10-27): buttons are sized to show Foundry's standard icons and ours clearly (a control, 28px, or the 24px target); the icon is centred both ways, and where a button is smaller, the icon shrinks to fit rather than spill or crowd. *check*
@@ -181,6 +181,7 @@ One set of rules for every tab and both modes (user, 2026-10-27: "apply as unifo
 18. **A button's words are body style, not capitals** (user, 2026-10-27: "we are mixing all caps in the spellbook buttons with regular text"): Columns, Con save, the Level pill, a row name's subtitle ("Life Domain", muted). Abbreviations (Str, Dex) and headings that fold (favorites groups) keep the label style. *check*
 19. **A gear is no larger than the words beside it:** 12px beside labels, the same gear on every label (AC included, centred with its word); alone in a chip, a chip icon's size. A gear in a line of text keeps its 24px target without making the line taller. *check*
 20. **A 24px target, or the room around one** (WCAG 2.5.8): a control's target is 24px; where a column can't spare that (a gear in a stats label, 16 × 24), the target may be narrower when nothing else clickable lies within the 24px circle around it (user, 2026-10-27).
+21. **A hang** (user, 2026-10-28): a control may reach into the space around its line without growing it, by a negative margin: a gear in a line of text, the "+N" chip in a card's label line, the AC shield in its 28px line. Only these; anything else that would grow a line makes the line that height in both modes instead. *check*
 
 ### 5.1 Icons and colors on the sheet (one meaning each)
 

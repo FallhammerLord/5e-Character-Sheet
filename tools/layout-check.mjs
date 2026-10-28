@@ -359,6 +359,35 @@ function findProblems()
       const kept = control.matches('[data-action="toggleControls"], [data-action="close"], .preparation-warnings');
       if (kept !== !!control.getClientRects().length) { issues.push(`title bar: ${control.dataset.action} ${kept ? 'hidden' : 'shows'}`); }
    }
+   // Spacing is 4 or 8 (SCOPE §5.2 rule 3, user 2026-10-28), every gap, padding and margin on the sheet, except:
+   // a hang (rule 21: a control reaching into the space around its line, a negative margin on the named controls),
+   // an indent that lines text up with a column (the name column, a container's contents, the footer's last column),
+   // the screen-reader clip, and the lock's automatic margin.
+   if (app.matches('.fhcs-sheet'))
+   {
+      const HANGS = '.fhcs-shield, .fhcs-gear-button, .fhcs-more';
+      const INDENTS = '.fhcs-favorite-details, .fhcs-item-details > .wrapper, .fhcs-contents, .fhcs-inventory-foot';
+      const SPACING = ['rowGap', 'columnGap', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'marginTop', 'marginRight', 'marginBottom', 'marginLeft'];
+      const off = new Map();
+      for (const el of app.querySelectorAll('.window-content *'))
+      {
+         if (el.ownerSVGElement || !el.getClientRects().length || el.matches('.fhcs-sr-only, .fhcs-lock')) { continue; }
+         // Ours only: inside our markup (a plain page's paragraph keeps the browser's margins).
+         if (!el.closest('.window-content [class*="fhcs-"]')) { continue; }
+         const cs = getComputedStyle(el);
+         for (const prop of SPACING)
+         {
+            const v = parseFloat(cs[prop]);
+            if (Number.isNaN(v) || [0, 4, 8].includes(v)) { continue; }
+            if (prop.endsWith('Gap') && !/flex|grid/.test(cs.display)) { continue; }
+            if (v < 0 && el.matches(HANGS)) { continue; }
+            if (el.matches(INDENTS)) { continue; }
+            off.set(`${prop} ${v}px: ${el.tagName.toLowerCase()}.${[...el.classList].join('.')}`, true);
+         }
+      }
+      for (const key of off.keys()) { issues.push(`spacing not 4 or 8, ${key}`); }
+   }
+
    // Foundry's tab action finds a tab button only as a child of `.tabs`; anywhere else the click does nothing.
    for (const tab of app.querySelectorAll('[data-action="tab"]'))
    {
@@ -397,6 +426,7 @@ const SELF_TEST = [
    { id: 'self-mixed-sizes', expect: true, body: '<button style="display:flex;width:120px"><span style="font-size:12px">HP</span><span style="font-size:20px">8</span></button>' },
    { id: 'self-capitals', expect: true, body: '<button style="text-transform:uppercase;width:120px">Columns</button>' },
    { id: 'self-gear', expect: true, body: '<span style="display:flex;align-items:center;font-size:12px">Str<button style="display:grid;place-items:center;width:24px;height:24px;min-height:0;padding:0"><svg class="fhcs-gear" style="width:16px;height:16px"><path d="M0 0h16v16H0z"/></svg></button></span>' },
+   { id: 'self-spacing', expect: true, body: '<div class="fhcs-self" style="display:flex;gap:3px"><span>a</span><span>b</span></div>' },
    { id: 'self-overlap', expect: true, body: '<div style="display:grid;grid-template-columns:40px 1fr"><span style="justify-self:start;white-space:nowrap">Runs into the next</span><span>x</span></div>' }
 ];
 
