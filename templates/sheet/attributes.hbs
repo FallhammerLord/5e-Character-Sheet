@@ -166,7 +166,17 @@
                   {{#if prepared}}<svg class="fhcs-icon fhcs-state fhcs-state-fill" viewBox="0 0 24 24" role="img" aria-label="{{ stateLabel }}"><path d="M3 5.5c3-1.2 6-1 9 1 3-2 6-2.2 9-1V19c-3-1.2-6-1-9 1-3-2-6-2.2-9-1z"/></svg>{{/if}}
                </button>
                <span class="fhcs-label fhcs-muted fhcs-favorite-detail">{{#if kindText}}{{ kindText }} · {{/if}}{{ subtitle }}</span>
+               {{#if toggle}}
+               {{!-- The Effects tab's switch; dnd5e's useFavorite flips the effect. --}}
+               <span class="fhcs-favorite-uses">
+                  <button type="button" class="fhcs-toggle fhcs-switch" data-action="useFavorite" aria-pressed="{{#if toggle.on}}true{{else}}false{{/if}}"
+                          aria-label="{{ toggle.label }}" data-fhcs-tip="{{ toggle.label }}">
+                     <svg class="fhcs-switch-mark" viewBox="0 0 20 12" aria-hidden="true"><rect x="1" y="1" width="18" height="10" rx="5"/><circle cy="6" r="3"/></svg>
+                  </button>
+               </span>
+               {{else}}
                <span class="fhcs-body fhcs-favorite-uses">{{ uses }}</span>
+               {{/if}}
                {{#if expanded}}<div class="fhcs-body fhcs-favorite-details">{{{ summary }}}</div>{{/if}}
             </li>
             {{/each}}

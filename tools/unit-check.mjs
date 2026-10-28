@@ -247,6 +247,9 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    catch { problems.push(`attributes: got ${JSON.stringify(got)}, expected ${JSON.stringify(expected)}`); }
    const editing = attributesView({ ...facts, editing: true }, { format, localize });
    if (editing.traits.map((t) => t.text).join() !== 'Common,\u2014') { problems.push('edit mode does not list empty traits'); }
+   // A favorited effect brings its switch, on or off, to the Attributes tab (user, 2026-10-28).
+   const fx = attributesView({ ...facts, favorites: [{ ...row('Ward', 'effects'), toggle: { on: false } }] }, { format, localize }).favorites[0].rows[0];
+   if (fx.toggle?.on !== false || !fx.toggle.label) { problems.push(`favorited effect switch: ${JSON.stringify(fx.toggle)}`); }
    // The traits panel folds, remembered with the favorites groups; folded it summarizes what's set.
    // Resources: all three always; an unnamed one gets "Resource N"; recovery in words.
    const res = attributesView({ ...facts, resources: [

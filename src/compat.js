@@ -219,7 +219,9 @@ export async function attributesFacts(sheet, context, { folded, open = new Set()
          summary: expanded ? await renderTemplate(ITEM_SUMMARY, await item.getChatData({ secrets: item.isOwner })) : '',
          uses: f.uses?.max ? { value: f.uses.value, max: f.uses.max } : null, quantity: Number(f.quantity) || 0,
          itemId: f.itemId ?? '', activityId: f.activityId ?? '', effectId: f.effectId ?? '', key: f.key ?? '',
-         rollableClass: f.rollableClass ?? '', group, level: item?.type === 'spell' ? item.system.level : null, state, kind
+         rollableClass: f.rollableClass ?? '', group, level: item?.type === 'spell' ? item.system.level : null, state, kind,
+         // An effect's on or off (dnd5e's favorite data); a click on the row or its switch flips it (dnd5e's useFavorite).
+         toggle: f.toggle?.applicable ? { on: !!f.toggle.value } : null
       });
    }
 

@@ -205,7 +205,7 @@ Check here before choosing a mark, and add new ones. Every tint has an icon, mar
 | Underline | The open tab | Tab row |
 | Level pill solid, with an up arrow | Enough XP to level up | Header, XP mode (user, 2026-10-26) |
 | Every other row faintly filled | Nothing: a ledger, for reading across | Every list: Inventory, Spellbook, Features, Effects, Attributes favorites and skills (user, 2026-10-26). A row's own tint or open panel wins. |
-| Switch: filled track, knob right; outline track, knob left | On, off | Effects rows and conditions (user, 2026-10-26). Neutral ink, not green. |
+| Switch: filled track, knob right; outline track, knob left | On, off | Effects rows and conditions (user, 2026-10-26); a favorited effect on the Attributes tab (user, 2026-10-28). Neutral ink, not green. |
 | Dashed button with a plus | Something to choose or add | Class cards (subclass), Species and Background cards (user, 2026-10-26) |
 | × in a square control | Remove this (asks first) | Class, subclass, species and background cards, edit mode only (user, 2026-10-26) |
 | Cup; bed | Short rest; long rest | The status group in the name row (user, 2026-10-28) |

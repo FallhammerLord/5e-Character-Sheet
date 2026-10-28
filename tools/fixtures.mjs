@@ -239,7 +239,10 @@ const attributesFacts = (over = {}) => ({
       fav('Counterspell', 'spell', { level: 3, subtitle: 'S \u00b7 1 Reaction', state: 'prepared', kind: 'pact', expandable: true }),
       fav('Misty Step', 'spell', { level: 2, subtitle: 'V \u00b7 1 Bonus Action', kind: 'innate', expandable: true }),
       fav('Sacred Flame', 'spell', { level: 0, subtitle: 'V S \u00b7 1 Action' }),
-      fav('Channel Divinity: Preserve Life', 'features', { subtitle: '1 Action \u00b7 Short Rest', uses: { value: 1, max: 2 } })
+      fav('Channel Divinity: Preserve Life', 'features', { subtitle: '1 Action \u00b7 Short Rest', uses: { value: 1, max: 2 } }),
+      // Favorited effects show their switch, on and off (user, 2026-10-28).
+      fav('Bless', 'effects', { subtitle: '7 rounds', toggle: { on: true } }),
+      fav('Cloak of Protection', 'effects', { toggle: { on: false } })
    ],
    // dnd5e's three legacy resources: one set, one with a long name and both rests, one never set (user, 2026-10-28).
    resources: [

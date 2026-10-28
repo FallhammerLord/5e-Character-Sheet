@@ -897,6 +897,16 @@ export function registerQuenchTests(quench)
             const relative = foundry.utils.buildRelativeUuid(effect, actor);
             await click(`.fhcs-effects [data-effect-id="${effect.id}"] [data-action="favorite"]`);
             await until(() => actor.system.hasFavorite(relative), 'the bookmark makes it a favorite');
+            // The favorite brings its switch to the Attributes tab, and the switch flips it there (user, 2026-10-28).
+            await click('.fhcs-tabs [data-tab="details"]');
+            const favSwitch = `.fhcs-attributes [data-favorite-id="${relative}"] .fhcs-switch`;
+            await until(() => sheet.element.querySelector(favSwitch)?.getAttribute('aria-pressed') === 'true',
+               () => `the favorited effect shows its switch on; the row holds ${sheet.element.querySelector(`.fhcs-attributes [data-favorite-id="${relative}"]`)?.innerText ?? 'nothing'}`);
+            await click(favSwitch);
+            await until(() => effect.disabled, 'the favorite\'s switch turns the effect off');
+            await click(favSwitch);
+            await until(() => !effect.disabled, 'and on again');
+            await click('.fhcs-tabs [data-tab="effects"]');
             // Not yet known why this click once found no unfavorite (2026-10-28); report what the row holds.
             const actions = () => `the row holds ${[...(row()?.querySelectorAll('[data-action]') ?? [])].map((b) => b.dataset.action).join(', ') || 'nothing'}; the tab is ${sheet.tabGroups?.primary}; favorite ${actor.system.hasFavorite(relative)}`;
             await until(() => row()?.querySelector('[data-action="unfavorite"]'), () => `the bookmark now offers to remove it; ${actions()}`);

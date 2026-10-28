@@ -91,6 +91,8 @@ export function attributesView(facts, { format, localize })
             rows: rows.map((r) => ({
                ...r,
                uses: r.uses?.max ? `${r.uses.value} / ${r.uses.max}` : r.quantity > 1 ? `×${r.quantity}` : '',
+               // A favorited effect shows the Effects tab's switch, on or off (user, 2026-10-28: it showed nothing).
+               toggle: r.toggle ? { on: r.toggle.on, label: format(r.toggle.on ? 'FHCS.Effects.TurnOff' : 'FHCS.Effects.TurnOn', { name: r.title }) } : null,
                equipped: r.state === 'equipped',
                prepared: r.state === 'prepared',
                kind: r.kind ?? null,
