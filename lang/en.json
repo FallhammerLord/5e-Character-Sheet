@@ -217,6 +217,13 @@
         "prepared": "Prepared"
       },
       "ResourceLabel": "{title} {value} of {max}",
+      "Resources": "Resources",
+      "ResourceN": "Resource {n}",
+      "ResourceName": "Resource {n}: name",
+      "ResourceValue": "{title}: uses left",
+      "ResourceMax": "{title}: most uses",
+      "ShortRestAbbr": "SR",
+      "LongRestAbbr": "LR",
       "Senses": "Senses",
       "Languages": "Languages"
     },
@@ -346,7 +353,8 @@
       "On": "On",
       "TurnOn": "{name}: off, click to turn on",
       "TurnOff": "{name}: on, click to turn off",
-      "Concentrating": "Concentrating: end it on the Spellbook",
+      "Concentrating": "Concentrating: end it on the Spellbook, or break it here in edit mode",
+      "BreakLabel": "Break concentration ({name})",
       "Conditions": "Conditions",
       "Level": "{level}",
       "LevelLabel": "{name}, level {level}: click to raise, right-click to lower",

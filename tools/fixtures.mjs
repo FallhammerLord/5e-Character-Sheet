@@ -241,7 +241,12 @@ const attributesFacts = (over = {}) => ({
       fav('Sacred Flame', 'spell', { level: 0, subtitle: 'V S \u00b7 1 Action' }),
       fav('Channel Divinity: Preserve Life', 'features', { subtitle: '1 Action \u00b7 Short Rest', uses: { value: 1, max: 2 } })
    ],
-   resources: [{ id: 'resources.primary', title: 'Harness Divine Power', value: 1, max: 1 }],
+   // dnd5e's three legacy resources: one set, one with a long name and both rests, one never set (user, 2026-10-28).
+   resources: [
+      { key: 'primary', label: 'Harness Divine Power', value: 1, max: 1, sourceMax: 1, sr: false, lr: true },
+      { key: 'secondary', label: 'Superiority Dice from the Battle Master Feat', value: 3, max: 4, sourceMax: 4, sr: true, lr: true },
+      { key: 'tertiary', label: '', value: 0, max: 0, sourceMax: 0, sr: false, lr: false }
+   ],
    slots: { 1: { value: 3, max: 4 }, 3: { value: 3, max: 3 } },
    editing: false, folded: [], ...over
 });

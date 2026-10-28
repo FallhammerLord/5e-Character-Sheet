@@ -56,6 +56,12 @@
                         <button type="button" class="fhcs-toggle" data-action="delete" aria-label="{{ deleteLabel }}" data-fhcs-tip="{{ deleteLabel }}">
                            <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13"/></svg>
                         </button>
+                        {{else if concentration}}
+                        {{!-- Break: the drawn C struck through; it ends the concentration (dnd5e's endConcentration). --}}
+                        <button type="button" class="fhcs-toggle fhcs-conc-break" data-action="fhcsEndConcentration" data-effect-id="{{ id }}"
+                                aria-label="{{ concentration.breakLabel }}" data-fhcs-tip="{{ concentration.breakLabel }}">
+                           <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.4 7A7.2 7.2 0 1 0 17.4 17"/><path d="M4 20L20 4"/></svg>
+                        </button>
                         {{/if}}
                      </span>
                      {{/if}}

@@ -26,7 +26,9 @@ export function effectsView(facts, { format, localize })
          on: !e.disabled,
          label: format(e.disabled ? 'FHCS.Effects.TurnOn' : 'FHCS.Effects.TurnOff', { name: e.name })
       } : null,
-      concentration: e.concentration ? { label: localize('FHCS.Effects.Concentrating') } : null,
+      // In edit mode a concentration gets Break where other effects get Delete (user, 2026-10-28): it ends the
+      // concentration through dnd5e, as the Spellbook's End does, rather than deleting the effect.
+      concentration: e.concentration ? { label: localize('FHCS.Effects.Concentrating'), breakLabel: format('FHCS.Effects.BreakLabel', { name: e.name }) } : null,
       favorite: !!e.favorite,
       favoriteAction: e.favorite ? 'unfavorite' : 'favorite',
       favoriteLabel: localize(e.favorite ? 'FHCS.Favorite.On' : 'FHCS.Favorite.Off'),

@@ -179,15 +179,19 @@ export async function attributesFacts(sheet, context, { folded, open = new Set()
       { key: 'tool', title: title('tool'), values: sheet._prepareSkillsTools(context, 'tools').map((t) => t.label) }
    ];
 
+   // dnd5e's three legacy resources, all of them, set or not (user, 2026-10-28: an always-there Resources category);
+   // dnd5e lists one as a favorite only once it has a label and a max, so they're read from the actor, not the favorites.
+   const resources = ['primary', 'secondary', 'tertiary'].map((key) =>
+   {
+      const r = actor.system.resources?.[key] ?? {};
+      const source = actor._source.system.resources?.[key] ?? {};
+      return { key, label: source.label ?? '', value: source.value ?? 0, max: r.max ?? source.max ?? 0, sourceMax: source.max ?? 0,
+         sr: !!source.sr, lr: !!source.lr };
+   });
    const favorites = [];
-   const resources = [];
    for (const f of await sheet._prepareFavorites(context))
    {
-      if (f.type === 'resource')
-      {
-         resources.push({ id: f.id, title: f.title, value: f.resource.value, max: f.resource.max });
-         continue;
-      }
+      if (f.type === 'resource') { continue; }
       const item = f.itemId ? actor.items.get(f.itemId) : null;
       let group = 'other';
       let state = null;

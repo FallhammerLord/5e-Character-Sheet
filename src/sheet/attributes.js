@@ -111,10 +111,26 @@ export function attributesView(facts, { format, localize })
       traitsSummary: traits.filter((t) => t.text !== '—').map((t) => t.text).join(' · '),
       favorites,
       editing: !!facts.editing,
-      resources: facts.resources.map((r) => ({ ...r, label: format('FHCS.Attributes.ResourceLabel', r) })),
+      // The Resources category (user, 2026-10-28): all three always, folded like a favorites group.
+      resources: facts.resources.map((r, i) =>
+      {
+         const title = r.label || format('FHCS.Attributes.ResourceN', { n: i + 1 });
+         const recovery = [r.sr && localize('FHCS.Attributes.ShortRestAbbr'), r.lr && localize('FHCS.Attributes.LongRestAbbr')].filter(Boolean).join(' · ');
+         return {
+            ...r, title, named: !!r.label, recovery,
+            groupLabel: format('FHCS.Attributes.ResourceLabel', { title, value: r.value, max: r.max }),
+            nameLabel: format('FHCS.Attributes.ResourceName', { n: i + 1 }),
+            valueLabel: format('FHCS.Attributes.ResourceValue', { title }),
+            maxLabel: format('FHCS.Attributes.ResourceMax', { title })
+         };
+      }),
+      resourcesOpen: !(facts.folded ?? []).includes('resources'),
       text: {
          skills: localize('FHCS.Attributes.Skills'),
          traits: localize('FHCS.Attributes.Traits'),
+         resources: localize('FHCS.Attributes.Resources'),
+         shortRest: localize('FHCS.Attributes.ShortRestAbbr'),
+         longRest: localize('FHCS.Attributes.LongRestAbbr'),
          skillsConfig: localize('FHCS.Attributes.SkillsConfig'),
          favorites: localize('FHCS.Attributes.Favorites'),
          noFavorites: localize('FHCS.Attributes.NoFavorites')

@@ -703,6 +703,53 @@ export function registerQuenchTests(quench)
             await spell.delete();
          });
 
+         it('breaks a concentration from the Effects tab in edit mode, where others have Delete', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 4);
+            const [spell] = await actor.createEmbeddedDocuments('Item', [
+               { name: 'FHCS test hunter', type: 'spell', system: { level: 1, method: 'spell', prepared: 1, properties: ['concentration'] } }
+            ]);
+            const [effect] = await actor.createEmbeddedDocuments('ActiveEffect', [{
+               name: 'Concentrating', img: spell.img, statuses: [CONFIG.specialStatusEffects.CONCENTRATING],
+               flags: { dnd5e: { item: { id: spell.id } } }
+            }]);
+            try
+            {
+               await click('.fhcs-tabs [data-tab="effects"]');
+               if (!sheet.isEditMode)
+               {
+                  await click('.fhcs-tabs [data-action="changeMode"]');
+                  await until(() => sheet.isEditMode, 'the lock switches to edit mode');
+               }
+               const row = () => sheet.element.querySelector(`.fhcs-effects [data-effect-id="${effect.id}"]`);
+               await until(() => row(), 'the concentration has a row on the Effects tab');
+               assert.notOk(row().querySelector('[data-action="delete"]'), 'a concentration offers no Delete');
+               await click(`.fhcs-effects [data-action="fhcsEndConcentration"][data-effect-id="${effect.id}"]`);
+               await until(() => !actor.effects.get(effect.id), () => `Break ends the concentration; the row holds ${[...(row()?.querySelectorAll('[data-action]') ?? [])].map((b) => b.dataset.action).join(', ')}`);
+            }
+            finally
+            {
+               await actor.effects.get(effect.id)?.delete();
+               await spell.delete();
+               await click('.fhcs-tabs [data-tab="details"]');
+            }
+         });
+
+         it('keeps all three resources on the Attributes tab, and saves uses typed into one', async function ()
+         {
+            const before = foundry.utils.deepClone(actor._source.system.resources.primary);
+            try
+            {
+               await click('.fhcs-tabs [data-tab="details"]');
+               const rows = sheet.element.querySelectorAll('.fhcs-attributes .fhcs-resource');
+               assert.strictEqual(rows.length, 3, `the Resources category lists all three; it holds ${rows.length}`);
+               await actor.update({ 'system.resources.primary': { label: 'FHCS test ki', max: 4, value: 4 } });
+               await enter('.fhcs-attributes [name="system.resources.primary.value"]', '2');
+               await until(() => actor._source.system.resources.primary.value === 2, () => `the uses save; they hold ${actor._source.system.resources.primary.value}`);
+            }
+            finally { await actor.update({ 'system.resources.primary': before }); }
+         });
+
          it('shows and hides Spellbook columns from edit mode', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 4);

@@ -82,14 +82,44 @@
       </div>
       {{/if}}
       {{#if resources.length}}
-      <div class="fhcs-resources">
-         {{#each resources}}
-         <div class="fhcs-resource" role="group" aria-label="{{ label }}">
-            <span class="fhcs-body">{{ title }}</span>
-            <span class="fhcs-display">{{ value }}</span>
-            <span class="fhcs-body fhcs-muted">/ {{ max }}</span>
+      {{!-- Resources (user, 2026-10-28): dnd5e's three legacy resources, always listed, first among the favorites on the
+            panel underlay, folding like the other groups. Uses left is a field in play; edit mode adds the name, the
+            most uses, and whether a short or long rest restores them. --}}
+      <div class="fhcs-group fhcs-resources-panel" data-fhcs-group="resources">
+         <div class="fhcs-group-head">
+            <button type="button" class="fhcs-group-toggle" data-action="fhcsToggleGroup" aria-expanded="{{#if resourcesOpen}}true{{else}}false{{/if}}">
+               <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+               <span class="fhcs-label">{{ text.resources }}</span>
+            </button>
          </div>
-         {{/each}}
+         <ul class="fhcs-favorites fhcs-resources"{{#unless resourcesOpen}} hidden{{/unless}}>
+            {{#each resources}}
+            <li class="fhcs-resource" role="group" aria-label="{{ groupLabel }}">
+               {{#if ../editing}}
+               <input type="text" class="fhcs-input fhcs-body fhcs-resource-field" name="system.resources.{{ key }}.label" value="{{ label }}"
+                      placeholder="{{ title }}" aria-label="{{ nameLabel }}">
+               <span class="fhcs-resource-recovery">
+                  <label class="fhcs-label fhcs-muted"><input type="checkbox" name="system.resources.{{ key }}.sr"{{#if sr}} checked{{/if}}>{{ ../text.shortRest }}</label>
+                  <label class="fhcs-label fhcs-muted"><input type="checkbox" name="system.resources.{{ key }}.lr"{{#if lr}} checked{{/if}}>{{ ../text.longRest }}</label>
+               </span>
+               {{else}}
+               <span class="fhcs-body fhcs-resource-name{{#unless named}} fhcs-muted{{/unless}}">{{ title }}</span>
+               <span class="fhcs-label fhcs-muted fhcs-resource-recovery">{{ recovery }}</span>
+               {{/if}}
+               <span class="fhcs-resource-count">
+                  <input type="text" class="fhcs-input fhcs-body" name="system.resources.{{ key }}.value" data-dtype="Number" inputmode="numeric"
+                         value="{{ value }}" placeholder="0" aria-label="{{ valueLabel }}">
+                  <span class="fhcs-body fhcs-muted">/</span>
+                  {{#if ../editing}}
+                  <input type="text" class="fhcs-input fhcs-body" name="system.resources.{{ key }}.max" data-dtype="Number" inputmode="numeric"
+                         value="{{ sourceMax }}" placeholder="0" aria-label="{{ maxLabel }}">
+                  {{else}}
+                  <span class="fhcs-body fhcs-resource-max">{{ max }}</span>
+                  {{/if}}
+               </span>
+            </li>
+            {{/each}}
+         </ul>
       </div>
       {{/if}}
 

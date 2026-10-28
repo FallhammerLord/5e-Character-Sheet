@@ -248,6 +248,14 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const editing = attributesView({ ...facts, editing: true }, { format, localize });
    if (editing.traits.map((t) => t.text).join() !== 'Common,\u2014') { problems.push('edit mode does not list empty traits'); }
    // The traits panel folds, remembered with the favorites groups; folded it summarizes what's set.
+   // Resources: all three always; an unnamed one gets "Resource N"; recovery in words.
+   const res = attributesView({ ...facts, resources: [
+      { key: 'primary', label: 'Ki', value: 2, max: 4, sourceMax: 4, sr: true, lr: false },
+      { key: 'secondary', label: '', value: 0, max: 0, sourceMax: 0, sr: false, lr: false },
+      { key: 'tertiary', label: 'Rage', value: 1, max: 3, sourceMax: 3, sr: false, lr: true }
+   ] }, { format, localize }).resources.map((r) => `${r.title}|${r.recovery}|${r.named}`);
+   try { deepStrictEqual(res, ['Ki|SR|true', 'Resource 2||false', 'Rage|LR|true']); }
+   catch { problems.push(`resources: ${JSON.stringify(res)}`); }
    const folded = attributesView({ ...facts, folded: ['traits'] }, { format, localize });
    if (!view.traitsOpen || folded.traitsOpen || folded.traitsSummary !== 'Common') { problems.push(`traits fold: ${folded.traitsOpen} "${folded.traitsSummary}"`); }
 }
