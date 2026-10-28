@@ -1,29 +1,16 @@
 /**
  * Fire and Forge's textures as vectors (user, 2026-10-28: "use vectors rather than pixels", the Damascus first): writes
- * the `--fhcs-theme-damascus`, `--fhcs-theme-grain` and `--fhcs-theme-rune-*` data URIs into styles/themes/forge.css. Run after changing a
+ * the `--fhcs-theme-damascus` and `--fhcs-theme-rune-*` data URIs into styles/themes/forge.css. Run after changing a
  * number here: `node tools/forge-textures.mjs`.
  *
  * Damascus: layers of folded steel as smooth Bézier lines, light and dark by turns. Every wave's period divides the
- * tile's width, so the tile repeats with no seam. Grain: hammer dimples, soft gradient ellipses, light above and dark
- * below, placed by a seeded random and drawn again across any edge they cross, so this tile repeats too.
+ * tile's width, so the tile repeats with no seam. (A hammered grain lived here too, dropped 2026-10-28: on panels it
+ * read as rocks.)
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const CSS = new URL('../styles/themes/forge.css', import.meta.url);
-
-/** A seeded random (mulberry32), so the textures are the same on every run. */
-function seeded(seed)
-{
-   let a = seed;
-   return () =>
-   {
-      a = (a + 0x6d2b79f5) | 0;
-      let t = Math.imul(a ^ (a >>> 15), 1 | a);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-   };
-}
 
 const r1 = (n) => Math.round(n * 10) / 10;
 
@@ -71,39 +58,6 @@ function damascus()
 }
 
 /**
- * Hammer dimples: 36 shallow ellipses, each filled with a soft gradient, light above and dark below, 5% at its ends
- * and clear through the middle; no outlines, which read as marks or letters (user's rule: art never competes with text).
- */
-function grain()
-{
-   const S = 96;
-   const random = seeded(7);
-   const marks = [];
-   for (let n = 0; n < 36; n++)
-   {
-      const x = random() * S;
-      const y = random() * S;
-      const rx = 4 + random() * 6;
-      const ry = rx * (0.6 + random() * 0.3);
-      const turn = Math.round(random() * 40 - 20);
-      for (const dx of [-S, 0, S])
-      {
-         for (const dy of [-S, 0, S])
-         {
-            const cx = x + dx;
-            const cy = y + dy;
-            if (cx + rx < 0 || cx - rx > S || cy + rx < 0 || cy - rx > S) { continue; }
-            marks.push(`<ellipse cx='${r1(cx)}' cy='${r1(cy)}' rx='${r1(rx)}' ry='${r1(ry)}' transform='rotate(${turn} ${r1(cx)} ${r1(cy)})'/>`);
-         }
-      }
-   }
-   const gradient = "<linearGradient id='g' x2='0' y2='1'><stop offset='0' stop-color='#fff' stop-opacity='0.05'/>"
-      + "<stop offset='0.45' stop-color='#fff' stop-opacity='0'/><stop offset='0.55' stop-color='#000' stop-opacity='0'/>"
-      + "<stop offset='1' stop-color='#000' stop-opacity='0.05'/></linearGradient>";
-   return `<svg xmlns='http://www.w3.org/2000/svg' width='${S}' height='${S}'><defs>${gradient}</defs><g fill='url(#g)'>${marks.join('')}</g></svg>`;
-}
-
-/**
  * Inspiration's marks in Forge (user, 2026-10-28: "the runes from fire and forge"): five of the stamped runes, one per
  * place in the bank. Empty, the rune's lines; banked, a struck tile with the rune cut through it, so the shape says
  * which, not only the glow. Masks: only their shape counts, the sheet colours them.
@@ -121,11 +75,11 @@ const uri = (svg) => `url("data:image/svg+xml,${svg.replace(/#/g, '%23').replace
 
 let css = readFileSync(CSS, 'utf8');
 const runes = RUNES.flatMap((d, i) => [[`rune-${i + 1}`, rune(d, false)], [`rune-${i + 1}-on`, rune(d, true)]]);
-for (const [name, svg] of [['damascus', damascus()], ['grain', grain()], ...runes])
+for (const [name, svg] of [['damascus', damascus()], ...runes])
 {
    const line = new RegExp(`(--fhcs-theme-${name}: )url\\("data:image/svg\\+xml,[^"]*"\\);`);
    if (!line.test(css)) { throw new Error(`forge.css has no --fhcs-theme-${name} token to replace`); }
    css = css.replace(line, `$1${uri(svg)};`);
 }
 writeFileSync(CSS, css);
-console.log('Wrote the Damascus, grain and rune marks into styles/themes/forge.css.');
+console.log('Wrote the Damascus and rune marks into styles/themes/forge.css.');
