@@ -6,7 +6,7 @@
 import { countingDie, MAX_PER_SIDE, modeForSides } from './chat/d20.js';
 import { diceMath } from './chat/math.js';
 import { canCast, spellKind } from './sheet/spellbook.js';
-import { APPLIED_FLAG, MODULE_ID, PORTRAIT_FLAG, RESOURCES_FLAG, SHAPE_FLAG } from './constants.js';
+import { APPLIED_FLAG, INSPIRATION_FLAG, MODULE_ID, PORTRAIT_FLAG, RESOURCES_FLAG, SHAPE_FLAG } from './constants.js';
 
 /** dnd5e's own character sheet, which ours extends so every mechanic keeps working. Set by dnd5e before init. */
 export function systemCharacterSheet()
@@ -644,6 +644,66 @@ export function refreshResource(actor, key)
    if (item) { return item.update({ 'system.uses.spent': 0 }); }
    if (!RESOURCE_KEYS.includes(key)) { return null; }
    return actor.update({ [`system.resources.${key}.value`]: actor.system.resources?.[key]?.max ?? 0 });
+}
+
+/**
+ * The item banking a character's inspiration (SCOPE §4.12): ours (`flags.fhcs.inspiration`), else modern Tidy's
+ * source (`flags.tidy5e-sheet.inspiration-source`, read straight from the flags: `getFlag` throws for a module that
+ * isn't active), so a character keeps its bank across sheets. Only while it has uses.
+ */
+function inspirationItem(actor)
+{
+   const id = actor.getFlag(MODULE_ID, INSPIRATION_FLAG) ?? actor.flags?.['tidy5e-sheet']?.['inspiration-source'];
+   if (!id || typeof id !== 'string') { return null; }
+   const item = actor.items.get(id) ?? (id.includes('.') ? fromUuidSync(id, { relative: actor }) : null);
+   return item?.parent === actor && item.system.uses?.max ? item : null;
+}
+
+/**
+ * Inspiration for the tab row: dnd5e's on or off, and the bank when an item with uses holds it, with the items that
+ * could.
+ */
+export function inspirationFacts(actor)
+{
+   const item = inspirationItem(actor);
+   return {
+      on: !!actor.system.attributes?.inspiration,
+      bank: item ? { link: docFacts(item), value: item.system.uses.value ?? 0, max: item.system.uses.max } : null,
+      linkable: actor.items.filter((i) => i.system.uses?.max).map(docFacts).sort((a, b) => a.name.localeCompare(b.name))
+   };
+}
+
+/** Keeps dnd5e's on-or-off inspiration in step with the bank: on while it holds any, so whatever reads dnd5e's works. */
+function syncInspiration(actor, banked)
+{
+   const on = banked > 0;
+   return !!actor.system.attributes?.inspiration === on ? null : actor.update({ 'system.attributes.inspiration': on });
+}
+
+/** Banks (+1) or spends (−1) one inspiration: dnd5e stores what's spent (inventory.mjs:565). */
+export async function changeInspiration(actor, delta)
+{
+   const item = inspirationItem(actor);
+   if (!item || !Number.isFinite(delta)) { return null; }
+   const max = item.system.uses.max;
+   const value = Math.clamp((item.system.uses.value ?? 0) + Math.sign(delta), 0, max);
+   await item.update({ 'system.uses.spent': max - value });
+   return syncInspiration(actor, value);
+}
+
+/** Banks inspiration in an item's uses, or goes back to dnd5e's on or off (no id). */
+export async function linkInspiration(actor, itemId)
+{
+   const item = itemId ? actor.items.get(itemId) : null;
+   if (itemId && !item?.system.uses?.max) { return null; }
+   if (!item)
+   {
+      // Tidy's source too, or it would come straight back.
+      if (actor.flags?.['tidy5e-sheet']?.['inspiration-source']) { await actor.update({ 'flags.tidy5e-sheet.-=inspiration-source': null }); }
+      return actor.unsetFlag(MODULE_ID, INSPIRATION_FLAG);
+   }
+   await actor.setFlag(MODULE_ID, INSPIRATION_FLAG, item.id);
+   return syncInspiration(actor, item.system.uses.value ?? 0);
 }
 
 /** @returns {{id, uuid, name, img}} What our cards need of an item. */

@@ -203,7 +203,7 @@ export function registerQuenchTests(quench)
             await clickReaches('.fhcs-header [data-type="initiative"]', 'dnd5e.preRollInitiativeDialog');
          });
 
-         it('toggles inspiration and sets exhaustion from the portrait chips', async function ()
+         it('toggles inspiration from the tab row and sets exhaustion from the name row', async function ()
          {
             const before = !!actor.system.attributes.inspiration;
             const changed = (path) => new Promise((resolve) =>
@@ -214,7 +214,7 @@ export function registerQuenchTests(quench)
                });
             });
             let done = changed('system.attributes.inspiration');
-            await click('.fhcs-header [data-action="toggleInspiration"]');
+            await click('.fhcs-tabs [data-action="toggleInspiration"]');
             await done;
             assert.strictEqual(!!actor.system.attributes.inspiration, !before);
             done = changed('system.attributes.exhaustion');
@@ -811,6 +811,49 @@ export function registerQuenchTests(quench)
                await actor.update({ 'system.resources': resources });
                if (flag) { await actor.setFlag('fhcs', 'resources', flag); }
                else { await actor.unsetFlag('fhcs', 'resources'); }
+               await feat?.delete();
+            }
+         });
+
+         it('banks inspiration in an item from the tab row: links it, banks and spends with the stars, keeps dnd5e in step', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 12);
+            const flag = actor.getFlag('fhcs', 'inspiration') ?? null;
+            const inspired = !!actor.system.attributes.inspiration;
+            let feat = null;
+            const uses = () => `${feat.system.uses.value} of ${feat.system.uses.max}, dnd5e's inspiration ${actor.system.attributes.inspiration}`;
+            try
+            {
+               await actor.update({ 'system.attributes.inspiration': false });
+               [feat] = await createItems([{ name: 'FHCS test heroic inspiration', type: 'feat', system: { uses: { max: '3', spent: 3 } } }]);
+               if (!sheet.isEditMode)
+               {
+                  await click('.fhcs-tabs [data-action="changeMode"]');
+                  await until(() => sheet.isEditMode, 'the lock switches to edit mode');
+               }
+               await click('.fhcs-tabs .fhcs-inspiration-link > summary');
+               await click(`.fhcs-tabs [data-action="fhcsLinkInspiration"][data-item-id="${feat.id}"]`);
+               await until(() => actor.getFlag('fhcs', 'inspiration') === feat.id,
+                  () => `the gear's tray links the item; the flag holds ${actor.getFlag('fhcs', 'inspiration')}`);
+               await until(() => sheet.element.querySelectorAll('.fhcs-inspiration-stars .fhcs-star').length === 3,
+                  () => `a star per use; the row draws ${sheet.element.querySelectorAll('.fhcs-inspiration-stars .fhcs-star').length}`);
+               await leaveEditMode();
+               await click('.fhcs-inspiration-stars [data-delta="1"]');
+               await until(() => feat.system.uses.value === 1 && actor.system.attributes.inspiration === true,
+                  () => `an empty star banks one and turns dnd5e's on; it holds ${uses()}`);
+               await click('.fhcs-inspiration-count [data-delta="1"]');
+               await until(() => feat.system.uses.value === 2, () => `the count's + banks one; it holds ${uses()}`);
+               await click('.fhcs-inspiration-stars [data-delta="-1"]');
+               await click('.fhcs-inspiration-stars [data-delta="-1"]');
+               await until(() => feat.system.uses.value === 0 && actor.system.attributes.inspiration === false,
+                  () => `filled stars spend, and an empty bank turns dnd5e's off; it holds ${uses()}`);
+            }
+            finally
+            {
+               await leaveEditMode();
+               if (flag) { await actor.setFlag('fhcs', 'inspiration', flag); }
+               else { await actor.unsetFlag('fhcs', 'inspiration'); }
+               await actor.update({ 'system.attributes.inspiration': inspired });
                await feat?.delete();
             }
          });

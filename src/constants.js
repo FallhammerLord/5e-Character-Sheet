@@ -24,6 +24,9 @@ export const SHAPE_FLAG = 'portraitShape';
 /** Actor flag: which item, by id, each resource panel shows in place of dnd5e's own resource ({ primary: id }). */
 export const RESOURCES_FLAG = 'resources';
 
+/** Actor flag: the item, by id, whose uses are the character's banked inspiration (SCOPE §4.12). */
+export const INSPIRATION_FLAG = 'inspiration';
+
 /** The sheet's themes (SCOPE §4.11), by key; `plain` is today's look. Actor flag `flags.fhcs.theme` picks one per
     character; without it, the world setting `fhcs.theme` applies. */
 export const THEMES = ['plain', 'forge', 'wind', 'sand', 'valley'];

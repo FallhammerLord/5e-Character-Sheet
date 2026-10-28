@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES } from '../constants.js';
-import { attributesFacts, biographyFacts, changeHp, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, changeHp, changeInspiration, inspirationFacts, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, renderTemplate, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
@@ -8,7 +8,7 @@ import { featureColumnChoice, featuresView } from '../sheet/features.js';
 import { effectsView } from '../sheet/effects.js';
 import { biographyView } from '../sheet/biography.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
-import { headerMinWidth, headerView, hpPreview, tabRow, themePicker } from '../sheet/header.js';
+import { headerMinWidth, headerView, hpPreview, inspirationBar, tabRow, themePicker } from '../sheet/header.js';
 import { scheduleSparks, stopSparks } from './sparks.js';
 import { delayTips, keepFolds } from '../chat/card.js';
 import { startFraming } from './framing.js';
@@ -39,7 +39,8 @@ const PART_OPTIONS = {
    features: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/feature-row.hbs`, LIST_BAR] },
    effects: { scrollable: ['.fhcs-items'], templates: [LIST_BAR, `${MODULE_PATH}/templates/sheet/conc-c.hbs`] },
    biography: { templates: [`${MODULE_PATH}/templates/sheet/bio-box.hbs`] },
-   details: { templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`] }
+   details: { templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`] },
+   tabs: { templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`] }
 };
 
 /** Each list tab's column setting, by dnd5e's list name. */
@@ -226,6 +227,36 @@ function linkResourceAction(event, target)
 {
    target.closest('details')?.removeAttribute('open');
    return linkResource(this.actor, target.dataset.key, target.dataset.itemId);
+}
+
+/** The inspiration bar (SCOPE §4.12): a filled star spends one, an empty one banks one. */
+function inspirationAction(event, target)
+{
+   return changeInspiration(this.actor, Number(target.dataset.delta));
+}
+
+/** The inspiration gear's tray: bank inspiration in an item's uses, or back to dnd5e's on or off. */
+function linkInspirationAction(event, target)
+{
+   target.closest('details')?.removeAttribute('open');
+   return linkInspiration(this.actor, target.dataset.itemId);
+}
+
+/**
+ * Inspiration gained between two draws: the newest star gleams for a moment (SCOPE §4.12), on every look; styles
+ * keep it still under Motion off and reduced motion.
+ */
+function inspirationMoment(element)
+{
+   const bar = element.querySelector('.fhcs-tabs .fhcs-inspiration');
+   if (!bar) { return; }
+   const count = Number(bar.dataset.fhcsCount) || 0;
+   const before = element.dataset.fhcsInspired;
+   element.dataset.fhcsInspired = String(count);
+   if (before === undefined || count <= Number(before)) { return; }
+   element.classList.remove('fhcs-moment-inspire');
+   element.classList.add('fhcs-moment-inspire');
+   setTimeout(() => element.classList.remove('fhcs-moment-inspire'), MOMENT_MS);
 }
 
 /** A resource panel's Restore: uses back to most. */
@@ -415,7 +446,8 @@ export function makeCharacterSheet(Base)
             fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails,
             fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange, fhcsFrame: frame, fhcsLevelDown: levelDown, fhcsPortraitShape: portraitShape,
             fhcsSkillAbility: skillAbility, fhcsLinkResource: linkResourceAction, fhcsRefreshResource: refreshResourceAction,
-            fhcsToggleSection: toggleSection, fhcsSetTheme: setTheme }
+            fhcsToggleSection: toggleSection, fhcsSetTheme: setTheme,
+            fhcsInspiration: inspirationAction, fhcsLinkInspiration: linkInspirationAction }
       };
 
       static PARTS = ourParts(Base.PARTS);
@@ -481,7 +513,8 @@ export function makeCharacterSheet(Base)
          }
          if (partId === 'tabs')
          {
-            context.fhcsTabs = tabRow(context.tabs, { canEdit: this.isEditable, editing: this.isEditMode }, i18n.localize);
+            const mode = { canEdit: this.isEditable, editing: this.isEditMode };
+            context.fhcsTabs = { ...tabRow(context.tabs, mode, i18n.localize), inspiration: inspirationBar(inspirationFacts(this.actor), mode, i18n) };
          }
          return context;
       }
@@ -534,6 +567,7 @@ export function makeCharacterSheet(Base)
          wireHpTray(this.element);
          wireResourceUses(this.element, this.actor);
          themeState(this.element, this.actor);
+         inspirationMoment(this.element);
          scheduleSparks(this.element);
          await drawThemePicker(this);
          const items = this.element.querySelector('.fhcs-inventory .fhcs-items');

@@ -55,12 +55,11 @@
    /* The maker's mark: a hammer over an anvil, stamped into the nameplate. */
    --fhcs-theme-mark: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cg%20fill='%235a4320'%3E%3Cpath%20d='M3%2015h12c0%201.8%201.8%202.8%205%202.8V20h-6l-1%201.5h2V23H7v-1.5h2L8%2020c-3-.5-5-2.4-5-5z'/%3E%3Cpath%20d='M6%203h8v3H11v7H9V6H6z'/%3E%3C/g%3E%3C/svg%3E");
    /* The steel of heading bars and the tab rail (user, 2026-10-28: polished steel in light mode, dark iron in dark),
-      and runes stamped into it, dark on polished steel, light on iron. */
+      its ink dark on polished steel, light on iron. */
    --fhcs-theme-bar-top: #d6d0c8;
    --fhcs-theme-bar: #b3aca3;
    --fhcs-theme-bar-ink: #1d1712;
    --fhcs-theme-bar-rivet: #6b625a;
-   --fhcs-theme-runes: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='120'%20height='28'%3E%3Cg%20fill='none'%20stroke='%23000'%20stroke-width='1.4'%20stroke-linecap='square'%20opacity='0.2'%3E%3Cpath%20d='M8%207v14M8%2010l6-3M8%2014l6-3'/%3E%3Cpath%20d='M24%2021V7l6%204v10'/%3E%3Cpath%20d='M40%207v14M40%2010l5%204-5%204'/%3E%3Cpath%20d='M58%207v14M54%2011l4-4%204%204'/%3E%3Cpath%20d='M72%2021l4-14%204%2014M74%2015h4'/%3E%3Cpath%20d='M94%207v14M90%2010l8%207M98%2010l-8%207'/%3E%3Cpath%20d='M108%207l6%207-6%207M114%207v14'/%3E%3C/g%3E%3C/svg%3E");
    --fhcs-theme-temper: linear-gradient(to right, transparent, #e2c278 20%, #c99a3a 50%, #9c6a2c 80%, transparent);
 }
 
@@ -82,7 +81,6 @@
    --fhcs-theme-bar: #2b2521;
    --fhcs-theme-bar-ink: #efe3d2;
    --fhcs-theme-bar-rivet: #8d847b;
-   --fhcs-theme-runes: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='120'%20height='28'%3E%3Cg%20fill='none'%20stroke='%23fff'%20stroke-width='1.4'%20stroke-linecap='square'%20opacity='0.14'%3E%3Cpath%20d='M8%207v14M8%2010l6-3M8%2014l6-3'/%3E%3Cpath%20d='M24%2021V7l6%204v10'/%3E%3Cpath%20d='M40%207v14M40%2010l5%204-5%204'/%3E%3Cpath%20d='M58%207v14M54%2011l4-4%204%204'/%3E%3Cpath%20d='M72%2021l4-14%204%2014M74%2015h4'/%3E%3Cpath%20d='M94%207v14M90%2010l8%207M98%2010l-8%207'/%3E%3Cpath%20d='M108%207l6%207-6%207M114%207v14'/%3E%3C/g%3E%3C/svg%3E");
    --fhcs-theme-mortar: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='32'%3E%3Cg fill='%23160f0c'%3E%3Crect y='14' width='36' height='2'/%3E%3Crect y='30' width='36' height='2'/%3E%3Crect x='34' width='2' height='14'/%3E%3Crect x='16' y='16' width='2' height='14'/%3E%3C/g%3E%3C/svg%3E");
    --fhcs-theme-glow: color-mix(in srgb, #f08a40 50%, transparent);
    --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23e2793a' d='M2 7h14c0 2.2 2.2 3.4 6 3.4V13h-7l-1.4 2.2H17V19H6v-3.8h3.4L8 13C4.4 12.4 2 10.2 2 7z'/%3E%3C/svg%3E");
@@ -191,12 +189,6 @@
 .fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-panel-head, .fhcs-group-head) { border-image: linear-gradient(to right, var(--fhcs-theme-accent), var(--fhcs-theme-edge) 40%, transparent) 1; }
 
 /* The open tab: a bar of hot iron. */
-/* Edit mode's longer tab row (Special Traits) reaches the runes: the rail goes without them. */
-.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-tabs:has(.fhcs-lock[aria-pressed="true"])
-{
-   background-image: var(--fhcs-theme-emblem), linear-gradient(to right, transparent, var(--fhcs-theme-fire) 50%, transparent);
-}
-
 .fhcs-sheet[data-fhcs-theme="forge"] .fhcs-tab.active
 {
    border-bottom-color: var(--fhcs-theme-accent);
@@ -204,11 +196,26 @@
 
 .fhcs-sheet[data-fhcs-theme="forge"] .fhcs-tabs
 {
-   /* The emblem, and the rail under the tabs warm with the hearth. */
-   background-image: var(--fhcs-theme-emblem), linear-gradient(to right, transparent, var(--fhcs-theme-fire) 50%, transparent);
-   background-position: right calc(var(--fhcs-control) + 2 * var(--fhcs-s2)) center, 0 100%;
-   background-size: 20px, 100% 2px;
+   /* The rail under the tabs warms with the hearth. */
+   background-image: linear-gradient(to right, transparent, var(--fhcs-theme-fire) 50%, transparent);
+   background-position: 0 100%;
+   background-size: 100% 2px;
    background-repeat: no-repeat;
+}
+
+/* The anvil rides at the inspiration bar's left (user, 2026-10-28: the controls there had covered it); a narrow edit
+   row, which needs its room for Special Traits and the gear, goes without. */
+.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-inspiration::before
+{
+   content: '';
+   flex: none;
+   width: 20px;
+   height: 20px;
+   background: var(--fhcs-theme-emblem) center / contain no-repeat;
+}
+@container fhcs-tabs (width < 720px)
+{
+   .fhcs-sheet[data-fhcs-theme="forge"] .fhcs-tabs:has(.fhcs-lock[aria-pressed="true"]) .fhcs-inspiration::before { display: none; }
 }
 
 /* ---------- The portrait, lit from below by the hearth ---------- */
@@ -280,10 +287,10 @@
    color: var(--fhcs-theme-bar-ink);
    background-color: var(--fhcs-theme-bar);
    border-bottom: 1px solid var(--fhcs-theme-iron);
-   background-image: var(--fhcs-theme-emblem), linear-gradient(to right, transparent, var(--fhcs-theme-fire) 50%, transparent), var(--fhcs-theme-runes);
-   /* One band of seven runes, between the last tab and the anvil, so no tab name sits on them. */
-   background-position: right calc(var(--fhcs-control) + 2 * var(--fhcs-s2)) center, 0 100%, right calc(var(--fhcs-control) + 2 * var(--fhcs-s2) + 28px) center;
-   background-size: 20px, 100% 2px, 120px 100%;
+   /* The rail under the tabs warm; the runes left the rail when inspiration took its empty right (2026-10-28). */
+   background-image: linear-gradient(to right, transparent, var(--fhcs-theme-fire) 50%, transparent);
+   background-position: 0 100%;
+   background-size: 100% 2px;
    background-repeat: no-repeat;
 }
 

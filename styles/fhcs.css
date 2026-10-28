@@ -953,7 +953,9 @@
    flex: none;
    justify-content: flex-start;
    align-items: center;
-   gap: var(--fhcs-s1);
+   /* No gap between tabs: each tab's own padding keeps labels 8px apart, and edit mode's row (Special Traits, the
+      inspiration gear) fits at 644px. */
+   gap: 0;
    padding: 0 var(--fhcs-s2);
    border-bottom: 1px solid var(--fhcs-line-soft);
 }
@@ -995,6 +997,62 @@
    border-color: var(--fhcs-die-ink);
    background: var(--fhcs-die-ink);
    color: var(--fhcs-die-on-ink);
+}
+
+/* ---------- Inspiration (SCOPE §4.12, user 2026-10-28) ----------
+   In the tab row's empty right, before the lock: one star (dnd5e's on or off) or the bank, a star per use, filled
+   ones banked. A row too narrow for the stars, or a bank bigger than five, shows the count: bank (+), then spend.
+   Edit mode's gear sits at its left, in the + button's place, so nothing moves on the lock. On is a filled star (never colour alone).
+   No gaps inside: each control is a 24px target round a smaller mark, which spaces them, and the 644px edit row
+   (Bastion, Special Traits, the gear) has no room to spare. */
+.fhcs-sheet .fhcs-tabs { container: fhcs-tabs / inline-size; }
+.fhcs-sheet .fhcs-inspiration { position: relative; display: flex; flex: 1 0 auto; justify-content: flex-end; align-items: center; gap: 0; }
+.fhcs-sheet .fhcs-tabs .fhcs-inspiration + .fhcs-lock { margin-left: var(--fhcs-s1); }
+.fhcs-sheet .fhcs-inspiration > details { position: static; display: flex; }
+.fhcs-sheet :is(.fhcs-inspiration-stars, .fhcs-inspiration-count) { display: flex; align-items: center; }
+.fhcs-sheet .fhcs-inspiration-count,
+.fhcs-sheet .fhcs-inspiration-compact .fhcs-inspiration-stars { display: none; }
+.fhcs-sheet .fhcs-inspiration-compact .fhcs-inspiration-count { display: flex; }
+@container fhcs-tabs (width < 720px)
+{
+   .fhcs-sheet .fhcs-inspiration-stars { display: none; }
+   .fhcs-sheet .fhcs-inspiration-count { display: flex; }
+}
+.fhcs-sheet .fhcs-star
+{
+   display: inline-flex;
+   flex: none;
+   align-items: center;
+   justify-content: center;
+   gap: var(--fhcs-s1);
+   min-width: 24px;
+   height: var(--fhcs-control);
+   margin: 0;
+   padding: 0;
+   border: 0;
+   border-radius: var(--fhcs-radius);
+   background: none;
+   box-shadow: none;
+   color: inherit;
+   cursor: pointer;
+}
+.fhcs-sheet .fhcs-star:disabled { cursor: default; }
+.fhcs-sheet .fhcs-star:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
+.fhcs-sheet .fhcs-star.fhcs-on .fhcs-icon { fill: currentColor; }
+/* The count reads from the left: its star, then "3/5". */
+.fhcs-sheet .fhcs-star-spend { justify-content: flex-start; gap: 0; }
+.fhcs-sheet .fhcs-inspiration .fhcs-inspiration-tray { left: auto; right: 0; z-index: 10; width: 15rem; max-height: 20rem; overflow-y: auto; scrollbar-gutter: stable; }
+
+/* Gained: the newest star turns in and swells for a moment. */
+@keyframes fhcs-inspire
+{
+   0% { transform: scale(0.5) rotate(-72deg); }
+   60% { transform: scale(1.3) rotate(8deg); }
+   100% { transform: none; }
+}
+@media (prefers-reduced-motion: no-preference)
+{
+   .fhcs-sheet.fhcs-moment-inspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-last .fhcs-icon { animation: fhcs-inspire 600ms ease-out; }
 }
 
 /* The theme picker on the title bar, beside ⋮ (SCOPE §4.11, user 2026-10-28): a title-bar control, its tray under it. */

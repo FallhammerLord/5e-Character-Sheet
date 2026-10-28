@@ -170,9 +170,9 @@ function findProblems()
    const shown = (el) => el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden' && !el.closest('[aria-hidden="true"], [hidden]');
    const named = (el) => `${el.tagName.toLowerCase()}.${[...el.classList].join('.')}`;
    const ownText = (el) => [...el.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent).join('').trim();
-   // 16: the portrait's chips are the inspiration chip's size (an icon-only chip square), and chips side by side
-   // share a row, never stacked.
-   const model = app.querySelector('.window-content .fhcs-portrait-stage [data-action="toggleInspiration"]');
+   // 16: the portrait's chips are one size, the first's (an icon-only chip square; inspiration was the model until it
+   // moved to the tab row, 2026-10-28), and chips side by side share a row, never stacked.
+   const model = [...app.querySelectorAll('.window-content .fhcs-portrait-stage .fhcs-chip')].find((el) => !el.closest('.fhcs-tray'));
    if (model && shown(model))
    {
       const m = model.getBoundingClientRect();
@@ -185,7 +185,7 @@ function findProblems()
          const ring = getComputedStyle(el).boxShadow !== getComputedStyle(model).boxShadow;
          if (ring || Math.abs(r.height - m.height) > 1 || (iconOnly && Math.abs(r.width - m.width) > 1))
          {
-            issues.push(`portrait chip is ${Math.round(r.width)}×${Math.round(r.height)}${ring ? ' with a ring' : ''}, inspiration ${Math.round(m.width)}×${Math.round(m.height)}: ${named(el)}`);
+            issues.push(`portrait chip is ${Math.round(r.width)}×${Math.round(r.height)}${ring ? ' with a ring' : ''}, the first ${Math.round(m.width)}×${Math.round(m.height)}: ${named(el)}`);
          }
       }
       // The chips on the portrait keep a gap between them (a crowded top row once ran Frame into Inspiration).

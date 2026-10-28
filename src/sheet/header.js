@@ -280,6 +280,54 @@ export function tabRow(tabs, { canEdit, editing }, localize)
    };
 }
 
+/** The most stars the inspiration bar draws; a bigger bank shows as a count ("5 / 8"). */
+export const INSPIRATION_STARS = 5;
+
+/**
+ * The inspiration bar at the tab row's right, before the lock (SCOPE §4.12, user 2026-10-28). Without a bank, one star:
+ * dnd5e's on or off. With one, a star per use, filled ones banked: a click on a filled star spends one, on an empty
+ * star banks one. A count with spend and bank buttons ("compact") stands in when the bank is bigger than the stars
+ * drawn, and in a narrow row (styles). Edit mode adds a gear whose tray picks the item that banks it.
+ * @param {{on: boolean, bank: object|null, linkable: object[]}} facts  From `compat.inspirationFacts`.
+ * @param {{canEdit: boolean, editing: boolean}} mode
+ */
+export function inspirationBar(facts, { canEdit, editing }, { localize, format })
+{
+   const bank = facts.bank;
+   const count = bank ? bank.value : facts.on ? 1 : 0;
+   const label = localize('FHCS.Inspiration.Label');
+   const view = { label, canEdit, editing, count, bank: !!bank, on: facts.on };
+   if (bank)
+   {
+      const spend = localize('FHCS.Inspiration.Spend');
+      const add = localize('FHCS.Inspiration.Bank');
+      view.value = bank.value;
+      view.max = bank.max;
+      view.name = bank.link.name;
+      view.countLabel = format('FHCS.Inspiration.Count', { value: bank.value, max: bank.max, name: bank.link.name });
+      view.spend = { label: spend, can: canEdit && bank.value > 0 };
+      view.add = { label: add, can: canEdit && bank.value < bank.max };
+      view.onlyCompact = bank.max > INSPIRATION_STARS;
+      view.stars = view.onlyCompact ? [] : Array.from({ length: bank.max }, (_, i) =>
+      {
+         const filled = i < bank.value;
+         return { filled, last: filled && i === bank.value - 1, delta: filled ? -1 : 1, label: filled ? spend : add, can: canEdit };
+      });
+   }
+   if (editing)
+   {
+      view.link = {
+         label: localize('FHCS.Inspiration.Link'),
+         title: localize('FHCS.Inspiration.LinkTitle'),
+         options: [
+            { id: '', name: localize('FHCS.Inspiration.Own'), on: !bank },
+            ...facts.linkable.map((item) => ({ ...item, on: bank?.link.id === item.id }))
+         ]
+      };
+   }
+   return view;
+}
+
 /**
  * The theme picker on the title bar (SCOPE §4.11): the world default (named), then each theme; the one worn pressed.
  * @param {{chosen: string, world: string, keys: string[]}} theme  The character's own ('' for none), the world's.

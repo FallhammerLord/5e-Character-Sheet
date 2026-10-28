@@ -5,15 +5,14 @@
  * A case: { name, template: 'path/without-hbs', context: {...}, frame?: 'sheet' | 'chat', theme?: 'light' }
  */
 import { appliedLines, cardParts, d20Band, damageBand, saveRow } from '../src/chat/card.js';
-import { headerView, tabRow, themePicker } from '../src/sheet/header.js';
-import { template } from './templates.mjs';
+import { headerView, inspirationBar, tabRow, themePicker } from '../src/sheet/header.js';
 import { attributesView } from '../src/sheet/attributes.js';
 import { inventoryView } from '../src/sheet/inventory.js';
 import { spellbookView } from '../src/sheet/spellbook.js';
 import { featuresView } from '../src/sheet/features.js';
 import { effectsView } from '../src/sheet/effects.js';
 import { biographyView } from '../src/sheet/biography.js';
-import { format, localize } from './templates.mjs';
+import { format, localize, template } from './templates.mjs';
 
 /** A usage card's context as FHCSUsageMessageData#_prepareContext builds it, with overrides. */
 const card = (over = {}, buttons = []) => ({
@@ -200,7 +199,15 @@ const SPECIAL_TRAITS = `<section class="tab active" data-tab="specialTraits" dat
 /** dnd5e's tabs as `_getTabs` gives them, dnd5e's order and labels. */
 const DND5E_TABS = Object.fromEntries(['details', 'inventory', 'features', 'spells', 'effects', 'biography', 'bastion', 'specialTraits']
    .map((id, i) => [id, { id, label: ['Details', 'Inventory', 'Features', 'Spells', 'Effects', 'Biography', 'Bastion', 'Special Traits'][i], active: id === 'details' }]));
-const tabs = (mode) => ({ fhcsTabs: tabRow(DND5E_TABS, mode, localize) });
+// Inspiration in the tab row (SCOPE §4.12): dnd5e's on or off, a bank of five (three banked), and a bank too big for stars.
+const INSPIRE_ITEMS = [{ id: 'insp1', uuid: 'Actor.a.Item.insp1', name: 'Heroic Inspiration', img: '' },
+   { id: 'luck1', uuid: 'Actor.a.Item.luck1', name: 'Lucky', img: '' }];
+const INSPIRE = {
+   none: { on: true, bank: null, linkable: INSPIRE_ITEMS },
+   bank: { on: true, bank: { link: INSPIRE_ITEMS[0], value: 3, max: 5 }, linkable: INSPIRE_ITEMS },
+   big: { on: true, bank: { link: INSPIRE_ITEMS[1], value: 5, max: 8 }, linkable: INSPIRE_ITEMS }
+};
+const tabs = (mode, inspire = 'none') => ({ fhcsTabs: { ...tabRow(DND5E_TABS, mode, localize), inspiration: inspirationBar(INSPIRE[inspire], mode, { localize, format }) } });
 // The theme picker on the title bar (SCOPE §4.11), its tray open: this character wears Forge, the world Plain.
 const THEME_PICK = themePicker({ chosen: 'forge', world: 'plain', keys: ['plain', 'forge', 'wind', 'sand', 'valley'] }, { localize, format });
 const titleBarPick = template('sheet/theme-pick')(THEME_PICK).replace('data-fold-key="theme"', 'data-fold-key="theme" open');
@@ -592,6 +599,11 @@ export const CASES = [
    { name: 'attributes-empty', template: 'sheet/attributes', context: attributes({ favorites: [], resources: [], traits: [] }) },
    { name: 'tabs', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }) },
    { name: 'tabs-editing', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: true }) },
+   { name: 'tabs-bank', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }, 'bank'), rows: '.fhcs-tabs' },
+   { name: 'tabs-bank-editing', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: true }, 'bank'), rows: '.fhcs-tabs', sameRowsAs: 'tabs-bank' },
+   { name: 'tabs-bank-big', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }, 'big') },
+   { name: 'tabs-inspiration-tray', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: true }, 'bank'), open: ['inspiration'] },
+   { name: 'tabs-observer', template: 'sheet/tabs', context: tabs({ canEdit: false, editing: false }, 'bank') },
    { name: 'title-theme-tray', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }), titleBar: titleBarPick },
    { name: 'special-traits', html: SPECIAL_TRAITS },
    { name: 'header', template: 'sheet/header', context: header(), align: HEADER_ALIGN, rows: '.fhcs-header, .fhcs-ability' },
@@ -753,7 +765,7 @@ for (const look of LOOKS)
 // Fire and Forge, the whole sheet (user, 2026-10-28: "finish the sheet ... trays, tabs, and anything we've missed"):
 // every tab, edit mode, and each tray open.
 for (const name of ['features', 'effects', 'biography', 'attributes-editing', 'attributes-resource-tray', 'inventory-editing',
-   'spellbook-editing', 'features-editing', 'title-theme-tray', 'header-editing', 'header-hp-tray', 'header-exhaustion-open',
+   'spellbook-editing', 'features-editing', 'title-theme-tray', 'tabs-bank-big', 'tabs-inspiration-tray', 'header-editing', 'header-hp-tray', 'header-exhaustion-open',
    'header-level-up', 'header-classes-open', 'header-milestones'])
 {
    const base = CASES.find((c) => c.name === name);

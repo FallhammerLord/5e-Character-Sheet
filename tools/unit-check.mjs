@@ -17,7 +17,7 @@ import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js
 import { effectsView } from '../src/sheet/effects.js';
 import { biographyView, paragraphs } from '../src/sheet/biography.js';
 import { pinView } from '../src/sheet/lists.js';
-import { headerMinWidth, headerView, hpPreview, levelOrder, levelTrack, portraitFrame, signed, tabRow, themePicker } from '../src/sheet/header.js';
+import { headerMinWidth, headerView, hpPreview, inspirationBar, levelOrder, levelTrack, portraitFrame, signed, tabRow, themePicker } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
 const facts = (over) => ({
@@ -246,6 +246,26 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const options = themePicker({ chosen: '', world: 'forge', keys: ['plain', 'forge'] }, { localize, format }).options.map((o) => `${o.value || 'world'}:${o.name}:${o.on}`);
    try { deepStrictEqual(options, ['world:World default (Fire and Forge):true', 'plain:Plain:false', 'forge:Fire and Forge:false']); }
    catch { problems.push(`theme picker: ${JSON.stringify(options)}`); }
+}
+
+// Inspiration (SCOPE §4.12): one star without a bank; a star per use with one, filled ones spend and empty ones bank;
+// a bank over five shows only the count; edit mode's tray lists the items with uses, the one banking it pressed.
+{
+   const item = { id: 'h', uuid: 'Actor.a.Item.h', name: 'Heroic', img: '' };
+   const mode = { canEdit: true, editing: false };
+   const i18n = { localize, format };
+   const none = inspirationBar({ on: true, bank: null, linkable: [item] }, mode, i18n);
+   if (none.bank || none.count !== 1 || none.link) { problems.push(`inspiration without a bank: ${JSON.stringify(none)}`); }
+   const bank = inspirationBar({ on: true, bank: { link: item, value: 2, max: 4 }, linkable: [item] }, mode, i18n);
+   const stars = bank.stars.map((x) => `${x.filled ? '*' : 'o'}${x.delta}${x.last ? '!' : ''}`).join(' ');
+   if (stars !== '*-1 *-1! o1 o1' || bank.onlyCompact || bank.count !== 2) { problems.push(`inspiration bank 2 of 4: ${stars}, compact ${bank.onlyCompact}`); }
+   const big = inspirationBar({ on: true, bank: { link: item, value: 6, max: 8 }, linkable: [item] }, mode, i18n);
+   if (!big.onlyCompact || big.stars.length || big.add.can !== true || big.spend.can !== true) { problems.push(`inspiration bank 6 of 8: ${JSON.stringify(big)}`); }
+   const empty = inspirationBar({ on: false, bank: { link: item, value: 0, max: 3 }, linkable: [item] }, { canEdit: true, editing: true }, i18n);
+   const options = empty.link?.options.map((o) => `${o.id || 'own'}:${o.on}`).join(' ');
+   if (empty.spend.can || options !== 'own:false h:true') { problems.push(`inspiration empty bank in edit mode: spend ${empty.spend.can}, options ${options}`); }
+   const observer = inspirationBar({ on: true, bank: { link: item, value: 1, max: 3 }, linkable: [] }, { canEdit: false, editing: false }, i18n);
+   if (observer.stars.some((x) => x.can) || observer.add.can) { problems.push('inspiration: an observer can change the bank'); }
 }
 
 // Attributes: every passive, every trait in both modes, favorites grouped in Classic's order with slot pips.

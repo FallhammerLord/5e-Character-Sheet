@@ -113,7 +113,7 @@ Second pass, from the user's play (2026-10-28):
 - [x] 5. Rows no longer drop on the lock: Foundry's control height reset on every `summary` and `select` too (the edit-mode theme chip was a `summary`); the layout check gives `summary` Foundry's height, so it can't return
 - [x] 6. Status group segments one width, icons centred; exhaustion's ring hides while its chip shows
 - [x] 7. Theme picker on the title bar, both modes; portrait options chip top left, solid
-- [ ] 8. Inspiration bar in the tab row, right-aligned before the lock (SCOPE §4.12)
+- [x] 8. Inspiration on the tab row, right-aligned before the lock: one star, or a bank in an item's uses as stars or a count; edit mode's gear links the item; Forge's anvil rides beside it (SCOPE §4.12; Quench test added)
 - [ ] 9. Window: least height at the tab row's foot; width comfort stops while dragging
 - [ ] 10. Textures as vectors (Damascus, frame grain)
 

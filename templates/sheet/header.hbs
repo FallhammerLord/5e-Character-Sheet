@@ -49,15 +49,7 @@
          </div>
 
          <div class="fhcs-portrait-stage">
-            {{!-- Inspiration on the art (user, 2026-10-28); exhaustion, rests and hit dice are in the name row. --}}
-
-            <button type="button" class="fhcs-chip fhcs-corner-tr{{#if inspiration}} fhcs-on{{/if}}" data-action="toggleInspiration"
-                    aria-pressed="{{#if inspiration}}true{{else}}false{{/if}}" aria-label="{{ text.inspiration }}"
-                    data-fhcs-tip="{{ text.inspiration }}">
-               <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>
-            </button>
-
-
+            {{!-- Inspiration moved to the tab row (user, 2026-10-28); exhaustion, rests and hit dice are in the name row. --}}
             {{#if @root.editable}}
             {{!-- Edit mode: one gear chip opens the portrait's options (user, 2026-10-27: five chips crowded the top row):
                   show the token instead (dnd5e's own switch, a flag on the actor), round, and Frame. --}}
