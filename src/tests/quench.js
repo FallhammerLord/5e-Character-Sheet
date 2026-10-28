@@ -940,6 +940,35 @@ export function registerQuenchTests(quench)
             }
          });
 
+         it('moves the Traits panel below the Resources with its arrow on Attributes', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 6);
+            const order = foundry.utils.deepClone(actor.getFlag('fhcs', 'sectionOrder') ?? null);
+            const resources = foundry.utils.deepClone(actor._source.system.resources);
+            const blocks = () => [...sheet.element.querySelectorAll('.fhcs-attributes-main > [data-fhcs-section]')].map((el) => el.dataset.fhcsSection);
+            try
+            {
+               await actor.update({ 'system.resources.primary': { label: 'FHCS test ki', max: 2, value: 2 } });
+               await actor.unsetFlag('fhcs', 'sectionOrder');
+               await click('.fhcs-tabs [data-tab="details"]');
+               if (!sheet.isEditMode)
+               {
+                  await click('.fhcs-tabs [data-action="changeMode"]');
+                  await until(() => sheet.isEditMode, 'the lock switches to edit mode');
+               }
+               await until(() => blocks()[0] === 'traits' && blocks()[1] === 'resources', () => `traits lead, then resources; the column holds ${blocks().join(', ')}`);
+               await click('.fhcs-traits-panel [data-action="fhcsMoveSection"][data-delta="1"]');
+               await until(() => blocks()[0] === 'resources' && blocks()[1] === 'traits', () => `the down arrow moves traits below resources; the column holds ${blocks().join(', ')}`);
+            }
+            finally
+            {
+               await leaveEditMode();
+               await actor.update({ 'system.resources': resources });
+               if (order) { await actor.setFlag('fhcs', 'sectionOrder', order); }
+               else { await actor.unsetFlag('fhcs', 'sectionOrder'); }
+            }
+         });
+
          it('files an item under a category of its own, and moves that section with the arrows', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 8);

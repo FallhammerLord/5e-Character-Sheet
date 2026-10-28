@@ -173,6 +173,25 @@ function findProblems()
    const shown = (el) => el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden' && !el.closest('[aria-hidden="true"], [hidden]');
    const named = (el) => `${el.tagName.toLowerCase()}.${[...el.classList].join('.')}`;
    const ownText = (el) => [...el.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent).join('').trim();
+   // Text inside a panel sits at least 4px in from its sides (user's screenshot, 2026-10-28: the Traits labels sat on the
+   // panel's left edge, a reset outweighing the list's padding). Measured on the text itself, not its box.
+   for (const panel of app.querySelectorAll('.window-content .fhcs-frame'))
+   {
+      if (!panel.getClientRects().length) { continue; }
+      const p = panel.getBoundingClientRect();
+      for (const el of panel.querySelectorAll('*'))
+      {
+         if (!ownText(el) || el.closest('.fhcs-tray, [hidden], input, textarea, select') || !el.getClientRects().length) { continue; }
+         const range = document.createRange();
+         range.selectNodeContents(el);
+         const r = range.getBoundingClientRect();
+         if (!r.width) { continue; }
+         // Text cut with an ellipsis runs past its box unseen: only what shows counts.
+         const box = el.getBoundingClientRect();
+         const t = { left: Math.max(r.left, box.left), right: Math.min(r.right, box.right) };
+         if (t.left - p.left < 3.5 || p.right - t.right < 3.5) { issues.push(`text ${Math.round(Math.min(t.left - p.left, p.right - t.right))}px from its panel's side: ${el.tagName.toLowerCase()}.${[...el.classList].join('.')} "${ownText(el).slice(0, 20)}"`); }
+      }
+   }
    // 16: the portrait's chips are one size, the first's (an icon-only chip square; inspiration was the model until it
    // moved to the tab row, 2026-10-28), and chips side by side share a row, never stacked.
    const model = [...app.querySelectorAll('.window-content .fhcs-portrait-stage .fhcs-chip')].find((el) => !el.closest('.fhcs-tray'));

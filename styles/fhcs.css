@@ -1784,7 +1784,7 @@
 }
 
 /* AC, Init, Prof: label, then value; Level across the panel's foot. */
-.fhcs-sheet .fhcs-combat { grid-template-columns: 34px minmax(0, 1fr) 32px; align-items: center; justify-items: center; }
+.fhcs-sheet .fhcs-combat { grid-template-columns: 34px minmax(0, 1fr) 36px; align-items: center; justify-items: center; }
 .fhcs-sheet .fhcs-combat > .fhcs-button { width: 100%; }
 .fhcs-sheet .fhcs-combat-level { grid-column: 1 / -1; align-self: stretch; justify-self: stretch; display: flex; }
 .fhcs-sheet .fhcs-combat-level > * { flex: 1; min-width: 0; }
@@ -2041,12 +2041,13 @@
 .fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head > .fhcs-group-toggle:is(:hover, :focus, :focus-visible) { outline: none; box-shadow: none; background: none; }
 .fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head:has(> .fhcs-group-toggle:focus-visible) { outline: 2px solid var(--fhcs-ink); outline-offset: -2px; }
 .fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head > .fhcs-traits-summary { pointer-events: none; }
-/* The Special Traits gear sits above the fold button's stretched target. */
+/* The Special Traits gear and the panel's arrows sit above the fold button's stretched target. */
 .fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head { justify-content: space-between; }
-.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head > .fhcs-special-traits { position: relative; z-index: 1; flex: none; }
+.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head > :is(.fhcs-special-traits, .fhcs-section-move) { position: relative; z-index: 1; flex: none; }
 .fhcs-sheet .fhcs-traits-summary { flex: 1; }
 
-.fhcs-sheet .fhcs-traits
+/* `.fhcs-traits-panel >` outweighs the tab's reset of every `dl` (user, 2026-10-28: the labels sat on the edge). */
+.fhcs-sheet .fhcs-traits-panel > .fhcs-traits
 {
    display: grid;
    grid-template-columns: minmax(96px, max-content) minmax(0, 1fr) 24px;

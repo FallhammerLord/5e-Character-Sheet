@@ -72,8 +72,8 @@ export function attributesView(facts, { format, localize })
       if (!groups.has(key)) { groups.set(key, []); }
       groups.get(key).push(row);
    }
-   // In the player's order, with edit mode's arrows (SCOPE §4.13); a group's key is its section ID.
-   const favorites = arrangeSections([...groups.entries()]
+   // A group's key is its section ID; the groups are ordered with the traits and resources below.
+   const favorites = [...groups.entries()]
       .sort(([a], [b]) => groupRank(a) - groupRank(b))
       .map(([key, rows]) =>
       {
@@ -106,7 +106,15 @@ export function attributesView(facts, { format, localize })
                detailsLabel: format('FHCS.Inventory.DetailsLabel', { name: r.title })
             }))
          };
-      }), facts.order, { tab: 'favorites', editing: !!facts.editing, format });
+      });
+
+   // The main column's panels in the player's order (SCOPE §4.13; user, 2026-10-28: "both traits and resources should be
+   // reorderable"): the traits, the resources while any is set, then each favorites group, with edit mode's arrows.
+   const resourcesSet = facts.resources.some((r) => r.link || r.label || r.max);
+   const traitBlock = facts.traits?.length ? [{ id: 'traits', label: localize('FHCS.Attributes.Traits'), traits: true }] : [];
+   const resourceBlock = resourcesSet ? [{ id: 'resources', label: localize('FHCS.Attributes.Resources'), resources: true }] : [];
+   const blocks = arrangeSections([...traitBlock, ...resourceBlock, ...favorites.map((g) => ({ ...g, group: true }))],
+      facts.order, { tab: 'favorites', editing: !!facts.editing, format });
 
    return {
       skills,
@@ -115,6 +123,9 @@ export function attributesView(facts, { format, localize })
       traitsOpen: !(facts.folded ?? []).includes('traits'),
       traitsSummary: traits.filter((t) => t.text !== '—').map((t) => t.text).join(' · '),
       favorites,
+      blocks,
+      traitsMove: blocks.find((b) => b.traits)?.move ?? null,
+      resourcesMove: blocks.find((b) => b.resources)?.move ?? null,
       editing: !!facts.editing,
       // Resources (user, 2026-10-28, SCOPE §4.10): three panels in a row; in play only those set, with the lock off all
       // three. A panel linked to an item shows its uses and recovery; the cog's tray picks the item.

@@ -95,6 +95,7 @@ Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies insta
 - **Foundry's control height** (2rem `min-height`) reaches every `button`, `summary` and `select`; the reset at the top of `styles/fhcs.css` covers them, and the layout harness imitates Foundry on each. A new kind of control goes in both, or the row it sits in grows in one mode (rows dropped on the lock twice).
 - **A scrollbar that comes and goes** narrows its column: scrolling areas keep `scrollbar-gutter: stable` (checked).
 - **`:is()` after `>` matches children only:** `.a > :is(details > summary)` never reaches the `summary`. Write `:is(.a > details > summary)`.
+- **A type selector adds weight:** the Attributes tab's `.fhcs-attributes dl` reset outweighed `.fhcs-sheet .fhcs-traits`'s padding (labels on the panel's edge). The layout check now fails text within 4px of its panel's side.
 - **A later base rule of equal weight wins:** `.fhcs-tray { left: 0 }` comes late in the file, so a tray placed right needs a more specific selector.
 - **A filter on a masked element is masked away** (filter, then clip, then mask): put a glow on its parent.
 - **A blurred, translucent plate is its own layer:** its open tray hides under the next plate unless the plate rises (`:has(details[open] > .fhcs-tray)`).
