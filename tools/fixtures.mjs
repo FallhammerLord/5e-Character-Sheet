@@ -738,7 +738,7 @@ for (const look of LOOKS)
       context: header({ portrait: { src: TALL, isVideo: false }, originCards: FOUR_CLASSES() }) });
    CASES.push({ name: `theme-${look}-header-round`, template: 'sheet/header', look,
       context: header({ portrait: { src: SQUARE, isVideo: false }, shape: 'round' }) });
-   for (const name of ['attributes', 'spellbook', 'inventory'])
+   for (const name of ['attributes', 'spellbook', 'inventory', 'tabs', 'tabs-editing'])
    {
       const base = CASES.find((c) => c.name === name);
       CASES.push({ ...base, name: `theme-${look}-${name}`, look, sameRowsAs: undefined });
