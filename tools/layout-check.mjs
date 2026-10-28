@@ -44,7 +44,10 @@ const THEMES = { light: 'background:#f4f1ea;color:#191813', dark: 'background:#2
 const frame = (kind, width, theme, body) => `<section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"
    style="width:${width}px;height:${HEIGHT}px;display:flex;flex-direction:column;border:1px solid #000;margin:8px;
    ${THEMES[theme]}">
-   <header style="background:#111;color:#eee;padding:4px 8px;font:13px sans-serif">${width}px</header>
+   ${kind === 'sheet'
+      // Foundry's title bar as it draws one, with a module's extra button that must wait in the ⋮ menu (rule 14).
+      ? `<header class="window-header"><h1 class="window-title">${width}px</h1><button type="button" class="header-control icon fa-solid fa-ellipsis-vertical" data-action="toggleControls" aria-label="Controls"></button><button type="button" class="header-control icon fa-solid fa-id-badge" data-action="moduleExtra" aria-label="A module's button"></button><button type="button" class="header-control icon fa-solid fa-xmark" data-action="close" aria-label="Close"></button></header>`
+      : `<header style="background:#111;color:#eee;padding:4px 8px;font:13px sans-serif">${width}px</header>`}
    <div class="window-content" style="flex:1;min-height:0;overflow:auto">${FRAMES[kind].wrap(body)}</div></section>`;
 
 const page = (html) => `<!doctype html><html><head><meta charset="utf-8">
@@ -329,6 +332,12 @@ function findProblems()
       issues.push(`${styles.size} text styles (3 allowed): ${[...styles].map(([k, v]) => `${k} (${v})`).join('; ')}`);
    }
 
+   // The title bar holds only ⋮ and × (rule 14, user 2026-10-28); any other button waits in the ⋮ menu.
+   for (const control of app.querySelectorAll(':scope > .window-header > .header-control'))
+   {
+      const kept = control.matches('[data-action="toggleControls"], [data-action="close"], .preparation-warnings');
+      if (kept !== !!control.getClientRects().length) { issues.push(`title bar: ${control.dataset.action} ${kept ? 'hidden' : 'shows'}`); }
+   }
    // Foundry's tab action finds a tab button only as a child of `.tabs`; anywhere else the click does nothing.
    for (const tab of app.querySelectorAll('[data-action="tab"]'))
    {

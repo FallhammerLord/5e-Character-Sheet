@@ -54,8 +54,6 @@
    /* The HP bar's fill: a light tint of success, so ink on it keeps 4.5:1 in both themes (the dark block's success and
       surface feed it there). */
    --fhcs-hp-fill: color-mix(in srgb, var(--fhcs-success) 28%, var(--fhcs-surface));
-   /* Room for Foundry's window controls (menu, sheet, close) floating over the header's top right (rule 14). */
-   --fhcs-window-controls: 84px;
    /* The combat panel's width (COMBAT_WIDTH in src/sheet/header.js). */
    --fhcs-combat: 125px;
 }
@@ -840,28 +838,29 @@
    color: var(--fhcs-ink);
 }
 
-/* No title band (SCOPE §5.2 rule 14, user 2026-10-27: "bothersome since the beginning"): Foundry's window controls
-   float over the header's top right; the window drags from around them. The name is in our header, so the title is
-   hidden but kept for screen readers. Minimized, the window keeps Foundry's own bar, title and all. */
-/* The window header is a drag strip the sheet's full width, as tall as the header's top padding, so it covers nothing
-   (user, 2026-10-27: the grip was only the corner by the controls). The controls hang below it at the right. */
+/* The title bar (SCOPE §5.2 rule 14, user 2026-10-28, replacing the controls floating over the header): an unstyled
+   row above the sheet, its full width a grip, holding only ⋮ and × (and dnd5e's warnings when it has some). Any other
+   button there moves into the ⋮ menu (`extraHeaderControls`, src/compat.js). The name is in our header, so the title
+   is hidden but kept for screen readers. Minimized, the window keeps Foundry's own bar, title and all. */
 .fhcs-sheet:not(.minimized) > .window-header
 {
-   position: absolute;
-   top: 0;
-   right: 0;
-   left: 0;
-   z-index: 5;
-   align-items: flex-start;
+   position: relative;
+   display: flex;
+   flex: none;
+   align-items: center;
    justify-content: flex-end;
-   height: var(--fhcs-s2);
+   gap: var(--fhcs-s1);
+   height: var(--fhcs-control);
    min-height: 0;
-   overflow: visible;
+   margin: 0;
    padding: 0 var(--fhcs-s1);
    border: 0;
    background: transparent;
    color: var(--fhcs-muted);
 }
+
+/* Foundry's other title-bar buttons, and modules', wait in the ⋮ menu instead. */
+.fhcs-sheet:not(.minimized) > .window-header > .header-control:not([data-action="toggleControls"], [data-action="close"], .preparation-warnings) { display: none; }
 
 .fhcs-sheet:not(.minimized) > .window-header :is(.window-title, .window-icon)
 {
@@ -989,8 +988,8 @@
    padding-bottom: var(--fhcs-s1);
 }
 
-/* The first line leaves room for Foundry's window controls, which float at the top right (rule 14). */
-.fhcs-sheet .fhcs-header-top > .fhcs-header-row:first-child { min-height: var(--fhcs-control); padding-right: var(--fhcs-window-controls); }
+/* The first line: the name, then the status group at its right end, under the title bar's × (rule 14). */
+.fhcs-sheet .fhcs-header-top > .fhcs-header-row:first-child { min-height: var(--fhcs-control); }
 .fhcs-sheet .fhcs-header-top > .fhcs-header-row { min-height: 24px; }
 
 /* The cards: the second row, on the abilities' columns; they stretch to the band's height. */

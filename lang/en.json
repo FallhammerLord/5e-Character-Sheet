@@ -1,6 +1,7 @@
 {
   "FHCS": {
     "SheetLabel": "Fallhammer Character Sheet",
+    "SheetControl": "Window control",
     "Settings": {
       "Cards": {
         "Name": "One card per action",

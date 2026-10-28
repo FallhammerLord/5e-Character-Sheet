@@ -844,6 +844,29 @@ export async function recordLevelOrder(manager, moduleId, reconcile)
 }
 
 /** Re-renders every open sheet of ours, after a client setting it reads changes. */
+/** The title-bar buttons that stay in the bar: ⋮, ×, and dnd5e's warnings (shown only when there are some). */
+const KEPT_HEADER_CONTROLS = '[data-action="toggleControls"], [data-action="close"], .preparation-warnings';
+
+/**
+ * Every other button in the sheet's title bar, Foundry's or a module's, as entries for dnd5e's ⋮ menu (user,
+ * 2026-10-28: they spread across the bar). CSS hides them in the bar; an entry clicks the button itself, so whatever
+ * listens to it still runs. dnd5e builds the menu from `_getHeaderControlContextEntries()` each time it opens.
+ *
+ * @param {HTMLElement|null} element  The sheet's element.
+ * @returns {{label: string, icon: string, onClick: Function}[]}
+ */
+export function extraHeaderControls(element)
+{
+   const header = element?.querySelector(':scope > .window-header');
+   if (!header) { return []; }
+   return [...header.querySelectorAll(':scope > .header-control')].filter((button) => !button.matches(KEPT_HEADER_CONTROLS)).map((button) => ({
+      label: button.getAttribute('aria-label') || button.dataset.tooltip || button.title || button.textContent.trim() || game.i18n.localize('FHCS.SheetControl'),
+      // Font Awesome classes on the button itself, or on an icon inside it.
+      icon: [...button.classList, ...(button.querySelector('i')?.classList ?? [])].filter((c) => /^fa[srlbd-]|^fa$/.test(c)).join(' ') || 'fa-solid fa-circle',
+      onClick: () => button.click()
+   }));
+}
+
 export function rerenderSheets(className)
 {
    for (const app of foundry.applications.instances?.values() ?? [])

@@ -257,6 +257,31 @@ export function registerQuenchTests(quench)
             await flip();
          });
 
+         it('moves other title-bar buttons into the ⋮ menu, keeping only ⋮ and ×', async function ()
+         {
+            await settled();
+            const header = sheet.element.querySelector(':scope > .window-header');
+            const extra = document.createElement('button');
+            extra.type = 'button';
+            extra.className = 'header-control icon fa-solid fa-id-badge';
+            extra.setAttribute('aria-label', 'FHCS test extra');
+            let clicked = 0;
+            extra.addEventListener('click', () => { clicked++; });
+            header.append(extra);
+            try
+            {
+               assert.strictEqual(getComputedStyle(extra).display, 'none', 'the extra button is hidden in the bar');
+               const entries = Array.from(sheet._getHeaderControlContextEntries());
+               const entry = entries.find((e) => e.label === 'FHCS test extra');
+               assert.ok(entry, `the ⋮ menu lists the extra button; it lists ${entries.map((e) => e.label).join(', ')}`);
+               entry.onClick(new MouseEvent('click'));
+               assert.strictEqual(clicked, 1, 'its menu entry clicks the button itself');
+               const shown = [...header.querySelectorAll(':scope > .header-control')].filter((b) => b.getClientRects().length).map((b) => b.dataset.action ?? b.className);
+               assert.includeMembers(shown, ['toggleControls', 'close'], `the bar shows ${shown.join(', ')}`);
+            }
+            finally { extra.remove(); }
+         });
+
          it('rolls a skill from the Attributes tab', async function ()
          {
             const [skill] = await clickReaches('.fhcs-attributes [data-key="prc"] [data-action="roll"]', 'dnd5e.preRollSkill');

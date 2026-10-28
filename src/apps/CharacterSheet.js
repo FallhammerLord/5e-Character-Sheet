@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH } from '../constants.js';
-import { attributesFacts, biographyFacts, changeHp, cycleListGrouping, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, changeHp, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
@@ -313,6 +313,13 @@ export function makeCharacterSheet(Base)
       };
 
       static PARTS = ourParts(Base.PARTS);
+
+      /** dnd5e's ⋮ menu, with every other title-bar button added, so the bar holds only ⋮ and × (user, 2026-10-28). */
+      * _getHeaderControlContextEntries()
+      {
+         yield* super._getHeaderControlContextEntries();
+         yield* extraHeaderControls(this.element);
+      }
 
       /** Foundry joins every parent's classes; drop dnd5e's look from the list. */
       _initializeApplicationOptions(options)
