@@ -115,7 +115,7 @@ Second pass, from the user's play (2026-10-28):
 - [x] 7. Theme picker on the title bar, both modes; portrait options chip top left, solid
 - [x] 8. Inspiration on the tab row, right-aligned before the lock: one star, or a bank in an item's uses as stars or a count; edit mode's gear links the item; Forge's anvil rides beside it (SCOPE §4.12; Quench test added)
 - [x] 9. Window: least height at the tab row's foot; width comfort stops while dragging (644, 720, 800, 900, 1024, 1280; Quench test added)
-- [ ] 10. Textures as vectors (Damascus, frame grain)
+- [x] 10. Textures as vectors (Damascus, frame grain), drawn by `tools/forge-textures.mjs`
 
 ## Phase 6.6: Themes (user, 2026-10-28; SCOPE §4.11)
 

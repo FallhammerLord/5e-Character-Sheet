@@ -43,7 +43,7 @@ network, so package pages weren't read. Several "chart" results were low-quality
   *For us:* a straw-to-bronze sheen along frame rims, a gleam on hover. Stop before purple and blue: those mean
   Pact Magic and prepared spells on our sheet (§5.1).
 - **Pattern-welded (Damascus) steel:** two steels folded and etched, light and dark layers in ladder, raindrop or
-  twist patterns. *For us:* a ladder pattern etched into the steel heading bars (SVG turbulence and displacement).
+  twist patterns. *For us:* a ladder pattern etched into the steel heading bars: smooth vector lines bunched at folds (first built with SVG turbulence and displacement, replaced 2026-10-28: textures are vectors).
 - **Moradin's marks:** a hammer, an anvil wreathed in flame, a hammer whose heads are carved as dwarves' heads.
   *For us:* the emblem family, and a maker's mark stamped into the nameplate.
 
