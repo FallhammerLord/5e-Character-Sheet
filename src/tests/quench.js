@@ -52,12 +52,14 @@ export function registerQuenchTests(quench)
          find(selector).click(); // redraw-safe: after settled()
       };
 
-      /** Once the sheet has settled, types a value into a field and sends its change. */
+      /** Once the sheet has settled, types a value into a field and sends its input and change, as typing does. */
       const enter = async (selector, value) =>
       {
          await settled();
          const field = find(selector);
          field.value = value;
+         // dnd5e's search filters on input (item-list-controls.mjs:205); fields save on change.
+         field.dispatchEvent(new Event('input', { bubbles: true })); // redraw-safe: after settled()
          field.dispatchEvent(new Event('change', { bubbles: true })); // redraw-safe: after settled()
       };
 
@@ -810,6 +812,42 @@ export function registerQuenchTests(quench)
                if (flag) { await actor.setFlag('fhcs', 'resources', flag); }
                else { await actor.unsetFlag('fhcs', 'resources'); }
                await feat?.delete();
+            }
+         });
+
+         it('folds an Inventory section, shows its matches while a search is on, and remembers the fold', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 8);
+            const prefs = foundry.utils.deepClone(game.user.getFlag('fhcs', 'foldedFavorites') ?? []);
+            const [loot] = await createItems([{ name: 'FHCS test trinket', type: 'loot' }]);
+            const row = () => sheet.element.querySelector(`.fhcs-inventory .fhcs-item[data-item-id="${loot.id}"]`);
+            const shows = () => !!row()?.getClientRects().length;
+            const section = () => row()?.closest('[data-fhcs-fold]');
+            try
+            {
+               await click('.fhcs-tabs [data-tab="inventory"]');
+               await until(() => section(), 'the trinket\'s row sits in a section that folds');
+               const key = section().dataset.fhcsFold;
+               const toggle = `.fhcs-inventory [data-fhcs-fold="${key}"] [data-action="fhcsToggleSection"]`;
+               if (!shows()) { await click(toggle); }
+               await until(() => shows(), `the ${key} section starts open`);
+               await click(toggle);
+               await until(() => !shows() && (game.user.getFlag('fhcs', 'foldedFavorites') ?? []).includes(key),
+                  () => `a click folds ${key} and remembers it; the row ${shows() ? 'shows' : 'hides'}, the folds are ${JSON.stringify(game.user.getFlag('fhcs', 'foldedFavorites'))}`);
+               await enter('.fhcs-inventory item-list-controls input', 'trinket');
+               await until(() => shows(), 'a search shows the match inside the folded section');
+               await enter('.fhcs-inventory item-list-controls input', '');
+               await until(() => !shows(), 'clearing the search folds the section away again');
+               await sheet.render();
+               await until(() => !shows(), 'the fold holds after a redraw');
+               await click(toggle);
+               await until(() => shows() && !(game.user.getFlag('fhcs', 'foldedFavorites') ?? []).includes(key), `a second click opens ${key} again`);
+            }
+            finally
+            {
+               await game.user.setFlag('fhcs', 'foldedFavorites', prefs);
+               await loot.delete();
+               await click('.fhcs-tabs [data-tab="details"]');
             }
          });
 

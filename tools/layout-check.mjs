@@ -225,12 +225,12 @@ function findProblems()
       if (sizes.size > 1) { issues.push(`mixed text sizes (${[...sizes].join(', ')}) in one control: ${named(el)} "${el.textContent.trim().replace(/\s+/g, ' ').slice(0, 24)}"`); }
    }
    // 18: a button's words are body style, not capitals. An abbreviation (Str, Dex) may stay in capitals, and a heading
-   // that folds (a favorites group) keeps the headings' label style.
+   // that folds (a favorites group, a list section) keeps the headings' label style.
    for (const el of app.querySelectorAll('.window-content :is(button, summary) *, .window-content :is(button, summary)'))
    {
       if (el.ownerSVGElement || !shown(el) || !el.closest('.fhcs-sheet')) { continue; }
       const text = ownText(el);
-      if (/[a-z]/.test(text) && text.length > 3 && !el.closest('.fhcs-group-toggle') && getComputedStyle(el).textTransform === 'uppercase')
+      if (/[a-z]/.test(text) && text.length > 3 && !el.closest('.fhcs-group-toggle, .fhcs-section-toggle') && getComputedStyle(el).textTransform === 'uppercase')
       {
          issues.push(`capitals in a button: ${named(el)} "${text.slice(0, 20)}"`);
       }

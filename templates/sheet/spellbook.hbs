@@ -47,11 +47,12 @@
 
       <section class="items-list spells-list fhcs-items" data-item-list="spells">
          {{#each sections}}
-         <div class="items-section fhcs-section" data-fhcs-section="{{ id }}" data-level="{{ level }}" data-method="{{ method }}">
+         <div class="items-section fhcs-section{{#unless fold.open}} fhcs-folded{{/unless}}" data-fhcs-fold="{{ fold.key }}" data-fhcs-section="{{ id }}" data-level="{{ level }}" data-method="{{ method }}">
             <div class="items-header fhcs-item-head">
-               <span class="fhcs-col-img" aria-hidden="true"></span>
+               {{!-- The fold (user, 2026-10-28): its caret in the picture column, then the name; the slot pips stay outside
+                     it, so a pip click never folds. --}}
                <span class="fhcs-col-name fhcs-spell-head">
-                  <span class="fhcs-label">{{ label }}</span>
+                  <button type="button" class="fhcs-section-toggle" data-action="fhcsToggleSection" aria-expanded="{{#if fold.open}}true{{else}}false{{/if}}"><span class="fhcs-section-caret" aria-hidden="true"><svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span><span class="fhcs-label">{{ label }}</span></button>
                   {{#if slots}}
                   <span class="fhcs-slots" data-prop="{{ slots.prop }}">
                      {{#each slots.pips}}

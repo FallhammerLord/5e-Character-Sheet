@@ -2,7 +2,7 @@
  * The Features tab's display values (SCOPE §4.8), from plain facts. Pure, like inventory.js: the unit check and the
  * layout fixtures use the same code. `compat.featuresFacts` gathers the facts from dnd5e.
  */
-import { FEATURE_PINS, pinView } from './lists.js';
+import { FEATURE_PINS, pinView, sectionFold } from './lists.js';
 
 /** The columns a player can show or hide, as on the other list tabs. */
 export const FEATURE_COLUMNS = ['uses', 'usage', 'recovery', 'favorite'];
@@ -73,7 +73,7 @@ export function featuresView(facts, { format, localize })
    const sections = (facts.sections ?? []).map((s) =>
    {
       const items = s.group === grouping ? rows.filter((r) => home(r) === s.value) : [];
-      return { id: s.id, label: s.label, group: s.group, value: s.value, items, hidden: !items.length };
+      return { id: s.id, label: s.label, group: s.group, value: s.value, items, hidden: !items.length, fold: sectionFold('features', s.id, facts.folded) };
    });
 
    return {

@@ -21,3 +21,16 @@ export function pinView(keys, active, localize)
       pressed: on.has(key) ? 'true' : on.has(`!${key}`) ? 'mixed' : 'false'
    }));
 }
+
+/**
+ * A list section's fold (user, 2026-10-28, SCOPE §4.10): remembered per player with the favorites groups, keyed by tab
+ * and section ("inventory:weapon").
+ * @param {string} tab  The tab's part ID.
+ * @param {string} id   The section's ID.
+ * @param {string[]} folded  The player's folded keys.
+ */
+export function sectionFold(tab, id, folded)
+{
+   const key = `${tab}:${id}`;
+   return { key, open: !(folded ?? []).includes(key) };
+}

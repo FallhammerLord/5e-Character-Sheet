@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6.5, Polish** (ROADMAP; SCOPE §4.10): slices 1 (portrait, class cards, milestones, effect label) and 2 (resource panels) built, offline checks pass, not yet seen in Foundry. Next: slice 3, folding sections on the list tabs; then Quench core and a play check. Phase 7 or the Actions tab after.
+1. **Phase 6.5, Polish** (ROADMAP; SCOPE §4.10): all three slices built, offline checks pass, not yet seen in Foundry. Waits on the user: Quench core (new or changed: the class card's level ring, the resource panels, section folding) and a play check. Then the BUILT entry, and Phase 7 or the Actions tab.
 2. **One Quench test to rerun:** "switches an effect off and on, favorites it…" failed once after favoriting (2026-10-28); the user's hand test passed, so likely the test. Its messages now report what the row holds; if it fails again, read them before changing anything.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.

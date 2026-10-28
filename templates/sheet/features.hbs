@@ -9,10 +9,9 @@
 
       <section class="items-list features-list fhcs-items" data-item-list="features">
          {{#each sections}}
-         <div class="items-section fhcs-section" data-fhcs-section="{{ id }}" data-group-{{ group }}="{{ value }}"{{#if hidden}} hidden{{/if}}>
+         <div class="items-section fhcs-section{{#unless fold.open}} fhcs-folded{{/unless}}" data-fhcs-fold="{{ fold.key }}" data-fhcs-section="{{ id }}" data-group-{{ group }}="{{ value }}"{{#if hidden}} hidden{{/if}}>
             <div class="items-header fhcs-item-head">
-               <span class="fhcs-col-img" aria-hidden="true"></span>
-               <span class="fhcs-label fhcs-col-name">{{ label }}</span>
+               <span class="fhcs-col-name"><button type="button" class="fhcs-section-toggle" data-action="fhcsToggleSection" aria-expanded="{{#if fold.open}}true{{else}}false{{/if}}"><span class="fhcs-section-caret" aria-hidden="true"><svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span><span class="fhcs-label">{{ label }}</span></button></span>
                {{#if ../columns.uses}}<span class="fhcs-label fhcs-muted fhcs-col-uses">{{ ../text.head.uses }}</span>{{/if}}
                {{#if ../columns.usage}}<span class="fhcs-label fhcs-muted fhcs-col-usage">{{ ../text.head.usage }}</span>{{/if}}
                {{#if ../columns.recovery}}<span class="fhcs-label fhcs-muted fhcs-col-recovery">{{ ../text.head.recovery }}</span>{{/if}}

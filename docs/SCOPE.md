@@ -210,7 +210,7 @@ Check here before choosing a mark, and add new ones. Every tint has an icon, mar
 | R | Ritual | Beside the spell's name |
 | Shield on the save button: filled, outline | Proficient save, not proficient | The abilities panel (user, 2026-10-27; filled means proficient, as the skill dots) |
 | Soft blue dot, 12px in a 24px target: filled, ring, dotted ring | Slot left, spent, temporary | Spell level headings on Spellbook and Attributes; no count beside them |
-| Caret: pointing right, pointing down | Folded, open | Row names (details), favorite groups, containers |
+| Caret: pointing right, pointing down | Folded, open | Row names (details), favorite groups, containers, list sections in the picture column (user, 2026-10-28) |
 | Faint panel with a line under it | An open row | Inventory, Spellbook, Attributes favorites |
 | Pin: heavier edge; dashed and struck through | Filter on; filter excluding | Pinned filters beside a list's search |
 | Green pips with a tick, red with a cross | Death save successes, failures | Header, at 0 HP |

@@ -70,6 +70,19 @@ async function toggleGroup(event, target)
    await game.user.setFlag(MODULE_ID, PREFS.folded, [...folded]);
 }
 
+/** Folds or opens a section on a list tab (user, 2026-10-28), and remembers it with the favorites groups. */
+async function toggleSection(event, target)
+{
+   const section = target.closest('[data-fhcs-fold]');
+   if (!section) { return; }
+   const open = !section.classList.toggle('fhcs-folded');
+   target.setAttribute('aria-expanded', String(open));
+   const folded = new Set(game.user.getFlag(MODULE_ID, PREFS.folded) ?? []);
+   if (open) { folded.delete(section.dataset.fhcsFold); }
+   else { folded.add(section.dataset.fhcsFold); }
+   await game.user.setFlag(MODULE_ID, PREFS.folded, [...folded]);
+}
+
 /** A favorite's name: opens or shuts the item's details under its row (user, 2026-10-26), until the sheet closes. */
 function toggleFavoriteDetails(event, target)
 {
@@ -340,7 +353,8 @@ export function makeCharacterSheet(Base)
             fhcsToggleContainer: toggleContainer, fhcsPinFilter: pinFilter, fhcsOpenConcentration: openConcentration,
             fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails,
             fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange, fhcsFrame: frame, fhcsLevelDown: levelDown, fhcsPortraitShape: portraitShape,
-            fhcsSkillAbility: skillAbility, fhcsLinkResource: linkResourceAction, fhcsRefreshResource: refreshResourceAction }
+            fhcsSkillAbility: skillAbility, fhcsLinkResource: linkResourceAction, fhcsRefreshResource: refreshResourceAction,
+            fhcsToggleSection: toggleSection }
       };
 
       static PARTS = ourParts(Base.PARTS);
@@ -365,6 +379,8 @@ export function makeCharacterSheet(Base)
       {
          context = await super._preparePartContext(partId, context, options);
          const i18n = { localize: (key) => game.i18n.localize(key), format: (key, data) => game.i18n.format(key, data) };
+         // The player's folded favorites groups and list sections.
+         const folded = () => game.user.getFlag(MODULE_ID, PREFS.folded) ?? [];
          if (partId === 'header' && !this.actor.limited)
          {
             const facts = await headerFacts(this, context, MODULE_ID);
@@ -373,7 +389,7 @@ export function makeCharacterSheet(Base)
          if (partId === 'details')
          {
             const prefs = {
-               folded: game.user.getFlag(MODULE_ID, PREFS.folded) ?? [],
+               folded: folded(),
                open: this.fhcsOpenFavorites ?? new Set()
             };
             context.fhcsAttributes = attributesView(await attributesFacts(this, context, prefs), i18n);
@@ -382,21 +398,21 @@ export function makeCharacterSheet(Base)
          {
             const columns = columnChoice(game.settings.get(MODULE_ID, 'inventoryColumns'));
             const openContainers = game.user.getFlag(MODULE_ID, PREFS.openContainers) ?? [];
-            context.fhcsInventory = inventoryView(await inventoryFacts(this, context, { columns, openContainers }), i18n);
+            context.fhcsInventory = inventoryView({ ...await inventoryFacts(this, context, { columns, openContainers }), folded: folded() }, i18n);
          }
          if (partId === 'spells')
          {
             const columns = spellColumnChoice(game.settings.get(MODULE_ID, 'spellColumns'));
-            context.fhcsSpellbook = spellbookView(await spellbookFacts(this, context, { columns }), i18n);
+            context.fhcsSpellbook = spellbookView({ ...await spellbookFacts(this, context, { columns }), folded: folded() }, i18n);
          }
          if (partId === 'features')
          {
             const columns = featureColumnChoice(game.settings.get(MODULE_ID, 'featureColumns'));
-            context.fhcsFeatures = featuresView(await featuresFacts(this, context, { columns }), i18n);
+            context.fhcsFeatures = featuresView({ ...await featuresFacts(this, context, { columns }), folded: folded() }, i18n);
          }
          if (partId === 'effects')
          {
-            context.fhcsEffects = effectsView(await effectsFacts(this, context), i18n);
+            context.fhcsEffects = effectsView({ ...await effectsFacts(this, context), folded: folded() }, i18n);
          }
          if (partId === 'biography')
          {

@@ -2,7 +2,7 @@
  * The Spellbook tab's display values (SCOPE §4.7), from plain facts. Pure, like inventory.js: the unit check and the
  * layout fixtures use the same code. `compat.spellbookFacts` gathers the facts from dnd5e.
  */
-import { SPELL_PINS, pinView } from './lists.js';
+import { SPELL_PINS, pinView, sectionFold } from './lists.js';
 
 /** The columns a player can show or hide. The prepare mark always shows; it isn't a column choice. */
 export const SPELL_COLUMNS = ['components', 'concentration', 'time', 'range', 'school', 'target', 'favorite'];
@@ -148,6 +148,7 @@ export function spellbookView(facts, { format, localize })
             level: s.level ?? '',
             label: s.label,
             count: s.items.length,
+            fold: sectionFold('spells', s.id, facts.folded),
             // Filled pips are slots still to spend, as on Attributes (user, 2026-10-26); past the max, temporary ones.
             slots: total ? {
                prop: `system.spells.${s.id}.value`,

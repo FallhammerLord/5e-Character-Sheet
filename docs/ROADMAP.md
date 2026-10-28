@@ -104,7 +104,7 @@ From the user's screenshot after Phase 6 (2026-10-28). Decisions: SCOPE §4.10.
 - [x] Research: dnd5e has no section folding (ours, as favorites groups); an effect favorite's subtitle is its duration's label whenever `remaining` is truthy; item uses change through `system.uses.spent`, recovery periods in `CONFIG.DND5E.limitedUsePeriods`
 - [x] 1. Portrait art to the frame's foot, HP, Temp and Max ± on a scrim; class cards split class | subclass art, level ring, name in display; milestone tray without its key; effect favorites without "None"
 - [x] 2. Resources: three panels in a row; only set ones in play; link an item from the cog in edit mode; Restore
-- [ ] 3. Sections fold on Inventory, Spellbook, Features and Effects
+- [x] 3. Sections fold on Inventory, Spellbook, Features and Effects (the caret in the picture column; a search shows matches through CSS on dnd5e's search field)
 - [ ] Quench and play
 
 ## Phase 7: The ADHD layer

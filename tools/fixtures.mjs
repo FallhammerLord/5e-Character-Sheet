@@ -571,6 +571,11 @@ export const CASES = [
       context: inventory({ columns: { uses: false, usage: false, quantity: false, equipped: true, attuned: false }, encumbrance: null })
    },
    { name: 'inventory-containers-shut', template: 'sheet/inventory', context: inventory({ openContainers: [], editing: true, columns: ALL_COLUMNS }) },
+   // Folded sections (user, 2026-10-28): the heading stays, its rows hide; a spell level's pips stay in its heading.
+   { name: 'inventory-folded', template: 'sheet/inventory', context: inventory({ folded: ['inventory:weapons'] }) },
+   { name: 'spellbook-folded', template: 'sheet/spellbook', context: spellbook({ folded: ['spells:spell0', 'spells:spell1'] }) },
+   { name: 'features-folded', template: 'sheet/features', context: features({ folded: ['features:cleric'] }) },
+   { name: 'effects-folded', template: 'sheet/effects', context: effects({ folded: ['effects:temporary'] }) },
    { name: 'inventory-empty', template: 'sheet/inventory', context: inventory({ sections: [], attunement: { value: 0, max: 0 }, encumbrance: null }) },
    { name: 'attributes', template: 'sheet/attributes', context: attributes(), rows: '.fhcs-skills > li, .fhcs-traits > dt', marks: '.fhcs-skill-name, .fhcs-skill-mod',
       align: [['.fhcs-attributes-side .fhcs-panel-head', 'top', '.fhcs-traits-panel .fhcs-panel-head', 'top'], ['.fhcs-attributes-side .fhcs-panel-head', 'bottom', '.fhcs-traits-panel .fhcs-panel-head', 'bottom']] },

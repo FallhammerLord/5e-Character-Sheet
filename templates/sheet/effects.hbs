@@ -8,10 +8,9 @@
 
       <section class="items-list effects-list fhcs-items" data-item-list="effects">
          {{#each sections}}
-         <div class="items-section fhcs-section" data-effect-type="{{ id }}">
+         <div class="items-section fhcs-section{{#unless fold.open}} fhcs-folded{{/unless}}" data-fhcs-fold="{{ fold.key }}" data-effect-type="{{ id }}">
             <div class="items-header fhcs-item-head">
-               <span class="fhcs-col-img" aria-hidden="true"></span>
-               <span class="fhcs-label fhcs-col-name">{{ label }}</span>
+               <span class="fhcs-col-name"><button type="button" class="fhcs-section-toggle" data-action="fhcsToggleSection" aria-expanded="{{#if fold.open}}true{{else}}false{{/if}}"><span class="fhcs-section-caret" aria-hidden="true"><svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span><span class="fhcs-label">{{ label }}</span></button></span>
                <span class="fhcs-label fhcs-muted fhcs-col-source">{{ ../text.source }}</span>
                <span class="fhcs-label fhcs-muted fhcs-col-duration">{{ ../text.duration }}</span>
                <span class="fhcs-label fhcs-muted fhcs-col-toggle">{{ ../text.on }}</span>

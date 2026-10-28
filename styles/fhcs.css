@@ -2290,10 +2290,41 @@
 .fhcs-sheet .fhcs-col-edit { flex: none; display: flex; gap: var(--fhcs-s1); width: calc(var(--fhcs-control) * 2 + var(--fhcs-s1)); }
 .fhcs-sheet .fhcs-item-head .fhcs-col-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+/* A section's fold (user, 2026-10-28, SCOPE §4.10): the caret sits in the picture column, so names stay lined up with
+   the rows'; the button runs on through the name (and the Inventory's count). The slot pips stay outside it. */
+.fhcs-sheet .fhcs-section-toggle
+{
+   display: flex;
+   flex: 0 1 auto;
+   align-items: center;
+   justify-content: flex-start;
+   gap: var(--fhcs-s2);
+   min-width: 0;
+   height: auto;
+   min-height: 24px;
+   margin: 0;
+   padding: 0;
+   border: 0;
+   background: none;
+   color: inherit;
+   font-family: inherit;
+   text-align: left;
+   white-space: nowrap;
+   cursor: pointer;
+}
+
+.fhcs-sheet .fhcs-section-caret { display: grid; flex: none; place-items: center; width: 24px; }
+.fhcs-sheet .fhcs-section-caret + .fhcs-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.fhcs-sheet .fhcs-section-toggle[aria-expanded="true"] .fhcs-caret { transform: rotate(90deg); }
+/* The name column starts where the picture column did (a heading has no picture of its own now). */
+.fhcs-sheet .fhcs-item-head > .fhcs-col-name { display: flex; align-items: center; min-width: calc(96px + 24px + var(--fhcs-s2)); }
+
+/* Folded: the rows hide, unless a search is on (dnd5e's search field shows its placeholder only while empty), when
+   the matches show and clearing the search folds them away again. */
+.fhcs-sheet .fhcs-list-tab:not(:has(item-list-controls input:not(:placeholder-shown))) .fhcs-section.fhcs-folded > .fhcs-item-list { display: none; }
+
 /* An Inventory heading: the section name gives way to the count beside it. */
-.fhcs-sheet .fhcs-inventory .fhcs-item-head .fhcs-col-name { display: flex; align-items: center; gap: var(--fhcs-s1); }
-.fhcs-sheet .fhcs-inventory .fhcs-item-head .fhcs-col-name > :first-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
-.fhcs-sheet .fhcs-inventory .fhcs-item-head .fhcs-col-name > :last-child { flex: none; }
+.fhcs-sheet .fhcs-section-toggle > .fhcs-label + .fhcs-label { flex: none; }
 
 .fhcs-sheet .fhcs-item { border-bottom: 1px solid var(--fhcs-line-soft); }
 
@@ -2680,6 +2711,7 @@
    that much and Time and Range give way first. With School and Target on too, 644px has no room: the pips wrap. */
 .fhcs-sheet .fhcs-spell-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fhcs-s2); }
 .fhcs-sheet .fhcs-spellbook:not(:has(.fhcs-col-school, .fhcs-col-target)) .fhcs-col-name { min-width: 160px; }
+.fhcs-sheet .fhcs-spellbook:not(:has(.fhcs-col-school, .fhcs-col-target)) .fhcs-item-head > .fhcs-col-name { min-width: calc(160px + 24px + var(--fhcs-s2)); }
 /* Range keeps room for its heading uncut there too. */
 .fhcs-sheet .fhcs-spellbook:not(:has(.fhcs-col-school, .fhcs-col-target)) .fhcs-col-range { min-width: 48px; }
 .fhcs-sheet .fhcs-item-head .fhcs-spell-head { overflow: visible; }
