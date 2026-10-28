@@ -144,7 +144,8 @@ Third pass, from the user's play (2026-10-28):
 - [x] Research: dnd5e's NPC, vehicle, group, encounter, item and container sheets, and its smaller windows
 - [x] Design answers (rebuild item and NPC; reuse Inventory for the rest; skin the smaller windows; theme by owner, else world)
 - [x] Item sheet decisions (SCOPE §4.13, user 2026-10-28)
-- [ ] Mockups (canvas: a row per sheet)
+- [x] Item sheet mocked up (canvas row "Phase 6.7 · the item sheet": a weapon light, a spell dark, a feature in Forge, 500px edit mode), waits on the user's review
+- [ ] Mockups for the NPC and the rest
 - [x] Chat cards in the world theme (world setting "Themed chat cards", on by default); Forge's card: a riveted iron plate, Grenze title and totals, iron-edged bands that heat on hover; every card case checked in Forge; Quench test added
 - [ ] Item sheet (every type, spells included)
 - [ ] NPC sheet
