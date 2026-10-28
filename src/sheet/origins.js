@@ -7,10 +7,11 @@
 export const MAX_CLASS_CARDS = 2;
 
 /**
- * How many ability-grid columns each card spans (user, 2026-10-26): the cards sit on the ability row's grid, so they
- * line up with it and scale with it. Species and background take 2 columns each; the classes share the rest, 2 at
- * the least, and wrap to a further row when there are too many to share it.
- * @param {number} columns  The grid's columns (AC, Init and one per ability: 8 with six abilities).
+ * How many columns each card spans (user, 2026-10-26): the cards sit on the stats row's columns, the combat panel's
+ * then one per ability, so they line up with it. Species and background take 2 ability columns each; one class takes
+ * the rest; two split them, the first on the combat panel's column (about two ability columns wide), the second on
+ * what's left (user, 2026-10-27).
+ * @param {number} columns  The grid's columns (the combat panel's and one per ability: 7 with six abilities).
  * @param {number} classes  How many class cards.
  * @returns {number[]} One span per class card.
  */
@@ -20,10 +21,7 @@ export function classSpans(columns, classes)
    // Two class cards at most (user, 2026-10-27): the rest are in the class tray, so the cards always fit one row.
    classes = Math.min(classes, MAX_CLASS_CARDS);
    const room = Math.max(2, columns - 4);
-   if (classes * 2 > room) { return Array(classes).fill(2); }
-   const base = Math.floor(room / classes);
-   // The first classes take any odd column left over, so the row is filled edge to edge.
-   return Array.from({ length: classes }, (_, i) => base + (i < room - base * classes ? 1 : 0));
+   return classes === 1 ? [room] : [1, room - 1];
 }
 
 /**

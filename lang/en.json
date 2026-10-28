@@ -22,12 +22,6 @@
         "Name": "No roll dialogs",
         "Hint": "Rolls go straight to the card, without the roll configuration window. Hold the skip-dialog key (Shift) to get the window back. Spellcasting and activity choices still ask."
       },
-      "AbilityEmphasis": {
-        "Name": "Ability emphasis",
-        "Hint": "What the sheet header shows large in each ability column: the modifier you roll with, or the score.",
-        "Modifier": "Modifier large, score small",
-        "Score": "Score large, modifier small"
-      },
       "InventoryColumns": {
         "Name": "Inventory columns",
         "Hint": "Which columns the Inventory tab shows. Change them from the tab's Columns menu in edit mode."
@@ -143,6 +137,8 @@
       "AC": "AC",
       "Init": "Init",
       "Proficiency": "Proficiency",
+      "Prof": "Prof",
+      "ProfLabel": "Proficiency bonus {prof}",
       "Save": "Save",
       "Level": "Level {level}",
       "XP": "{value} / {max} XP",
@@ -179,6 +175,19 @@
     },
     "Attributes": {
       "Skills": "Skills",
+      "Traits": "Traits",
+      "TraitShort": {
+        "senses": "Senses",
+        "languages": "Languages",
+        "di": "Immunities",
+        "dr": "Resistances",
+        "dv": "Vulnerabilities",
+        "dm": "Damage mod.",
+        "ci": "Condition imm.",
+        "weapon": "Weapons",
+        "armor": "Armor",
+        "tool": "Tools"
+      },
       "SkillsConfig": "Bonuses for every skill",
       "SkillAbility": "{skill}: ability",
       "SkillProf": "{skill}: proficiency (click to change)",

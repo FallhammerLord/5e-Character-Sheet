@@ -176,14 +176,14 @@
                <span class="fhcs-hp-line"><span class="fhcs-display">{{ text.hp }}</span><span class="fhcs-display">{{ hp.text }}</span></span>
             </div>
             {{/if}}
+            {{!-- Temp and Max ±: each a bar like HP, its word and its field inside (user, 2026-10-27). --}}
             <div class="fhcs-hp-fields">
-               <label class="fhcs-label fhcs-muted" for="{{ @root.document.id }}-fhcs-temp">{{ text.temp }}</label>
-               <input type="text" id="{{ @root.document.id }}-fhcs-temp" class="fhcs-input fhcs-body" name="system.attributes.hp.temp"
-                      data-dtype="Number" inputmode="numeric" value="{{ hp.temp }}" placeholder="0">
-               <label class="fhcs-label fhcs-muted" for="{{ @root.document.id }}-fhcs-tempmax">{{ text.maxMod }}</label>
-               <input type="text" id="{{ @root.document.id }}-fhcs-tempmax" class="fhcs-input fhcs-body" name="system.attributes.hp.tempmax"
-                      data-dtype="Number" inputmode="numeric" value="{{ hp.maxMod }}" placeholder="0" aria-label="{{ text.maxModLabel }}"
-                      data-fhcs-tip="{{ text.maxModLabel }}">
+               <label class="fhcs-hp-bar" for="{{ @root.document.id }}-fhcs-temp"><span class="fhcs-label fhcs-muted">{{ text.temp }}</span>
+                  <input type="text" id="{{ @root.document.id }}-fhcs-temp" class="fhcs-input fhcs-body" name="system.attributes.hp.temp"
+                         data-dtype="Number" inputmode="numeric" value="{{ hp.temp }}" placeholder="0"></label>
+               <label class="fhcs-hp-bar" for="{{ @root.document.id }}-fhcs-tempmax" data-fhcs-tip="{{ text.maxModLabel }}"><span class="fhcs-label fhcs-muted">{{ text.maxMod }}</span>
+                  <input type="text" id="{{ @root.document.id }}-fhcs-tempmax" class="fhcs-input fhcs-body" name="system.attributes.hp.tempmax"
+                         data-dtype="Number" inputmode="numeric" value="{{ hp.maxMod }}" placeholder="0" aria-label="{{ text.maxModLabel }}"></label>
             </div>
          </div>
       </div>
@@ -198,41 +198,6 @@
          <input type="text" class="fhcs-input fhcs-display fhcs-name fhcs-name-input" name="name" value="{{ nameSource }}" aria-label="{{ text.name }}">
          {{else}}
          <span class="fhcs-display fhcs-name">{{ name }}</span>
-         {{/if}}
-         {{#if xp}}
-         {{#if levelUp}}
-         {{!-- The level pill opens Level up (user, 2026-10-26); solid with an arrow once the XP is there. --}}
-         <details class="fhcs-fold fhcs-level" data-fold-key="level-up">
-            <summary class="fhcs-pill fhcs-body{{#if levelUp.ready}} fhcs-ready{{/if}}" aria-label="{{ levelUpLabel }}">
-               {{#if levelUp.ready}}<svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>{{/if}}{{ level }}
-               <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-            </summary>
-            <div class="fhcs-tray fhcs-track">{{> "modules/fhcs/templates/sheet/level-up.hbs" levelUp }}</div>
-         </details>
-         {{else}}
-         <span class="fhcs-pill fhcs-body">{{ level }}</span>
-         {{/if}}
-         {{/if}}
-         {{#if milestones}}
-         <details class="fhcs-fold fhcs-level" data-fold-key="milestones">
-            <summary class="fhcs-pill fhcs-body" aria-label="{{ milestones.label }}">{{ level }}
-               <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
-            </summary>
-            <div class="fhcs-tray fhcs-track">
-               <div class="fhcs-track-head"><span class="fhcs-label">{{ text.milestones }}</span><span class="fhcs-label fhcs-muted">{{ milestones.filled }} / {{ milestones.total }}</span></div>
-               <div class="fhcs-track-pips">
-                  {{#each milestones.pips}}
-                  <span class="fhcs-pip{{#if filled}} fhcs-on{{/if}}" role="img" aria-label="{{ label }}">{{#if img}}<img src="{{ img }}" alt="">{{/if}}</span>
-                  {{/each}}
-               </div>
-               <div class="fhcs-track-key">
-                  {{#each milestones.key}}
-                  <span class="fhcs-body"><img src="{{ img }}" alt="">{{ text }}</span>
-                  {{/each}}
-               </div>
-               {{#if levelUp}}{{> "modules/fhcs/templates/sheet/level-up.hbs" levelUp }}{{/if}}
-            </div>
-         </details>
          {{/if}}
       </div>
       <div class="fhcs-header-row">
@@ -258,51 +223,91 @@
             {{/if}}
          </div>
          {{/if}}
-         <span class="fhcs-label fhcs-nowrap">{{ text.proficiency }} {{ prof }}</span>
       </div>
 
-      {{!-- One row, never wrapped (user, 2026-10-24): columns grow and shrink between limits; the sheet has a minimum width. --}}
-      {{!-- The class, species and background cards share the grid's columns, under the abilities (user, 2026-10-26). --}}
-      <div class="fhcs-abilities{{#if scoreFirst}} fhcs-score-first{{/if}}" style="--fhcs-columns: {{ columns }}">
-         <div class="fhcs-ability">
-            {{!-- Edit mode: AC's gear opens dnd5e's AC window, the same gear as every other label (user, 2026-10-27). --}}
+      {{!-- Two panels on one row, never wrapped (user, 2026-10-27): the combat panel (AC, Init, Prof on the abilities'
+            lines, Level under them) and the abilities panel (each: score | modifier, the modifier rolling the check;
+            then the save, its shield filled when proficient). The cards below share these columns. --}}
+      <div class="fhcs-stats" style="--fhcs-columns: {{ abilityCount }}">
+         <div class="fhcs-combat">
             <span class="fhcs-label fhcs-muted fhcs-ability-head">{{ text.ac }}{{#if @root.editable}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="armorClass"
                     aria-label="{{ text.acConfig }}" data-fhcs-tip="{{ text.acConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</span>
+            <span class="fhcs-label fhcs-muted fhcs-ability-head">{{ text.init }}{{#if @root.editable}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="initiative"
+                    aria-label="{{ text.initConfig }}" data-fhcs-tip="{{ text.initConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</span>
+            <span class="fhcs-label fhcs-muted fhcs-ability-head">{{ text.prof }}</span>
             <span class="fhcs-shield" data-attribution="attributes.ac" data-attribution-caption="DND5E.ArmorClass">
                <svg viewBox="0 0 40 46" aria-hidden="true"><path d="M20 2l16 6v13c0 11-7 18-16 23C11 39 4 32 4 21V8z"/></svg>
                <span class="fhcs-display">{{ ac }}</span>
             </span>
-         </div>
-         <div class="fhcs-ability">
-            <span class="fhcs-label fhcs-muted fhcs-ability-head">{{ text.init }}{{#if @root.editable}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="initiative"
-                    aria-label="{{ text.initConfig }}" data-fhcs-tip="{{ text.initConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</span>
             <button type="button" class="fhcs-button fhcs-display {{ @root.rollableClass }}" data-action="roll" data-type="initiative"
                     aria-label="{{ text.initLabel }}">{{ init }}</button>
+            <span class="fhcs-display fhcs-prof-value" role="img" aria-label="{{ text.profLabel }}">{{ prof }}</span>
+            <div class="fhcs-combat-level">
+               {{#if xp}}
+               {{#if levelUp}}
+               {{!-- The level pill opens Level up (user, 2026-10-26); solid with an arrow once the XP is there. --}}
+               <details class="fhcs-fold fhcs-level" data-fold-key="level-up">
+                  <summary class="fhcs-pill fhcs-body{{#if levelUp.ready}} fhcs-ready{{/if}}" aria-label="{{ levelUpLabel }}">
+                     {{#if levelUp.ready}}<svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>{{/if}}{{ level }}
+                     <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                  </summary>
+                  <div class="fhcs-tray fhcs-track">{{> "modules/fhcs/templates/sheet/level-up.hbs" levelUp }}</div>
+               </details>
+               {{else}}
+               <span class="fhcs-pill fhcs-body">{{ level }}</span>
+               {{/if}}
+               {{/if}}
+               {{#if milestones}}
+               <details class="fhcs-fold fhcs-level" data-fold-key="milestones">
+                  <summary class="fhcs-pill fhcs-body" aria-label="{{ milestones.label }}">{{ level }}
+                     <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+                  </summary>
+                  <div class="fhcs-tray fhcs-track">
+                     <div class="fhcs-track-head"><span class="fhcs-label">{{ text.milestones }}</span><span class="fhcs-label fhcs-muted">{{ milestones.filled }} / {{ milestones.total }}</span></div>
+                     <div class="fhcs-track-pips">
+                        {{#each milestones.pips}}
+                        <span class="fhcs-pip{{#if filled}} fhcs-on{{/if}}" role="img" aria-label="{{ label }}">{{#if img}}<img src="{{ img }}" alt="">{{/if}}</span>
+                        {{/each}}
+                     </div>
+                     <div class="fhcs-track-key">
+                        {{#each milestones.key}}
+                        <span class="fhcs-body"><img src="{{ img }}" alt="">{{ text }}</span>
+                        {{/each}}
+                     </div>
+                     {{#if levelUp}}{{> "modules/fhcs/templates/sheet/level-up.hbs" levelUp }}{{/if}}
+                  </div>
+               </details>
+               {{/if}}
+            </div>
          </div>
-         {{#each abilities}}
-         <div class="fhcs-ability" data-ability="{{ key }}">
-            <span class="fhcs-label fhcs-muted fhcs-ability-head">{{ abbr }}{{#if @root.editable}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="ability"
-                    aria-label="{{ configLabel }}" data-fhcs-tip="{{ configLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</span>
-            {{#if @root.editable}}
-            {{!-- Edit mode: the score is a field (SCOPE §4.9); the check rolls from the label row's ability in play. --}}
-            <input type="text" class="fhcs-input fhcs-display fhcs-score-input" name="system.abilities.{{ key }}.value" data-dtype="Number"
-                   value="{{ source }}" placeholder="10" aria-label="{{ scoreLabel }}">
-            {{else}}
-            <button type="button" class="fhcs-button fhcs-display ability-check {{ @root.rollableClass }}" data-action="roll"
-                    data-type="ability" aria-label="{{ checkLabel }}">{{#if ../scoreFirst}}{{ score }}{{else}}{{ mod }}{{/if}}</button>
-            {{/if}}
-            <button type="button" class="fhcs-button fhcs-body saving-throw {{ @root.rollableClass }}" data-action="roll"
-                    data-type="ability" aria-label="{{ saveLabel }}" data-fhcs-tip="{{ saveLabel }}">
-               <span class="fhcs-prof{{#if proficient}} fhcs-on{{/if}}" aria-hidden="true"></span>{{ save }}
-            </button>
-            <span class="fhcs-label fhcs-muted">{{#if @root.editable}}{{ mod }}{{else}}{{#if ../scoreFirst}}{{ mod }}{{else}}{{ score }}{{/if}}{{/if}}</span>
+         <div class="fhcs-abilities">
+            {{#each abilities}}
+            <div class="fhcs-ability" data-ability="{{ key }}">
+               <span class="fhcs-label fhcs-muted fhcs-ability-head">{{ abbr }}{{#if @root.editable}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="ability"
+                       aria-label="{{ configLabel }}" data-fhcs-tip="{{ configLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</span>
+               <div class="fhcs-ability-pair">
+                  {{#if @root.editable}}
+                  {{!-- Edit mode: the score is a field in its half (SCOPE §4.9), outlined inside so nothing moves. --}}
+                  <input type="text" class="fhcs-input fhcs-body fhcs-score-input" name="system.abilities.{{ key }}.value" data-dtype="Number"
+                         value="{{ source }}" placeholder="10" aria-label="{{ scoreLabel }}">
+                  {{else}}
+                  <span class="fhcs-body fhcs-ability-score" role="img" aria-label="{{ scoreLabel }}">{{ score }}</span>
+                  {{/if}}
+                  <button type="button" class="fhcs-body ability-check {{ @root.rollableClass }}" data-action="roll"
+                          data-type="ability" aria-label="{{ checkLabel }}" data-fhcs-tip="{{ checkLabel }}">{{ mod }}</button>
+               </div>
+               <button type="button" class="fhcs-button fhcs-body saving-throw {{ @root.rollableClass }}" data-action="roll"
+                       data-type="ability" aria-label="{{ saveLabel }}" data-fhcs-tip="{{ saveLabel }}">
+                  <svg class="fhcs-icon fhcs-save-mark{{#if proficient}} fhcs-on{{/if}}" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/></svg>{{ save }}
+               </button>
+            </div>
+            {{/each}}
          </div>
-         {{/each}}
       </div>
    </div>
 
    {{!-- The cards: their own grid on the abilities' columns, so they still line up with the ability row. --}}
-   <div class="fhcs-cards" style="--fhcs-columns: {{ columns }}">
+   <div class="fhcs-cards" style="--fhcs-columns: {{ abilityCount }}">
          {{#each cards}}
          {{!-- Each card alike (SCOPE §4.8): the kind as a label, then the name, which opens the item, then a subclass on its
                own line; the item's art as a faded underlay; a dashed Subclass or Choose (dnd5e's findItem) where something

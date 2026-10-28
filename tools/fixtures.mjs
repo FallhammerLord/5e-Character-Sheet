@@ -133,7 +133,7 @@ const headerFacts = (over = {}) => ({
    originCards: originFacts(),
    prof: 4, ac: 16, init: 0, hp: { value: 87, max: 87, temp: 0 }, inspiration: false,
    exhaustion: { value: 0, max: 6 }, hd: { value: 12, max: 12 }, showRests: true,
-   restTypes: [{ key: 'short', label: 'Short Rest' }, { key: 'long', label: 'Long Rest' }], emphasis: 'modifier',
+   restTypes: [{ key: 'short', label: 'Short Rest' }, { key: 'long', label: 'Long Rest' }],
    abilities: [['str', 18, 4, 4, 0], ['dex', 10, 0, 0, 0], ['con', 14, 2, 2, 0], ['int', 8, -1, -1, 0],
       ['wis', 20, 5, 9, 1], ['cha', 9, -1, 3, 1]].map(([key, value, mod, save, proficient]) => ({
       key, abbr: key[0].toUpperCase() + key.slice(1), label: key, value, mod, save, proficient
@@ -160,7 +160,12 @@ const MULTICLASS = {
 };
 
 /** The header's second row: the HP band and the cards share its top and bottom (SCOPE §5.2 rule 1). */
-const HEADER_ALIGN = [['.fhcs-portrait-band', 'top', '.fhcs-origin-card', 'top'], ['.fhcs-portrait-band', 'bottom', '.fhcs-origin-card', 'bottom']];
+const HEADER_ALIGN = [['.fhcs-portrait-band', 'top', '.fhcs-origin-card', 'top'], ['.fhcs-portrait-band', 'bottom', '.fhcs-origin-card', 'bottom'],
+   // The two stats panels share their top and foot; the cards' outer edges meet the panels' (user, 2026-10-27).
+   ['.fhcs-combat', 'top', '.fhcs-abilities', 'top'], ['.fhcs-combat', 'bottom', '.fhcs-abilities', 'bottom'],
+   ['.fhcs-combat', 'left', '.fhcs-cards > :first-child', 'left'], ['.fhcs-abilities', 'right', '.fhcs-cards > :last-child', 'right'],
+   // An ability's score and the AC shield share a line; its save and Level share the foot.
+   ['.fhcs-combat .fhcs-button', 'top', '.fhcs-ability-pair', 'top'], ['.fhcs-combat-level', 'bottom', '.fhcs-abilities .saving-throw', 'bottom']];
 
 /** Four classes, highest first after sorting: Cleric and Fighter take the cards, Rogue and Wizard the class tray. */
 const FOUR_CLASSES = (over = {}) => originFacts({
@@ -553,9 +558,12 @@ export const CASES = [
    },
    { name: 'inventory-containers-shut', template: 'sheet/inventory', context: inventory({ openContainers: [], editing: true, columns: ALL_COLUMNS }) },
    { name: 'inventory-empty', template: 'sheet/inventory', context: inventory({ sections: [], attunement: { value: 0, max: 0 }, encumbrance: null }) },
-   { name: 'attributes', template: 'sheet/attributes', context: attributes(), rows: '.fhcs-skills > li', marks: '.fhcs-skill-name, .fhcs-skill-mod' },
-   { name: 'attributes-folded', template: 'sheet/attributes', context: attributes({ folded: ['inventory', 'spell-1'] }) },
-   { name: 'attributes-editing', template: 'sheet/attributes', context: attributes({ editing: true }), rows: '.fhcs-skills > li', marks: '.fhcs-skill-name, .fhcs-skill-mod', sameRowsAs: 'attributes' },
+   { name: 'attributes', template: 'sheet/attributes', context: attributes(), rows: '.fhcs-skills > li, .fhcs-traits > dt', marks: '.fhcs-skill-name, .fhcs-skill-mod',
+      align: [['.fhcs-attributes-side .fhcs-panel-head', 'top', '.fhcs-traits-panel .fhcs-panel-head', 'top'], ['.fhcs-attributes-side .fhcs-panel-head', 'bottom', '.fhcs-traits-panel .fhcs-panel-head', 'bottom']] },
+   { name: 'attributes-folded', template: 'sheet/attributes', context: attributes({ folded: ['inventory', 'spell-1', 'traits'] }),
+      // The traits heading sits on the Skills heading's line, folded or open (user, 2026-10-27).
+      align: [['.fhcs-attributes-side .fhcs-panel-head', 'top', '.fhcs-traits-panel .fhcs-panel-head', 'top'], ['.fhcs-attributes-side .fhcs-panel-head', 'bottom', '.fhcs-traits-panel .fhcs-panel-head', 'bottom']] },
+   { name: 'attributes-editing', template: 'sheet/attributes', context: attributes({ editing: true }), rows: '.fhcs-skills > li, .fhcs-traits > dt', marks: '.fhcs-skill-name, .fhcs-skill-mod', sameRowsAs: 'attributes' },
    { name: 'attributes-ability-tray', template: 'sheet/attributes', open: ['skill-ability-ath'], context: attributes({ editing: true }) },
    { name: 'attributes-empty', template: 'sheet/attributes', context: attributes({ favorites: [], resources: [], traits: [] }) },
    { name: 'tabs', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }) },
@@ -563,7 +571,7 @@ export const CASES = [
    { name: 'special-traits', html: SPECIAL_TRAITS },
    { name: 'header', template: 'sheet/header', context: header(), align: HEADER_ALIGN, rows: '.fhcs-header, .fhcs-ability' },
    { name: 'header-tall-art', template: 'sheet/header', context: header({ portrait: { src: TALL, isVideo: false } }) },
-   { name: 'header-score-first', template: 'sheet/header', context: header({ emphasis: 'score', inspiration: true, exhaustion: { value: 2, max: 6 } }) },
+   { name: 'header-inspired', template: 'sheet/header', context: header({ inspiration: true, exhaustion: { value: 2, max: 6 } }) },
    {
       name: 'header-milestones', template: 'sheet/header', open: ['milestones'],
       context: header({ ...MULTICLASS, name: 'Kira Ashvale of the Long Road, Keeper of the Ember Gate' })

@@ -94,7 +94,7 @@ Already in place before the phase: portrait picker (edit mode), rests, death sav
 - [ ] 5. Attributes in edit mode: skill proficiency and ability, trait and sense gears (built 2026-10-27; Quench passes, user 2026-10-27; play next)
 - [ ] 6. Spellcasting ability; level down (built 2026-10-27; Quench passes, user 2026-10-27; play next)
 - [x] Special Traits tab in our look: dnd5e's form, name and control on a line, hint under (user's screenshot, 2026-10-27; built, play next)
-- [ ] 7. Styling and space pass, by SCOPE §5.2 (user, 2026-10-27): sort ring, slot gear, Additional Spells uses, title band, two-row header, mode parity, round or square portrait, drawn C, like elements alike (rules 16–19, every element compared across modes) done 2026-10-27; the user's look in Foundry next
+- [ ] 7. Styling and space pass, by SCOPE §5.2 (user, 2026-10-27): sort ring, slot gear, Additional Spells uses, title band, two-row header, mode parity, round or square portrait, drawn C, like elements alike (rules 16–19, every element compared across modes), skill rows on dnd5e's model, the combat and abilities panels and the traits panel (2026-10-28) done; the user's look in Foundry next
 - ~~Limited and Observer views~~ skipped (user, 2026-10-27): Observers get our sheet read-only; Limited keeps dnd5e's small layout
 
 ## Phase 7: The ADHD layer

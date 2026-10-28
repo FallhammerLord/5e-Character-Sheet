@@ -7,14 +7,17 @@ import { levelUpChoices, originCards } from './origins.js';
 /** Pips on the milestone track: 4 rows of 5 (user, 2026-10-24). More appear if a character passes 20. */
 export const TRACK_PIPS = 20;
 
+/** The combat panel's width (AC, Init, Prof, Level; user, 2026-10-27). Matches `--fhcs-combat` in styles/fhcs.css. */
+export const COMBAT_WIDTH = 125;
+
 /**
- * The narrowest the sheet may be, so the ability row never wraps (user, 2026-10-24): padding, the 160px portrait
- * column, and AC, Init and each ability at the smallest column (52px) with 4px between. Matches styles/fhcs.css.
+ * The narrowest the sheet may be, so the stats row never wraps (user, 2026-10-24): padding, the 160px portrait
+ * column, the combat panel, and the abilities panel (its edge and padding, each ability at its smallest column, 48px,
+ * 3px between). Matches styles/fhcs.css.
  */
 export function headerMinWidth(abilityCount)
 {
-   const columns = 2 + abilityCount;
-   return 8 + 160 + 8 + columns * 52 + (columns - 1) * 4 + 8 + 2 * 8;
+   return 8 + 160 + 8 + COMBAT_WIDTH + 6 + (2 + 8 + abilityCount * 48 + (abilityCount - 1) * 3) + 8 + 2 * 8;
 }
 
 /** @returns {string} A modifier with its sign: +3, +0, −1 (a true minus sign). */
@@ -142,8 +145,8 @@ export function hpPreview(amount, hp, { format, localize })
  */
 export function headerView(facts, { format, localize })
 {
-   // The ability grid: AC, Init, then each ability; the class, species and background cards share its columns.
-   const columns = facts.abilities.length + 2;
+   // The cards' grid: the combat panel's column, then one per ability, so the cards line up with the stats row.
+   const columns = facts.abilities.length + 1;
    const i18n = { format, localize };
    const { hp, xp } = facts;
    const milestones = facts.leveling === 'noxp';
@@ -154,7 +157,7 @@ export function headerView(facts, { format, localize })
       nameSource: facts.nameSource ?? facts.name,
       // The portrait card (SCOPE §4.1, user, 2026-10-27): art fills the frame; a token shows whole, at the top.
       portrait: framedPortrait(facts),
-      columns,
+      abilityCount: facts.abilities.length,
       cards: facts.originCards ? originCards(facts.originCards, columns, i18n) : [],
       levelUp: facts.originCards ? levelUpChoices(facts.originCards, i18n) : null,
       levelUpLabel: format('FHCS.Header.LevelUpLabel', { level }),
@@ -210,7 +213,6 @@ export function headerView(facts, { format, localize })
       },
       // One chip per rest, one click each into dnd5e's rest dialog (user, 2026-10-27, replacing one chip with a tray).
       rests: facts.showRests ? facts.restTypes.map((r) => ({ ...r, short: r.key === 'short' })) : [],
-      scoreFirst: facts.emphasis === 'score',
       abilities: facts.abilities.map((a) => ({
          key: a.key,
          abbr: a.abbr,
@@ -241,7 +243,8 @@ export function headerView(facts, { format, localize })
          giveTemp: localize('FHCS.Header.HpTemp'), damageLabel: localize('FHCS.Header.HpDamageLabel'),
          healLabel: localize('FHCS.Header.HpHealLabel'), tempLabel: localize('FHCS.Header.HpTempLabel'),
          ac: localize('FHCS.Header.AC'),
-         init: localize('FHCS.Header.Init'), proficiency: localize('FHCS.Header.Proficiency'),
+         init: localize('FHCS.Header.Init'), prof: localize('FHCS.Header.Prof'),
+         profLabel: format('FHCS.Header.ProfLabel', { prof: signed(facts.prof) }),
          save: localize('FHCS.Header.Save'), inspiration: localize('FHCS.Header.Inspiration'),
          rest: localize('FHCS.Header.Rest'), milestones: localize('FHCS.Header.Milestones'),
          initLabel: format('FHCS.Header.InitLabel', { mod: signed(facts.init) })

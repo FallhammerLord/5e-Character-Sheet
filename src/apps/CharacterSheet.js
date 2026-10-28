@@ -58,10 +58,12 @@ const PREFS = { folded: 'foldedFavorites', openContainers: 'openContainers' };
 async function toggleGroup(event, target)
 {
    const group = target.closest('[data-fhcs-group]');
-   const list = group?.querySelector('.fhcs-favorites');
+   const list = group?.querySelector('.fhcs-favorites, .fhcs-traits');
    if (!list) { return; }
    list.hidden = !list.hidden;
    target.setAttribute('aria-expanded', String(!list.hidden));
+   // What shows only while folded (the traits' one-line summary).
+   for (const el of group.querySelectorAll('[data-fhcs-folded]')) { el.hidden = !list.hidden; }
    const folded = new Set(game.user.getFlag(MODULE_ID, PREFS.folded) ?? []);
    if (list.hidden) { folded.add(group.dataset.fhcsGroup); }
    else { folded.delete(group.dataset.fhcsGroup); }
@@ -327,7 +329,7 @@ export function makeCharacterSheet(Base)
          const i18n = { localize: (key) => game.i18n.localize(key), format: (key, data) => game.i18n.format(key, data) };
          if (partId === 'header' && !this.actor.limited)
          {
-            const facts = await headerFacts(this, context, MODULE_ID, game.settings.get(MODULE_ID, 'abilityEmphasis'));
+            const facts = await headerFacts(this, context, MODULE_ID);
             context.fhcs = { ...headerView(facts, i18n), editable: facts.editable };
          }
          if (partId === 'details')

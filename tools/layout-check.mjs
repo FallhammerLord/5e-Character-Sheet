@@ -97,8 +97,9 @@ function findProblems()
       {
          issues.push(`content wider than box by ${wider}px: ${label}`);
       }
-      // Short fixed words may never be cut short, ellipsis or not: "Exhaus…" passed once (2026-10-26).
-      if (clipsOnPurpose && wider > 1 && el.matches(WHOLE)) { issues.push(`cut short by ${wider}px: ${label}`); }
+      // Short fixed words may never be cut short, ellipsis or not, even by 1px: "Exhaus…" passed once (2026-10-26), and
+      // "Backgrou…" at 1px (2026-10-28).
+      if (clipsOnPurpose && wider >= 1 && el.matches(WHOLE)) { issues.push(`cut short by ${wider}px: ${label}`); }
    }
    // A checkbox stays square: Foundry's form groups stretched one into a bar across the row (user, 2026-10-27).
    for (const el of app.querySelectorAll('.window-content input[type=checkbox]'))

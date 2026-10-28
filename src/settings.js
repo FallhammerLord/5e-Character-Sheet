@@ -17,21 +17,6 @@ export function registerSettings()
       requiresReload: true
    });
 
-   // What the header shows large in each ability column (user, 2026-10-24: each player's choice).
-   game.settings.register(MODULE_ID, 'abilityEmphasis', {
-      name: 'FHCS.Settings.AbilityEmphasis.Name',
-      hint: 'FHCS.Settings.AbilityEmphasis.Hint',
-      scope: 'client',
-      config: true,
-      type: String,
-      choices: {
-         modifier: 'FHCS.Settings.AbilityEmphasis.Modifier',
-         score: 'FHCS.Settings.AbilityEmphasis.Score'
-      },
-      default: 'modifier',
-      onChange: () => rerenderSheets(SHEET_CLASS_NAME)
-   });
-
    // Which Inventory columns show (user, 2026-10-26: each player's choice, made from the tab in edit mode).
    game.settings.register(MODULE_ID, 'inventoryColumns', {
       name: 'FHCS.Settings.InventoryColumns.Name',

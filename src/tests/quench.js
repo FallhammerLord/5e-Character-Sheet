@@ -263,6 +263,21 @@ export function registerQuenchTests(quench)
             assert.strictEqual(skill.skill, 'prc');
          });
 
+         it('folds the traits panel for this player, and opens it again', async function ()
+         {
+            const before = game.user.getFlag(MODULE_ID, 'foldedFavorites') ?? [];
+            const folded = () => (game.user.getFlag(MODULE_ID, 'foldedFavorites') ?? []).includes('traits');
+            const was = folded();
+            try
+            {
+               await click('.fhcs-attributes [data-fhcs-group="traits"] [data-action="fhcsToggleGroup"]');
+               await until(() => folded() !== was, () => `the traits fold is remembered; folded groups hold ${JSON.stringify(game.user.getFlag(MODULE_ID, 'foldedFavorites'))}`);
+               await click('.fhcs-attributes [data-fhcs-group="traits"] [data-action="fhcsToggleGroup"]');
+               await until(() => folded() === was, () => `the traits open again; folded groups hold ${JSON.stringify(game.user.getFlag(MODULE_ID, 'foldedFavorites'))}`);
+            }
+            finally { await game.user.setFlag(MODULE_ID, 'foldedFavorites', before); }
+         });
+
          it('shows death saves in the header at 0 HP, and rolls one from there', async function ()
          {
             // A new test character may already be at 0 HP (no class, no max), so this only checks the 0 HP side.

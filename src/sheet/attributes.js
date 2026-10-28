@@ -52,12 +52,13 @@ export function attributesView(facts, { format, localize })
       };
    });
 
-   // Empty traits are hidden in play; edit mode lists them all (SCOPE §4.3).
+   // Every trait in both modes, "—" when empty (user, 2026-10-27: edit mode once showed what play mode hid).
    const traits = TRAIT_ORDER
       .map((key) => facts.traits.find((t) => t.key === key))
-      .filter((t) => t && (t.values.length || facts.editing))
+      .filter(Boolean)
       .map((t) => ({
-         key: t.key, title: t.title, text: t.values.length ? t.values.join(', ') : '—',
+         // A short label, so the label column stays narrow (user's mockup, 2026-10-27); dnd5e's full name stays in the gear's.
+         key: t.key, title: localize(`FHCS.Attributes.TraitShort.${t.key}`), text: t.values.length ? t.values.join(', ') : '—', empty: !t.values.length,
          // Each trait's gear opens dnd5e's window for it; senses have their own (`data-config`), the rest go by trait.
          config: t.key === 'senses' ? 'senses' : '', trait: t.key === 'senses' ? '' : t.key,
          configLabel: format('FHCS.Attributes.TraitConfig', { trait: t.title })
@@ -105,11 +106,15 @@ export function attributesView(facts, { format, localize })
    return {
       skills,
       traits,
+      // The traits panel folds (user, 2026-10-27), remembered like a favorites group; folded, one line of what's set.
+      traitsOpen: !(facts.folded ?? []).includes('traits'),
+      traitsSummary: traits.filter((t) => t.text !== '—').map((t) => t.text).join(' · '),
       favorites,
       editing: !!facts.editing,
       resources: facts.resources.map((r) => ({ ...r, label: format('FHCS.Attributes.ResourceLabel', r) })),
       text: {
          skills: localize('FHCS.Attributes.Skills'),
+         traits: localize('FHCS.Attributes.Traits'),
          skillsConfig: localize('FHCS.Attributes.SkillsConfig'),
          favorites: localize('FHCS.Attributes.Favorites'),
          noFavorites: localize('FHCS.Attributes.NoFavorites')

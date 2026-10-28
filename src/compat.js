@@ -88,7 +88,7 @@ export function changeHp(actor, kind, amount)
    return actor.applyDamage(kind === 'heal' ? -amount : amount);
 }
 
-export async function headerFacts(sheet, context, moduleId, emphasis)
+export async function headerFacts(sheet, context, moduleId)
 {
    const actor = sheet.actor;
    const { attributes, details, traits, abilities } = actor.system;
@@ -135,7 +135,6 @@ export async function headerFacts(sheet, context, moduleId, emphasis)
       hd: { value: attributes.hd?.value ?? 0, max: attributes.hd?.max ?? 0 },
       showRests: game.user.isGM || (actor.isOwner && game.settings.get('dnd5e', 'allowRests')),
       restTypes: Object.entries(config.restTypes ?? {}).map(([key, rest]) => ({ key, label: game.i18n.localize(rest.label) })),
-      emphasis,
       abilities: sheet._prepareAbilities(context).map((a) => ({
          key: a.key, abbr: a.abbr, label: a.label, value: a.value, mod: a.mod,
          source: actor.system._source.abilities?.[a.key]?.value ?? a.value,

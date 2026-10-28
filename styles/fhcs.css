@@ -56,6 +56,8 @@
    --fhcs-hp-fill: color-mix(in srgb, var(--fhcs-success) 28%, var(--fhcs-surface));
    /* Room for Foundry's window controls (menu, sheet, close) floating over the header's top right (rule 14). */
    --fhcs-window-controls: 84px;
+   /* The combat panel's width (COMBAT_WIDTH in src/sheet/header.js). */
+   --fhcs-combat: 125px;
 }
 
 .theme-dark .fhcs-sheet,
@@ -997,7 +999,8 @@
    display: grid;
    grid-row: 2;
    grid-column: 2;
-   grid-template-columns: repeat(var(--fhcs-columns, 8), minmax(52px, 88px));
+   /* The stats row's columns: the combat panel's, then the abilities panel's share, so card edges meet panel edges. */
+   grid-template-columns: var(--fhcs-combat) repeat(var(--fhcs-columns, 6), minmax(0, 1fr));
    gap: var(--fhcs-s1);
    min-width: 0;
 }
@@ -1334,17 +1337,42 @@
 /* Damage, the main action, is solid; color stays out of it (green already means equipped). */
 .fhcs-sheet .fhcs-hp-actions .fhcs-hp-damage { border-color: var(--fhcs-die-ink); background: var(--fhcs-die-ink); color: var(--fhcs-die-on-ink); }
 
-/* Temp and Max ± on one line: the labels never wrap; the two fields share what's left. */
-.fhcs-sheet .fhcs-hp-fields
+/* Temp and Max ±: two bars like HP's (user, 2026-10-27), each its word and its field inside; the field shows its edge
+   only on focus. */
+.fhcs-sheet .fhcs-hp-fields { display: grid; grid-template-columns: 1fr 1fr; gap: var(--fhcs-s1); }
+
+.fhcs-sheet .fhcs-hp-bar
 {
-   display: grid;
-   grid-template-columns: auto minmax(0, 1fr) auto minmax(0, 1fr);
+   display: flex;
    align-items: center;
-   gap: var(--fhcs-s1);
+   justify-content: space-between;
+   gap: 2px;
+   box-sizing: border-box;
+   height: var(--fhcs-control);
+   min-width: 0;
+   padding: 0 2px 0 var(--fhcs-s1);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-fill);
+   cursor: text;
 }
 
-.fhcs-sheet .fhcs-hp-fields label { white-space: nowrap; }
-.fhcs-sheet .fhcs-hp-fields .fhcs-input { min-width: 0; text-align: center; }
+.fhcs-sheet .fhcs-hp-bar > span { white-space: nowrap; }
+
+.fhcs-sheet .fhcs-hp-bar > .fhcs-input
+{
+   flex: 0 1 28px;
+   width: 28px;
+   min-width: 0;
+   height: 22px;
+   min-height: 0;
+   padding: 0 2px;
+   border-color: transparent;
+   background: transparent;
+   text-align: right;
+}
+
+.fhcs-sheet .fhcs-hp-bar > .fhcs-input:focus { border-color: var(--fhcs-ink); background: var(--fhcs-surface); }
 
 /* The XP bar. */
 .fhcs-sheet .fhcs-bar
@@ -1389,7 +1417,10 @@
 /* A gear inside a line of text keeps its 24px target without making the line taller than in play mode (rule 6). */
 /* A control in a line of text (a gear, the "+N" chip) keeps its 24px target without making the line taller than in
    play mode or than its neighbours' (rule 6; user 2026-10-27: "+1" pushed the second class's name down). */
-.fhcs-sheet :is(.fhcs-trait dt, .fhcs-origin-speed, .fhcs-ability-head) > .fhcs-gear-button { margin-block: -5px; }
+.fhcs-sheet :is(.fhcs-origin-speed, .fhcs-ability-head) > .fhcs-gear-button { margin-block: -5px; }
+/* In a stats label the gear is 16px wide (24px tall), so "CON" and its gear fit a 48px column. WCAG 2.5.8's spacing
+   rule allows it: nothing else clickable lies within the 24px circle around it, only label text (SCOPE §5.2 rule 20). */
+.fhcs-sheet .fhcs-toggle.fhcs-gear-button:is(.fhcs-ability-head > *) { width: 16px; }
 
 .fhcs-sheet .fhcs-name-input { flex: 1; min-width: 0; padding: 0 var(--fhcs-s1); text-align: left; }
 
@@ -1525,33 +1556,97 @@
 
 .fhcs-sheet .fhcs-track-key img { width: 16px; height: 16px; border-radius: 50%; }
 
-/* Abilities: one row that never wraps (user, 2026-10-24). Columns stretch between 52 and 88px; below that the
-   sheet stops shrinking (headerMinWidth, src/sheet/header.js). */
-.fhcs-sheet .fhcs-abilities
+/* The stats row (user, 2026-10-27): the combat panel and the abilities panel side by side, never wrapped. Both share
+   three lines: a 24px label line, then two 28px control lines. Each panel is an underlay with an edge (rule 3). Below
+   the narrowest columns the sheet stops shrinking (headerMinWidth, src/sheet/header.js). */
+.fhcs-sheet .fhcs-stats
 {
    display: grid;
-   /* AC, Init and each ability; the class, species and background cards follow on the next row, on these columns. */
-   grid-template-columns: repeat(var(--fhcs-columns, 8), minmax(52px, 88px));
-   gap: var(--fhcs-s1);
+   grid-template-columns: var(--fhcs-combat) minmax(0, 1fr);
+   gap: 6px;
    margin-top: var(--fhcs-s1);
 }
 
+.fhcs-sheet :is(.fhcs-combat, .fhcs-abilities)
+{
+   display: grid;
+   grid-template-rows: 24px var(--fhcs-control) var(--fhcs-control);
+   gap: var(--fhcs-s1) 3px;
+   box-sizing: border-box;
+   min-width: 0;
+   padding: var(--fhcs-s1);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-fill);
+}
+
+/* AC, Init, Prof: label, then value; Level across the panel's foot. */
+.fhcs-sheet .fhcs-combat { grid-template-columns: 34px minmax(0, 1fr) 32px; align-items: center; justify-items: center; }
+.fhcs-sheet .fhcs-combat > .fhcs-button { width: 100%; }
+.fhcs-sheet .fhcs-combat-level { grid-column: 1 / -1; align-self: stretch; justify-self: stretch; display: flex; }
+.fhcs-sheet .fhcs-combat-level > * { flex: 1; min-width: 0; }
+.fhcs-sheet .fhcs-combat-level .fhcs-pill { justify-content: center; width: 100%; box-sizing: border-box; height: var(--fhcs-control); }
+.fhcs-sheet .fhcs-combat-level .fhcs-pill:not(.fhcs-ready) { background: var(--fhcs-surface); }
+.fhcs-sheet .fhcs-combat-level .fhcs-level .fhcs-tray { left: 0; right: auto; }
+
+/* Each ability: its label, then score | modifier (the modifier rolls the check), then the save. */
+.fhcs-sheet .fhcs-abilities { grid-template-columns: repeat(var(--fhcs-columns, 6), minmax(48px, 1fr)); grid-auto-flow: column; }
+
 .fhcs-sheet .fhcs-ability
 {
-   display: flex;
-   flex-direction: column;
-   align-items: center;
-   gap: var(--fhcs-s1);
+   display: grid;
+   grid-row: 1 / -1;
+   grid-template-rows: subgrid;
+   justify-items: center;
    min-width: 0;
 }
 
+.fhcs-sheet .fhcs-ability > :not(.fhcs-ability-head) { width: 100%; }
+
+.fhcs-sheet .fhcs-ability-pair
+{
+   display: grid;
+   grid-template-columns: 1fr 1fr;
+   box-sizing: border-box;
+   overflow: hidden;
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-surface);
+}
+
+.fhcs-sheet .fhcs-ability-pair > *
+{
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   min-width: 0;
+   height: 100%;
+   min-height: 0;
+   margin: 0;
+   padding: 0;
+   border: 0;
+   border-radius: 0;
+}
+
+.fhcs-sheet .fhcs-ability-pair > :first-child { border-right: 1px solid var(--fhcs-line); }
+.fhcs-sheet .fhcs-ability-pair > .ability-check { background: var(--fhcs-fill); color: inherit; font-family: inherit; cursor: pointer; }
+/* Edit mode's score: outlined inside its half, so neither the box nor the number moves. */
+.fhcs-sheet .fhcs-ability-pair > .fhcs-score-input { width: 100%; background: var(--fhcs-surface); box-shadow: inset 0 0 0 1.5px var(--fhcs-ink); text-align: center; }
+.fhcs-sheet .fhcs-ability > .saving-throw { gap: var(--fhcs-s1); padding: 0 2px; }
+/* Save proficiency: the shield filled when proficient, outlined when not (filled means proficient, as on the skills). */
+.fhcs-sheet .fhcs-save-mark { flex: none; width: 12px; height: 12px; fill: none; }
+.fhcs-sheet .fhcs-save-mark.fhcs-on { fill: currentColor; }
+
+/* The AC shield, at the panel's 28px line. */
+/* 34px tall in the 28px line (it reaches 3px into the gaps), so the display-size number sits inside it. */
 .fhcs-sheet .fhcs-shield
 {
    position: relative;
    display: grid;
    place-items: center;
-   width: 40px;
-   height: 46px;
+   width: 32px;
+   height: 34px;
+   margin-block: -3px;
    color: var(--fhcs-die-on-ink);
 }
 
@@ -1566,17 +1661,6 @@
 
 .fhcs-sheet .fhcs-shield > span { position: relative; }
 
-/* Save proficiency: a filled dot when proficient, an outline when not. */
-.fhcs-sheet .fhcs-prof
-{
-   flex: none;
-   width: 8px;
-   height: 8px;
-   border: 1.5px solid currentColor;
-   border-radius: 50%;
-}
-
-.fhcs-sheet .fhcs-prof.fhcs-on { background: currentColor; }
 
 /* Death saves, only at 0 HP: successes in green with a tick, failures in red with a cross, so color isn't alone. */
 /* At 0 HP: the art goes grey, and the death saves sit over it, successes over failures with the roll beside. */
@@ -1736,26 +1820,27 @@
    box-shadow: 0 0 0 2px var(--fhcs-surface), 0 0 0 3.5px currentColor;
 }
 
-/* Traits: a label over its values. */
+/* Traits (user, 2026-10-27): a panel at the main column's top, its heading on the Skills heading's line, on the fill
+   underlay the stats panels use. One line per trait: label, values, then a gear column (empty in play), every row
+   24px at least in both modes. */
+.fhcs-sheet .fhcs-traits-panel { border-radius: var(--fhcs-radius); background: var(--fhcs-fill); }
+.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head { gap: var(--fhcs-s2); }
+.fhcs-sheet .fhcs-traits-panel .fhcs-group-toggle { flex: none; }
+.fhcs-sheet .fhcs-traits-summary { flex: 1; }
+
 .fhcs-sheet .fhcs-traits
 {
-   display: flex;
-   flex-direction: column;
-   gap: var(--fhcs-s2);
-   margin-top: var(--fhcs-s2);
-   padding-top: var(--fhcs-s2);
-   border-top: 1px solid var(--fhcs-line);
+   display: grid;
+   grid-template-columns: minmax(96px, max-content) minmax(0, 1fr) 24px;
+   align-items: center;
+   column-gap: var(--fhcs-s2);
+   margin: 0;
+   padding: var(--fhcs-s1) var(--fhcs-s1) var(--fhcs-s1) var(--fhcs-s2);
 }
 
-.fhcs-sheet .fhcs-trait
-{
-   display: flex;
-   flex-direction: column;
-   gap: 2px;
-   padding: 0 var(--fhcs-s1);
-}
-
-.fhcs-sheet .fhcs-trait dd { margin: 0; }
+.fhcs-sheet .fhcs-traits[hidden] { display: none; }
+.fhcs-sheet .fhcs-traits > :is(dt, dd) { display: flex; align-items: center; min-height: 24px; margin: 0; }
+.fhcs-sheet .fhcs-traits > .fhcs-trait-gear { justify-content: center; }
 
 /* ---------- Attributes in edit mode (SCOPE §4.9, user, 2026-10-27) ---------- */
 
@@ -1818,7 +1903,6 @@
 .fhcs-sheet .fhcs-skill-roll:hover .fhcs-skill-name { text-decoration: underline; }
 .fhcs-sheet .fhcs-skill-roll { width: 100%; }
 .fhcs-sheet .fhcs-skill-roll > .fhcs-skill-name { flex: 1; min-width: 0; text-align: left; }
-.fhcs-sheet .fhcs-trait-head { display: flex; align-items: center; justify-content: space-between; min-height: 24px; }
 
 /* Resources: counters above the favorites. */
 .fhcs-sheet .fhcs-resources
@@ -2609,7 +2693,8 @@
    align-items: flex-start;
    gap: var(--fhcs-s2);
    min-width: 0;
-   padding: var(--fhcs-s1) var(--fhcs-s1) var(--fhcs-s1) var(--fhcs-s2);
+   /* No right padding: at 644px "Background" needs the card's whole width (user's sheet, 2026-10-28). */
+   padding: var(--fhcs-s1) 0 var(--fhcs-s1) var(--fhcs-s2);
    border: 1px solid var(--fhcs-line);
    border-radius: var(--fhcs-radius);
    background: var(--fhcs-surface);

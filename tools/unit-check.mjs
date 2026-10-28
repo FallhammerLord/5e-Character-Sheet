@@ -222,7 +222,7 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    if (names[0] !== 'Attributes' || names[2] !== 'Spellbook') { problems.push(`tab names: ${names.join()}`); }
 }
 
-// Attributes: every passive, empty traits hidden in play, favorites grouped in Classic's order with slot pips.
+// Attributes: every passive, every trait in both modes, favorites grouped in Classic's order with slot pips.
 {
    const skill = (key, prof) => ({ key, label: key, abbr: 'Wis', total: 2, passive: 12, prof });
    const row = (title, group, level = null) => ({ id: title, title, group, level, uses: null, quantity: 0, state: null });
@@ -239,7 +239,7 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
       open: view.favorites.map((g) => g.open), pips: view.favorites.find((g) => g.slots)?.slots.pips.map((p) => p.filled)
    };
    const expected = {
-      passives: [12, 12, 12], marks: ['full', 'half', 'expert'], traits: ['languages'],
+      passives: [12, 12, 12], marks: ['full', 'half', 'expert'], traits: ['languages', 'di'],
       groups: ['Inventory', 'Features', 'Cantrips', 'Spell level 1', 'Spell level 3'],
       open: [false, true, true, true, true], pips: [true, false]
    };
@@ -247,6 +247,9 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    catch { problems.push(`attributes: got ${JSON.stringify(got)}, expected ${JSON.stringify(expected)}`); }
    const editing = attributesView({ ...facts, editing: true }, { format, localize });
    if (editing.traits.map((t) => t.text).join() !== 'Common,\u2014') { problems.push('edit mode does not list empty traits'); }
+   // The traits panel folds, remembered with the favorites groups; folded it summarizes what's set.
+   const folded = attributesView({ ...facts, folded: ['traits'] }, { format, localize });
+   if (!view.traitsOpen || folded.traitsOpen || folded.traitsSummary !== 'Common') { problems.push(`traits fold: ${folded.traitsOpen} "${folded.traitsSummary}"`); }
 }
 
 // Framing belongs to one image, stays inside its limits, and a token has none.
@@ -486,30 +489,30 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
       maxLevel: 20, xp: { value: 100, max: 300 }, canEdit: true, editing: false,
       ...over
    });
-   const spans = [classSpans(8, 1), classSpans(8, 2), classSpans(8, 3), classSpans(9, 2), classSpans(9, 1)].map((x) => x.join('+'));
-   // One class takes the 4 columns left by species and background; two share them; a third and more go to the class
-   // tray (user, 2026-10-27), so there are never more than two spans.
-   try { deepStrictEqual(spans, ['4', '2+2', '2+2', '3+2', '5']); }
+   const spans = [classSpans(7, 1), classSpans(7, 2), classSpans(7, 3), classSpans(8, 2), classSpans(8, 1)].map((x) => x.join('+'));
+   // One class takes the columns left by species and background (the combat panel's and two abilities'); two split
+   // them, the first on the combat panel's; a third and more go to the class tray (user, 2026-10-27).
+   try { deepStrictEqual(spans, ['3', '1+2', '1+2', '1+3', '4']); }
    catch { problems.push(`card spans: ${JSON.stringify(spans)}`); }
-   const cards = originCards(facts(), 8, { format, localize });
+   const cards = originCards(facts(), 7, { format, localize });
    const shape = cards.map((k) => `${k.kind}:${k.item?.name ?? ''}${k.level ? ` ${k.level}` : ''}${k.sub ? `/${k.sub.name}` : ''}${k.choose ? `+${k.choose.type}` : ''}${k.item?.clear ? 'x' : ''}@${k.span}`);
    // Highest level first; a subclass due offers Subclass; a missing background offers Choose; no removes outside edit mode.
-   try { deepStrictEqual(shape, ['Class:Cleric 9/Life@2', 'Class:Warlock 1+subclass@2', 'Species:Dwarf@2', 'Background:+background@2']); }
+   try { deepStrictEqual(shape, ['Class:Cleric 9/Life@1', 'Class:Warlock 1+subclass@2', 'Species:Dwarf@2', 'Background:+background@2']); }
    catch { problems.push(`header cards: ${JSON.stringify(shape)}`); }
-   const editing = originCards(facts({ editing: true }), 8, { format, localize });
+   const editing = originCards(facts({ editing: true }), 7, { format, localize });
    if (!editing[0].item.clear || !editing[0].sub.clear || !editing[2].item.clear) { problems.push('edit mode does not offer to remove cards'); }
-   const viewer = originCards(facts({ canEdit: false }), 8, { format, localize });
+   const viewer = originCards(facts({ canEdit: false }), 7, { format, localize });
    if (viewer.some((k) => k.choose || k.item?.clear)) { problems.push('a viewer without edit rights gets Choose or remove'); }
-   const blank = originCards(facts({ classes: [] }), 8, { format, localize });
-   if (blank[0].choose?.type !== 'class' || blank[0].span !== 4) { problems.push(`no class: ${JSON.stringify(blank[0])}`); }
+   const blank = originCards(facts({ classes: [] }), 7, { format, localize });
+   if (blank[0].choose?.type !== 'class' || blank[0].span !== 3) { problems.push(`no class: ${JSON.stringify(blank[0])}`); }
    // Four classes: the two highest take cards; the last card's "+2" holds the rest, highest first.
    const four = originCards(facts({ editing: true, classes: [
       ...facts().classes,
       { id: 'r', uuid: 'r', name: 'Rogue', img: '', identifier: 'rogue', level: 3, subclass: null, needsSubclass: true },
       { id: 'f', uuid: 'f', name: 'Fighter', img: '', identifier: 'fighter', level: 2, subclass: null, needsSubclass: false }
-   ] }), 8, { format, localize });
+   ] }), 7, { format, localize });
    const fourShape = four.filter((k) => k.isClass).map((k) => `${k.item.name}@${k.span}${k.more ? `${k.more.text}:${k.more.classes.map((m) => `${m.item.name}${m.choose ? '+' : ''}${m.item.clear ? 'x' : ''}`).join(',')}` : ''}`);
-   try { deepStrictEqual(fourShape, ['Cleric@2', 'Rogue@2+2:Fighterx,Warlock+x']); }
+   try { deepStrictEqual(fourShape, ['Cleric@1', 'Rogue@2+2:Fighterx,Warlock+x']); }
    catch { problems.push(`four classes: ${JSON.stringify(fourShape)}`); }
    if (cards.some((k) => k.more)) { problems.push('two classes get a "+N" chip'); }
    const up = levelUpChoices(facts(), { format, localize });
@@ -575,7 +578,7 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
 }
 
 // Each extra ability (honor, sanity) widens the minimum by one column and its gap.
-if (headerMinWidth(7) - headerMinWidth(6) !== 56) { problems.push('the sheet minimum does not grow by one ability column'); }
+if (headerMinWidth(7) - headerMinWidth(6) !== 51) { problems.push('the sheet minimum does not grow by one ability column'); }
 
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
 console.log(`${CASES.length} outcome lines, ${PART_CASES.length} card layouts, ${ROW_CASES.length} d20 rows, `
