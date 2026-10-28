@@ -317,21 +317,27 @@
       animation: fhcs-forge-strike 0.25s ease-out;
    }
 
-   /* Embers: a handful rise from the hearth for three seconds in every twenty, never at 0 HP. */
+   /* Embers: sparks rise from the coal grate in front of the panels and fade within the window's lowest third, for
+      three seconds in every twenty (user, 2026-10-28: behind the plates they couldn't be seen), never at 0 HP. Below
+      the window band, never catching a click. */
    .fhcs-sheet[data-fhcs-theme="forge"]:not([data-fhcs-motion="off"]):not([data-fhcs-hp="down"]) .window-content::before
    {
       content: '';
       position: absolute;
       inset: auto 0 0 0;
-      height: 45%;
-      z-index: -1;
+      height: 22%;
+      z-index: 3;
       pointer-events: none;
       opacity: 0;
       background:
-         radial-gradient(circle at 38% 100%, var(--fhcs-theme-ember) 0 1.5px, transparent 2px),
-         radial-gradient(circle at 52% 100%, var(--fhcs-theme-ember) 0 1px, transparent 1.5px),
-         radial-gradient(circle at 61% 100%, var(--fhcs-theme-ember) 0 1.5px, transparent 2px),
-         radial-gradient(circle at 46% 100%, var(--fhcs-theme-ember) 0 1px, transparent 1.5px);
+         radial-gradient(circle at 14% 92%, #fff1c2 0 1.5px, var(--fhcs-theme-ember) 2.5px, color-mix(in srgb, var(--fhcs-theme-ember) 35%, transparent) 4px, transparent 6px),
+         radial-gradient(circle at 27% 78%, #fff1c2 0 1px, var(--fhcs-theme-ember) 2px, color-mix(in srgb, var(--fhcs-theme-ember) 35%, transparent) 3px, transparent 4.5px),
+         radial-gradient(circle at 36% 96%, #fff1c2 0 1.5px, var(--fhcs-theme-ember) 2.5px, color-mix(in srgb, var(--fhcs-theme-ember) 35%, transparent) 4px, transparent 6px),
+         radial-gradient(circle at 48% 84%, #fff1c2 0 1px, var(--fhcs-theme-ember) 2px, color-mix(in srgb, var(--fhcs-theme-ember) 35%, transparent) 3px, transparent 4.5px),
+         radial-gradient(circle at 57% 98%, #fff1c2 0 1.5px, var(--fhcs-theme-ember) 2.5px, color-mix(in srgb, var(--fhcs-theme-ember) 35%, transparent) 4px, transparent 6px),
+         radial-gradient(circle at 66% 72%, #fff1c2 0 1px, var(--fhcs-theme-ember) 2px, color-mix(in srgb, var(--fhcs-theme-ember) 35%, transparent) 3px, transparent 4.5px),
+         radial-gradient(circle at 74% 90%, #fff1c2 0 1.5px, var(--fhcs-theme-ember) 2.5px, color-mix(in srgb, var(--fhcs-theme-ember) 35%, transparent) 4px, transparent 6px),
+         radial-gradient(circle at 86% 80%, #fff1c2 0 1px, var(--fhcs-theme-ember) 2px, color-mix(in srgb, var(--fhcs-theme-ember) 35%, transparent) 3px, transparent 4.5px);
       animation: fhcs-forge-embers 20s ease-out infinite;
    }
 
@@ -352,10 +358,11 @@
 
 @keyframes fhcs-forge-embers
 {
-   0% { opacity: 0; transform: translateY(0); }
+   0% { opacity: 0; transform: translate(0, 0); }
    2% { opacity: 1; }
-   15% { opacity: 0; transform: translateY(-70%); }
-   100% { opacity: 0; transform: translateY(-70%); }
+   8% { opacity: 0.9; transform: translate(6px, -55%); }
+   15% { opacity: 0; transform: translate(-4px, -110%); }
+   100% { opacity: 0; transform: translate(-4px, -110%); }
 }
 
 @keyframes fhcs-forge-jolt
