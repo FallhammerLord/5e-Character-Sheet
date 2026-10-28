@@ -378,6 +378,17 @@ function findProblems()
       const kept = control.matches('[data-action="toggleControls"], [data-action="close"], .preparation-warnings');
       if (kept !== !!control.getClientRects().length) { issues.push(`title bar: ${control.dataset.action} ${kept ? 'hidden' : 'shows'}`); }
    }
+   // A scrolling region keeps its scrollbar's room (user, 2026-10-28: the favorites jumped when a fold brought the
+   // scrollbar in and out), so its contents never change width.
+   if (app.matches('.fhcs-sheet'))
+   {
+      for (const el of app.querySelectorAll('.window-content *'))
+      {
+         const cs = getComputedStyle(el);
+         if (!['auto', 'scroll'].includes(cs.overflowY) || !el.getClientRects().length || el.matches('textarea, input')) { continue; }
+         if (!cs.scrollbarGutter.startsWith('stable')) { issues.push(`scrolls without keeping its scrollbar's room: ${el.tagName.toLowerCase()}.${[...el.classList].join('.')}`); }
+      }
+   }
    // Spacing is 4 or 8 (SCOPE §5.2 rule 3, user 2026-10-28), every gap, padding and margin on the sheet, except:
    // a hang (rule 21: a control reaching into the space around its line, a negative margin on the named controls),
    // an indent that lines text up with a column (the name column, a container's contents, the footer's last column),
@@ -548,8 +559,10 @@ for (const c of CASES)
 {
    // `open` lists folded panels to draw open, by their data-fold-key.
    // A case gives a template and its context, or `html`: markup Foundry draws for dnd5e (its form helpers aren't here).
-   const body = (c.open ?? []).reduce((html, key) => html.replace(`data-fold-key="${key}"`, `data-fold-key="${key}" open`),
+   const drawn = (c.open ?? []).reduce((html, key) => html.replace(`data-fold-key="${key}"`, `data-fold-key="${key}" open`),
       c.html ?? template(c.template)(c.context));
+   // A tab sits in Foundry's tab body, padded, as on the sheet (a list hangs into that padding for its scrollbar).
+   const body = /^\s*(\{\{!--[\s\S]*?--\}\}\s*)?<section class="tab /.test(drawn) ? `<div class="tab-body">${drawn}</div>` : drawn;
    const kind = c.frame ?? 'sheet';
    for (const theme of c.theme ? [c.theme] : Object.keys(THEMES))
    {

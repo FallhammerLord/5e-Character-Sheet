@@ -231,6 +231,11 @@
    #2a1a0c on the plate's darkest brass is 7.6:1. */
 .fhcs-sheet[data-fhcs-theme="forge"] .fhcs-name
 {
+   /* One height in both modes, as text and as edit mode's field (user, 2026-10-28: the row shifted on unlocking). */
+   box-sizing: border-box;
+   height: var(--fhcs-control);
+   min-height: 0;
+   line-height: calc(var(--fhcs-control) - 2px);
    padding: 0 var(--fhcs-s2);
    /* The right border is the mark's room: brass like the plate (the background runs under it), so a long name
       never runs under the mark. */
@@ -353,14 +358,8 @@
    box-shadow: 0 6px 18px rgb(0 0 0 / 45%), inset 0 0 0 1px color-mix(in srgb, var(--fhcs-theme-iron) 30%, transparent);
 }
 
-/* Fields: sunken steel wells; focus heats the edge. The HP bar's fields and the nameplate keep their own look. */
-.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-input:not(.fhcs-name, .fhcs-hp-bar > .fhcs-input, .fhcs-hp-meter > .fhcs-input)
-{
-   border-color: var(--fhcs-theme-edge);
-   background-color: color-mix(in srgb, var(--fhcs-surface) 88%, var(--fhcs-theme-iron));
-   box-shadow: inset 0 1px 2px rgb(0 0 0 / 35%);
-}
-
+/* Fields keep the sheet's own look, so a value looks the same as text in play and as a field in edit mode (rules
+   16–19; user, 2026-10-28: sunken wells changed the scores on unlocking). Focus heats the edge. */
 .fhcs-sheet[data-fhcs-theme="forge"] .fhcs-input:focus { border-color: var(--fhcs-theme-accent); }
 
 /* Buttons: an iron edge and a lit top. The solid Damage button and the dashed choose buttons keep their marks. */

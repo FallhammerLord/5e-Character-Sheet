@@ -181,6 +181,12 @@ Proposed for ours:
 - **dnd5e stays in step:** its boolean is on while the bank holds any, so whatever reads dnd5e's inspiration still works.
 - **To decide:** where the bar sits (the portrait's top edge, or beside the HP bar), and the most segments drawn before it becomes "5 / 8".
 
+### 4.13 Nothing moves when a group folds or the lock turns (user, 2026-10-28)
+
+- **Scrolling areas keep their scrollbar's room** (`scrollbar-gutter: stable`, thin), so opening or folding a group never narrows the column (the favorites jumped as the scrollbar came and went). On a list tab the list's scrollbar room takes the place of the tab's right padding; the search bar, footer and casting cards keep theirs. The layout check fails on any scrolling area without it, and draws tabs inside Foundry's padded tab body (it had given them 16px Foundry doesn't). At 644px with every column on, Uses (to 56px), Weight (to 50px), Usage (to 56px) and Time, Range, School and Target (to 36px) give way to make the room.
+- **Themes don't restyle fields:** a value looks the same as text in play and as a field in edit mode (Forge's sunken wells changed the scores on unlocking); a theme may only heat a field's edge on focus. Forge's nameplate keeps one height in both modes.
+- **Play and edit mode are compared in every theme** (Forge's pairs, a character with no resources, one with four classes).
+
 ## 5. ADHD rules carried over
 
 Typography and spacing (user, 2026-10-24): three text styles across the module (display, body, label), two spacing steps, one control height; every panel uses space economically, folded and open: a band's heading, total and open mark share one line; the card header is one label line (actor · details) over the title.

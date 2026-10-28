@@ -842,6 +842,11 @@
    height: 100%;
    padding: var(--fhcs-s2);
    overflow-y: auto;
+   /* The scrollbar's room is kept whether or not it shows, so opening or folding a group never narrows the column
+      (user, 2026-10-28: the favorites jumped on a fold when the scrollbar came and went); a thin one, so the room it
+      keeps is small. */
+   scrollbar-gutter: stable;
+   scrollbar-width: thin;
 }
 
 .fhcs-sheet .tab[data-group="primary"]:not(.active) { display: none; }
@@ -2045,7 +2050,7 @@
 .fhcs-sheet .fhcs-resource-link { position: relative; flex: none; }
 .fhcs-sheet .fhcs-resource-link > summary { list-style: none; }
 .fhcs-sheet .fhcs-resource-link > summary::-webkit-details-marker { display: none; }
-.fhcs-sheet .fhcs-resource-tray { left: auto; right: 0; z-index: 3; width: 15rem; max-height: 20rem; overflow-y: auto; }
+.fhcs-sheet .fhcs-resource-tray { left: auto; right: 0; z-index: 3; width: 15rem; max-height: 20rem; overflow-y: auto; scrollbar-gutter: stable; }
 .fhcs-sheet .fhcs-resource-option { justify-content: flex-start; gap: var(--fhcs-s1); padding: 0 var(--fhcs-s1); }
 /* The one shown: the radio dot filled, as the main spellcasting ability's (SCOPE §5.1). */
 .fhcs-sheet .fhcs-resource-option > .fhcs-radio-mark { flex: none; }
@@ -2323,7 +2328,16 @@
    gap: var(--fhcs-s2);
    min-height: 0;
    overflow-y: auto;
+   /* Its scrollbar's room is kept, so a fold never narrows the rows (user, 2026-10-28); it takes the place of the
+      tab's right padding (below). */
+   scrollbar-gutter: stable;
+   scrollbar-width: thin;
 }
+
+/* A list tab gives its right padding to the list's scrollbar room; what sits above and below the list keeps it. */
+.fhcs-sheet .tab-body > .fhcs-list-tab { padding-right: 0; }
+.fhcs-sheet .fhcs-list-tab > :not(.fhcs-list-element),
+.fhcs-sheet .fhcs-list-element > :not(.fhcs-items) { padding-right: var(--fhcs-s2); }
 
 .fhcs-sheet :is(.fhcs-item-head, .fhcs-item-row)
 {
@@ -2343,10 +2357,12 @@
 .fhcs-sheet .fhcs-col-img { flex: none; width: 24px; }
 /* Names keep at least 96px; the columns that can give way (usage, time, range) do so first. */
 .fhcs-sheet .fhcs-col-name { flex: 1; min-width: 96px; }
-.fhcs-sheet .fhcs-col-weight { flex: none; width: 56px; text-align: right; white-space: nowrap; }
-.fhcs-sheet .fhcs-col-uses { flex: none; display: flex; align-items: center; justify-content: center; gap: var(--fhcs-s1); width: 72px; white-space: nowrap; }
-/* Usage gives way (to 64px, ellipsed) before the name does, with every column on at the narrowest width. */
-.fhcs-sheet .fhcs-col-usage { flex: 0 1 112px; min-width: 64px; overflow: hidden; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+.fhcs-sheet .fhcs-col-weight { flex: 0 1 56px; min-width: 50px; text-align: right; white-space: nowrap; }
+/* Weight and Uses give way a little too (to 50 and 56px) with every column on at 644px, since lists keep their
+   scrollbar's room (2026-10-28). */
+.fhcs-sheet .fhcs-col-uses { flex: 0 1 72px; display: flex; align-items: center; justify-content: center; gap: var(--fhcs-s1); min-width: 56px; white-space: nowrap; }
+/* Usage gives way (to 56px, ellipsed) before the name does, with every column on at the narrowest width. */
+.fhcs-sheet .fhcs-col-usage { flex: 0 1 112px; min-width: 56px; overflow: hidden; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
 .fhcs-sheet .fhcs-col-quantity { flex: none; width: 44px; text-align: center; }
 .fhcs-sheet .fhcs-col-toggle { flex: none; display: flex; justify-content: center; width: var(--fhcs-control); }
 .fhcs-sheet .fhcs-col-edit { flex: none; display: flex; gap: var(--fhcs-s1); width: calc(var(--fhcs-control) * 2 + var(--fhcs-s1)); }
@@ -2781,11 +2797,12 @@
 
 .fhcs-sheet .fhcs-col-components { flex: none; width: 52px; text-align: center; white-space: nowrap; }
 .fhcs-sheet .fhcs-col-conc { flex: none; display: flex; justify-content: center; width: var(--fhcs-control); }
-/* With every column on at the narrowest width, these give way (to 40px, ellipsed) before the row overflows. */
+/* With every column on at the narrowest width, these give way (to 36px, ellipsed) before the row overflows (36, not
+   40, since the list keeps its scrollbar's room, 2026-10-28). */
 .fhcs-sheet :is(.fhcs-col-time, .fhcs-col-range, .fhcs-col-school, .fhcs-col-target)
 {
    flex: 0 1 72px;
-   min-width: 40px;
+   min-width: 36px;
    overflow: hidden;
    text-overflow: ellipsis;
    white-space: nowrap;
