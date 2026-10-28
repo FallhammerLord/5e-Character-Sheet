@@ -5,7 +5,8 @@
  * A case: { name, template: 'path/without-hbs', context: {...}, frame?: 'sheet' | 'chat', theme?: 'light' }
  */
 import { appliedLines, cardParts, d20Band, damageBand, saveRow } from '../src/chat/card.js';
-import { headerView, tabRow } from '../src/sheet/header.js';
+import { headerView, tabRow, themePicker } from '../src/sheet/header.js';
+import { template } from './templates.mjs';
 import { attributesView } from '../src/sheet/attributes.js';
 import { inventoryView } from '../src/sheet/inventory.js';
 import { spellbookView } from '../src/sheet/spellbook.js';
@@ -199,9 +200,10 @@ const SPECIAL_TRAITS = `<section class="tab active" data-tab="specialTraits" dat
 /** dnd5e's tabs as `_getTabs` gives them, dnd5e's order and labels. */
 const DND5E_TABS = Object.fromEntries(['details', 'inventory', 'features', 'spells', 'effects', 'biography', 'bastion', 'specialTraits']
    .map((id, i) => [id, { id, label: ['Details', 'Inventory', 'Features', 'Spells', 'Effects', 'Biography', 'Bastion', 'Special Traits'][i], active: id === 'details' }]));
-// The theme picker beside the lock in edit mode (SCOPE §4.11): this character wears Forge, the world Plain.
-const THEME_PICK = { chosen: 'forge', world: 'plain', keys: ['plain', 'forge', 'wind', 'sand', 'valley'] };
-const tabs = (mode) => ({ fhcsTabs: tabRow(DND5E_TABS, { theme: THEME_PICK, ...mode }, localize, format) });
+const tabs = (mode) => ({ fhcsTabs: tabRow(DND5E_TABS, mode, localize) });
+// The theme picker on the title bar (SCOPE §4.11), its tray open: this character wears Forge, the world Plain.
+const THEME_PICK = themePicker({ chosen: 'forge', world: 'plain', keys: ['plain', 'forge', 'wind', 'sand', 'valley'] }, { localize, format });
+const titleBarPick = template('sheet/theme-pick')(THEME_PICK).replace('data-fold-key="theme"', 'data-fold-key="theme" open');
 
 /** The Attributes tab's facts as compat.attributesFacts gathers them, with overrides. */
 const SKILLS = [['acr', 'Acrobatics', 'Dex', 0, 10, 0], ['ani', 'Animal Handling', 'Wis', 5, 15, 0], ['arc', 'Arcana', 'Int', -1, 9, 0],
@@ -590,7 +592,7 @@ export const CASES = [
    { name: 'attributes-empty', template: 'sheet/attributes', context: attributes({ favorites: [], resources: [], traits: [] }) },
    { name: 'tabs', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }) },
    { name: 'tabs-editing', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: true }) },
-   { name: 'tabs-theme-tray', template: 'sheet/tabs', open: ['theme'], context: tabs({ canEdit: true, editing: true }) },
+   { name: 'title-theme-tray', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }), titleBar: titleBarPick },
    { name: 'special-traits', html: SPECIAL_TRAITS },
    { name: 'header', template: 'sheet/header', context: header(), align: HEADER_ALIGN, rows: '.fhcs-header, .fhcs-ability' },
    { name: 'header-tall-art', template: 'sheet/header', context: header({ portrait: { src: TALL, isVideo: false } }) },
@@ -751,7 +753,7 @@ for (const look of LOOKS)
 // Fire and Forge, the whole sheet (user, 2026-10-28: "finish the sheet ... trays, tabs, and anything we've missed"):
 // every tab, edit mode, and each tray open.
 for (const name of ['features', 'effects', 'biography', 'attributes-editing', 'attributes-resource-tray', 'inventory-editing',
-   'spellbook-editing', 'features-editing', 'tabs-theme-tray', 'header-editing', 'header-hp-tray', 'header-exhaustion-open',
+   'spellbook-editing', 'features-editing', 'title-theme-tray', 'header-editing', 'header-hp-tray', 'header-exhaustion-open',
    'header-level-up', 'header-classes-open', 'header-milestones'])
 {
    const base = CASES.find((c) => c.name === name);

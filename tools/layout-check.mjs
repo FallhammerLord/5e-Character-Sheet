@@ -44,12 +44,12 @@ const FRAMES = {
 const THEMES = { light: 'background:#f4f1ea;color:#191813', dark: 'background:#26252b;color:#e8e6e3' };
 
 /** A window like Foundry's, with the classes dnd5e, Foundry's theme and our code put on it. */
-const frame = (kind, width, theme, body, { look = '', hp = null } = {}) => `<section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"${look ? ` data-fhcs-theme="${look}"` : ''}${hp === null ? '' : ` data-fhcs-hp="${hp <= 0 ? 'down' : hp <= 0.5 ? 'bloodied' : 'full'}"`}
+const frame = (kind, width, theme, body, { look = '', hp = null, titleBar = '' } = {}) => `<section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"${look ? ` data-fhcs-theme="${look}"` : ''}${hp === null ? '' : ` data-fhcs-hp="${hp <= 0 ? 'down' : hp <= 0.5 ? 'bloodied' : 'full'}"`}
    style="${hp === null ? '' : `--fhcs-hp:${hp};`}width:${width}px;height:${HEIGHT}px;display:flex;flex-direction:column;border:1px solid #000;margin:8px;
    ${THEMES[theme]}">
    ${kind === 'sheet'
       // Foundry's title bar as it draws one, with a module's extra button that must wait in the ⋮ menu (rule 14).
-      ? `<header class="window-header"><h1 class="window-title">${width}px</h1><button type="button" class="header-control icon fa-solid fa-ellipsis-vertical" data-action="toggleControls" aria-label="Controls"></button><button type="button" class="header-control icon fa-solid fa-id-badge" data-action="moduleExtra" aria-label="A module's button"></button><button type="button" class="header-control icon fa-solid fa-xmark" data-action="close" aria-label="Close"></button></header>`
+      ? `<header class="window-header"><h1 class="window-title">${width}px</h1>${titleBar}<button type="button" class="header-control icon fa-solid fa-ellipsis-vertical" data-action="toggleControls" aria-label="Controls"></button><button type="button" class="header-control icon fa-solid fa-id-badge" data-action="moduleExtra" aria-label="A module's button"></button><button type="button" class="header-control icon fa-solid fa-xmark" data-action="close" aria-label="Close"></button></header>`
       : `<header style="background:#111;color:#eee;padding:4px 8px;font:13px sans-serif">${width}px</header>`}
    <div class="window-content" style="flex:1;min-height:0;overflow:auto">${FRAMES[kind].wrap(body)}</div></section>`;
 
@@ -57,6 +57,8 @@ const page = (html) => `<!doctype html><html lang="en"><head><meta charset="utf-
    <style>body{margin:0;background:#444;font-family:sans-serif}*{box-sizing:border-box}button,input,select{font:inherit}
    /* Foundry core's control defaults, roughly (v13/v14 foundry.css): ours must override them. */
    button{min-height:var(--button-size,2rem);padding:0 .5rem;line-height:1.5;justify-content:center}
+   /* Treated as Foundry treats buttons, so a control we draw as a summary must reset its height too (2026-10-28). */
+   summary{min-height:var(--button-size,2rem);line-height:1.5}
    /* Foundry's glow on the open tab and its box on a focused button (the user's screenshot, 2026-10-28). */
    nav.tabs [data-tab].active{text-shadow:0 0 10px #c33}button:focus{box-shadow:0 0 6px #c33}
    /* Foundry's window frame, roughly (v13/v14): a 36px title bar and padded content; ours must override both. */
@@ -203,8 +205,8 @@ function findProblems()
          if (new Set(tops).size > 1) { issues.push(`portrait chips stacked, not side by side: ${named(group)}`); }
       }
    }
-   // 16, the name row's status group (user, 2026-10-28): its segments are one height, touch with no gap, and an
-   // icon-only segment is square.
+   // 16, the name row's status group (user, 2026-10-28): its segments are one height, touch with no gap, and its
+   // icons are spread evenly: every segment without text (exhaustion, the rests) one width.
    for (const group of app.querySelectorAll('.window-content .fhcs-status'))
    {
       const parts = [...group.children].filter(shown).map((el) => el.matches('details') ? el.querySelector(':scope > summary') : el);
@@ -213,7 +215,9 @@ function findProblems()
       {
          const el = parts[n];
          if (Math.abs(r.height - boxes[0].height) > 1) { issues.push(`status segment ${Math.round(r.height)}px tall, the first ${Math.round(boxes[0].height)}px: ${named(el)}`); }
-         if (!(el.textContent || '').trim() && Math.abs(r.width - r.height) > 1) { issues.push(`icon-only status segment ${Math.round(r.width)}×${Math.round(r.height)}: ${named(el)}`); }
+         const icons = boxes.filter((b, k) => !(parts[k].textContent || '').trim() || parts[k].matches('.fhcs-exhaustion-dot'));
+         const iconOnly = !(el.textContent || '').trim() || el.matches('.fhcs-exhaustion-dot');
+         if (iconOnly && Math.abs(r.width - icons[0].width) > 1) { issues.push(`status icon segment ${Math.round(r.width)}px wide, the first ${Math.round(icons[0].width)}px: ${named(el)}`); }
          if (n && r.left - boxes[n - 1].right > 1.5) { issues.push(`status segments ${Math.round(r.left - boxes[n - 1].right)}px apart: ${named(el)}`); }
       }
    }
@@ -392,7 +396,7 @@ function findProblems()
    // Spacing is 4 or 8 (SCOPE §5.2 rule 3, user 2026-10-28), every gap, padding and margin on the sheet, except:
    // a hang (rule 21: a control reaching into the space around its line, a negative margin on the named controls),
    // an indent that lines text up with a column (the name column, a container's contents, the footer's last column),
-   // the screen-reader clip, and the lock's automatic margin (the theme chip's, when it stands before the lock).
+   // the screen-reader clip, and the lock's automatic margin.
    if (app.matches('.fhcs-sheet'))
    {
       const HANGS = '.fhcs-shield, .fhcs-gear-button, .fhcs-more, .fhcs-class-level';
@@ -401,7 +405,7 @@ function findProblems()
       const off = new Map();
       for (const el of app.querySelectorAll('.window-content *'))
       {
-         if (el.ownerSVGElement || !el.getClientRects().length || el.matches('.fhcs-sr-only, .fhcs-lock, .fhcs-theme-pick')) { continue; }
+         if (el.ownerSVGElement || !el.getClientRects().length || el.matches('.fhcs-sr-only, .fhcs-lock')) { continue; }
          // Ours only: inside our markup (a plain page's paragraph keeps the browser's margins).
          if (!el.closest('.window-content [class*="fhcs-"]')) { continue; }
          const cs = getComputedStyle(el);

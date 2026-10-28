@@ -851,9 +851,11 @@
 
 .fhcs-sheet .tab[data-group="primary"]:not(.active) { display: none; }
 
-/* Foundry's control sizes (button min-height) made our round pips oval; each of our controls sets its own size.
-   :where() keeps this weaker than our own control rules, but stronger than Foundry's bare `button`. */
-.fhcs-sheet :where(.window-content button)
+/* Foundry's control sizes (button min-height) made our round pips oval and, in edit mode, rows taller; each of our
+   controls sets its own size. Every kind of control we draw, not only buttons (user, 2026-10-28: the tab row grew
+   again on unlocking, its new theme chip a summary). :where() keeps this weaker than our own control rules, but
+   stronger than Foundry's bare element styles. */
+.fhcs-sheet :where(.window-content :is(button, summary, select), .window-header .fhcs-theme-pick > summary)
 {
    min-width: 0;
    min-height: 0;
@@ -995,14 +997,14 @@
    color: var(--fhcs-die-on-ink);
 }
 
-/* Edit mode: the theme chip before the lock (SCOPE §4.11); it takes the lock's automatic margin, the lock follows it. */
-.fhcs-sheet .fhcs-tabs .fhcs-theme-pick { position: relative; flex: none; margin-left: auto; }
-.fhcs-sheet .fhcs-tabs .fhcs-theme-pick + .fhcs-lock { margin-left: var(--fhcs-s1); }
-.fhcs-sheet .fhcs-theme-chip { list-style: none; cursor: pointer; }
-.fhcs-sheet .fhcs-theme-chip::-webkit-details-marker { display: none; }
-.fhcs-sheet .fhcs-tabs .fhcs-theme-tray { left: auto; right: 0; z-index: 3; width: 14rem; }
+/* The theme picker on the title bar, beside ⋮ (SCOPE §4.11, user 2026-10-28): a title-bar control, its tray under it. */
+.fhcs-sheet > .window-header .fhcs-theme-pick { position: relative; flex: none; display: flex; }
+.fhcs-sheet > .window-header .fhcs-theme-chip { display: grid; place-items: center; list-style: none; cursor: pointer; }
+.fhcs-sheet > .window-header .fhcs-theme-chip::-webkit-details-marker { display: none; }
+.fhcs-sheet > .window-header .fhcs-theme-chip .fhcs-icon { width: 16px; height: 16px; }
+.fhcs-sheet > .window-header .fhcs-theme-tray { top: calc(100% + var(--fhcs-s1)); left: auto; right: 0; z-index: 10; width: 14rem; }
 /* Each theme a row with the radio dot: the one this character wears is filled (SCOPE §5.1). */
-.fhcs-sheet .fhcs-tabs .fhcs-theme-option { justify-content: flex-start; gap: var(--fhcs-s2); padding: 0 var(--fhcs-s2); }
+.fhcs-sheet > .window-header .fhcs-theme-option { justify-content: flex-start; gap: var(--fhcs-s2); padding: 0 var(--fhcs-s2); }
 .fhcs-sheet .fhcs-theme-option > .fhcs-radio-mark { flex: none; }
 .fhcs-sheet .fhcs-theme-option[aria-pressed="true"] .fhcs-radio-mark { background: currentColor; box-shadow: inset 0 0 0 2px var(--fhcs-surface); }
 
@@ -1231,6 +1233,17 @@
 .fhcs-sheet .fhcs-status > :first-child, .fhcs-sheet .fhcs-status > :first-child > summary { border-radius: var(--fhcs-radius) 0 0 var(--fhcs-radius); }
 .fhcs-sheet .fhcs-status > :last-child { border-radius: 0 var(--fhcs-radius) var(--fhcs-radius) 0; }
 .fhcs-sheet .fhcs-status .fhcs-tray { left: auto; right: 0; }
+/* Exhaustion, Short rest and Long rest: one width each, their marks centred, so the bar's icons sit evenly (user,
+   2026-10-28); the width is exhaustion's chip's ("0" and its face), so showing it moves nothing. */
+.fhcs-sheet :is(.fhcs-status > details > summary, .fhcs-status > .fhcs-chip[data-action="rest"])
+{
+   box-sizing: border-box;
+   width: 40px;
+   min-width: 40px;
+   justify-content: center;
+   justify-items: center;
+}
+.fhcs-sheet .fhcs-status .fhcs-exhaustion-dot::before { justify-self: center; margin-left: 0; }
 /* Exhaustion 0 in the bar: an ink ring on the bar's fill. */
 .fhcs-sheet .fhcs-status .fhcs-exhaustion-dot { background: var(--fhcs-fill); color: var(--fhcs-ink); }
 .fhcs-sheet .fhcs-status .fhcs-exhaustion-dot::before { justify-self: center; margin-left: 0; border-color: currentColor; background: transparent; }
@@ -1268,6 +1281,9 @@
 .fhcs-sheet .fhcs-dot-chip { visibility: hidden; }
 .fhcs-sheet .fhcs-exhaustion-dot:hover .fhcs-dot-chip { visibility: visible; transition: visibility 0s linear 1.5s; }
 .fhcs-sheet :is(.fhcs-exhaustion-dot:focus-visible, details[open] > .fhcs-exhaustion-dot) .fhcs-dot-chip { visibility: visible; }
+/* The chip takes the dot's place, never shown over it (user, 2026-10-28: the two overlapped on rest). */
+.fhcs-sheet .fhcs-exhaustion-dot:hover::before { visibility: hidden; transition: visibility 0s linear 1.5s; }
+.fhcs-sheet :is(.fhcs-exhaustion-dot:focus-visible, details[open] > .fhcs-exhaustion-dot)::before { visibility: hidden; }
 
 /* Chips, the size of a control, on the panels' underlay: the fill, an edge, ink marks (user, 2026-10-28: one look for
    every chip, the status bar's, not solid ink on the art). On is a filled mark. */
@@ -1518,15 +1534,18 @@
 
 /* Edit mode's portrait options, top centre: one gear chip, its tray of the token switch (a ring when on), round and
    Frame opening below it, centred. */
+/* The portrait's options: a solid chip in the top-left corner (user, 2026-10-28: at the top centre, outlined, it was
+   too light to notice). */
 .fhcs-sheet .fhcs-portrait-edit
 {
    position: absolute;
    top: var(--fhcs-s1);
-   left: 50%;
-   transform: translateX(-50%);
+   left: var(--fhcs-s1);
 }
 
-.fhcs-sheet .fhcs-portrait-edit > .fhcs-tray { left: 50%; transform: translateX(-50%); }
+.fhcs-sheet .fhcs-portrait-edit > .fhcs-chip { border-color: var(--fhcs-die-ink); background: var(--fhcs-die-ink); color: var(--fhcs-die-on-ink); }
+
+.fhcs-sheet .fhcs-portrait-edit > .fhcs-tray { left: 0; }
 /* Alone in its chip, the gear is a chip icon's size, like the star beside it. */
 .fhcs-sheet .fhcs-portrait-edit > .fhcs-chip > .fhcs-gear { width: 16px; height: 16px; }
 

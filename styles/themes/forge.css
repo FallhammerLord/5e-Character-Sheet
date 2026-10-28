@@ -191,8 +191,8 @@
 .fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-panel-head, .fhcs-group-head) { border-image: linear-gradient(to right, var(--fhcs-theme-accent), var(--fhcs-theme-edge) 40%, transparent) 1; }
 
 /* The open tab: a bar of hot iron. */
-/* Edit mode's longer tab row (Special Traits, the theme chip) reaches the runes: the rail goes without them. */
-.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-tabs:has(.fhcs-theme-pick)
+/* Edit mode's longer tab row (Special Traits) reaches the runes: the rail goes without them. */
+.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-tabs:has(.fhcs-lock[aria-pressed="true"])
 {
    background-image: var(--fhcs-theme-emblem), linear-gradient(to right, transparent, var(--fhcs-theme-fire) 50%, transparent);
 }

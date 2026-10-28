@@ -108,13 +108,21 @@ From the user's screenshot after Phase 6 (2026-10-28). Decisions: SCOPE §4.10.
 - [x] 4. Chat cards: each damage type its own total; a record on the card of what Apply did (SCOPE §6.7)
 - [ ] Quench and play
 
+Second pass, from the user's play (2026-10-28):
+
+- [x] 5. Rows no longer drop on the lock: Foundry's control height reset on every `summary` and `select` too (the edit-mode theme chip was a `summary`); the layout check gives `summary` Foundry's height, so it can't return
+- [x] 6. Status group segments one width, icons centred; exhaustion's ring hides while its chip shows
+- [x] 7. Theme picker on the title bar, both modes; portrait options chip top left, solid
+- [ ] 8. Inspiration bar in the tab row, right-aligned before the lock (SCOPE §4.12)
+- [ ] 9. Window: least height at the tab row's foot; width comfort stops while dragging
+- [ ] 10. Textures as vectors (Damascus, frame grain)
+
 ## Phase 6.6: Themes (user, 2026-10-28; SCOPE §4.11)
 
 - [x] 1. Theme layer: `data-fhcs-theme` on the sheet, `fhcs-frame` on every panel, the four themes in light and dark (colors, frames, decals, motion); layout cases per theme; mockup page for the user (built 2026-10-28; waits on the user's review of `tools/theme-mockup.mjs`'s page)
 - [x] 1b. Fire and Forge as artwork, the whole sheet: every tab, edit mode, trays, fields, buttons, tips, scrollbars, light mode in polished steel (user, 2026-10-28): the window a smithy, state art from HP, plates, Grenze, moments, embers; the layout check reads text over art against black and white (`--fhcs-art`); `tools/forge-mockup.html` (built 2026-10-28; waits on the user's review). The sheet already applies a character's `flags.fhcs.theme` and its HP state.
-- [x] 2. Choosing: world default setting, per-character choice in edit mode (`flags.fhcs.theme`), the player's Motion switch (built 2026-10-28; Quench test added)
+- [x] 2. Choosing: world default setting, per-character choice from the title bar (`flags.fhcs.theme`), the player's Motion switch (built 2026-10-28; Quench test added)
 - [ ] 3. Chat cards in the world theme, with the setting to keep them plain
-- [ ] Banked inspiration (SCOPE §4.12; scoped, waits on the user)
 - [ ] Quench and play
 
 ## Phase 7: The ADHD layer

@@ -1,0 +1,15 @@
+{{!-- The sheet's theme (SCOPE §4.11), on the title bar beside ⋮, always there for whoever may edit the character
+      (user, 2026-10-28: in the tab row it crowded the emblem and changed the row on unlocking). Drawn by
+      CharacterSheet#_onRender into Foundry's title bar, which our parts don't own. --}}
+<details class="fhcs-fold fhcs-theme-pick" data-fold-key="theme">
+   <summary class="header-control fhcs-theme-chip" aria-label="{{ label }}" data-fhcs-tip="{{ label }}">
+      <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.8 1.8-1.6 0-1.1-.9-1.4-.9-2.4 0-.9.7-1.5 1.6-1.5H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7" r="1.2"/><circle cx="15" cy="7.5" r="1.2"/></svg>
+   </summary>
+   <div class="fhcs-tray fhcs-theme-tray">
+      <span class="fhcs-label">{{ title }}</span>
+      {{#each options}}
+      <button type="button" class="fhcs-button fhcs-body fhcs-theme-option" data-action="fhcsSetTheme" data-theme="{{ value }}"
+              aria-pressed="{{#if on}}true{{else}}false{{/if}}"><span class="fhcs-radio-mark" aria-hidden="true"></span>{{ name }}</button>
+      {{/each}}
+   </div>
+</details>

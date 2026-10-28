@@ -1,6 +1,6 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES } from '../constants.js';
 import { attributesFacts, biographyFacts, changeHp, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
-   passesExtraFilters, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
+   passesExtraFilters, renderTemplate, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
 import { EXTRA_SPELL_FILTERS, spellbookView, spellColumnChoice } from '../sheet/spellbook.js';
@@ -8,7 +8,7 @@ import { featureColumnChoice, featuresView } from '../sheet/features.js';
 import { effectsView } from '../sheet/effects.js';
 import { biographyView } from '../sheet/biography.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
-import { headerMinWidth, headerView, hpPreview, tabRow } from '../sheet/header.js';
+import { headerMinWidth, headerView, hpPreview, tabRow, themePicker } from '../sheet/header.js';
 import { scheduleSparks, stopSparks } from './sparks.js';
 import { delayTips, keepFolds } from '../chat/card.js';
 import { startFraming } from './framing.js';
@@ -107,6 +107,28 @@ function setTheme(event, target)
    const value = target.dataset.theme;
    if (value && !THEMES.includes(value)) { return null; }
    return value ? this.actor.setFlag(MODULE_ID, THEME_FLAG, value) : this.actor.unsetFlag(MODULE_ID, THEME_FLAG);
+}
+
+/** The title bar's theme picker (SCOPE §4.11). */
+const THEME_PICK = `${MODULE_PATH}/templates/sheet/theme-pick.hbs`;
+
+/**
+ * Draws the theme picker on Foundry's title bar, beside ⋮, for whoever may edit the character (user, 2026-10-28:
+ * always there, in play and edit mode). Redrawn after each render, so it shows the theme worn; an open tray stays open.
+ */
+async function drawThemePicker(sheet)
+{
+   const bar = sheet.element.querySelector(':scope > .window-header');
+   const old = bar?.querySelector(':scope > .fhcs-theme-pick');
+   if (!bar || !sheet.isEditable) { old?.remove(); return; }
+   const i18n = { localize: (key) => game.i18n.localize(key), format: (key, data) => game.i18n.format(key, data) };
+   const theme = { chosen: sheet.actor.getFlag(MODULE_ID, THEME_FLAG) ?? '', world: game.settings.get(MODULE_ID, 'theme'), keys: THEMES };
+   const holder = document.createElement('div');
+   holder.innerHTML = await renderTemplate(THEME_PICK, themePicker(theme, i18n));
+   const pick = holder.firstElementChild;
+   if (old?.open) { pick.open = true; }
+   if (old) { old.replaceWith(pick); }
+   else { bar.insertBefore(pick, bar.querySelector(':scope > [data-action="toggleControls"]')); }
 }
 
 /** Folds or opens a section on a list tab (user, 2026-10-28), and remembers it with the favorites groups. */
@@ -459,8 +481,7 @@ export function makeCharacterSheet(Base)
          }
          if (partId === 'tabs')
          {
-            const theme = { chosen: this.actor.getFlag(MODULE_ID, THEME_FLAG) ?? '', world: game.settings.get(MODULE_ID, 'theme'), keys: THEMES };
-            context.fhcsTabs = tabRow(context.tabs, { canEdit: this.isEditable, editing: this.isEditMode, theme }, i18n.localize, i18n.format);
+            context.fhcsTabs = tabRow(context.tabs, { canEdit: this.isEditable, editing: this.isEditMode }, i18n.localize);
          }
          return context;
       }
@@ -514,6 +535,7 @@ export function makeCharacterSheet(Base)
          wireResourceUses(this.element, this.actor);
          themeState(this.element, this.actor);
          scheduleSparks(this.element);
+         await drawThemePicker(this);
          const items = this.element.querySelector('.fhcs-inventory .fhcs-items');
          if (items && !items.dataset.fhcsWatched)
          {
