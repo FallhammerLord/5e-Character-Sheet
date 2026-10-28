@@ -8,9 +8,9 @@ This file holds how we work and the rules. Everything else lives in `docs/`:
 |---|---|
 | `docs/STATUS.md` | What's verified, what waits on the user, and **what the next session does**. Read first. |
 | `docs/ROADMAP.md` | Phases and their checklists. |
-| `docs/SCOPE.md` | The design and every decision, with who decided and when. §5.1 is the sheet's icon and color vocabulary. |
+| `docs/SCOPE.md` | The design and every decision, with who decided and when. §5.1 the icon and color vocabulary, §5.2 the styling rules, §5.3 the theme rules. |
 | `docs/BUILT.md` | How finished, verified parts work, for changing them later. |
-| `docs/research/dnd5e-6.0-sheet.md`, `…-chat.md` | dnd5e internals we rely on (sheet; chat cards and rolls). |
+| `docs/research/dnd5e-6.0-sheet.md`, `…-chat.md`, `forge-theme.md` | dnd5e internals we rely on (sheet; chat cards and rolls); the Forge theme's references. |
 
 Mockups: one Design canvas, https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, a row of boards per phase (header, Attributes, Inventory, Spellbook, Features, Effects, Biography, header cards). Add new boards there.
 
@@ -84,7 +84,24 @@ Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies insta
 - **Text in a button reads from the left;** Foundry centers button content, so set `justify-content: flex-start` on text buttons.
 - **Tooltips use `data-fhcs-tip`** (shown after a 1.5 s rest, above the button, cleared by a click), never `data-tooltip`, which shows at once and covered dice a click had just added (user, 2026-10-24). Two to four words.
 - **At the 644px minimum with every column on,** lesser columns give way (`flex-shrink` with a `min-width`) before names do (96px floor).
+- **Themes follow SCOPE §5.3:** art never under text without a plate, never reshapes (same heights as Plain), vectors only, moments about 600ms, each theme its own on/off moments through the toggle's hooks, everything still under Motion off and reduced motion. A theme is one CSS file in `styles/themes/`; textures that are generated come from a script in `tools/`.
 - **Code style:** Allman braces, 3-space indent, single quotes (matches the quest log).
+
+### Traps we've hit (check here before debugging layout)
+
+- **Foundry's control height** (2rem `min-height`) reaches every `button`, `summary` and `select`; the reset at the top of `styles/fhcs.css` covers them, and the layout harness imitates Foundry on each. A new kind of control goes in both, or the row it sits in grows in one mode (rows dropped on the lock twice).
+- **A scrollbar that comes and goes** narrows its column: scrolling areas keep `scrollbar-gutter: stable` (checked).
+- **`:is()` after `>` matches children only:** `.a > :is(details > summary)` never reaches the `summary`. Write `:is(.a > details > summary)`.
+- **A later base rule of equal weight wins:** `.fhcs-tray { left: 0 }` comes late in the file, so a tray placed right needs a more specific selector.
+- **A filter on a masked element is masked away** (filter, then clip, then mask): put a glow on its parent.
+- **A blurred, translucent plate is its own layer:** its open tray hides under the next plate unless the plate rises (`:has(details[open] > .fhcs-tray)`).
+- **`getFlag` throws for a module that isn't active:** read another module's flag as `actor.flags['tidy5e-sheet']?.[key]`.
+- **A form that depends on a row's room** (inspiration's stars or count) uses a container query on that row, not the window's width.
+- **The 644px edit-mode tab row is full** (Bastion, Special Traits, inspiration's gear and count): measure in the layout check before adding anything to it.
+- **Data URIs:** encode `#` once (`%23`); `%2523` draws nothing.
+- **Custom properties inherit:** a check keyed on one (`--fhcs-art`) must count only the element where it starts.
+- **Sideways moves pass the parity check** by design (rule 6 lets columns slide left); only heights and vertical places fail it.
+- **Headless Chromium has no hyphenation dictionary:** "Dragonbo / rn" in a screenshot is the harness, not the sheet.
 
 ### Checks and tests
 
