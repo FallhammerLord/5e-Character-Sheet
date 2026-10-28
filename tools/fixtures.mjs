@@ -585,6 +585,8 @@ export const CASES = [
    { name: 'header-dying', template: 'sheet/header', context: header({ hp: { value: 0, max: 87, temp: 0 }, death: { success: 1, failure: 2 } }) },
    { name: 'header-square-art', template: 'sheet/header', context: header({ portrait: { src: SQUARE, isVideo: false } }) },
    // Round, the player's choice (user, 2026-10-27): square art in a circle; the token art fixture is round by default.
+   // A token in round mode shows whole; the card's edge steps back around the art (user, 2026-10-28).
+   { name: 'header-round-token', template: 'sheet/header', context: header({ portrait: { src: SQUARE, isVideo: false, token: true }, shape: 'round', exhaustion: { value: 2, max: 6 } }), align: HEADER_ALIGN },
    { name: 'header-round-art', template: 'sheet/header', context: header({ portrait: { src: SQUARE, isVideo: false }, shape: 'round' }), align: HEADER_ALIGN },
    // Aid on: temp HP and a temporary change to max (Max ±), so both fields hold a value.
    { name: 'header-max-mod', template: 'sheet/header', context: header({ hp: { value: 82, max: 92, temp: 5, tempmax: 5 } }) },

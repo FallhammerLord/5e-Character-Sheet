@@ -90,7 +90,9 @@ function framedPortrait(facts)
    const frame = token ? { ...FRAME_DEFAULT } : portraitFrame(facts.frame, facts.portrait?.src);
    // Round or square, the player's choice (user, 2026-10-27); until chosen, a token is round and other art square.
    const shape = facts.shape === 'round' || facts.shape === 'square' ? facts.shape : token ? 'round' : 'square';
-   return { ...facts.portrait, fit: token && shape === 'square' ? 'contain' : 'cover', canFrame: !token, frame, frameStyle: frameStyle(frame),
+   // A token shows whole in either shape: it is often already a circle with its own ring, which cover would crop and
+   // seem to zoom (user, 2026-10-28).
+   return { ...facts.portrait, fit: token ? 'contain' : 'cover', canFrame: !token, frame, frameStyle: frameStyle(frame),
       shape, round: shape === 'round' };
 }
 

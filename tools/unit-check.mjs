@@ -326,10 +326,10 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const tired = headerView({ ...base, portrait: {}, exhaustion: { value: 2, max: 6 }, hp: { value: 5, max: 10, temp: 0, tempmax: -3 } }, { format, localize });
    const got = [card.exhaustion.none, tired.exhaustion.none, card.hp.maxMod, tired.hp.maxMod, up.hp.maxMod, card.portrait.fit, tired.portrait.fit,
       card.rests.map((r) => `${r.key}${r.short ? '*' : ''}`).join()];
-   // A token starts round (it fills its circle); chosen square, a token shows whole (user, 2026-10-27).
+   // A token starts round and shows whole in either shape (user, 2026-10-28: cover cropped its own ring, like a zoom).
    const squareToken = headerView({ ...base, portrait: { token: true }, shape: 'square', hp: { value: 5, max: 10, temp: 0 } }, { format, localize });
    got.push(card.portrait.shape, squareToken.portrait.fit, tired.portrait.shape);
-   try { deepStrictEqual(got, [true, false, '5', '-3', '', 'cover', 'cover', 'short*,long', 'round', 'contain', 'square']); }
+   try { deepStrictEqual(got, [true, false, '5', '-3', '', 'contain', 'cover', 'short*,long', 'round', 'contain', 'square']); }
    catch { problems.push(`portrait card: ${JSON.stringify(got)}`); }
    // Edit mode edits what's stored: the name and score as saved, not as an effect shows them.
    const stored = headerView({ ...base, name: 'Shown', nameSource: 'Stored', xp: { value: 10, max: 300 }, hp: { value: 5, max: 10, temp: 0 },

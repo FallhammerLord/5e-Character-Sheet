@@ -311,7 +311,7 @@ export function registerQuenchTests(quench)
             await enter('.fhcs-header [name="system.attributes.hp.temp"]', '3');
             await until(() => source().temp === 3, () => `Temp writes dnd5e's temp; it holds ${source().temp}`);
             await actor.update({ 'system.attributes.hp.temp': before.temp, 'system.attributes.hp.tempmax': before.tempmax });
-            const [rester, config] = await clickReaches('.fhcs-header .fhcs-rests [data-action="rest"][data-type="short"]', 'dnd5e.preShortRest');
+            const [rester, config] = await clickReaches('.fhcs-header .fhcs-status [data-action="rest"][data-type="short"]', 'dnd5e.preShortRest');
             assert.strictEqual(rester, actor);
             assert.strictEqual(config.type, 'short');
          });
@@ -381,7 +381,9 @@ export function registerQuenchTests(quench)
                await open(Kind).close();
             }
             // The token switch sits in the portrait's options tray (one gear chip, user 2026-10-27).
-            if (!find('.fhcs-header .fhcs-portrait-edit')?.open) { await click('.fhcs-header .fhcs-portrait-edit > summary'); }
+            // Edit mode's redraw brings the portrait options; wait for them before opening their tray.
+            await until(() => sheet.element.querySelector('.fhcs-header .fhcs-portrait-edit'), 'edit mode shows the portrait options');
+            if (!sheet.element.querySelector('.fhcs-header .fhcs-portrait-edit')?.open) { await click('.fhcs-header .fhcs-portrait-edit > summary'); }
             await click('.fhcs-header [name="flags.dnd5e.showTokenPortrait"]');
             await until(() => (actor.getFlag('dnd5e', 'showTokenPortrait') ?? false) !== before.token,
                () => `the Token switch flips dnd5e's flag; it holds ${actor.getFlag('dnd5e', 'showTokenPortrait')}`);
@@ -401,7 +403,8 @@ export function registerQuenchTests(quench)
                await click('.fhcs-tabs [data-action="changeMode"]');
                await until(() => sheet.isEditMode, 'the lock switches to edit mode');
             }
-            if (!find('.fhcs-header .fhcs-portrait-edit')?.open) { await click('.fhcs-header .fhcs-portrait-edit > summary'); }
+            await until(() => sheet.element.querySelector('.fhcs-header .fhcs-portrait-edit'), 'edit mode shows the portrait options');
+            if (!sheet.element.querySelector('.fhcs-header .fhcs-portrait-edit')?.open) { await click('.fhcs-header .fhcs-portrait-edit > summary'); }
             await click('.fhcs-header [data-action="fhcsFrame"]');
             assert.isTrue(find('.fhcs-header .fhcs-portrait').classList.contains('fhcs-framing'), 'Frame starts framing');
             // Two presses down, one zoom in, then Enter: no redraw comes until Enter saves.
@@ -869,7 +872,11 @@ export function registerQuenchTests(quench)
             const relative = foundry.utils.buildRelativeUuid(effect, actor);
             await click(`.fhcs-effects [data-effect-id="${effect.id}"] [data-action="favorite"]`);
             await until(() => actor.system.hasFavorite(relative), 'the bookmark makes it a favorite');
-            await until(() => row()?.querySelector('[data-action="unfavorite"]'), 'the bookmark now offers to remove it');
+            // Not yet known why this click once found no unfavorite (2026-10-28); report what the row holds.
+            const actions = () => `the row holds ${[...(row()?.querySelectorAll('[data-action]') ?? [])].map((b) => b.dataset.action).join(', ') || 'nothing'}; the tab is ${sheet.tabGroups?.primary}; favorite ${actor.system.hasFavorite(relative)}`;
+            await until(() => row()?.querySelector('[data-action="unfavorite"]'), () => `the bookmark now offers to remove it; ${actions()}`);
+            await settled();
+            await until(() => row()?.querySelector('[data-action="unfavorite"]'), () => `after the redraw the bookmark still offers to remove it; ${actions()}`);
             await click(`.fhcs-effects [data-effect-id="${effect.id}"] [data-action="unfavorite"]`);
             await until(() => !actor.system.hasFavorite(relative), 'a second click removes the favorite');
             const prone = () => actor.statuses.has('prone');

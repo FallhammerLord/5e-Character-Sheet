@@ -1088,7 +1088,11 @@
 .fhcs-sheet .fhcs-portrait-art.fhcs-fit-contain { object-fit: contain; object-position: top; transform: none; }
 
 /* Round (user, 2026-10-27): the art in a circle at the stage's top, the frame's width less a step; the band stays
-   square below it. */
+   square below it. The card's own edge and fill step back around the art, so the frame reads as a circle, not a
+   square box with a round picture in it (user, 2026-10-28); the band keeps an edge of its own. */
+.fhcs-sheet .fhcs-portrait.fhcs-shape-round { border-color: transparent; background: transparent; }
+.fhcs-sheet .fhcs-shape-round > .fhcs-portrait-band { border: 1px solid var(--fhcs-line); border-radius: var(--fhcs-radius); }
+.fhcs-sheet .fhcs-shape-round .fhcs-portrait-art.fhcs-fit-contain { object-position: center; }
 .fhcs-sheet .fhcs-shape-round > .fhcs-portrait-clip
 {
    inset: var(--fhcs-s1) auto auto 50%;
@@ -1158,13 +1162,15 @@
 .fhcs-sheet .fhcs-status { position: relative; display: flex; flex: none; align-items: stretch; height: var(--fhcs-control); }
 .fhcs-sheet .fhcs-status > * { flex: none; }
 .fhcs-sheet .fhcs-status > details { position: static; display: flex; }
-.fhcs-sheet .fhcs-status > :is(.fhcs-chip, details > summary) { border: 0; border-radius: 0; }
-.fhcs-sheet .fhcs-status > * + * { border-left: 1px solid var(--fhcs-die-on-ink); }
+/* On the panels' underlay, not solid ink (user, 2026-10-28): the fill, an edge, ink marks. */
+.fhcs-sheet :is(.fhcs-status > .fhcs-chip, .fhcs-status > details > summary) { border: 0; border-radius: 0; background: var(--fhcs-fill); color: var(--fhcs-ink); }
+.fhcs-sheet .fhcs-status { box-sizing: border-box; border: 1px solid var(--fhcs-line); border-radius: var(--fhcs-radius); }
+.fhcs-sheet .fhcs-status > * + * { border-left: 1px solid var(--fhcs-line); }
 .fhcs-sheet .fhcs-status > :first-child, .fhcs-sheet .fhcs-status > :first-child > summary { border-radius: var(--fhcs-radius) 0 0 var(--fhcs-radius); }
 .fhcs-sheet .fhcs-status > :last-child { border-radius: 0 var(--fhcs-radius) var(--fhcs-radius) 0; }
 .fhcs-sheet .fhcs-status .fhcs-tray { left: auto; right: 0; }
-/* Exhaustion 0 in the bar: a ring on the bar's ink. */
-.fhcs-sheet .fhcs-status .fhcs-exhaustion-dot { background: var(--fhcs-die-ink); color: var(--fhcs-die-on-ink); }
+/* Exhaustion 0 in the bar: an ink ring on the bar's fill. */
+.fhcs-sheet .fhcs-status .fhcs-exhaustion-dot { background: var(--fhcs-fill); color: var(--fhcs-ink); }
 .fhcs-sheet .fhcs-status .fhcs-exhaustion-dot::before { justify-self: center; margin-left: 0; border-color: currentColor; background: transparent; }
 
 /* Exhaustion 0: a small dot; resting on it 1.5 s (like tips), focusing it or opening it shows the chip. Dot and chip
