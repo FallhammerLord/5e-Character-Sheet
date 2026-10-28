@@ -108,6 +108,13 @@ From the user's screenshot after Phase 6 (2026-10-28). Decisions: SCOPE §4.10.
 - [x] 4. Chat cards: each damage type its own total; a record on the card of what Apply did (SCOPE §6.7)
 - [ ] Quench and play
 
+## Phase 6.6: Themes (user, 2026-10-28; SCOPE §4.11)
+
+- [ ] 1. Theme layer: `data-fhcs-theme` on the sheet, `fhcs-frame` on every panel, the four themes in light and dark (colors, frames, decals, motion); layout cases per theme; mockup page for the user (built 2026-10-28; waits on the user's review of `tools/theme-mockup.mjs`'s page)
+- [ ] 2. Choosing: world default setting, per-character choice in edit mode (`flags.fhcs.theme`), the player's Motion switch
+- [ ] 3. Chat cards in the world theme, with the setting to keep them plain
+- [ ] Quench and play
+
 ## Phase 7: The ADHD layer
 
 Skills column on every tab (user, 2026-10-26): the Attributes skills column stays beside every tab, as in Tidy's current sheet (its sidebar; Classic showed skills on Attributes only, checked in Tidy v13.0.0 source). Tab bodies then lose about 240px; recheck Inventory and Spellbook rows at 644px. Optional "Now" strip: action, bonus action, reaction and movement, with spent ones dimmed until the next turn. Favorites capped at five. Panels fold; HP, AC and conditions stay pinned. An effect that turns all incoming damage into one type (user, 2026-10-28; SCOPE §6.7).

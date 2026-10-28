@@ -1,0 +1,79 @@
+/* Wind and Wrath (SCOPE §4.11, user 2026-10-28): a storm front over high cliffs. Square, wind-cut frames with a gust
+   streak down their left edge, a bolt on the tab row; a hover sends a gust across a heading, a press is shoved
+   sideways. The accent is a pale storm-light, kept off the pact violet and the prepared blue; frames only. */
+
+.fhcs-sheet[data-fhcs-theme="wind"]
+{
+   --fhcs-surface: #edf0f3;
+   --fhcs-ink: #151a21;
+   --fhcs-die-ink: #151a21;
+   --fhcs-die-on-ink: #f4f6f8;
+   --fhcs-theme-edge: #5f6c7b;
+   --fhcs-theme-accent: #3e4a5c;
+   --fhcs-theme-streak: color-mix(in srgb, #ffffff 70%, transparent);
+   --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%233e4a5c' d='M13.5 1.5 4 13.5h6.5l-1.5 9 10-13h-6.8z'/%3E%3C/svg%3E");
+}
+
+.theme-dark .fhcs-sheet[data-fhcs-theme="wind"],
+.fhcs-sheet.theme-dark[data-fhcs-theme="wind"]
+{
+   --fhcs-surface: #1c2129;
+   --fhcs-ink: #e4e9ef;
+   --fhcs-die-ink: #e9eef3;
+   --fhcs-die-on-ink: #1c2129;
+   --fhcs-theme-edge: #7d8a99;
+   --fhcs-theme-accent: #d7e0ea;
+   --fhcs-theme-streak: color-mix(in srgb, #dfe8f2 30%, transparent);
+   --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23d7e0ea' d='M13.5 1.5 4 13.5h6.5l-1.5 9 10-13h-6.8z'/%3E%3C/svg%3E");
+}
+
+/* The ground: long faint wind lines. */
+.fhcs-sheet[data-fhcs-theme="wind"] .window-content
+{
+   background-image: repeating-linear-gradient(172deg, transparent 0 22px, color-mix(in srgb, currentColor 3%, transparent) 22px 23px);
+}
+
+/* Wind-cut frames: square corners, a cut across the top right, and the storm-light down the left edge. */
+.fhcs-sheet[data-fhcs-theme="wind"] .fhcs-frame
+{
+   border-color: var(--fhcs-theme-edge);
+   border-left-color: var(--fhcs-theme-accent);
+   border-radius: 0;
+   background-image: linear-gradient(225deg, var(--fhcs-theme-edge) 0 7px, transparent 7.5px);
+}
+
+.fhcs-sheet[data-fhcs-theme="wind"] .fhcs-frame:hover { border-color: var(--fhcs-theme-accent); }
+
+/* Heading lines thin out like a gust; the open tab's line is the storm-light. */
+.fhcs-sheet[data-fhcs-theme="wind"] :is(.fhcs-panel-head, .fhcs-group-head) { border-image: linear-gradient(to right, var(--fhcs-theme-edge), transparent 85%) 1; }
+.fhcs-sheet[data-fhcs-theme="wind"] .fhcs-tab.active { border-bottom-color: var(--fhcs-theme-accent); border-bottom-width: 3px; }
+
+.fhcs-sheet[data-fhcs-theme="wind"] .fhcs-tabs { background: var(--fhcs-theme-emblem) right calc(var(--fhcs-control) + 2 * var(--fhcs-s2)) center / 20px no-repeat; }
+
+@media (prefers-reduced-motion: no-preference)
+{
+   /* A gust: one light streak runs across a heading on hover. */
+   .fhcs-sheet[data-fhcs-theme="wind"]:not([data-fhcs-motion="off"]) :is(.fhcs-panel-head, .fhcs-group-head):hover
+   {
+      background: linear-gradient(100deg, transparent 30%, var(--fhcs-theme-streak) 50%, transparent 70%) no-repeat;
+      background-size: 50% 100%;
+      animation: fhcs-wind-gust 0.3s ease-out forwards;
+   }
+   /* A press is shoved downwind, once. */
+   .fhcs-sheet[data-fhcs-theme="wind"]:not([data-fhcs-motion="off"]) :is(.fhcs-button, .fhcs-toggle, .fhcs-chip, .fhcs-tab):active
+   {
+      animation: fhcs-wind-shove 0.2s ease-out;
+   }
+}
+
+@keyframes fhcs-wind-gust
+{
+   from { background-position: -60% 0; }
+   to { background-position: 160% 0; }
+}
+
+@keyframes fhcs-wind-shove
+{
+   40% { transform: translateX(2px); }
+   to { transform: none; }
+}

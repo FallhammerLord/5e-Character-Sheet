@@ -149,6 +149,24 @@ From the user's screenshot after Phase 6's play check. Mockups: the layout check
 - **Resources: three panels in a row,** each several lines (as Classic's): name (wrapping to two lines before it's cut); uses left / most; recovery (SR, LR, or a linked item's periods) and Restore. Labels centred; a linked item's art fills the panel as an underlay at 15% (user, 2026-10-28, replacing the art beside the name). In play only the resources that are set show; with the lock off all three show, for editing and adding. Edit mode: the name and most uses become fields, recovery two checkboxes, and a cog opens a tray to link an item with uses to that panel. A linked panel shows and edits the item's uses and recovery (stored in `flags.fhcs.resources`); unlinked keeps dnd5e's own resource. Refresh sets uses back to most. A linked item may also be a favorite (Claude's pick; the user didn't object).
 - **Sections fold on Inventory, Spellbook, Features and Effects,** as favorites groups do, remembered per player. A search shows matches inside folded sections and clearing it puts the folds back; a spell level's slot pips stay usable while folded.
 
+### 4.11 Themes (user, 2026-10-28)
+
+Four themes for players who want them, ahead of the rest of Phase 7: **Fire and Forge**, **Wind and Wrath**, **Sand and Sanctuary**, **Valley and Valor**. Plain (today's look) stays the default.
+
+- **Per character, with a world default:** a character's theme is stored on the actor (`flags.fhcs.theme`); without one, the GM's world setting applies. Everyone who opens the sheet sees the same theme.
+- **Light and dark for each theme:** every theme token has both values, as now.
+- **Chat cards follow the world theme,** not the speaker's; a world setting switches themed cards off (plain cards). A later slice than the sheet.
+- **Not shared with the quest log** for now; the user may carry the themes there later, so each theme stays one self-contained CSS file.
+- **SVG and CSS only:** decals are SVG inside the theme's CSS (masks tinted by theme tokens), frames are CSS. Room for custom images later, not now.
+- **What a theme may change** (Claude's rule, 2026-10-28): the ground, panel surfaces and frames, corners, decals, heading bands, the tab underline, and motion. Never the meaning colors of §5.1: it may shift their lightness to keep contrast on its ground, never their hue. Its accent colors decorate frames only, never a control or a mark.
+- **Contrast:** text sits on a solid theme surface or on texture no stronger than 15% (worst case worked out per theme); the layout check renders every theme in light and dark at every width.
+- **Motion:** only in answer to the player (hover, press, a fold opening), under 300ms, never looping, never flashing more than three times a second; off under the system's reduced-motion setting and with the player's Motion switch.
+- **The four, as first mocked up** (Claude, 2026-10-28, for the user's review; `styles/themes/*.css`, `tools/theme-mockup.mjs`). The panels carry `fhcs-frame`; a round portrait keeps no frame. Each theme puts its emblem on the tab row before the lock.
+  - *Fire and Forge:* warm soot and ash parchment; riveted iron frames; heading lines quenched steel to ember; an anvil. Hover heats a frame's edge; a press dips 1px with a spark ring.
+  - *Wind and Wrath:* storm slate and overcast; square frames with a cut top-right corner and a storm-light left edge; faint wind lines in the ground; a bolt. Hover sends a gust across a heading; a press is shoved sideways.
+  - *Sand and Sanctuary:* sandstone and shade-brown; carved frames with stepped corners and a terracotta inlay along the top; a tile lattice; a sun. Hover passes a shaft of light down the portrait; a press settles like stone.
+  - *Valley and Valor:* meadow parchment and forest night; tooled frames, a brass edge with a second line inside (solid, since dashed means choose); a meadow tint rising from the foot; a crimson pennant, which also notches the open tab's line. Hover runs a gleam along a heading; a press pulses like a shield bash.
+
 ## 5. ADHD rules carried over
 
 Typography and spacing (user, 2026-10-24): three text styles across the module (display, body, label), two spacing steps, one control height; every panel uses space economically, folded and open: a band's heading, total and open mark share one line; the card header is one label line (actor · details) over the title.

@@ -3,7 +3,7 @@
    <div class="fhcs-header-side">
       {{!-- The portrait card (SCOPE §4.1, user, 2026-10-27): one frame height for every art shape; the art fills it, and
             HP, Temp and Max ± sit on a band over its foot. The chips sit on the stage above the band. --}}
-      <div class="fhcs-portrait fhcs-shape-{{ portrait.shape }}{{#if death}} fhcs-dying{{/if}}{{#if portrait.framing}} fhcs-framing{{/if}}"
+      <div class="fhcs-portrait fhcs-frame fhcs-shape-{{ portrait.shape }}{{#if death}} fhcs-dying{{/if}}{{#if portrait.framing}} fhcs-framing{{/if}}"
            data-src="{{ portrait.src }}" data-fx="{{ portrait.frame.x }}" data-fy="{{ portrait.frame.y }}" data-zoom="{{ portrait.frame.zoom }}">
          {{!-- The art, at the character's framing (focus point and zoom; user, 2026-10-27), clipped to the frame. --}}
          <div class="fhcs-portrait-clip" style="{{ portrait.frameStyle }}">
@@ -165,7 +165,7 @@
          {{!-- One joined group at the name row's right (user, 2026-10-28, moved off the portrait so the art shows):
                exhaustion (a dot at 0, shown on rest), Short and Long rest (one click each into dnd5e's rest dialog), and
                hit dice ("HD 12"; in edit mode a gear and dnd5e's hit dice window). --}}
-         <div class="fhcs-status">
+         <div class="fhcs-status fhcs-frame">
             <details class="fhcs-fold fhcs-status-exhaustion" data-fold-key="exhaustion">
                {{#if exhaustion.none}}
                <summary class="fhcs-exhaustion-dot" aria-label="{{ text.exhaustionShow }}">
@@ -231,7 +231,7 @@
             lines, Level under them) and the abilities panel (each: score | modifier, the modifier rolling the check;
             then the save, its shield filled when proficient). The cards below share these columns. --}}
       <div class="fhcs-stats" style="--fhcs-columns: {{ abilityCount }}">
-         <div class="fhcs-combat">
+         <div class="fhcs-combat fhcs-frame">
             <span class="fhcs-label fhcs-muted fhcs-ability-head">{{ text.ac }}{{#if @root.editable}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="armorClass"
                     aria-label="{{ text.acConfig }}" data-fhcs-tip="{{ text.acConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</span>
             <span class="fhcs-label fhcs-muted fhcs-ability-head">{{ text.init }}{{#if @root.editable}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="initiative"
@@ -277,7 +277,7 @@
                {{/if}}
             </div>
          </div>
-         <div class="fhcs-abilities">
+         <div class="fhcs-abilities fhcs-frame">
             {{#each abilities}}
             <div class="fhcs-ability" data-ability="{{ key }}">
                <span class="fhcs-label fhcs-muted fhcs-ability-head">{{ abbr }}{{#if @root.editable}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="ability"
@@ -310,7 +310,7 @@
                own line; the item's art as a faded underlay; a dashed Subclass or Choose (dnd5e's findItem) where something
                is missing; in edit mode a remove (dnd5e's deleteDocument, which asks first) after the name. Two class
                cards at most: the last carries a "+N" chip opening the class tray (user, 2026-10-27). --}}
-         <div class="fhcs-origin-card{{#if isClass}} fhcs-class-card{{/if}}" style="grid-column: span {{ span }}"{{#if item}} data-item-id="{{ item.id }}" data-uuid="{{ item.uuid }}"{{/if}}>
+         <div class="fhcs-origin-card fhcs-frame{{#if isClass}} fhcs-class-card{{/if}}" style="grid-column: span {{ span }}"{{#if item}} data-item-id="{{ item.id }}" data-uuid="{{ item.uuid }}"{{/if}}>
             {{#if subArt}}
             {{!-- Class and subclass art side by side, the card split down the middle (user, 2026-10-28). --}}
             <span class="fhcs-origin-art fhcs-origin-split" aria-hidden="true"><img class="fhcs-origin-underlay" src="{{ art }}" alt=""><img class="fhcs-origin-underlay" src="{{ subArt }}" alt=""></span>

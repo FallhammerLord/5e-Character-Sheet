@@ -1137,6 +1137,9 @@
    transform: translateX(-50%);
 }
 
+/* A theme (SCOPE §4.11) leaves a round portrait round: no frame drawn around the circle, at rest or on hover. */
+.fhcs-sheet[data-fhcs-theme] .fhcs-portrait.fhcs-shape-round:is(*, :hover) { border-color: transparent; background-image: none; box-shadow: none; }
+
 /* Framing: the art moves under the pointer; the other chips step aside for the framing tools. */
 /* The dashed edge is a layer over the art: the zoomed art would cover an outline. */
 .fhcs-sheet .fhcs-framing .fhcs-portrait-clip::after

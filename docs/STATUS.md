@@ -5,7 +5,7 @@ The current state: what the next session does, what waits on the user, what's ve
 ## Next session
 
 1. **Phase 6.5, Polish** (ROADMAP; SCOPE §4.10, §6.7): built, offline checks pass, not yet seen in Foundry. Waits on the user: Quench core and chat cards (new or changed: the class card's level ring, resource panels, section folding, damage types, the applied record) and a play check (an effect applied from a card leaves a line; the hit line holds when targets change). Then the BUILT entry.
-2. **Next: themes** (user, 2026-10-28: custom themes for eager players), ahead of the rest of Phase 7; ROADMAP Phase 8's first item.
+2. **Themes** (Phase 6.6; SCOPE §4.11): the four themes are drawn and pass the layout check in light and dark; waits on the user's review of the mockup page (`node tools/theme-mockup.mjs`, then `tools/out/theme-mockup.html`). After it: slice 2, choosing a theme (world default, per character, Motion switch).
 3. **One Quench test to rerun:** "switches an effect off and on, favorites it…" failed once after favoriting (2026-10-28); the user's hand test passed, so likely the test. Its messages now report what the row holds; if it fails again, read them before changing anything.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.

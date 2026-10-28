@@ -1,0 +1,79 @@
+/* Valley and Valor (SCOPE §4.11, user 2026-10-28): heraldry over green hills. Tooled frames, a brass edge, a pennant
+   on the tab row; a hover runs a gleam along a heading, a press gives a shield-bash pulse. Green means equipped and
+   red means failure (§5.1): the meadow green stays in the ground's tint, the crimson on the pennant and the tab line. */
+
+.fhcs-sheet[data-fhcs-theme="valley"]
+{
+   --fhcs-surface: #eeeee0;
+   --fhcs-ink: #1b2017;
+   --fhcs-die-ink: #1b2017;
+   --fhcs-die-on-ink: #f5f5ea;
+   --fhcs-theme-edge: #8c7a4c;
+   --fhcs-theme-accent: #8a2533;
+   --fhcs-theme-gleam: color-mix(in srgb, #fff6d0 70%, transparent);
+   --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%238a2533' d='M4 2h2v20H4z'/%3E%3Cpath fill='%238a2533' d='M6 3h14l-4 4.5L20 12H6z'/%3E%3C/svg%3E");
+}
+
+.theme-dark .fhcs-sheet[data-fhcs-theme="valley"],
+.fhcs-sheet.theme-dark[data-fhcs-theme="valley"]
+{
+   --fhcs-surface: #1a211b;
+   --fhcs-ink: #e7ece2;
+   --fhcs-die-ink: #ecf0e6;
+   --fhcs-die-on-ink: #1a211b;
+   --fhcs-theme-edge: #a99463;
+   --fhcs-theme-accent: #d0566a;
+   --fhcs-theme-gleam: color-mix(in srgb, #fff2c0 25%, transparent);
+   --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23d0566a' d='M4 2h2v20H4z'/%3E%3Cpath fill='%23d0566a' d='M6 3h14l-4 4.5L20 12H6z'/%3E%3C/svg%3E");
+}
+
+/* The ground: a meadow tint rising from the foot of the window. */
+.fhcs-sheet[data-fhcs-theme="valley"] .window-content
+{
+   background-image: linear-gradient(to top, color-mix(in srgb, #4f7a3a 6%, transparent), transparent 40%);
+}
+
+/* Tooled-leather frames: a brass edge and a second line just inside it (solid: a dashed edge means something to
+   choose, §5.1). */
+.fhcs-sheet[data-fhcs-theme="valley"] .fhcs-frame
+{
+   border-color: var(--fhcs-theme-edge);
+   box-shadow: inset 0 0 0 2px var(--fhcs-surface), inset 0 0 0 3px color-mix(in srgb, var(--fhcs-theme-edge) 60%, transparent);
+}
+
+.fhcs-sheet[data-fhcs-theme="valley"] .fhcs-frame:hover { border-color: var(--fhcs-theme-accent); }
+
+.fhcs-sheet[data-fhcs-theme="valley"] :is(.fhcs-panel-head, .fhcs-group-head) { border-bottom-color: var(--fhcs-theme-edge); }
+/* The open tab's line ends in a pennant's notch. */
+.fhcs-sheet[data-fhcs-theme="valley"] .fhcs-tab.active { border-image: linear-gradient(to right, var(--fhcs-theme-accent) 80%, transparent 80% 88%, var(--fhcs-theme-accent) 88%) 1; }
+
+.fhcs-sheet[data-fhcs-theme="valley"] .fhcs-tabs { background: var(--fhcs-theme-emblem) right calc(var(--fhcs-control) + 2 * var(--fhcs-s2)) center / 20px no-repeat; }
+
+@media (prefers-reduced-motion: no-preference)
+{
+   .fhcs-sheet[data-fhcs-theme="valley"]:not([data-fhcs-motion="off"]) .fhcs-frame { transition: border-color 0.2s; }
+   /* A gleam runs along a heading on hover, once. */
+   .fhcs-sheet[data-fhcs-theme="valley"]:not([data-fhcs-motion="off"]) :is(.fhcs-panel-head, .fhcs-group-head):hover
+   {
+      background: linear-gradient(110deg, transparent 35%, var(--fhcs-theme-gleam) 50%, transparent 65%) no-repeat;
+      background-size: 60% 100%;
+      animation: fhcs-valley-gleam 0.3s ease-out forwards;
+   }
+   /* A press: a shield-bash pulse, once. */
+   .fhcs-sheet[data-fhcs-theme="valley"]:not([data-fhcs-motion="off"]) :is(.fhcs-button, .fhcs-toggle, .fhcs-chip, .fhcs-tab):active
+   {
+      animation: fhcs-valley-bash 0.2s ease-out;
+   }
+}
+
+@keyframes fhcs-valley-gleam
+{
+   from { background-position: -80% 0; }
+   to { background-position: 180% 0; }
+}
+
+@keyframes fhcs-valley-bash
+{
+   50% { transform: scale(1.04); }
+   to { transform: none; }
+}

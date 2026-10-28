@@ -41,7 +41,7 @@ const FRAMES = {
 const THEMES = { light: 'background:#f4f1ea;color:#191813', dark: 'background:#26252b;color:#e8e6e3' };
 
 /** A window like Foundry's, with the classes dnd5e, Foundry's theme and our code put on it. */
-const frame = (kind, width, theme, body) => `<section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"
+const frame = (kind, width, theme, body, look = '') => `<section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"${look ? ` data-fhcs-theme="${look}"` : ''}
    style="width:${width}px;height:${HEIGHT}px;display:flex;flex-direction:column;border:1px solid #000;margin:8px;
    ${THEMES[theme]}">
    ${kind === 'sheet'
@@ -535,7 +535,7 @@ for (const c of CASES)
       for (const width of WIDTHS[kind])
       {
          const id = `${c.name}-${theme}-${width}`;
-         for (const issue of await check(id, frame(kind, width, theme, body), true, c)) { problems.push(`${id}: ${issue}`); }
+         for (const issue of await check(id, frame(kind, width, theme, body, c.look), true, c)) { problems.push(`${id}: ${issue}`); }
          // `sameRowsAs` names the play-mode case this edit-mode one must match row for row (rule 6).
          if (c.sameRowsAs)
          {

@@ -1,0 +1,85 @@
+/* Sand and Sanctuary (SCOPE §4.11, user 2026-10-28): a desert temple at noon. Carved frames with stepped corners and
+   an inlaid band along the top, a sun disc on the tab row; a hover sends a shaft of light down a frame, a press
+   settles like stone. Turquoise is the theme's natural color but teal means always prepared, and lapis sits on the
+   prepared blue: the inlay is terracotta and sandstone. Frames only. */
+
+.fhcs-sheet[data-fhcs-theme="sand"]
+{
+   --fhcs-surface: #f2e6cf;
+   --fhcs-ink: #2a1d10;
+   --fhcs-die-ink: #2a1d10;
+   --fhcs-die-on-ink: #f7eedc;
+   --fhcs-theme-edge: #a0835a;
+   --fhcs-theme-accent: #a24f27;
+   --fhcs-theme-light: color-mix(in srgb, #fff3c8 55%, transparent);
+   --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%23a24f27' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='4.5'/%3E%3Cpath d='M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.theme-dark .fhcs-sheet[data-fhcs-theme="sand"],
+.fhcs-sheet.theme-dark[data-fhcs-theme="sand"]
+{
+   --fhcs-surface: #272017;
+   --fhcs-ink: #f1e5cf;
+   --fhcs-die-ink: #f3e8d3;
+   --fhcs-die-on-ink: #272017;
+   --fhcs-theme-edge: #a38a63;
+   --fhcs-theme-accent: #d4794a;
+   --fhcs-theme-light: color-mix(in srgb, #ffe7a8 22%, transparent);
+   --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='%23d4794a' stroke-width='2'%3E%3Ccircle cx='12' cy='12' r='4.5'/%3E%3Cpath d='M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* The ground: a faint tile lattice. */
+.fhcs-sheet[data-fhcs-theme="sand"] .window-content
+{
+   background-image:
+      linear-gradient(45deg, color-mix(in srgb, currentColor 3%, transparent) 1px, transparent 1px),
+      linear-gradient(-45deg, color-mix(in srgb, currentColor 3%, transparent) 1px, transparent 1px);
+   background-size: 18px 18px;
+}
+
+/* Carved frames: square, stepped corners (a notch of ground in each), an inlaid terracotta band along the top. */
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-frame
+{
+   border-color: var(--fhcs-theme-edge);
+   border-radius: 0;
+   box-shadow: inset 0 3px 0 var(--fhcs-theme-accent);
+   background-image:
+      linear-gradient(var(--fhcs-theme-edge), var(--fhcs-theme-edge)),
+      linear-gradient(var(--fhcs-theme-edge), var(--fhcs-theme-edge)),
+      linear-gradient(var(--fhcs-theme-edge), var(--fhcs-theme-edge)),
+      linear-gradient(var(--fhcs-theme-edge), var(--fhcs-theme-edge));
+   background-position: 0 0, 100% 0, 0 100%, 100% 100%;
+   background-size: 4px 4px;
+   background-repeat: no-repeat;
+}
+
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-frame:hover { border-color: var(--fhcs-theme-accent); }
+
+.fhcs-sheet[data-fhcs-theme="sand"] :is(.fhcs-panel-head, .fhcs-group-head) { border-bottom: 1px double var(--fhcs-theme-edge); border-bottom-width: 3px; }
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-tab.active { border-bottom-color: var(--fhcs-theme-accent); }
+
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-tabs { background: var(--fhcs-theme-emblem) right calc(var(--fhcs-control) + 2 * var(--fhcs-s2)) center / 20px no-repeat; }
+
+@media (prefers-reduced-motion: no-preference)
+{
+   .fhcs-sheet[data-fhcs-theme="sand"]:not([data-fhcs-motion="off"]) .fhcs-frame { transition: border-color 0.2s; }
+   /* A shaft of light passes down the portrait, once, on hover. */
+   .fhcs-sheet[data-fhcs-theme="sand"]:not([data-fhcs-motion="off"]) .fhcs-portrait:hover .fhcs-portrait-stage
+   {
+      background: linear-gradient(to bottom, transparent, var(--fhcs-theme-light), transparent) no-repeat;
+      background-size: 100% 40%;
+      animation: fhcs-sand-shaft 0.3s ease-out forwards;
+   }
+   /* A press settles like stone. */
+   .fhcs-sheet[data-fhcs-theme="sand"]:not([data-fhcs-motion="off"]) :is(.fhcs-button, .fhcs-toggle, .fhcs-chip, .fhcs-tab):active
+   {
+      transform: scale(0.97);
+      transition: transform 0.1s;
+   }
+}
+
+@keyframes fhcs-sand-shaft
+{
+   from { background-position: 0 -60%; }
+   to { background-position: 0 160%; }
+}

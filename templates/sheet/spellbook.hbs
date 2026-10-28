@@ -7,7 +7,7 @@
       <div class="fhcs-casting-classes">
          {{#each classes}}
          {{!-- dnd5e's setSpellcastingAbility reads the ability from the nearest [data-ability]. --}}
-         <div class="fhcs-casting-class{{#if primary}} fhcs-primary{{/if}}" data-ability="{{ ability }}">
+         <div class="fhcs-casting-class fhcs-frame{{#if primary}} fhcs-primary{{/if}}" data-ability="{{ ability }}">
             <span class="fhcs-label fhcs-casting-name">{{ label }}</span>
             {{#if ../editing}}<button type="button" class="fhcs-toggle fhcs-radio" data-action="setSpellcastingAbility"
                     aria-pressed="{{#if primary}}true{{else}}false{{/if}}" aria-label="{{ primaryLabel }}" data-fhcs-tip="{{ primaryLabel }}"><span class="fhcs-radio-mark" aria-hidden="true"></span></button>{{/if}}
@@ -21,7 +21,7 @@
       {{/if}}
       {{!-- What the character is concentrating on, always in this place (user, 2026-10-26). The save rolls through
             dnd5e's roll action, which reads the ability from [data-ability]. --}}
-      <div class="fhcs-concentration{{#if concentration.on}} fhcs-on{{/if}}" data-ability="concentration">
+      <div class="fhcs-concentration fhcs-frame{{#if concentration.on}} fhcs-on{{/if}}" data-ability="concentration">
          <span class="fhcs-conc-mark" role="img" aria-label="{{ text.concentration }}">{{> "modules/fhcs/templates/sheet/conc-c.hbs" }}</span>
          {{#each concentration.spells}}
          <span class="fhcs-conc-spell" data-effect-id="{{ effectId }}">

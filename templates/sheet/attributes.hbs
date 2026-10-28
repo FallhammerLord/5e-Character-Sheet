@@ -63,7 +63,7 @@
       {{!-- Traits beside the skills, at the column's top (user, 2026-10-27): its heading on the Skills heading's line;
             it folds to one line of what's set, remembered like a favorites group. Every trait in both modes, one line
             each; edit mode adds a gear in the last column. --}}
-      <div class="fhcs-panel fhcs-traits-panel" data-fhcs-group="traits">
+      <div class="fhcs-panel fhcs-frame fhcs-traits-panel" data-fhcs-group="traits">
          <div class="fhcs-panel-head">
             <button type="button" class="fhcs-group-toggle" data-action="fhcsToggleGroup" aria-expanded="{{#if traitsOpen}}true{{else}}false{{/if}}">
                <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
@@ -85,7 +85,7 @@
       {{!-- Resources (user, 2026-10-28, SCOPE §4.10): three panels in a row, first among the favorites, folding like the
             other groups. In play only those set show; with the lock off all three, for editing and adding. Each panel:
             name; uses left / most; recovery and Restore. A panel linked to an item (the cog's tray) shows its uses. --}}
-      <div class="fhcs-group fhcs-resources-panel" data-fhcs-group="resources">
+      <div class="fhcs-group fhcs-frame fhcs-resources-panel" data-fhcs-group="resources">
          <div class="fhcs-group-head">
             <button type="button" class="fhcs-group-toggle" data-action="fhcsToggleGroup" aria-expanded="{{#if resourcesOpen}}true{{else}}false{{/if}}">
                <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
@@ -94,7 +94,7 @@
          </div>
          <ul class="fhcs-favorites fhcs-resources"{{#unless resourcesOpen}} hidden{{/unless}}>
             {{#each resources}}
-            <li class="fhcs-resource{{#if linked}} fhcs-resource-linked{{/if}}" role="group" aria-label="{{ groupLabel }}" data-resource="{{ key }}">
+            <li class="fhcs-resource fhcs-frame{{#if linked}} fhcs-resource-linked{{/if}}" role="group" aria-label="{{ groupLabel }}" data-resource="{{ key }}">
                {{!-- A linked item's art as the panel's underlay (user, 2026-10-28), as the header's cards carry theirs. --}}
                {{#if link}}<span class="fhcs-resource-art" aria-hidden="true"><img src="{{ link.img }}" alt=""></span>{{/if}}
                <span class="fhcs-resource-head">
@@ -163,7 +163,7 @@
 
       {{#each favorites}}
       {{!-- Each group folds and stays as the player left it (user, 2026-10-24); its slot pips sit outside the fold button. --}}
-      <div class="fhcs-group" data-fhcs-group="{{ key }}">
+      <div class="fhcs-group fhcs-frame" data-fhcs-group="{{ key }}">
          <div class="fhcs-group-head">
             <button type="button" class="fhcs-group-toggle" data-action="fhcsToggleGroup" aria-expanded="{{#if open}}true{{else}}false{{/if}}">
                <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>

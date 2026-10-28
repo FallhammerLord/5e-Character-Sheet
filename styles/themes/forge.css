@@ -1,0 +1,80 @@
+/* Fire and Forge (SCOPE §4.11, user 2026-10-28): smithy iron and banked coals. Riveted iron frames, a quench-dark
+   heading line, an anvil on the tab row; a hover heats a frame's edge, a press lands like a hammer strike.
+   A theme changes the ground, surfaces, frames, decals and motion; never a meaning color's hue (§5.1). The ember
+   accent decorates frames only. Texture under text stays at or under 4%. */
+
+.fhcs-sheet[data-fhcs-theme="forge"]
+{
+   --fhcs-surface: #eee4d4;
+   --fhcs-ink: #221913;
+   --fhcs-die-ink: #221913;
+   --fhcs-die-on-ink: #f6efe4;
+   --fhcs-theme-edge: #6b625a;
+   --fhcs-theme-accent: #9c4317;
+   --fhcs-theme-glow: color-mix(in srgb, #d86a28 45%, transparent);
+   --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%239c4317' d='M2 7h14c0 2.2 2.2 3.4 6 3.4V13h-7l-1.4 2.2H17V19H6v-3.8h3.4L8 13C4.4 12.4 2 10.2 2 7z'/%3E%3C/svg%3E");
+   --fhcs-theme-grain: radial-gradient(circle at 30% 40%, color-mix(in srgb, currentColor 4%, transparent) 0 1px, transparent 1.5px);
+}
+
+.theme-dark .fhcs-sheet[data-fhcs-theme="forge"],
+.fhcs-sheet.theme-dark[data-fhcs-theme="forge"]
+{
+   --fhcs-surface: #221b18;
+   --fhcs-ink: #eee3d6;
+   --fhcs-die-ink: #f1e5d8;
+   --fhcs-die-on-ink: #221b18;
+   --fhcs-theme-edge: #8d847b;
+   --fhcs-theme-accent: #e2793a;
+   --fhcs-theme-glow: color-mix(in srgb, #f08a40 50%, transparent);
+   --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23e2793a' d='M2 7h14c0 2.2 2.2 3.4 6 3.4V13h-7l-1.4 2.2H17V19H6v-3.8h3.4L8 13C4.4 12.4 2 10.2 2 7z'/%3E%3C/svg%3E");
+}
+
+/* The ground: a faint hammered grain. */
+.fhcs-sheet[data-fhcs-theme="forge"] .window-content { background-image: var(--fhcs-theme-grain); background-size: 7px 7px; }
+
+/* Iron frames: a heavier edge, a lit top, a cast shadow, and a rivet in each corner. */
+.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-frame
+{
+   border-color: var(--fhcs-theme-edge);
+   border-radius: 3px;
+   box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent), 0 1px 2px color-mix(in srgb, #000 30%, transparent);
+   background-image:
+      radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
+      radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
+      radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
+      radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px);
+   background-position: 0 0, 100% 0, 0 100%, 100% 100%;
+   background-size: 8px 8px;
+   background-repeat: no-repeat;
+}
+
+/* Hover heats the edge (state, so it shows with motion off too; the transition is motion). */
+.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-frame:hover { border-color: var(--fhcs-theme-accent); }
+
+/* Heading lines and the open tab: quenched steel running to ember. */
+.fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-panel-head, .fhcs-group-head) { border-image: linear-gradient(to right, var(--fhcs-theme-accent), var(--fhcs-theme-edge) 40%, transparent) 1; }
+.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-tab.active { border-image: linear-gradient(to right, var(--fhcs-theme-accent), var(--fhcs-ink)) 1; }
+
+/* The anvil, on the tab row before the lock. */
+.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-tabs { background: var(--fhcs-theme-emblem) right calc(var(--fhcs-control) + 2 * var(--fhcs-s2)) center / 20px no-repeat; }
+
+@media (prefers-reduced-motion: no-preference)
+{
+   .fhcs-sheet[data-fhcs-theme="forge"]:not([data-fhcs-motion="off"]) .fhcs-frame { transition: border-color 0.2s, box-shadow 0.2s; }
+   .fhcs-sheet[data-fhcs-theme="forge"]:not([data-fhcs-motion="off"]) .fhcs-frame:hover
+   {
+      box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent), 0 0 6px var(--fhcs-theme-glow);
+   }
+   /* A press lands like a hammer: a 1px dip and a spark ring, once. */
+   .fhcs-sheet[data-fhcs-theme="forge"]:not([data-fhcs-motion="off"]) :is(.fhcs-button, .fhcs-toggle, .fhcs-chip, .fhcs-tab):active
+   {
+      transform: translateY(1px);
+      animation: fhcs-forge-strike 0.25s ease-out;
+   }
+}
+
+@keyframes fhcs-forge-strike
+{
+   from { box-shadow: 0 0 0 0 var(--fhcs-theme-glow); }
+   to { box-shadow: 0 0 0 6px transparent; }
+}

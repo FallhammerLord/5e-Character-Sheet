@@ -728,3 +728,19 @@ export const CASES = [
    },
    { name: 'card-no-details', template: 'chat/usage-card', frame: 'chat', context: card({ hasDetails: false }, []) }
 ];
+
+// The four themes (SCOPE §4.11): the header, Attributes and Spellbook in each, light and dark, every width; `look` sets
+// the sheet's data-fhcs-theme.
+export const LOOKS = ['forge', 'wind', 'sand', 'valley'];
+for (const look of LOOKS)
+{
+   CASES.push({ name: `theme-${look}-header`, template: 'sheet/header', look,
+      context: header({ portrait: { src: TALL, isVideo: false }, originCards: FOUR_CLASSES() }) });
+   CASES.push({ name: `theme-${look}-header-round`, template: 'sheet/header', look,
+      context: header({ portrait: { src: SQUARE, isVideo: false }, shape: 'round' }) });
+   for (const name of ['attributes', 'spellbook', 'inventory'])
+   {
+      const base = CASES.find((c) => c.name === name);
+      CASES.push({ ...base, name: `theme-${look}-${name}`, look, sameRowsAs: undefined });
+   }
+}
