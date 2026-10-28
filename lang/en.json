@@ -186,6 +186,17 @@
       "Unlock": "Unlock to edit",
       "Lock": "Lock the sheet"
     },
+    "Section": {
+      "Up": "Move {name} up",
+      "Down": "Move {name} down"
+    },
+    "Category": {
+      "Menu": "Category…",
+      "Title": "Category",
+      "Hint": "Its own section on the sheet. Leave it blank for its usual place.",
+      "Field": "Category",
+      "Save": "Save"
+    },
     "Inspiration": {
       "Label": "Inspiration",
       "Spend": "Spend inspiration",

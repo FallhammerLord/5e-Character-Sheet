@@ -580,6 +580,10 @@ export const CASES = [
    { name: 'inventory-editing-parity', template: 'sheet/inventory', context: inventory({ editing: true }), rows: '.fhcs-list-bar, .fhcs-item-row', sameRowsAs: 'inventory' },
    { name: 'inventory-all-columns', template: 'sheet/inventory', context: inventory({ columns: ALL_COLUMNS }) },
    { name: 'inventory-editing', template: 'sheet/inventory', open: ['inventory-columns'], context: inventory({ editing: true, columns: ALL_COLUMNS }) },
+   // A category of the player's own, moved first (SCOPE §4.13): edit mode's arrows, the first's up arrow off.
+   { name: 'inventory-categories', template: 'sheet/inventory', context: inventory({ editing: true, columns: ALL_COLUMNS, order: ['custom-ritual-kit'],
+      sections: [{ id: 'custom-ritual-kit', label: 'Ritual Kit', custom: true, items: [gear('Holy Symbol', '#c9a227', { weight: '1 lb' }), gear('Incense', '#7a5a3a', { quantity: 5 })] },
+         ...inventoryFacts().sections] }) },
    {
       name: 'inventory-few-columns', template: 'sheet/inventory',
       context: inventory({ columns: { uses: false, usage: false, quantity: false, equipped: true, attuned: false }, encumbrance: null })
@@ -769,7 +773,7 @@ for (const look of LOOKS)
 // Fire and Forge, the whole sheet (user, 2026-10-28: "finish the sheet ... trays, tabs, and anything we've missed"):
 // every tab, edit mode, and each tray open.
 for (const name of ['features', 'effects', 'biography', 'attributes-editing', 'attributes-resource-tray', 'inventory-editing',
-   'spellbook-editing', 'features-editing', 'title-theme-tray', 'tabs-bank-big', 'tabs-inspiration-tray', 'tabs-bank-tray', 'header-editing', 'header-hp-tray', 'header-exhaustion-open',
+   'spellbook-editing', 'features-editing', 'inventory-categories', 'title-theme-tray', 'tabs-bank-big', 'tabs-inspiration-tray', 'tabs-bank-tray', 'header-editing', 'header-hp-tray', 'header-exhaustion-open',
    'header-level-up', 'header-classes-open', 'header-milestones'])
 {
    const base = CASES.find((c) => c.name === name);

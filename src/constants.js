@@ -30,6 +30,12 @@ export const INSPIRATION_FLAG = 'inspiration';
 /** Actor flag: which places in that bank are filled ({ item: id, filled: [index] }), so any may be spent or banked. */
 export const INSPIRATION_SLOTS_FLAG = 'inspirationSlots';
 
+/** Item flag: the item's category of the player's own, a name (SCOPE §4.13); Tidy's `flags.tidy5e-sheet.section` is read when unset. */
+export const CATEGORY_FLAG = 'section';
+
+/** Actor flag: each tab's section order, by section ID ({ inventory: [id] }). */
+export const SECTION_ORDER_FLAG = 'sectionOrder';
+
 /** The sheet's themes (SCOPE §4.11), by key; `plain` is today's look. Actor flag `flags.fhcs.theme` picks one per
     character; without it, the world setting `fhcs.theme` applies. */
 export const THEMES = ['plain', 'forge', 'wind', 'sand', 'valley'];

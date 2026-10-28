@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES } from '../constants.js';
-import { attributesFacts, biographyFacts, changeHp, stepResource, useResourceItem, inspirationFacts, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, changeHp, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, renderTemplate, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
@@ -32,14 +32,15 @@ export const SHEET_PARTS = {
  * re-renders. Their partials load with the part, since the tab (and each container) includes them.
  */
 const LIST_BAR = `${MODULE_PATH}/templates/sheet/list-bar.hbs`;
+const SECTION_MOVE = `${MODULE_PATH}/templates/sheet/section-move.hbs`;
 const PART_OPTIONS = {
    header: { templates: [`${MODULE_PATH}/templates/sheet/level-up.hbs`, `${MODULE_PATH}/templates/sheet/gear.hbs`] },
-   inventory: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/item-row.hbs`, LIST_BAR] },
-   spells: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/spell-row.hbs`, LIST_BAR, `${MODULE_PATH}/templates/sheet/gear.hbs`, `${MODULE_PATH}/templates/sheet/conc-c.hbs`] },
-   features: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/feature-row.hbs`, LIST_BAR] },
-   effects: { scrollable: ['.fhcs-items'], templates: [LIST_BAR, `${MODULE_PATH}/templates/sheet/conc-c.hbs`] },
+   inventory: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/item-row.hbs`, LIST_BAR, SECTION_MOVE] },
+   spells: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/spell-row.hbs`, LIST_BAR, `${MODULE_PATH}/templates/sheet/gear.hbs`, `${MODULE_PATH}/templates/sheet/conc-c.hbs`, SECTION_MOVE] },
+   features: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/feature-row.hbs`, LIST_BAR, SECTION_MOVE] },
+   effects: { scrollable: ['.fhcs-items'], templates: [LIST_BAR, `${MODULE_PATH}/templates/sheet/conc-c.hbs`, SECTION_MOVE] },
    biography: { templates: [`${MODULE_PATH}/templates/sheet/bio-box.hbs`] },
-   details: { templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`] },
+   details: { templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`, SECTION_MOVE] },
    tabs: { templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`] }
 };
 
@@ -338,6 +339,29 @@ function followPointer(element)
    });
 }
 
+/**
+ * A section's up or down arrow in edit mode (SCOPE §4.13, user 2026-10-28): it swaps places with the next section
+ * shown that way, and the tab's whole order, as drawn, is saved on the character.
+ */
+function moveSection(event, target)
+{
+   const { tab, section } = target.dataset;
+   const delta = Number(target.dataset.delta);
+   const head = target.closest('[data-fhcs-section]');
+   const list = head?.parentElement;
+   if (!list || !tab) { return null; }
+   const all = [...list.querySelectorAll(':scope > [data-fhcs-section]')];
+   const shown = all.filter((el) => !el.hidden);
+   const at = shown.findIndex((el) => el.dataset.fhcsSection === section);
+   const other = shown[at + delta];
+   if (at < 0 || !other) { return null; }
+   const ids = all.map((el) => el.dataset.fhcsSection);
+   const a = ids.indexOf(section);
+   const b = ids.indexOf(other.dataset.fhcsSection);
+   [ids[a], ids[b]] = [ids[b], ids[a]];
+   return saveSectionOrder(this.actor, tab, ids);
+}
+
 /** A resource panel's − and + (user, 2026-10-28). */
 function stepResourceAction(event, target)
 {
@@ -542,7 +566,7 @@ export function makeCharacterSheet(Base)
             fhcsToggleContainer: toggleContainer, fhcsPinFilter: pinFilter, fhcsOpenConcentration: openConcentration,
             fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails,
             fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange, fhcsFrame: frame, fhcsLevelDown: levelDown, fhcsPortraitShape: portraitShape,
-            fhcsSkillAbility: skillAbility, fhcsLinkResource: linkResourceAction, fhcsRefreshResource: refreshResourceAction, fhcsStepResource: stepResourceAction, fhcsUseResource: useResourceAction,
+            fhcsSkillAbility: skillAbility, fhcsLinkResource: linkResourceAction, fhcsRefreshResource: refreshResourceAction, fhcsStepResource: stepResourceAction, fhcsMoveSection: moveSection, fhcsUseResource: useResourceAction,
             fhcsToggleSection: toggleSection, fhcsSetTheme: setTheme, fhcsThemeTray: themeTray, fhcsSpecialTraits: openSpecialTraits,
             fhcsInspiration: inspirationAction, fhcsLinkInspiration: linkInspirationAction }
       };
@@ -582,27 +606,27 @@ export function makeCharacterSheet(Base)
                folded: folded(),
                open: this.fhcsOpenFavorites ?? new Set()
             };
-            context.fhcsAttributes = attributesView(await attributesFacts(this, context, prefs), i18n);
+            context.fhcsAttributes = attributesView({ ...await attributesFacts(this, context, prefs), order: sectionOrder(this.actor, 'favorites') }, i18n);
          }
          if (partId === 'inventory')
          {
             const columns = columnChoice(game.settings.get(MODULE_ID, 'inventoryColumns'));
             const openContainers = game.user.getFlag(MODULE_ID, PREFS.openContainers) ?? [];
-            context.fhcsInventory = inventoryView({ ...await inventoryFacts(this, context, { columns, openContainers }), folded: folded() }, i18n);
+            context.fhcsInventory = inventoryView({ ...await inventoryFacts(this, context, { columns, openContainers }), folded: folded(), order: sectionOrder(this.actor, 'inventory') }, i18n);
          }
          if (partId === 'spells')
          {
             const columns = spellColumnChoice(game.settings.get(MODULE_ID, 'spellColumns'));
-            context.fhcsSpellbook = spellbookView({ ...await spellbookFacts(this, context, { columns }), folded: folded() }, i18n);
+            context.fhcsSpellbook = spellbookView({ ...await spellbookFacts(this, context, { columns }), folded: folded(), order: sectionOrder(this.actor, 'spells') }, i18n);
          }
          if (partId === 'features')
          {
             const columns = featureColumnChoice(game.settings.get(MODULE_ID, 'featureColumns'));
-            context.fhcsFeatures = featuresView({ ...await featuresFacts(this, context, { columns }), folded: folded() }, i18n);
+            context.fhcsFeatures = featuresView({ ...await featuresFacts(this, context, { columns }), folded: folded(), order: sectionOrder(this.actor, 'features') }, i18n);
          }
          if (partId === 'effects')
          {
-            context.fhcsEffects = effectsView({ ...await effectsFacts(this, context), folded: folded() }, i18n);
+            context.fhcsEffects = effectsView({ ...await effectsFacts(this, context), folded: folded(), order: sectionOrder(this.actor, 'effects') }, i18n);
          }
          if (partId === 'biography')
          {

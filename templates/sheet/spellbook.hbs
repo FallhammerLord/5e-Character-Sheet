@@ -69,17 +69,16 @@
                {{#if ../columns.school}}<span class="fhcs-label fhcs-muted fhcs-col-school">{{ ../text.head.school }}</span>{{/if}}
                {{#if ../columns.target}}<span class="fhcs-label fhcs-muted fhcs-col-target">{{ ../text.head.target }}</span>{{/if}}
                {{#if showUses}}<span class="fhcs-label fhcs-muted fhcs-col-uses">{{ ../text.uses }}</span>{{/if}}
-               <span class="fhcs-col-toggle" role="img" aria-label="{{ ../text.prep }}"></span>
+               {{!-- The prepared column, empty in a heading: in edit mode the slots' gear (user, 2026-10-28: the edit
+                     column holds the section's arrows). --}}
+               {{#if ../editing}}{{#if slots}}
+               <span class="fhcs-col-toggle"><button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="spellSlots"
+                       aria-label="{{ ../text.slotsConfig }}" data-fhcs-tip="{{ ../text.slotsConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button></span>
+               {{else}}<span class="fhcs-col-toggle" role="img" aria-label="{{ ../text.prep }}"></span>{{/if}}
+               {{else}}<span class="fhcs-col-toggle" role="img" aria-label="{{ ../text.prep }}"></span>{{/if}}
                {{#if ../columns.favorite}}<span class="fhcs-muted fhcs-col-toggle" role="img" aria-label="{{ ../text.head.favorite }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>{{/if}}
                {{#if ../editing}}
-               <span class="fhcs-col-edit">
-                  {{#if slots}}
-                  <button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="spellSlots"
-                          aria-label="{{ ../text.slotsConfig }}" data-fhcs-tip="{{ ../text.slotsConfig }}">
-                     {{> "modules/fhcs/templates/sheet/gear.hbs" }}
-                  </button>
-                  {{/if}}
-               </span>
+               <span class="fhcs-col-edit">{{#if move}}{{> "modules/fhcs/templates/sheet/section-move.hbs" }}{{/if}}</span>
                {{/if}}
             </div>
             <ol class="item-list fhcs-item-list">

@@ -184,7 +184,7 @@
 
       {{#each favorites}}
       {{!-- Each group folds and stays as the player left it (user, 2026-10-24); its slot pips sit outside the fold button. --}}
-      <div class="fhcs-group fhcs-frame" data-fhcs-group="{{ key }}">
+      <div class="fhcs-group fhcs-frame" data-fhcs-group="{{ key }}" data-fhcs-section="{{ key }}">
          <div class="fhcs-group-head">
             <button type="button" class="fhcs-group-toggle" data-action="fhcsToggleGroup" aria-expanded="{{#if open}}true{{else}}false{{/if}}">
                <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
@@ -198,6 +198,7 @@
                {{/each}}
             </span>
             {{/if}}
+            {{#if move}}{{> "modules/fhcs/templates/sheet/section-move.hbs" }}{{/if}}
          </div>
          <ul class="fhcs-favorites"{{#unless open}} hidden{{/unless}}>
             {{#each rows}}

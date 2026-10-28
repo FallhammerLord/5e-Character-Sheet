@@ -898,6 +898,40 @@ export function registerQuenchTests(quench)
             }
          });
 
+         it('files an item under a category of its own, and moves that section with the arrows', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 8);
+            const order = foundry.utils.deepClone(actor.getFlag('fhcs', 'sectionOrder') ?? null);
+            // A second item without a category, so the category's section always has one above it.
+            const [loot, rope] = await createItems([{ name: 'FHCS test incense', type: 'loot' }, { name: 'FHCS test rope', type: 'loot' }]);
+            const id = 'custom-fhcs-test-kit';
+            const sections = () => [...sheet.element.querySelectorAll('.fhcs-inventory [data-fhcs-section]')].map((el) => el.dataset.fhcsSection);
+            try
+            {
+               await click('.fhcs-tabs [data-tab="inventory"]');
+               await loot.setFlag('fhcs', 'section', 'FHCS test kit');
+               await until(() => sheet.element.querySelector(`.fhcs-inventory [data-fhcs-section="${id}"] [data-item-id="${loot.id}"]`),
+                  () => `the item sits in its category's section; the sections are ${sections().join(', ')}`);
+               if (!sheet.isEditMode)
+               {
+                  await click('.fhcs-tabs [data-action="changeMode"]');
+                  await until(() => sheet.isEditMode, 'the lock switches to edit mode');
+               }
+               const before = sections().indexOf(id);
+               await click(`.fhcs-inventory [data-action="fhcsMoveSection"][data-section="${id}"][data-delta="-1"]`);
+               await until(() => sections().indexOf(id) === before - 1,
+                  () => `the up arrow moves it one place; it was ${before}, it is ${sections().indexOf(id)} of ${sections().join(', ')}`);
+            }
+            finally
+            {
+               await leaveEditMode();
+               if (order) { await actor.setFlag('fhcs', 'sectionOrder', order); }
+               else { await actor.unsetFlag('fhcs', 'sectionOrder'); }
+               await loot.delete();
+               await rope.delete();
+            }
+         });
+
          it('folds an Inventory section, shows its matches while a search is on, and remembers the fold', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 8);

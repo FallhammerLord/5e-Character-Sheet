@@ -2,7 +2,7 @@
  * The Spellbook tab's display values (SCOPE §4.7), from plain facts. Pure, like inventory.js: the unit check and the
  * layout fixtures use the same code. `compat.spellbookFacts` gathers the facts from dnd5e.
  */
-import { SPELL_PINS, pinView, sectionFold } from './lists.js';
+import { arrangeSections, SPELL_PINS, pinView, sectionFold } from './lists.js';
 
 /** The columns a player can show or hide. The prepare mark always shows; it isn't a column choice. */
 export const SPELL_COLUMNS = ['components', 'concentration', 'time', 'range', 'school', 'target', 'favorite'];
@@ -32,6 +32,8 @@ const METHOD_RANK = { spell: 10, pact: 30, ritual: 40, innate: 50, atwill: 60, i
 export function sectionRank(method, level)
 {
    if (method === 'spell') { return level ? METHOD_RANK.spell + level : 0; }
+   // A category of the player's own comes after dnd5e's sections until the player moves it (SCOPE §4.13).
+   if (method === 'custom') { return 1000; }
    return METHOD_RANK[method] ?? 80;
 }
 
@@ -135,7 +137,7 @@ export function spellbookView(facts, { format, localize })
    };
 
    const anyUses = (facts.sections ?? []).some((s) => s.items.some((i) => i.uses?.max));
-   const sections = [...facts.sections]
+   const sections = arrangeSections([...facts.sections]
       .filter((s) => s.items.length)
       .sort((a, b) => sectionRank(a.method, a.level) - sectionRank(b.method, b.level))
       .map((s) =>
@@ -163,7 +165,7 @@ export function spellbookView(facts, { format, localize })
             showUses: anyUses,
             items: s.items.map(row)
          };
-      });
+      }), facts.order, { tab: 'spells', editing: !!facts.editing, format });
 
    const conc = facts.concentration ?? { spells: [], save: 0 };
    return {

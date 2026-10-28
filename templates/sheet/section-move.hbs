@@ -1,0 +1,7 @@
+{{!-- A section's place (SCOPE §4.13, user 2026-10-28): up and down arrows in edit mode, each off at its end. --}}
+<span class="fhcs-section-move">
+   <button type="button" class="fhcs-toggle" data-action="fhcsMoveSection" data-tab="{{ move.tab }}" data-section="{{ id }}" data-delta="-1"
+           aria-label="{{ move.upLabel }}" data-fhcs-tip="{{ move.upLabel }}"{{#unless move.up}} disabled{{/unless}}><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>
+   <button type="button" class="fhcs-toggle" data-action="fhcsMoveSection" data-tab="{{ move.tab }}" data-section="{{ id }}" data-delta="1"
+           aria-label="{{ move.downLabel }}" data-fhcs-tip="{{ move.downLabel }}"{{#unless move.down}} disabled{{/unless}}><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+</span>

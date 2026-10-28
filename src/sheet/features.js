@@ -2,7 +2,7 @@
  * The Features tab's display values (SCOPE §4.8), from plain facts. Pure, like inventory.js: the unit check and the
  * layout fixtures use the same code. `compat.featuresFacts` gathers the facts from dnd5e.
  */
-import { FEATURE_PINS, pinView, sectionFold } from './lists.js';
+import { arrangeSections, FEATURE_PINS, pinView, sectionFold } from './lists.js';
 
 /** The columns a player can show or hide, as on the other list tabs. */
 export const FEATURE_COLUMNS = ['uses', 'usage', 'recovery', 'favorite'];
@@ -70,11 +70,12 @@ export function featuresView(facts, { format, localize })
    const ours = (facts.sections ?? []).filter((s) => s.group === grouping);
    // A row whose group has no section (a class removed since) goes to Other, in its place, so nothing disappears.
    const home = (r) => (ours.some((s) => s.value === r[grouping]) ? r[grouping] : 'other');
-   const sections = (facts.sections ?? []).map((s) =>
+   // In the player's order (SCOPE §4.13): each grouping's sections keep their own order, as hidden ones aren't counted.
+   const sections = arrangeSections((facts.sections ?? []).map((s) =>
    {
       const items = s.group === grouping ? rows.filter((r) => home(r) === s.value) : [];
       return { id: s.id, label: s.label, group: s.group, value: s.value, items, hidden: !items.length, fold: sectionFold('features', s.id, facts.folded) };
-   });
+   }), facts.order, { tab: 'features', editing: !!facts.editing, format });
 
    return {
       sections,

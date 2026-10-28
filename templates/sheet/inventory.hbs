@@ -20,7 +20,7 @@
                {{#if ../columns.equipped}}<span class="fhcs-muted fhcs-col-toggle" role="img" aria-label="{{ ../text.head.equipped }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span>{{/if}}
                {{#if ../columns.attuned}}<span class="fhcs-muted fhcs-col-toggle" role="img" aria-label="{{ ../text.head.attuned }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.4 6.1L21 12l-6.6 2.9L12 21l-2.4-6.1L3 12l6.6-2.9z"/></svg></span>{{/if}}
                {{#if ../columns.favorite}}<span class="fhcs-muted fhcs-col-toggle" role="img" aria-label="{{ ../text.head.favorite }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>{{/if}}
-               {{#if ../editing}}<span class="fhcs-col-edit" aria-hidden="true"></span>{{/if}}
+               {{#if ../editing}}<span class="fhcs-col-edit">{{#if move}}{{> "modules/fhcs/templates/sheet/section-move.hbs" }}{{/if}}</span>{{/if}}
             </div>
             <ol class="item-list fhcs-item-list">
                {{#each items}}{{> "modules/fhcs/templates/sheet/item-row.hbs" }}{{/each}}

@@ -15,7 +15,7 @@ import { featureColumnChoice, featuresView, groupingOf } from '../src/sheet/feat
 import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js';
 import { effectsView } from '../src/sheet/effects.js';
 import { biographyView, paragraphs } from '../src/sheet/biography.js';
-import { pinView } from '../src/sheet/lists.js';
+import { arrangeSections, categoryId, pinView } from '../src/sheet/lists.js';
 import { comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, levelOrder, levelTrack, portraitFrame, signed, tabRow, themePicker } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
@@ -246,6 +246,17 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
 {
    const got = [600, 650, 657, 700, 709, 731, 733, 812, 850, 1030].map((w) => comfortWidth(w, 644)).join(' ');
    if (got !== '644 644 657 700 720 720 733 800 850 1024') { problems.push(`comfort widths: ${got}`); }
+}
+
+// Categories and their order (SCOPE §4.13): one ID per name whatever its case and spacing; the saved order first, the
+// rest after in their own order; arrows off at the ends, hidden sections passed over; none in play.
+{
+   if (categoryId('  Ritual   Kit ') !== 'custom-ritual-kit' || categoryId('') !== '') { problems.push(`category ids: ${categoryId('  Ritual   Kit ')}`); }
+   const s = (id, hidden = false) => ({ id, label: id, hidden });
+   const arranged = arrangeSections([s('a'), s('b'), s('h', true), s('c')], ['c', 'a'], { tab: 't', editing: true, format });
+   const got = arranged.map((x) => `${x.id}${x.move.up ? '^' : ''}${x.move.down ? 'v' : ''}`).join(' ');
+   if (got !== 'cv a^v b^ h') { problems.push(`section order and arrows: ${got}`); }
+   if (arrangeSections([s('a')], [], { tab: 't', editing: false, format })[0].move !== null) { problems.push('section arrows show in play'); }
 }
 
 // Inspiration (SCOPE §4.12): one star without a bank; a star per use with one, any place filled or empty as stored

@@ -6,7 +6,8 @@
 import { countingDie, MAX_PER_SIDE, modeForSides } from './chat/d20.js';
 import { diceMath } from './chat/math.js';
 import { canCast, spellKind } from './sheet/spellbook.js';
-import { APPLIED_FLAG, INSPIRATION_FLAG, INSPIRATION_SLOTS_FLAG, MODULE_ID, PORTRAIT_FLAG, RESOURCES_FLAG, SHAPE_FLAG } from './constants.js';
+import { categoryId } from './sheet/lists.js';
+import { APPLIED_FLAG, CATEGORY_FLAG, INSPIRATION_FLAG, SECTION_ORDER_FLAG, INSPIRATION_SLOTS_FLAG, MODULE_ID, PORTRAIT_FLAG, RESOURCES_FLAG, SHAPE_FLAG } from './constants.js';
 
 /** dnd5e's own character sheet, which ours extends so every mechanic keeps working. Set by dnd5e before init. */
 export function systemCharacterSheet()
@@ -343,9 +344,13 @@ export async function inventoryFacts(sheet, context, { columns, openContainers }
    // dnd5e keeps containers out of the character's inventory list (they head its tab); here they are rows too.
    const items = [...(context.itemCategories?.inventory ?? []), ...(context.containers ?? [])]
       .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
+   // An item with a category of the player's own goes to that category's section (SCOPE §4.13), after the types'.
+   const custom = new Map();
    for (const item of items)
    {
-      (sections.find((s) => s.type === item.type) ?? other).items.push(await rowFacts(sheet, item, ctxs[item.id] ?? {}));
+      const category = itemCategory(item);
+      const home = category ? customSection(custom, category, () => ({ type: null })) : sections.find((s) => s.type === item.type) ?? other;
+      home.items.push(await rowFacts(sheet, item, ctxs[item.id] ?? {}));
    }
 
    const encumbrance = game.settings.get('dnd5e', 'encumbrance') === 'none' ? null : (() =>
@@ -356,7 +361,7 @@ export async function inventoryFacts(sheet, context, { columns, openContainers }
    })();
    const controls = context.listControls ?? {};
    return {
-      sections: [...sections, other],
+      sections: [...sections, ...custom.values(), other],
       columns,
       openContainers,
       editing: sheet.isEditMode,
@@ -489,6 +494,8 @@ export async function spellbookFacts(sheet, context, { columns })
    const ctxs = context.itemContext ?? {};
 
    const sections = [];
+   // A spell with a category of the player's own goes to that category's section, after dnd5e's (SCOPE §4.13).
+   const custom = new Map();
    for (const section of Object.values(context.spellbook ?? {}))
    {
       const level = section.dataset?.level ?? null;
@@ -496,9 +503,11 @@ export async function spellbookFacts(sheet, context, { columns })
       const items = [];
       for (const item of [...section.items].sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)))
       {
+         const category = itemCategory(item);
+         const home = category ? customSection(custom, category, () => ({ method: 'custom', level: null, slots: null })).items : items;
          const ctx = ctxs[item.id] ?? {};
          const facts = spellFacts(actor, item);
-         items.push({
+         home.push({
             ...facts,
             id: item.id,
             uuid: item.uuid,
@@ -532,6 +541,7 @@ export async function spellbookFacts(sheet, context, { columns })
          items
       });
    }
+   sections.push(...custom.values());
 
    const concentration = { save: actor.system.attributes?.concentration?.save ?? 0, spells: [] };
    for (const effect of actor.concentration?.effects ?? [])
@@ -749,6 +759,81 @@ export async function linkInspiration(actor, itemId)
    return syncInspiration(actor, item.system.uses.value ?? 0);
 }
 
+/* ---------- Categories of the player's own, and the sections' order (SCOPE §4.13, user 2026-10-28) ---------- */
+
+/**
+ * An item's category: ours (`flags.fhcs.section`), else modern Tidy's (`flags.tidy5e-sheet.section`, read straight
+ * from the flags), so a character keeps its sections across sheets. Ours set to '' means none, over Tidy's.
+ * @returns {string} The name, or '' for the item's usual place.
+ */
+export function itemCategory(item)
+{
+   const own = item?.flags?.[MODULE_ID]?.[CATEGORY_FLAG];
+   const tidy = item?.flags?.['tidy5e-sheet']?.section;
+   return String((typeof own === 'string' ? own : typeof tidy === 'string' ? tidy : '') ?? '').trim();
+}
+
+/** Files an item under a category, or back in its usual place (an empty name). */
+export function setItemCategory(item, name)
+{
+   return item.update({ [`flags.${MODULE_ID}.${CATEGORY_FLAG}`]: String(name ?? '').trim() });
+}
+
+/** @returns {string[]} The categories in use on an actor, by name. */
+export function actorCategories(actor)
+{
+   return [...new Set(actor.items.map(itemCategory).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+}
+
+/** A category's section in the map, made on first use with what the tab needs (`extra`). */
+function customSection(map, name, extra)
+{
+   const id = categoryId(name);
+   if (!map.has(id)) { map.set(id, { id, label: name, custom: true, items: [], ...extra() }); }
+   return map.get(id);
+}
+
+/** @returns {string[]} The player's order of a tab's sections, by ID (`flags.fhcs.sectionOrder`). */
+export function sectionOrder(actor, tab)
+{
+   return actor.getFlag(MODULE_ID, SECTION_ORDER_FLAG)?.[tab] ?? [];
+}
+
+/** Saves a tab's section order. */
+export function saveSectionOrder(actor, tab, ids)
+{
+   return actor.setFlag(MODULE_ID, `${SECTION_ORDER_FLAG}.${tab}`, ids);
+}
+
+/** Asks for an item's category, offering those in use, and files it (dnd5e's item context menu, "Category…"). */
+export async function chooseItemCategory(item)
+{
+   const esc = (text) => foundry.utils.escapeHTML(text);
+   const names = item.actor ? actorCategories(item.actor) : [];
+   const listId = `fhcs-categories-${item.id}`;
+   const content = `<div class="form-group"><label for="fhcs-category-${item.id}">${esc(game.i18n.localize('FHCS.Category.Field'))}</label>`
+      + `<input type="text" id="fhcs-category-${item.id}" name="category" list="${listId}" value="${esc(itemCategory(item))}">`
+      + `<datalist id="${listId}">${names.map((n) => `<option value="${esc(n)}"></option>`).join('')}</datalist></div>`
+      + `<p class="hint">${esc(game.i18n.localize('FHCS.Category.Hint'))}</p>`;
+   const name = await foundry.applications.api.DialogV2.prompt({
+      window: { title: game.i18n.localize('FHCS.Category.Title') },
+      content,
+      ok: { label: game.i18n.localize('FHCS.Category.Save'), callback: (event, button) => button.form.elements.category.value },
+      rejectClose: false
+   });
+   return name === null || name === undefined ? null : setItemCategory(item, name);
+}
+
+/** Adds "Category…" to dnd5e's item context menu (inventory.mjs:636), for an owned item on an actor. */
+export function watchItemCategories()
+{
+   Hooks.on('dnd5e.getItemContextOptions', (item, options) =>
+   {
+      if (!item?.actor || !item.isOwner) { return; }
+      options.push({ label: 'FHCS.Category.Menu', icon: 'fa-solid fa-folder', onClick: () => chooseItemCategory(item) });
+   });
+}
+
 /** @returns {{id, uuid, name, img}} What our cards need of an item. */
 const docFacts = (item) => ({ id: item.id, uuid: item.uuid, name: item.name, img: item.img });
 
@@ -870,14 +955,19 @@ export async function featuresFacts(sheet, context, { columns })
    const features = [];
    const items = [...(context.itemCategories?.features ?? []), ...(context.subclasses ?? [])]
       .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
+   // A feature with a category of the player's own (SCOPE §4.13) has that category's section in both groupings: its
+   // row's two groups both name it, so dnd5e's grouping switch keeps it there.
+   const custom = new Map();
    for (const item of items)
    {
       const ctx = ctxs[item.id] ?? {};
       const uses = ctx.uses ?? {};
+      const category = itemCategory(item);
+      const own = category ? customSection(custom, category, () => ({})).id : '';
       features.push({
          ...docFacts(item),
-         origin: ctx.groups?.origin ?? 'other',
-         activation: ctx.groups?.activation ?? 'passive',
+         origin: own || (ctx.groups?.origin ?? 'other'),
+         activation: own || (ctx.groups?.activation ?? 'passive'),
          expanded: !!ctx.isExpanded,
          summary: ctx.isExpanded && ctx.expanded ? await renderTemplate(ITEM_SUMMARY, ctx.expanded) : '',
          uses: uses.hasUses && !uses.hasRecharge ? { value: uses.value ?? 0, max: uses.max, prop: uses.prop } : null,
@@ -888,6 +978,10 @@ export async function featuresFacts(sheet, context, { columns })
       });
    }
 
+   for (const { id, label } of custom.values())
+   {
+      sections.push({ id: `${id}:origin`, label, group: 'origin', value: id }, { id: `${id}:activation`, label, group: 'activation', value: id });
+   }
    const controls = context.listControls ?? {};
    return {
       sections,

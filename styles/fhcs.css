@@ -2519,6 +2519,10 @@
 .fhcs-sheet .fhcs-col-quantity { flex: none; width: 44px; text-align: center; }
 .fhcs-sheet .fhcs-col-toggle { flex: none; display: flex; justify-content: center; width: var(--fhcs-control); }
 .fhcs-sheet .fhcs-col-edit { flex: none; display: flex; gap: var(--fhcs-s1); width: calc(var(--fhcs-control) * 2 + var(--fhcs-s1)); }
+/* A section's arrows (SCOPE §4.13): in the heading's edit column, or at a favorites group's right end; 24px targets. */
+.fhcs-sheet .fhcs-section-move { display: flex; flex: none; align-items: center; justify-content: flex-end; gap: var(--fhcs-s1); }
+.fhcs-sheet .fhcs-section-move > .fhcs-toggle { flex: none; width: 24px; height: 24px; }
+.fhcs-sheet .fhcs-section-move > .fhcs-toggle:disabled { cursor: default; }
 .fhcs-sheet .fhcs-item-head .fhcs-col-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* A section's fold (user, 2026-10-28, SCOPE §4.10): the caret sits in the picture column, so names stay lined up with
@@ -3381,3 +3385,6 @@
 
 /* Play mode keeps the Columns menu's place (it's edit mode's), so the search field keeps one width (rule 6). */
 .fhcs-sheet .fhcs-columns-space { flex: none; visibility: hidden; }
+
+/* A heading's toggle cells are one height in both modes, empty or holding edit mode's gear (rule 6). */
+.fhcs-sheet .fhcs-item-head > .fhcs-col-toggle { display: flex; align-items: center; justify-content: center; min-height: 24px; }

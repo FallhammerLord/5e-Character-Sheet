@@ -16,7 +16,7 @@
                {{#if ../columns.usage}}<span class="fhcs-label fhcs-muted fhcs-col-usage">{{ ../text.head.usage }}</span>{{/if}}
                {{#if ../columns.recovery}}<span class="fhcs-label fhcs-muted fhcs-col-recovery">{{ ../text.head.recovery }}</span>{{/if}}
                {{#if ../columns.favorite}}<span class="fhcs-muted fhcs-col-toggle" role="img" aria-label="{{ ../text.head.favorite }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>{{/if}}
-               {{#if ../editing}}<span class="fhcs-col-edit"></span>{{/if}}
+               {{#if ../editing}}<span class="fhcs-col-edit">{{#if move}}{{> "modules/fhcs/templates/sheet/section-move.hbs" }}{{/if}}</span>{{/if}}
             </div>
             <ol class="item-list fhcs-item-list">
                {{#each items}}{{> "modules/fhcs/templates/sheet/feature-row.hbs" }}{{/each}}

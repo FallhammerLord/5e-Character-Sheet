@@ -1,6 +1,6 @@
 import { MODULE_ID } from './constants.js';
 import { extendChatModel, preloadTemplates, quietPosts, recordLevelOrder, registerCharacterSheet,
-   systemCharacterSheet, watchApplications } from './compat.js';
+   systemCharacterSheet, watchApplications, watchItemCategories } from './compat.js';
 import { levelOrder } from './sheet/header.js';
 import { keepStable } from './sheet/death.js';
 import { makeCharacterSheet } from './apps/CharacterSheet.js';
@@ -41,6 +41,8 @@ Hooks.once('ready', () =>
 {
    quietPosts(isFolded);
    watchApplications();
+   // "Category…" on dnd5e's item context menu (SCOPE §4.13).
+   watchItemCategories();
 });
 Hooks.on('updateChatMessage', refreshOnRollChange);
 // Roll on use and no roll dialogs (world settings).

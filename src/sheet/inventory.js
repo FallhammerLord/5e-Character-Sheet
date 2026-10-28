@@ -2,7 +2,7 @@
  * The Inventory tab's display values (SCOPE §4.6), from plain facts. Pure, like attributes.js: the unit check and the
  * layout fixtures use the same code. `compat.inventoryFacts` gathers the facts from dnd5e.
  */
-import { INVENTORY_PINS, pinView, sectionFold } from './lists.js';
+import { arrangeSections, INVENTORY_PINS, pinView, sectionFold } from './lists.js';
 
 /** The columns a player can show or hide, in Classic's order (user, 2026-10-26). */
 export const INVENTORY_COLUMNS = ['weight', 'uses', 'usage', 'quantity', 'equipped', 'attuned', 'favorite'];
@@ -82,9 +82,11 @@ export function inventoryView(facts, { format, localize })
       };
    };
 
-   const sections = facts.sections
+   // In the player's order, with edit mode's arrows (SCOPE §4.13).
+   const sections = arrangeSections(facts.sections
       .filter((s) => s.items.length)
-      .map((s) => ({ id: s.id, label: s.label, count: s.items.length, items: s.items.map(row), fold: sectionFold('inventory', s.id, facts.folded) }));
+      .map((s) => ({ id: s.id, label: s.label, count: s.items.length, items: s.items.map(row), fold: sectionFold('inventory', s.id, facts.folded) })),
+   facts.order, { tab: 'inventory', editing: !!facts.editing, format });
 
    const enc = facts.encumbrance;
    const encumbrance = enc ? {

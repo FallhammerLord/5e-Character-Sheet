@@ -3,6 +3,7 @@
  * layout fixtures use the same code. `compat.attributesFacts` gathers the facts from dnd5e.
  */
 import { signed } from './header.js';
+import { arrangeSections } from './lists.js';
 
 /** Favorite groups in Classic's order; spell levels sit between features and effects. */
 const GROUP_ORDER = ['inventory', 'features', 'spell', 'effects', 'skills', 'other'];
@@ -71,7 +72,8 @@ export function attributesView(facts, { format, localize })
       if (!groups.has(key)) { groups.set(key, []); }
       groups.get(key).push(row);
    }
-   const favorites = [...groups.entries()]
+   // In the player's order, with edit mode's arrows (SCOPE §4.13); a group's key is its section ID.
+   const favorites = arrangeSections([...groups.entries()]
       .sort(([a], [b]) => groupRank(a) - groupRank(b))
       .map(([key, rows]) =>
       {
@@ -79,6 +81,7 @@ export function attributesView(facts, { format, localize })
          const slot = level ? facts.slots[level] : null;
          return {
             key,
+            id: key,
             label: level === null ? localize(`FHCS.Attributes.Group.${key}`)
                : level === 0 ? localize('FHCS.Attributes.Group.cantrips') : format('FHCS.Attributes.Group.spellLevel', { level }),
             open: !facts.folded.includes(key),
@@ -103,7 +106,7 @@ export function attributesView(facts, { format, localize })
                detailsLabel: format('FHCS.Inventory.DetailsLabel', { name: r.title })
             }))
          };
-      });
+      }), facts.order, { tab: 'favorites', editing: !!facts.editing, format });
 
    return {
       skills,

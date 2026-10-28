@@ -2,7 +2,7 @@
  * The Effects tab's display values (SCOPE §4.8), from plain facts. Pure, like features.js: the unit check and the
  * layout fixtures use the same code. `compat.effectsFacts` gathers the facts from dnd5e.
  */
-import { sectionFold } from './lists.js';
+import { arrangeSections, sectionFold } from './lists.js';
 
 /**
  * Everything the Effects tab shows.
@@ -37,9 +37,10 @@ export function effectsView(facts, { format, localize })
       deleteLabel: format('FHCS.Inventory.DeleteLabel', { name: e.name })
    });
 
-   const sections = (facts.categories ?? [])
+   const sections = arrangeSections((facts.categories ?? [])
       .filter((c) => c.effects.length)
-      .map((c) => ({ id: c.id, label: c.label, count: c.effects.length, items: c.effects.map(row), fold: sectionFold('effects', c.id, facts.folded) }));
+      .map((c) => ({ id: c.id, label: c.label, count: c.effects.length, items: c.effects.map(row), fold: sectionFold('effects', c.id, facts.folded) })),
+   facts.order, { tab: 'effects', editing: !!facts.editing, format });
 
    const conditions = (facts.conditions ?? []).map((c) =>
    {
