@@ -288,8 +288,10 @@ export function delayTips(element)
       target.addEventListener('pointerenter', () =>
       {
          cancel();
-         // A card redrawn meanwhile has replaced this button; show nothing then.
-         timer = setTimeout(() => { if (target.isConnected) { showTooltip(target, target.dataset.fhcsTip); } }, TIP_DELAY_MS);
+         // A card redrawn meanwhile has replaced this button; show nothing then. A tip marked `data-fhcs-tip-cut` (a
+         // long name, user 2026-10-28) shows only while its text is cut short.
+         const cut = () => !target.hasAttribute('data-fhcs-tip-cut') || target.scrollWidth > target.clientWidth;
+         timer = setTimeout(() => { if (target.isConnected && cut()) { showTooltip(target, target.dataset.fhcsTip); } }, TIP_DELAY_MS);
       });
       target.addEventListener('pointerleave', () => { cancel(); hideTooltip(); });
       target.addEventListener('pointerdown', () => { cancel(); hideTooltip(); });

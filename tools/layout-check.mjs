@@ -193,6 +193,20 @@ function findProblems()
          if (new Set(tops).size > 1) { issues.push(`portrait chips stacked, not side by side: ${named(group)}`); }
       }
    }
+   // 16, the name row's status group (user, 2026-10-28): its segments are one height, touch with no gap, and an
+   // icon-only segment is square.
+   for (const group of app.querySelectorAll('.window-content .fhcs-status'))
+   {
+      const parts = [...group.children].filter(shown).map((el) => el.matches('details') ? el.querySelector(':scope > summary') : el);
+      const boxes = parts.map((el) => el.getBoundingClientRect());
+      for (const [n, r] of boxes.entries())
+      {
+         const el = parts[n];
+         if (Math.abs(r.height - boxes[0].height) > 1) { issues.push(`status segment ${Math.round(r.height)}px tall, the first ${Math.round(boxes[0].height)}px: ${named(el)}`); }
+         if (!(el.textContent || '').trim() && Math.abs(r.width - r.height) > 1) { issues.push(`icon-only status segment ${Math.round(r.width)}×${Math.round(r.height)}: ${named(el)}`); }
+         if (n && r.left - boxes[n - 1].right > 1.5) { issues.push(`status segments ${Math.round(r.left - boxes[n - 1].right)}px apart: ${named(el)}`); }
+      }
+   }
    // 17: one text size inside one control ("HP" once sat smaller than its value). A row drawn as one button (a skill)
    // is a table row: its columns follow their own styles.
    // The sheet only: the chat cards' bands (a heading over its total) were settled in Phase 2.

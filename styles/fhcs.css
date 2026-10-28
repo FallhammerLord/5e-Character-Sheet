@@ -1152,8 +1152,20 @@
    background: var(--fhcs-surface);
 }
 
-/* Short and Long rest side by side at the stage's bottom left. */
-.fhcs-sheet .fhcs-rests { display: flex; gap: var(--fhcs-s1); }
+/* The status group at the name row's right (user, 2026-10-28): exhaustion, Short rest, Long rest, hit dice joined into
+   one bar, a 1px divider between, rounded at its ends only. Exhaustion's tray hangs from the bar's right edge, so it
+   never runs past the window. */
+.fhcs-sheet .fhcs-status { position: relative; display: flex; flex: none; align-items: stretch; height: var(--fhcs-control); }
+.fhcs-sheet .fhcs-status > * { flex: none; }
+.fhcs-sheet .fhcs-status > details { position: static; display: flex; }
+.fhcs-sheet .fhcs-status > :is(.fhcs-chip, details > summary) { border: 0; border-radius: 0; }
+.fhcs-sheet .fhcs-status > * + * { border-left: 1px solid var(--fhcs-die-on-ink); }
+.fhcs-sheet .fhcs-status > :first-child, .fhcs-sheet .fhcs-status > :first-child > summary { border-radius: var(--fhcs-radius) 0 0 var(--fhcs-radius); }
+.fhcs-sheet .fhcs-status > :last-child { border-radius: 0 var(--fhcs-radius) var(--fhcs-radius) 0; }
+.fhcs-sheet .fhcs-status .fhcs-tray { left: auto; right: 0; }
+/* Exhaustion 0 in the bar: a ring on the bar's ink. */
+.fhcs-sheet .fhcs-status .fhcs-exhaustion-dot { background: var(--fhcs-die-ink); color: var(--fhcs-die-on-ink); }
+.fhcs-sheet .fhcs-status .fhcs-exhaustion-dot::before { justify-self: center; margin-left: 0; border-color: currentColor; background: transparent; }
 
 /* Exhaustion 0: a small dot; resting on it 1.5 s (like tips), focusing it or opening it shows the chip. Dot and chip
    share one grid cell, so the target is the chip's size and nothing hangs outside it. */

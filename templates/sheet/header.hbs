@@ -21,24 +21,7 @@
          </div>
 
          <div class="fhcs-portrait-stage">
-            {{!-- Corner chips. At exhaustion 0 the chip hides behind a dot until hovered (user, 2026-10-27). --}}
-            <details class="fhcs-fold fhcs-corner-tl" data-fold-key="exhaustion">
-               {{#if exhaustion.none}}
-               <summary class="fhcs-exhaustion-dot" aria-label="{{ text.exhaustionShow }}">
-                  <span class="fhcs-chip fhcs-label fhcs-dot-chip" aria-hidden="true"><svg class="fhcs-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 15h8M8.5 9.5h2M13.5 9.5h2"/></svg>0</span>
-               </summary>
-               {{else}}
-               <summary class="fhcs-chip fhcs-label" aria-label="{{ exhaustion.label }}" data-fhcs-tip="{{ exhaustion.label }}">
-                  <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 15h8M8.5 9.5h2M13.5 9.5h2"/></svg>{{ exhaustion.value }}
-               </summary>
-               {{/if}}
-               <div class="fhcs-tray fhcs-tray-row" data-prop="system.attributes.exhaustion">
-                  {{#each exhaustion.pips}}
-                  <button type="button" class="fhcs-chip fhcs-label{{#if filled}} fhcs-on{{/if}}" data-action="togglePip" data-n="{{ n }}"
-                          aria-pressed="{{#if filled}}true{{else}}false{{/if}}" aria-label="{{ label }}">{{ n }}</button>
-                  {{/each}}
-               </div>
-            </details>
+            {{!-- Inspiration on the art (user, 2026-10-28); exhaustion, rests and hit dice are in the name row. --}}
 
             <button type="button" class="fhcs-chip fhcs-corner-tr{{#if inspiration}} fhcs-on{{/if}}" data-action="toggleInspiration"
                     aria-pressed="{{#if inspiration}}true{{else}}false{{/if}}" aria-label="{{ text.inspiration }}"
@@ -46,27 +29,6 @@
                <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>
             </button>
 
-            {{#if rests.length}}
-            {{!-- One chip per rest, one click into dnd5e's rest dialog (user, 2026-10-27). --}}
-            <div class="fhcs-rests fhcs-corner-bl">
-               {{#each rests}}
-               <button type="button" class="fhcs-chip" data-action="rest" data-type="{{ key }}" aria-label="{{ label }}" data-fhcs-tip="{{ label }}">
-                  {{#if short}}
-                  <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3v3M11 3v3"/></svg>
-                  {{else}}
-                  <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18V8M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.6"/></svg>
-                  {{/if}}
-               </button>
-               {{/each}}
-            </div>
-            {{/if}}
-
-            {{#if @root.editable}}
-            <button type="button" class="fhcs-chip fhcs-label fhcs-corner-br" data-action="showConfiguration" data-config="hitDice"
-                    aria-label="{{ text.hdConfig }}" data-fhcs-tip="{{ text.hdConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}{{ hd.text }}</button>
-            {{else}}
-            <span class="fhcs-chip fhcs-chip-static fhcs-label fhcs-corner-br" role="img" aria-label="{{ hd.label }}">{{ hd.text }}</span>
-            {{/if}}
 
             {{#if @root.editable}}
             {{!-- Edit mode: one gear chip opens the portrait's options (user, 2026-10-27: five chips crowded the top row):
@@ -197,8 +159,48 @@
          {{!-- Edit mode: the name is a field (SCOPE §4.9). --}}
          <input type="text" class="fhcs-input fhcs-display fhcs-name fhcs-name-input" name="name" value="{{ nameSource }}" aria-label="{{ text.name }}">
          {{else}}
-         <span class="fhcs-display fhcs-name">{{ name }}</span>
+         {{!-- The whole name on rest, when the row cuts it short (user, 2026-10-28). --}}
+         <span class="fhcs-display fhcs-name" data-fhcs-tip="{{ name }}" data-fhcs-tip-cut>{{ name }}</span>
          {{/if}}
+         {{!-- One joined group at the name row's right (user, 2026-10-28, moved off the portrait so the art shows):
+               exhaustion (a dot at 0, shown on rest), Short and Long rest (one click each into dnd5e's rest dialog), and
+               hit dice ("HD 12"; in edit mode a gear and dnd5e's hit dice window). --}}
+         <div class="fhcs-status">
+            <details class="fhcs-fold fhcs-status-exhaustion" data-fold-key="exhaustion">
+               {{#if exhaustion.none}}
+               <summary class="fhcs-exhaustion-dot" aria-label="{{ text.exhaustionShow }}">
+                  <span class="fhcs-chip fhcs-label fhcs-dot-chip" aria-hidden="true"><svg class="fhcs-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 15h8M8.5 9.5h2M13.5 9.5h2"/></svg>0</span>
+               </summary>
+               {{else}}
+               <summary class="fhcs-chip fhcs-label" aria-label="{{ exhaustion.label }}" data-fhcs-tip="{{ exhaustion.label }}">
+                  <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 15h8M8.5 9.5h2M13.5 9.5h2"/></svg>{{ exhaustion.value }}
+               </summary>
+               {{/if}}
+               <div class="fhcs-tray fhcs-tray-row" data-prop="system.attributes.exhaustion">
+                  {{#each exhaustion.pips}}
+                  <button type="button" class="fhcs-chip fhcs-label{{#if filled}} fhcs-on{{/if}}" data-action="togglePip" data-n="{{ n }}"
+                          aria-pressed="{{#if filled}}true{{else}}false{{/if}}" aria-label="{{ label }}">{{ n }}</button>
+                  {{/each}}
+               </div>
+            </details>
+            {{#if rests.length}}
+            {{#each rests}}
+               <button type="button" class="fhcs-chip" data-action="rest" data-type="{{ key }}" aria-label="{{ label }}" data-fhcs-tip="{{ label }}">
+                  {{#if short}}
+                  <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3v3M11 3v3"/></svg>
+                  {{else}}
+                  <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18V8M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.6"/></svg>
+                  {{/if}}
+               </button>
+               {{/each}}
+            {{/if}}
+            {{#if @root.editable}}
+            <button type="button" class="fhcs-chip fhcs-label" data-action="showConfiguration" data-config="hitDice"
+                    aria-label="{{ text.hdConfig }}" data-fhcs-tip="{{ text.hdConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}{{ hd.text }}</button>
+            {{else}}
+            <span class="fhcs-chip fhcs-chip-static fhcs-label" role="img" aria-label="{{ hd.label }}">{{ hd.text }}</span>
+            {{/if}}
+         </div>
       </div>
       <div class="fhcs-header-row">
          <span class="fhcs-origin-speed">
