@@ -839,6 +839,25 @@ export function registerQuenchTests(quench)
             }
          });
 
+         it('opens a row\'s sheet on a middle click', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 4);
+            const [lamp] = await createItems([{ name: 'FHCS test lamp', type: 'loot' }]);
+            try
+            {
+               await click('.fhcs-tabs [data-tab="inventory"]');
+               await settled();
+               const row = find(`.fhcs-inventory [data-item-id="${lamp.id}"]`);
+               row.dispatchEvent(new MouseEvent('auxclick', { button: 1, bubbles: true, cancelable: true })); // redraw-safe: found after settled(), sent at once
+               await until(() => lamp.sheet?.rendered, () => `the middle click opens the item's sheet; rendered ${lamp.sheet?.rendered}`);
+            }
+            finally
+            {
+               await lamp.sheet?.close();
+               await lamp.delete();
+            }
+         });
+
          it('rolls a hit die from the HD chip in play mode', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 4);

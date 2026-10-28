@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES } from '../constants.js';
-import { attributesFacts, biographyFacts, changeHp, rollHitDie, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, renderTemplate, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
@@ -368,6 +368,28 @@ function rollHitDieAction(event)
    return rollHitDie(this.actor, event);
 }
 
+/**
+ * A middle click on a row opens its sheet (user, 2026-10-28: "middle click to open its item/feature/spell/etc
+ * sheets"): items, effects, and anything with a UUID (the header's class, species and background cards). The middle
+ * button's press is held back on a row, so the browser's autoscroll doesn't start. Bound once per window.
+ */
+function middleClickOpens(element, actor)
+{
+   if (element.dataset.fhcsMiddle) { return; }
+   element.dataset.fhcsMiddle = 'on';
+   const row = (event) => (event.button === 1 && !event.target.closest('input, textarea, select, prose-mirror')
+      ? event.target.closest('.window-content [data-item-id], .window-content [data-effect-id], .window-content [data-uuid]') : null);
+   element.addEventListener('mousedown', (event) => { if (row(event)) { event.preventDefault(); } });
+   element.addEventListener('auxclick', (event) =>
+   {
+      const target = row(event);
+      const doc = target ? rowDocument(actor, target) : null;
+      if (!doc?.sheet) { return; }
+      event.preventDefault();
+      doc.sheet.render({ force: true });
+   });
+}
+
 /** A resource panel's − and + (user, 2026-10-28). */
 function stepResourceAction(event, target)
 {
@@ -699,6 +721,7 @@ export function makeCharacterSheet(Base)
          themeState(this.element, this.actor);
          inspirationMoment(this.element);
          followPointer(this.element);
+         middleClickOpens(this.element, this.actor);
          // Special Traits is a settings page: locking the sheet leaves it for Attributes.
          if (!this.isEditMode && this.tabGroups.primary === 'specialTraits') { this.changeTab('details', 'primary'); }
          await drawThemePicker(this);

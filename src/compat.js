@@ -647,6 +647,20 @@ export function setResourceUses(actor, key, value)
    return item.update({ 'system.uses.spent': max - Math.clamp(Math.round(value), 0, max) });
 }
 
+/**
+ * The document a row stands for, by the marks dnd5e's rows carry: an item (`data-item-id`), an effect
+ * (`data-effect-id`, on an item when `data-parent-id` names one), or anything with a UUID (`data-uuid`).
+ * @param {Actor} actor
+ * @param {HTMLElement} row
+ */
+export function rowDocument(actor, row)
+{
+   const { itemId, effectId, parentId, uuid } = row.dataset;
+   if (itemId) { return actor.items.get(itemId) ?? null; }
+   if (effectId) { return (parentId ? actor.items.get(parentId)?.effects : actor.effects)?.get(effectId) ?? null; }
+   return uuid ? fromUuidSync(uuid, { relative: actor }) ?? null : null;
+}
+
 /** The HD chip in play mode: dnd5e rolls a hit die of its first class with one left, without its dialog (SCOPE §6.4). */
 export function rollHitDie(actor, event)
 {
