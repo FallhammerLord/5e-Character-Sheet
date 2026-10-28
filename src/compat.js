@@ -6,7 +6,7 @@
 import { countingDie, MAX_PER_SIDE, modeForSides } from './chat/d20.js';
 import { diceMath } from './chat/math.js';
 import { canCast, spellKind } from './sheet/spellbook.js';
-import { MODULE_ID, PORTRAIT_FLAG, RESOURCES_FLAG, SHAPE_FLAG } from './constants.js';
+import { APPLIED_FLAG, MODULE_ID, PORTRAIT_FLAG, RESOURCES_FLAG, SHAPE_FLAG } from './constants.js';
 
 /** dnd5e's own character sheet, which ours extends so every mechanic keeps working. Set by dnd5e before init. */
 export function systemCharacterSheet()
@@ -1051,11 +1051,15 @@ export function damageFacts(message)
    if (!rolls.length || !message.isContentVisible) { return null; }
    const types = { ...CONFIG.DND5E.damageTypes, ...CONFIG.DND5E.healingTypes };
    const label = (type) => game.i18n.localize(types[type]?.label ?? '');
+   // Each type's total, split as dnd5e's Apply splits it (aggregate-damage-rolls.mjs): a die flavored "[radiant]" in a
+   // slashing roll counts as radiant (user, 2026-10-28: a sword's radiant read as slashing).
+   const aggregate = globalThis.dnd5e?.dice?.aggregateDamageRolls;
+   const split = aggregate ? aggregate(rolls) : rolls;
    const parts = new Map();
-   for (const roll of rolls)
+   for (const roll of split)
    {
       const type = roll.options.type ?? '';
-      parts.set(type, (parts.get(type) ?? 0) + Math.max(0, roll.total));
+      parts.set(type, (parts.get(type) ?? 0) + Math.max(0, roll.total ?? 0));
    }
    const onSave = message.system?.onSave;
    return {
@@ -1354,4 +1358,94 @@ export function showTooltip(element, text)
 export function hideTooltip()
 {
    game.tooltip?.deactivate?.();
+}
+
+/* ---------- What a card's Apply did (user, 2026-10-28) ---------- */
+
+/** Per message, the writes still running, so entries from one click (one per target) don't overwrite each other. */
+const appliedWrites = new Map();
+
+/** The name a target goes by on the canvas: an unlinked token's own, else the actor's. */
+const targetName = (actor) => actor?.token?.name ?? actor?.name ?? '';
+
+/** The card that shows a roll's record: its usage card, or the roll's own message when it stands alone. */
+const recordCard = (message) => usageOrigin(message) ?? message;
+
+/**
+ * Adds an entry to a card's record. Only the card's owner (its author, or the GM) can write it; a player applying on
+ * someone else's card leaves no line.
+ */
+function recordApplied(message, entry)
+{
+   if (!message?.isOwner) { return null; }
+   const write = (appliedWrites.get(message.id) ?? Promise.resolve())
+      .then(() => message.setFlag(MODULE_ID, APPLIED_FLAG, [...(message.getFlag(MODULE_ID, APPLIED_FLAG) ?? []), entry]))
+      .catch((err) => console.error(`${MODULE_ID} | The card's record of what was applied wasn't saved.`, err));
+   appliedWrites.set(message.id, write);
+   return write;
+}
+
+/**
+ * Keeps a record on the card of what its Apply did (user, 2026-10-28): dnd5e's trays follow the current selection and
+ * forget each application. Checked against dnd5e 6.0.6.
+ *
+ * - Damage and healing: `Actor5e#applyDamage` hands its options to `calculateDamage`, then fires
+ *   `dnd5e.calculateDamage` (each type's value after resistances) and `dnd5e.applyDamage` (the net amount); the
+ *   damage tray passes the damage message as `options.origin` (damage-application.mjs:607). Our HP tray passes none,
+ *   so it leaves no line.
+ * - Effects: the effect tray prepares each effect for each target (`_prepareEffectData`), then creates them in one
+ *   batch (`_onApplyEffects`); the pairs are recorded once the batch succeeds.
+ */
+export function watchApplications()
+{
+   const skip = new Set(['temphp', 'maximum']);
+   Hooks.on('dnd5e.calculateDamage', (actor, damages, options) =>
+   {
+      const parts = new Map();
+      for (const d of damages)
+      {
+         if (!d.type || skip.has(d.type)) { continue; }
+         parts.set(d.type, (parts.get(d.type) ?? 0) + Math.abs(d.value ?? 0));
+      }
+      options.fhcsApplied = { temp: damages.temp ?? 0, parts: [...parts].map(([type, value]) => ({ type, value: Math.trunc(value) })) };
+   });
+   Hooks.on('dnd5e.applyDamage', (actor, amount, options) =>
+   {
+      if (!(options.origin instanceof ChatMessage) || !options.fhcsApplied) { return; }
+      recordApplied(recordCard(options.origin), { kind: 'damage', who: targetName(actor), amount, ...options.fhcsApplied });
+   });
+
+   const Tray = globalThis.customElements?.get('effect-application');
+   const prepare = Tray?.prototype._prepareEffectData;
+   const applyAll = Tray?.prototype._onApplyEffects;
+   if (!prepare || !applyAll)
+   {
+      console.warn(`${MODULE_ID} | dnd5e's effect tray has changed; applied effects aren't recorded on cards.`);
+      return;
+   }
+   Tray.prototype._prepareEffectData = async function (effect, actor)
+   {
+      const result = await prepare.call(this, effect, actor);
+      this.fhcsPending?.push({ kind: 'effect', who: targetName(actor), name: effect.name });
+      return result;
+   };
+   Tray.prototype._onApplyEffects = async function (...args)
+   {
+      this.fhcsPending = [];
+      const result = await applyAll.apply(this, args);
+      const card = this.chatMessage ? recordCard(this.chatMessage) : null;
+      for (const entry of this.fhcsPending) { recordApplied(card, entry); }
+      this.fhcsPending = null;
+      return result;
+   };
+}
+
+/** A card's record, with damage types in words, for chat/card.js appliedLines. */
+export function appliedFacts(message)
+{
+   const types = { ...CONFIG.DND5E.damageTypes, ...CONFIG.DND5E.healingTypes };
+   return (message.getFlag(MODULE_ID, APPLIED_FLAG) ?? []).map((entry) => ({
+      ...entry,
+      parts: (entry.parts ?? []).map((p) => ({ ...p, label: game.i18n.localize(types[p.type]?.label ?? p.type) }))
+   }));
 }

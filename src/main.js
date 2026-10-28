@@ -1,6 +1,6 @@
 import { MODULE_ID } from './constants.js';
 import { extendChatModel, preloadTemplates, quietPosts, recordLevelOrder, registerCharacterSheet,
-   systemCharacterSheet } from './compat.js';
+   systemCharacterSheet, watchApplications } from './compat.js';
 import { levelOrder } from './sheet/header.js';
 import { keepStable } from './sheet/death.js';
 import { makeCharacterSheet } from './apps/CharacterSheet.js';
@@ -36,7 +36,12 @@ Hooks.once('init', () =>
 // One card per action: rolls made from a card draw in its bands; d20 rolls carry a spare die.
 Hooks.on('dnd5e.renderChatMessage', foldIntoCard);
 // ...and post without scrolling the chat log away from the card being used.
-Hooks.once('ready', () => quietPosts(isFolded));
+// ...and keep a record on each card of what its Apply did.
+Hooks.once('ready', () =>
+{
+   quietPosts(isFolded);
+   watchApplications();
+});
 Hooks.on('dnd5e.postRollConfiguration', addSpareD20);
 Hooks.on('updateChatMessage', refreshOnRollChange);
 // Roll on use and no roll dialogs (world settings).

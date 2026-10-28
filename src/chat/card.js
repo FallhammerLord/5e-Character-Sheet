@@ -8,7 +8,7 @@
  * `effect-application`) work inside our markup. Slices 2–8 fill the bands with results.
  */
 import { MODULE_ID } from '../constants.js';
-import { actorArtwork, addBonus, addD20, answersButton, canApplyDamage, damageFacts, hideTooltip, openTrays,
+import { actorArtwork, addBonus, addD20, answersButton, appliedFacts, canApplyDamage, damageFacts, hideTooltip, openTrays,
    preferSelected, rollCardDamage, rollFacts, rollsFrom, showTooltip } from '../compat.js';
 import { describeRoll } from './outcome.js';
 import { d20Row, dieClasses, MAX_PER_SIDE } from './d20.js';
@@ -202,6 +202,27 @@ export function damageBand(facts, earlier, format, { canCrit = false } = {})
       againAction: 'damageAgain',
       extra
    };
+}
+
+/**
+ * The card's record of what its Apply did (user, 2026-10-28), one line per target and click, kept whatever is
+ * selected or targeted next: "Dire Wolf takes 9 slashing", "Bless on Kira".
+ *
+ * @param {object[]} entries  From compat.appliedFacts.
+ * @param {Function} format   (key, data) => localized text.
+ */
+export function appliedLines(entries, format)
+{
+   return entries.map((e) =>
+   {
+      if (e.kind === 'effect') { return format('FHCS.Card.EffectOn', { name: e.name, who: e.who }); }
+      const parts = (e.parts ?? []).filter((p) => p.value);
+      const type = (p) => p.label.toLocaleLowerCase();
+      if (e.amount < 0) { return format('FHCS.Card.Heals', { who: e.who, amount: -e.amount }); }
+      if (e.amount === 0) { return format(e.temp ? 'FHCS.Card.GainsTemp' : 'FHCS.Card.TakesNone', { who: e.who, amount: e.temp }); }
+      if (parts.length === 1) { return format('FHCS.Card.TakesType', { who: e.who, amount: e.amount, type: type(parts[0]) }); }
+      return format('FHCS.Card.TakesTypes', { who: e.who, amount: e.amount, types: parts.map((p) => `${p.value} ${type(p)}`).join(', ') });
+   }).map((text) => ({ text }));
 }
 
 /**
@@ -427,7 +448,9 @@ export function makeUsageMessageData(Base)
             canAct: this.parent.isAuthor || game.user.isGM,
             apply: (damageId || context.effects?.length)
                ? { damageId, heading: localize('FHCS.Card.Apply'), note: localize('FHCS.Card.ApplyNote') }
-               : null
+               : null,
+            applied: appliedLines(appliedFacts(this.parent), format),
+            appliedHeading: localize('FHCS.Card.Applied')
          };
          return context;
       }

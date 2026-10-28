@@ -777,6 +777,27 @@
    padding: var(--fhcs-s1) var(--fhcs-s2) var(--fhcs-s2);
 }
 
+/* The record of what was applied: a heading, then one line per target; long records scroll like the history. */
+.fhcs-chat .fhcs-applied
+{
+   display: flex;
+   flex-direction: column;
+   gap: var(--fhcs-s1);
+   padding: var(--fhcs-s1) var(--fhcs-s2) var(--fhcs-s2);
+   border-top: 1px solid var(--fhcs-line-soft);
+   text-align: center;
+}
+
+.fhcs-chat .fhcs-applied-list
+{
+   max-height: calc(5 * var(--fhcs-body-size) * var(--fhcs-body-line));
+   margin: 0;
+   padding: 0;
+   overflow-y: auto;
+   list-style: none;
+   overflow-wrap: anywhere;
+}
+
 .fhcs-chat .fhcs-apply :is(button, .multiplier-button, .apply-button)
 {
    min-width: var(--fhcs-control);

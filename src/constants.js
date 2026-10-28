@@ -23,3 +23,6 @@ export const SHAPE_FLAG = 'portraitShape';
 
 /** Actor flag: which item, by id, each resource panel shows in place of dnd5e's own resource ({ primary: id }). */
 export const RESOURCES_FLAG = 'resources';
+
+/** Message flag: what a card's Apply did, one entry per target and click (`compat.watchApplications`). */
+export const APPLIED_FLAG = 'applied';

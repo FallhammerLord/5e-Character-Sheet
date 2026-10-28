@@ -82,6 +82,16 @@
    </details>
    {{/if}}
 
+   {{#if fhcs.applied.length}}
+   {{!-- What Apply did (user, 2026-10-28): kept on the card, open, whatever is selected or targeted next. --}}
+   <div class="fhcs-applied">
+      <span class="fhcs-band-heading">{{ fhcs.appliedHeading }}</span>
+      <ul class="fhcs-applied-list">
+         {{#each fhcs.applied}}<li>{{ text }}</li>{{/each}}
+      </ul>
+   </div>
+   {{/if}}
+
    {{#if fhcs.others.length}}
    <div class="fhcs-card-actions">
       {{#each fhcs.others}}

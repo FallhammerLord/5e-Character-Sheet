@@ -59,3 +59,10 @@ So SCOPE §6.4's "saves on the same card" exists already; our work there is word
 - `RequestMessageData` (`type: "request"`): `system.targets` = `{ actor (uuid), result (message), user }`; `system.handler` names a function in `CONFIG.DND5E.requests`; `system.button` its label and icon. The template's per-target button is `data-action="handleRequest"` inside `[data-uuid]`.
 - A result message gets `flags.dnd5e.requestResult = { actorUuid, requestId }`; the active GM then writes the result's id into the request's `system.targets` (`onCreateMessage`, `onUpdateResultMessage`), which re-renders the request.
 - Late adds change a result's rolls, not the request; we re-render the request ourselves (`compat.refreshCard`).
+
+## Applying damage and effects (checked 2026-10-28)
+
+- **Damage types inside one roll:** a die flavored `[radiant]` in a slashing roll is radiant. `dnd5e.dice.aggregateDamageRolls(rolls)` splits rolls into one per type (aggregate-damage-rolls.mjs); the damage tray and `ChatMessage#_prepareDamageContext` both use it.
+- **Apply damage:** the tray calls `actor.applyDamage(damages, { ...options, isDelta: true, origin: this.chatMessage })` per selected or targeted token it owns (damage-application.mjs:601). `applyDamage` hands the same options to `calculateDamage`, which fires `dnd5e.calculateDamage(actor, damages, options)` with each type's value after resistances (`damages.temp` and `.tempMax` beside them); then `dnd5e.preApplyDamage` and, after the update, `dnd5e.applyDamage(actor, amount, options)`.
+- **Apply effects:** `_onApplyEffects` prepares each checked effect for each target with `_prepareEffectData(effect, actor)`, then creates or updates them in one `foundry.documents.modifyBatch`. No hook; we wrap the two methods on `customElements.get('effect-application')`.
+- **Attack targets** are a `TargetsField` on the attack message, recorded at the roll; `evaluatedTargets` compares them with the roll.

@@ -4,7 +4,7 @@
  *
  * A case: { name, template: 'path/without-hbs', context: {...}, frame?: 'sheet' | 'chat', theme?: 'light' }
  */
-import { cardParts, d20Band, damageBand, saveRow } from '../src/chat/card.js';
+import { appliedLines, cardParts, d20Band, damageBand, saveRow } from '../src/chat/card.js';
 import { headerView, tabRow } from '../src/sheet/header.js';
 import { attributesView } from '../src/sheet/attributes.js';
 import { inventoryView } from '../src/sheet/inventory.js';
@@ -667,6 +667,19 @@ export const CASES = [
    { name: 'card-request', template: 'chat/request-card', frame: 'chat', context: request() },
    { name: 'card-fireball-saves', template: 'chat/usage-card', frame: 'chat', context: fireball() },
    { name: 'card-attack-crit', template: 'chat/usage-card', frame: 'chat', context: rolledAttack(attack(), ['6 + 5 + 3 = 14', '1 + 5 + 3 = 9'], damage()) },
+   // What Apply did, kept on the card (user, 2026-10-28): split damage, one type, none, an effect, a long name.
+   { name: 'card-applied', template: 'chat/usage-card', frame: 'chat', context: (() =>
+   {
+      const context = rolledAttack(attack(), [], damage());
+      context.fhcs.appliedHeading = 'Applied';
+      context.fhcs.applied = appliedLines([
+         { kind: 'damage', who: 'Dire Wolf', amount: 15, temp: 0, parts: [{ type: 'slashing', label: 'Slashing', value: 9 }, { type: 'radiant', label: 'Radiant', value: 6 }] },
+         { kind: 'damage', who: 'Dire Wolf 2', amount: 9, temp: 0, parts: [{ type: 'slashing', label: 'Slashing', value: 9 }] },
+         { kind: 'damage', who: 'Skeleton', amount: 0, temp: 0, parts: [{ type: 'poison', label: 'Poison', value: 0 }] },
+         { kind: 'effect', who: 'Grimgrollo the Unnecessarily Long-Named Ogre', name: 'Bless' }
+      ], format);
+      return context;
+   })() },
    {
       name: 'card-damage-mixed',
       template: 'chat/usage-card',

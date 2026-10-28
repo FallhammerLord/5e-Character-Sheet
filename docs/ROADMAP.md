@@ -105,11 +105,12 @@ From the user's screenshot after Phase 6 (2026-10-28). Decisions: SCOPE §4.10.
 - [x] 1. Portrait art to the frame's foot, HP, Temp and Max ± on a scrim; class cards split class | subclass art, level ring, name in display; milestone tray without its key; effect favorites without "None"
 - [x] 2. Resources: three panels in a row; only set ones in play; link an item from the cog in edit mode; Restore
 - [x] 3. Sections fold on Inventory, Spellbook, Features and Effects (the caret in the picture column; a search shows matches through CSS on dnd5e's search field)
+- [x] 4. Chat cards: each damage type its own total; a record on the card of what Apply did (SCOPE §6.7)
 - [ ] Quench and play
 
 ## Phase 7: The ADHD layer
 
-Skills column on every tab (user, 2026-10-26): the Attributes skills column stays beside every tab, as in Tidy's current sheet (its sidebar; Classic showed skills on Attributes only, checked in Tidy v13.0.0 source). Tab bodies then lose about 240px; recheck Inventory and Spellbook rows at 644px. Optional "Now" strip: action, bonus action, reaction and movement, with spent ones dimmed until the next turn. Favorites capped at five. Panels fold; HP, AC and conditions stay pinned.
+Skills column on every tab (user, 2026-10-26): the Attributes skills column stays beside every tab, as in Tidy's current sheet (its sidebar; Classic showed skills on Attributes only, checked in Tidy v13.0.0 source). Tab bodies then lose about 240px; recheck Inventory and Spellbook rows at 644px. Optional "Now" strip: action, bonus action, reaction and movement, with spent ones dimmed until the next turn. Favorites capped at five. Panels fold; HP, AC and conditions stay pinned. An effect that turns all incoming damage into one type (user, 2026-10-28; SCOPE §6.7).
 
 ## Phase 8: Themes, compatibility, release
 

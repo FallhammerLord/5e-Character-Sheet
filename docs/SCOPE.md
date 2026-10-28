@@ -301,6 +301,13 @@ The same frame serves every roll: a skill check from the sheet is header plus d2
 - **Who can click:** a card's author uses its rolls, late adds and saves; the GM uses every card. Foundry lets a player control and change only what they own, so a player's Apply reaches their own tokens (healing themselves); damage to enemies is the GM's click.
 - **Selected tokens, not targets.** Player targeting is too unreliable to drive anything. Apply buttons and "roll for" buttons act on selected tokens: in practice the GM's selection. A player's targets may show as information (the hit or miss against each); nothing happens automatically because of them. dnd5e's trays open in "selected" mode, said in words.
 
+### 6.7 Polish (user, 2026-10-28)
+
+- **Each damage type its own total:** the damage band splits a roll as dnd5e's Apply does (`aggregateDamageRolls`): radiant dice in a slashing roll read "9 Slashing · 6 Radiant" under the total, not all as slashing.
+- **What Apply did stays on the card:** one line per target and click under an "Applied" heading, open, whatever is selected or targeted next: "Dire Wolf takes 9 slashing", "Dire Wolf takes 15: 9 slashing, 6 radiant", "Kira heals 7", "Bless on Kira". Saved on the usage card (`flags.fhcs.applied`), so only the card's author or the GM leaves a line; our HP tray leaves none. No undo.
+- **Hits against targets** come from the targets dnd5e recorded at the attack roll, which don't follow later targeting; a report of the hit line changing waits on a before-and-after screenshot.
+- **Later (Phase 7 list):** an effect that turns every incoming damage type into one (dnd5e's `preCalculateDamage` hook, an actor flag set by the effect).
+
 ## 7. Open questions
 
 - Shared themes with the quest log, or Light and Dark first?

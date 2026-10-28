@@ -1,5 +1,5 @@
 import { MODULE_ID, SHEET_ID, SYSTEM_ACTIONS } from '../constants.js';
-import { addBonus, addD20, systemCharacterSheet } from '../compat.js';
+import { addBonus, addD20, damageFacts, systemCharacterSheet } from '../compat.js';
 
 /** How long a click may take to reach dnd5e's hook before a test fails. */
 const HOOK_WAIT_MS = 3000;
@@ -1187,6 +1187,50 @@ export function registerQuenchTests(quench)
                for (const message of damage()) { await message.delete(); }
                await usage.delete();
             }
+         });
+
+         it('keeps a record on the card of damage applied from it', async function ()
+         {
+            const results = await activity.use({ subsequentActions: false, consume: false }, { configure: false },
+               { rollMode: 'selfroll' });
+            const usage = results?.message;
+            const damage = () => usage.getAssociatedRolls('damage');
+            const hp = foundry.utils.deepClone(actor._source.system.attributes.hp);
+            try
+            {
+               await actor.update({ 'system.attributes.hp.value': 20, 'system.attributes.hp.temp': 0 });
+               await activity.rollDamage({ isCritical: false }, { configure: false },
+                  { rollMode: 'selfroll', data: { system: { origin: usage.id } } });
+               await waitFor(() => damage().length >= 1);
+               // As dnd5e's damage tray applies it: the damage message as the origin (damage-application.mjs:607).
+               await actor.applyDamage([{ value: 3, type: 'slashing' }, { value: 2, type: 'radiant' }], { origin: damage()[0], isDelta: true });
+               await waitFor(() => (usage.getFlag('fhcs', 'applied') ?? []).length >= 1);
+               const entry = usage.getFlag('fhcs', 'applied')?.[0] ?? {};
+               const parts = Object.fromEntries((entry.parts ?? []).map((p) => [p.type, p.value]));
+               assert.deepEqual({ who: entry.who, amount: entry.amount, parts }, { who: actor.name, amount: 5, parts: { slashing: 3, radiant: 2 } },
+                  `the usage card records the target, amount and each type; it holds ${JSON.stringify(entry)}`);
+               const html = await usage.renderHTML();
+               const line = html.querySelector('.fhcs-applied-list li')?.textContent.trim();
+               assert.ok(line?.startsWith(`${actor.name} takes 5`), `the card shows the line; it reads "${line}"`);
+            }
+            finally
+            {
+               await actor.update({ 'system.attributes.hp': hp });
+               for (const message of damage()) { await message.delete(); }
+               await usage.delete();
+            }
+         });
+
+         it('totals each damage type, a flavored die apart from its roll\'s type', async function ()
+         {
+            // A slashing roll with radiant dice in it, as a sword with radiant extra damage rolls (user, 2026-10-28).
+            const roll = await new CONFIG.Dice.DamageRoll('1d8 + 3 + 2d6[radiant]', {}, { type: 'slashing' }).evaluate();
+            const message = new ChatMessage.implementation({ type: 'damage', rolls: [roll] });
+            const parts = damageFacts(message)?.parts ?? [];
+            const got = Object.fromEntries(parts.map((p) => [p.type, p.total]));
+            const radiant = roll.terms.filter((t) => t.flavor === 'radiant').reduce((n, t) => n + t.total, 0);
+            assert.deepEqual(got, { slashing: roll.total - radiant, radiant },
+               `each type keeps its own total; the band holds ${JSON.stringify(got)} for ${roll.formula} = ${roll.total}`);
          });
 
          it('skips roll dialogs unless the skip-dialog key is held', function ()

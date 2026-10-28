@@ -4,7 +4,7 @@
  */
 import { deepStrictEqual } from 'node:assert';
 import { describeRoll } from '../src/chat/outcome.js';
-import { cardParts, damageBand, saveRow } from '../src/chat/card.js';
+import { appliedLines, cardParts, damageBand, saveRow } from '../src/chat/card.js';
 import { countingDie, d20Row, modeForSides } from '../src/chat/d20.js';
 import { diceMath } from '../src/chat/math.js';
 import { attributesView } from '../src/sheet/attributes.js';
@@ -204,6 +204,22 @@ for (const [name, order, classes, original, expected] of ORDER_CASES)
    const expected = { pips: 20, filled: ['c.svg', 'f.svg', 'c.svg'], third: 'Level 3: c 2', fourth: 'Level 4: not reached' };
    try { deepStrictEqual(got, expected); }
    catch { problems.push(`milestone track: got ${JSON.stringify(got)}, expected ${JSON.stringify(expected)}`); }
+}
+// What Apply did, in words (user, 2026-10-28): each type when damage is split, healing, temp HP, none, an effect.
+{
+   const slash = { type: 'slashing', label: 'Slashing', value: 9 };
+   const got = appliedLines([
+      { kind: 'damage', who: 'Wolf', amount: 15, temp: 0, parts: [slash, { type: 'radiant', label: 'Radiant', value: 6 }] },
+      { kind: 'damage', who: 'Wolf', amount: 9, temp: 0, parts: [slash] },
+      { kind: 'damage', who: 'Kira', amount: -7, temp: 0, parts: [{ type: 'healing', label: 'Healing', value: 7 }] },
+      { kind: 'damage', who: 'Kira', amount: 0, temp: 5, parts: [] },
+      { kind: 'damage', who: 'Skeleton', amount: 0, temp: 0, parts: [{ type: 'poison', label: 'Poison', value: 0 }] },
+      { kind: 'effect', who: 'Kira', name: 'Bless' }
+   ], format).map((l) => l.text);
+   const expected = ['Wolf takes 15: 9 slashing, 6 radiant', 'Wolf takes 9 slashing', 'Kira heals 7', 'Kira gains 5 temp HP',
+      'Skeleton takes no damage', 'Bless on Kira'];
+   try { deepStrictEqual(got, expected); }
+   catch { problems.push(`applied lines: got ${JSON.stringify(got)}`); }
 }
 for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
 {
