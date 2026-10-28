@@ -861,7 +861,7 @@
    controls sets its own size. Every kind of control we draw, not only buttons (user, 2026-10-28: the tab row grew
    again on unlocking, its new theme chip a summary). :where() keeps this weaker than our own control rules, but
    stronger than Foundry's bare element styles. */
-.fhcs-sheet :where(.window-content :is(button, summary, select), .window-header .fhcs-theme-pick > summary)
+.fhcs-sheet :where(.window-content :is(button, summary, select), .fhcs-theme-tray button)
 {
    min-width: 0;
    min-height: 0;
@@ -905,7 +905,7 @@
 .fhcs-sheet:not(.minimized) { gap: 0; }
 
 /* Foundry's other title-bar buttons, and modules', wait in the ⋮ menu instead. */
-.fhcs-sheet:not(.minimized) > .window-header > .header-control:not([data-action="toggleControls"], [data-action="close"], .preparation-warnings) { display: none; }
+.fhcs-sheet:not(.minimized) > .window-header > .header-control:not([data-action="toggleControls"], [data-action="close"], .preparation-warnings, .fhcs-theme-chip) { display: none; }
 
 .fhcs-sheet:not(.minimized) > .window-header :is(.window-title, .window-icon)
 {
@@ -1113,13 +1113,12 @@
 }
 
 /* The theme picker on the title bar, beside ⋮ (SCOPE §4.11, user 2026-10-28): a title-bar control, its tray under it. */
-.fhcs-sheet > .window-header .fhcs-theme-pick { position: relative; flex: none; display: flex; }
-.fhcs-sheet > .window-header .fhcs-theme-chip { display: grid; place-items: center; list-style: none; cursor: pointer; }
-.fhcs-sheet > .window-header .fhcs-theme-chip::-webkit-details-marker { display: none; }
-.fhcs-sheet > .window-header .fhcs-theme-chip .fhcs-icon { width: 16px; height: 16px; }
-.fhcs-sheet > .window-header .fhcs-theme-tray { top: calc(100% + var(--fhcs-s1)); left: auto; right: 0; z-index: 10; width: 14rem; }
-/* Each theme a row with the radio dot: the one this character wears is filled (SCOPE §5.1). */
-.fhcs-sheet > .window-header .fhcs-theme-option { justify-content: flex-start; gap: var(--fhcs-s2); padding: 0 var(--fhcs-s2); }
+.fhcs-sheet > .window-header > .fhcs-theme-chip { display: grid; flex: none; place-items: center; cursor: pointer; }
+.fhcs-sheet > .window-header > .fhcs-theme-chip .fhcs-icon { width: 16px; height: 16px; }
+/* The tray hangs under the title bar at the window's right (the window is its frame; `top` is set when it opens). */
+.fhcs-sheet > .fhcs-tray.fhcs-theme-tray { left: auto; right: var(--fhcs-s2); z-index: 10; width: 14rem; }
+.fhcs-sheet > .fhcs-theme-tray[hidden] { display: none; }
+.fhcs-sheet .fhcs-theme-tray > .fhcs-theme-option { justify-content: flex-start; gap: var(--fhcs-s2); padding: 0 var(--fhcs-s2); }
 .fhcs-sheet .fhcs-theme-option > .fhcs-radio-mark { flex: none; }
 .fhcs-sheet .fhcs-theme-option[aria-pressed="true"] .fhcs-radio-mark { background: currentColor; box-shadow: inset 0 0 0 2px var(--fhcs-surface); }
 

@@ -45,14 +45,14 @@ const FRAMES = {
 const THEMES = { light: 'background:#f4f1ea;color:#191813', dark: 'background:#26252b;color:#e8e6e3' };
 
 /** A window like Foundry's, with the classes dnd5e, Foundry's theme and our code put on it. */
-const frame = (kind, width, theme, body, { look = '', hp = null, titleBar = '' } = {}) => `<section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"${look ? ` data-fhcs-theme="${look}"` : ''}${hp === null ? '' : ` data-fhcs-hp="${hp <= 0 ? 'down' : hp <= 0.5 ? 'bloodied' : 'full'}"`}
-   style="${hp === null ? '' : `--fhcs-hp:${hp};`}width:${width}px;height:${HEIGHT}px;display:flex;flex-direction:column;border:1px solid #000;margin:8px;
+const frame = (kind, width, theme, body, { look = '', hp = null, titleBar = '', titleTray = '' } = {}) => `<section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"${look ? ` data-fhcs-theme="${look}"` : ''}${hp === null ? '' : ` data-fhcs-hp="${hp <= 0 ? 'down' : hp <= 0.5 ? 'bloodied' : 'full'}"`}
+   style="${hp === null ? '' : `--fhcs-hp:${hp};`}position:relative;width:${width}px;height:${HEIGHT}px;display:flex;flex-direction:column;border:1px solid #000;margin:8px;
    ${THEMES[theme]}">
    ${kind === 'sheet'
       // Foundry's title bar as it draws one, with a module's extra button that must wait in the ⋮ menu (rule 14).
       ? `<header class="window-header"><h1 class="window-title">${width}px</h1>${titleBar}<button type="button" class="header-control icon fa-solid fa-ellipsis-vertical" data-action="toggleControls" aria-label="Controls"></button><button type="button" class="header-control icon fa-solid fa-id-badge" data-action="moduleExtra" aria-label="A module's button"></button><button type="button" class="header-control icon fa-solid fa-xmark" data-action="close" aria-label="Close"></button></header>`
       : `<header style="background:#111;color:#eee;padding:4px 8px;font:13px sans-serif">${width}px</header>`}
-   <div class="window-content" style="flex:1;min-height:0;overflow:auto">${FRAMES[kind].wrap(body, look)}</div></section>`;
+   <div class="window-content" style="flex:1;min-height:0;overflow:auto">${FRAMES[kind].wrap(body, look)}</div>${titleTray}</section>`;
 
 const page = (html) => `<!doctype html><html lang="en"><head><meta charset="utf-8">
    <style>body{margin:0;background:#444;font-family:sans-serif}*{box-sizing:border-box}button,input,select{font:inherit}
@@ -380,7 +380,7 @@ function findProblems()
    // The title bar holds only ⋮ and × (rule 14, user 2026-10-28); any other button waits in the ⋮ menu.
    for (const control of app.querySelectorAll(':scope > .window-header > .header-control'))
    {
-      const kept = control.matches('[data-action="toggleControls"], [data-action="close"], .preparation-warnings');
+      const kept = control.matches('[data-action="toggleControls"], [data-action="close"], .preparation-warnings, .fhcs-theme-chip');
       if (kept !== !!control.getClientRects().length) { issues.push(`title bar: ${control.dataset.action} ${kept ? 'hidden' : 'shows'}`); }
    }
    // A scrolling region keeps its scrollbar's room (user, 2026-10-28: the favorites jumped when a fold brought the

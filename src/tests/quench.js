@@ -925,12 +925,12 @@ export function registerQuenchTests(quench)
                await actor.unsetFlag(MODULE_ID, 'theme');
                await game.settings.set(MODULE_ID, 'theme', 'forge');
                await until(() => look() === 'forge', () => `the world theme applies; the sheet wears ${look()}`);
-               await click('.window-header .fhcs-theme-pick > summary');
-               await click('.window-header [data-action="fhcsSetTheme"][data-theme="sand"]');
+               await click('.window-header [data-action="fhcsThemeTray"]');
+               await click('.fhcs-theme-tray [data-action="fhcsSetTheme"][data-theme="sand"]');
                await until(() => actor.getFlag(MODULE_ID, 'theme') === 'sand' && look() === 'sand',
                   () => `the tray sets the character's own theme; the flag holds ${actor.getFlag(MODULE_ID, 'theme')}, the sheet wears ${look()}`);
-               await click('.window-header .fhcs-theme-pick > summary');
-               await click('.window-header [data-action="fhcsSetTheme"][data-theme=""]');
+               await click('.window-header [data-action="fhcsThemeTray"]');
+               await click('.fhcs-theme-tray [data-action="fhcsSetTheme"][data-theme=""]');
                await until(() => !actor.getFlag(MODULE_ID, 'theme') && look() === 'forge',
                   () => `World default clears the character's own; the flag holds ${actor.getFlag(MODULE_ID, 'theme')}, the sheet wears ${look()}`);
                await game.settings.set(MODULE_ID, 'motion', false);

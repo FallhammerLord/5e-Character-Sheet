@@ -104,7 +104,7 @@ function themeState(element, actor)
 /** The theme tray (edit mode): a theme of the character's own, or back to the world default (no value). */
 function setTheme(event, target)
 {
-   target.closest('details')?.removeAttribute('open');
+   showThemeTray(this.element, false);
    const value = target.dataset.theme;
    if (value && !THEMES.includes(value)) { return null; }
    return value ? this.actor.setFlag(MODULE_ID, THEME_FLAG, value) : this.actor.unsetFlag(MODULE_ID, THEME_FLAG);
@@ -120,16 +120,40 @@ const THEME_PICK = `${MODULE_PATH}/templates/sheet/theme-pick.hbs`;
 async function drawThemePicker(sheet)
 {
    const bar = sheet.element.querySelector(':scope > .window-header');
-   const old = bar?.querySelector(':scope > .fhcs-theme-pick');
-   if (!bar || !sheet.isEditable) { old?.remove(); return; }
+   const oldChip = bar?.querySelector(':scope > .fhcs-theme-chip');
+   const oldTray = sheet.element.querySelector(':scope > .fhcs-theme-tray');
+   if (!bar || !sheet.isEditable) { oldChip?.remove(); oldTray?.remove(); return; }
    const i18n = { localize: (key) => game.i18n.localize(key), format: (key, data) => game.i18n.format(key, data) };
    const theme = { chosen: sheet.actor.getFlag(MODULE_ID, THEME_FLAG) ?? '', world: game.settings.get(MODULE_ID, 'theme'), keys: THEMES };
    const holder = document.createElement('div');
    holder.innerHTML = await renderTemplate(THEME_PICK, themePicker(theme, i18n));
-   const pick = holder.firstElementChild;
-   if (old?.open) { pick.open = true; }
-   if (old) { old.replaceWith(pick); }
-   else { bar.insertBefore(pick, bar.querySelector(':scope > [data-action="toggleControls"]')); }
+   const chip = holder.querySelector('.fhcs-theme-chip');
+   const tray = holder.querySelector('.fhcs-theme-tray');
+   if (oldChip) { oldChip.replaceWith(chip); }
+   else { bar.insertBefore(chip, bar.querySelector(':scope > [data-action="toggleControls"]')); }
+   if (oldTray) { oldTray.replaceWith(tray); }
+   else { sheet.element.append(tray); }
+   if (oldTray && !oldTray.hidden) { showThemeTray(sheet.element, true); }
+   delayTips(bar);
+}
+
+/** Opens or closes the theme tray, just under the title bar. */
+function showThemeTray(element, open)
+{
+   const tray = element.querySelector(':scope > .fhcs-theme-tray');
+   const chip = element.querySelector(':scope > .window-header > .fhcs-theme-chip');
+   const bar = element.querySelector(':scope > .window-header');
+   if (!tray) { return; }
+   tray.hidden = !open;
+   chip?.setAttribute('aria-expanded', String(open));
+   if (open && bar) { tray.style.top = `${bar.offsetTop + bar.offsetHeight}px`; }
+}
+
+/** The title bar's palette: opens or closes its tray. */
+function themeTray()
+{
+   const tray = this.element.querySelector(':scope > .fhcs-theme-tray');
+   showThemeTray(this.element, !!tray?.hidden);
 }
 
 /** Folds or opens a section on a list tab (user, 2026-10-28), and remembers it with the favorites groups. */
@@ -367,6 +391,12 @@ function closeTraysOnClickOff()
       {
          if (!fold.contains(event.target)) { fold.open = false; }
       }
+      // The title bar's theme tray, outside the content: its chip opens and closes it itself.
+      for (const tray of document.querySelectorAll('.fhcs-sheet > .fhcs-theme-tray:not([hidden])'))
+      {
+         const sheet = tray.parentElement;
+         if (!tray.contains(event.target) && !event.target.closest?.('.fhcs-theme-chip')) { showThemeTray(sheet, false); }
+      }
    }, { capture: true });
 }
 
@@ -447,7 +477,7 @@ export function makeCharacterSheet(Base)
             fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails,
             fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange, fhcsFrame: frame, fhcsLevelDown: levelDown, fhcsPortraitShape: portraitShape,
             fhcsSkillAbility: skillAbility, fhcsLinkResource: linkResourceAction, fhcsRefreshResource: refreshResourceAction,
-            fhcsToggleSection: toggleSection, fhcsSetTheme: setTheme,
+            fhcsToggleSection: toggleSection, fhcsSetTheme: setTheme, fhcsThemeTray: themeTray,
             fhcsInspiration: inspirationAction, fhcsLinkInspiration: linkInspirationAction }
       };
 

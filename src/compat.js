@@ -972,7 +972,7 @@ export async function recordLevelOrder(manager, moduleId, reconcile)
 
 /** Re-renders every open sheet of ours, after a client setting it reads changes. */
 /** The title-bar buttons that stay in the bar: ⋮, ×, and dnd5e's warnings (shown only when there are some). */
-const KEPT_HEADER_CONTROLS = '[data-action="toggleControls"], [data-action="close"], .preparation-warnings';
+const KEPT_HEADER_CONTROLS = '[data-action="toggleControls"], [data-action="close"], .preparation-warnings, .fhcs-theme-chip';
 
 /**
  * Every other button in the sheet's title bar, Foundry's or a module's, as entries for dnd5e's ⋮ menu (user,

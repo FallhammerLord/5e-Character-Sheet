@@ -210,7 +210,10 @@ const INSPIRE = {
 const tabs = (mode, inspire = 'none') => ({ fhcsTabs: { ...tabRow(DND5E_TABS, mode, localize), inspiration: inspirationBar(INSPIRE[inspire], mode, { localize, format }) } });
 // The theme picker on the title bar (SCOPE §4.11), its tray open: this character wears Forge, the world Plain.
 const THEME_PICK = themePicker({ chosen: 'forge', world: 'plain', keys: ['plain', 'forge', 'wind', 'sand', 'valley'] }, { localize, format });
-const titleBarPick = template('sheet/theme-pick')(THEME_PICK).replace('data-fold-key="theme"', 'data-fold-key="theme" open');
+const themePick = template('sheet/theme-pick')(THEME_PICK);
+const titleBarPick = themePick.slice(0, themePick.indexOf('<div class="fhcs-tray'));
+// The tray open, as CharacterSheet places it: a child of the window, just under the 28px title bar.
+const titleTrayOpen = themePick.slice(themePick.indexOf('<div class="fhcs-tray')).replace(' hidden>', ' style="top:28px">');
 
 /** The Attributes tab's facts as compat.attributesFacts gathers them, with overrides. */
 const SKILLS = [['acr', 'Acrobatics', 'Dex', 0, 10, 0], ['ani', 'Animal Handling', 'Wis', 5, 15, 0], ['arc', 'Arcana', 'Int', -1, 9, 0],
@@ -604,7 +607,7 @@ export const CASES = [
    { name: 'tabs-bank-big', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }, 'big') },
    { name: 'tabs-inspiration-tray', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: true }, 'bank'), open: ['inspiration'] },
    { name: 'tabs-observer', template: 'sheet/tabs', context: tabs({ canEdit: false, editing: false }, 'bank') },
-   { name: 'title-theme-tray', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }), titleBar: titleBarPick },
+   { name: 'title-theme-tray', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }), titleBar: titleBarPick, titleTray: titleTrayOpen },
    { name: 'special-traits', html: SPECIAL_TRAITS },
    { name: 'header', template: 'sheet/header', context: header(), align: HEADER_ALIGN, rows: '.fhcs-header, .fhcs-ability' },
    { name: 'header-tall-art', template: 'sheet/header', context: header({ portrait: { src: TALL, isVideo: false } }) },
