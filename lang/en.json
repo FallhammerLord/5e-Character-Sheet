@@ -164,6 +164,7 @@
       "ExhaustionLevel": "Exhaustion level {n}",
       "HD": "HD {n}",
       "HDLabel": "Hit dice {value} of {max}",
+      "HDRoll": "Roll a hit die ({value} of {max} left)",
       "Inspiration": "Inspiration",
       "Rest": "Rest",
       "CheckLabel": "{ability} check {mod}",

@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES } from '../constants.js';
-import { attributesFacts, biographyFacts, changeHp, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, changeHp, rollHitDie, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, renderTemplate, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
@@ -153,7 +153,7 @@ function showThemeTray(element, open)
 /** The Traits panel's gear (edit mode): dnd5e's Special Traits page, which the tab row no longer draws. */
 function openSpecialTraits()
 {
-   this.changeTab('specialTraits', 'primary');
+   this.changeTab('specialTraits', 'primary', { force: true });
 }
 
 /** The title bar's palette: opens or closes its tray. */
@@ -362,6 +362,12 @@ function moveSection(event, target)
    return saveSectionOrder(this.actor, tab, ids);
 }
 
+/** The HD chip in play mode: rolls a hit die. */
+function rollHitDieAction(event)
+{
+   return rollHitDie(this.actor, event);
+}
+
 /** A resource panel's − and + (user, 2026-10-28). */
 function stepResourceAction(event, target)
 {
@@ -566,7 +572,7 @@ export function makeCharacterSheet(Base)
             fhcsToggleContainer: toggleContainer, fhcsPinFilter: pinFilter, fhcsOpenConcentration: openConcentration,
             fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails,
             fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange, fhcsFrame: frame, fhcsLevelDown: levelDown, fhcsPortraitShape: portraitShape,
-            fhcsSkillAbility: skillAbility, fhcsLinkResource: linkResourceAction, fhcsRefreshResource: refreshResourceAction, fhcsStepResource: stepResourceAction, fhcsMoveSection: moveSection, fhcsUseResource: useResourceAction,
+            fhcsSkillAbility: skillAbility, fhcsLinkResource: linkResourceAction, fhcsRefreshResource: refreshResourceAction, fhcsStepResource: stepResourceAction, fhcsRollHitDie: rollHitDieAction, fhcsMoveSection: moveSection, fhcsUseResource: useResourceAction,
             fhcsToggleSection: toggleSection, fhcsSetTheme: setTheme, fhcsThemeTray: themeTray, fhcsSpecialTraits: openSpecialTraits,
             fhcsInspiration: inspirationAction, fhcsLinkInspiration: linkInspirationAction }
       };

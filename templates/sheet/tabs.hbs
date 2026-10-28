@@ -6,8 +6,14 @@
    data-action="fhcsInspiration" data-slot="{{ slot }}" aria-label="{{ label }}" aria-pressed="{{#if filled}}true{{else}}false{{/if}}" data-fhcs-tip="{{ label }}"{{#unless can}} disabled{{/unless}}>{{> fhcs-star-mark }}</button>{{/each}}{{/inline}}
 <nav class="tabs fhcs-tabs" data-group="primary" aria-label="{{ fhcsTabs.label }}">
    {{#each fhcsTabs.tabs}}
-   <button type="button" class="fhcs-tab fhcs-body{{#if active}} active{{/if}}" data-action="tab" data-group="primary"
+   {{!-- `always-interactive`: dnd5e's item sheet disables every button in play mode but those (application-v2-mixin.mjs:301). --}}
+   <button type="button" class="fhcs-tab fhcs-body always-interactive{{#if active}} active{{/if}}" data-action="tab" data-group="primary"
            data-tab="{{ id }}">{{ label }}</button>
+   {{/each}}
+   {{!-- Settings pages (Special Traits) open from a gear, not the row; their buttons stay here, hidden, for Foundry's
+         tab switch, which works through the row's buttons. --}}
+   {{#each fhcsTabs.settings}}
+   <button type="button" class="fhcs-tab always-interactive{{#if active}} active{{/if}}" data-action="tab" data-group="primary" data-tab="{{ id }}" hidden></button>
    {{/each}}
    {{!-- Inspiration at the row's right, before the lock (SCOPE §4.12, user 2026-10-28): one star (dnd5e's on or off)
          or the bank, a star per use, any one spent or banked by a click; a count stands in for a big bank or a narrow row, its tray
@@ -46,7 +52,7 @@
    </div>
    {{/with}}
    {{#if fhcsTabs.canEdit}}
-   <button type="button" class="fhcs-button fhcs-lock" data-action="changeMode" aria-pressed="{{#if fhcsTabs.editing}}true{{else}}false{{/if}}"
+   <button type="button" class="fhcs-button fhcs-lock always-interactive" data-action="changeMode" aria-pressed="{{#if fhcsTabs.editing}}true{{else}}false{{/if}}"
            aria-label="{{ fhcsTabs.lockLabel }}" data-fhcs-tip="{{ fhcsTabs.lockLabel }}">
       {{#if fhcsTabs.editing}}
       <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.5-2"/></svg>

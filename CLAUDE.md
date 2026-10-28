@@ -90,6 +90,8 @@ Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies insta
 ### Traps we've hit (check here before debugging layout)
 
 - **Foundry drags the window from any press in the title bar except on a button,** and keeps the pointer, so a `summary` there never opens: title-bar controls are buttons, and their trays hang from the window, outside the bar.
+- **dnd5e's item sheet disables every button and field in play mode** except those with `always-interactive` (application-v2-mixin.mjs:301): our lock, tabs and toggles carry it, or the sheet can never be unlocked.
+- **Foundry switches tabs through the tab row's buttons:** a tab opened from elsewhere (Special Traits' gear) keeps a hidden button in the row.
 - **Foundry's control height** (2rem `min-height`) reaches every `button`, `summary` and `select`; the reset at the top of `styles/fhcs.css` covers them, and the layout harness imitates Foundry on each. A new kind of control goes in both, or the row it sits in grows in one mode (rows dropped on the lock twice).
 - **A scrollbar that comes and goes** narrows its column: scrolling areas keep `scrollbar-gutter: stable` (checked).
 - **`:is()` after `>` matches children only:** `.a > :is(details > summary)` never reaches the `summary`. Write `:is(.a > details > summary)`.

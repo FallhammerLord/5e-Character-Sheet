@@ -226,7 +226,10 @@ export function headerView(facts, { format, localize })
       },
       hd: {
          text: format('FHCS.Header.HD', { n: facts.hd.value }),
-         label: format('FHCS.Header.HDLabel', { value: facts.hd.value, max: facts.hd.max })
+         label: format('FHCS.Header.HDLabel', { value: facts.hd.value, max: facts.hd.max }),
+         // Play mode: a click rolls a hit die (user, 2026-10-28: "HD button doesn't work while sheet locked").
+         rollLabel: format('FHCS.Header.HDRoll', { value: facts.hd.value, max: facts.hd.max }),
+         canRoll: facts.hd.value > 0
       },
       // One chip per rest, one click each into dnd5e's rest dialog (user, 2026-10-27, replacing one chip with a tray).
       rests: facts.showRests ? facts.restTypes.map((r) => ({ ...r, short: r.key === 'short' })) : [],
@@ -296,6 +299,8 @@ export function tabRow(tabs, { canEdit, editing }, localize, names = CHARACTER_T
    return {
       label: localize('FHCS.Tabs.Label'),
       // Special Traits is settings, not play: it opens from a gear, like dnd5e's other settings (SCOPE §4.5).
+      // Its button stays in the row, hidden: Foundry switches tabs through the row's buttons.
+      settings: Object.values(tabs).filter((t) => SETTINGS_TABS.includes(t.id)).map((t) => ({ id: t.id, active: !!t.active })),
       tabs: Object.values(tabs).filter((t) => !SETTINGS_TABS.includes(t.id))
          .sort((a, b) => rank(a.id) - rank(b.id)).map((t) => ({ id: t.id, active: !!t.active, label: localize(names[t.id] ?? t.label) })),
       canEdit,

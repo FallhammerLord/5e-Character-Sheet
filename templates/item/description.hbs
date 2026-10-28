@@ -26,8 +26,8 @@
       </div>
       <div class="fhcs-frame fhcs-item-text">
          <div class="fhcs-panel-head"><span class="fhcs-label">{{ text.description }}</span></div>
-         {{#if editable}}
-         <prose-mirror name="{{ description.name }}" value="{{ description.source }}" document-uuid="{{ uuid }}" toggled>{{{ description.enriched }}}</prose-mirror>
+         {{#if fields}}
+         <prose-mirror name="{{ description.name }}" value="{{ description.source }}" document-uuid="{{ uuid }}" toggled>{{{ description.enriched }}}{{#if description.empty}}<p class="fhcs-body fhcs-muted">{{ text.empty }}</p>{{/if}}</prose-mirror>
          {{else}}
          {{#if description.empty}}<p class="fhcs-body fhcs-muted">{{ text.empty }}</p>{{else}}<div class="fhcs-body fhcs-item-prose">{{{ description.enriched }}}</div>{{/if}}
          {{/if}}

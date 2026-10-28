@@ -3,7 +3,7 @@
       marks. dnd5e's `editImage` changes the icon in edit mode; `showIcon` shows it in play. --}}
 <header class="fhcs-item-header fhcs-frame">
    {{#with fhcsItem}}
-   <button type="button" class="fhcs-item-icon" {{#if fields}}data-action="editImage" data-edit="img"{{else}}data-action="showIcon"{{/if}}
+   <button type="button" class="fhcs-item-icon always-interactive" {{#if fields}}data-action="editImage" data-edit="img"{{else}}data-action="showIcon"{{/if}}
            aria-label="{{ text.icon }}"><img src="{{ img }}" alt=""></button>
    <div class="fhcs-item-titles">
       {{#if fields}}
@@ -21,7 +21,8 @@
    {{#if toggles.length}}
    <div class="fhcs-item-toggles">
       {{#each toggles}}
-      <button type="button" class="fhcs-chip fhcs-item-toggle{{#if on}} fhcs-on{{/if}}" data-action="fhcsItemToggle" data-key="{{ key }}"
+      {{!-- `always-interactive`: dnd5e disables the item sheet's buttons in play mode but those; these work in both. --}}
+      <button type="button" class="fhcs-chip fhcs-item-toggle always-interactive{{#if on}} fhcs-on{{/if}}" data-action="fhcsItemToggle" data-key="{{ key }}"
               aria-pressed="{{#if on}}true{{else}}false{{/if}}" aria-label="{{ label }}" data-fhcs-tip="{{ label }}"{{#unless can}} disabled{{/unless}}>
          <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ path }}"/></svg>
       </button>

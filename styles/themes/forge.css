@@ -79,10 +79,14 @@
    --fhcs-theme-temper: linear-gradient(to right, transparent, #e2c278 20%, #c99a3a 50%, #9c6a2c 80%, transparent);
 }
 
+/* Forge has one look, dark, in either Foundry mode (user, 2026-10-28): these values win over the light ones above, at
+   the same weight, by coming after them. The light block stays only as the base the dark one finishes. */
 .theme-dark .fhcs-sheet[data-fhcs-theme="forge"],
 .fhcs-sheet.theme-dark[data-fhcs-theme="forge"],
 .theme-dark .fhcs-chat[data-fhcs-theme="forge"],
-.fhcs-chat.theme-dark[data-fhcs-theme="forge"]
+.fhcs-chat.theme-dark[data-fhcs-theme="forge"],
+.fhcs-sheet[data-fhcs-theme="forge"],
+.fhcs-chat[data-fhcs-theme="forge"]
 {
    --fhcs-surface: #221b18;
    --fhcs-success: #7ed08a;

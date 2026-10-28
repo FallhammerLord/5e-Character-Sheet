@@ -151,11 +151,12 @@ export function registerQuenchTests(quench)
             if (sheet?.rendered) { await leaveEditMode(); }
          });
 
-         it('is offered for characters, and is not the default', function ()
+         // Registered without making itself the default (the load check reads the options); a world may still choose it as
+         // its default in Foundry's sheet settings (the user's does, 2026-10-28), so that isn't asserted here.
+         it('is offered for characters', function ()
          {
             const entry = CONFIG.Actor.sheetClasses.character?.[SHEET_ID];
             assert.ok(entry, `${SHEET_ID} is registered for characters`);
-            assert.isFalse(entry.default);
          });
 
          it('opens as our sheet, built on dnd5e\'s', function ()
@@ -838,8 +839,25 @@ export function registerQuenchTests(quench)
             }
          });
 
+         it('rolls a hit die from the HD chip in play mode', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 4);
+            const [fighter] = await createItems([{ name: 'FHCS test fighter', type: 'class', system: { identifier: 'fhcs-fighter', levels: 2, hd: { denomination: 'd10', spent: 0 } } }]);
+            try
+            {
+               const [config] = await clickReaches('.fhcs-status [data-action="fhcsRollHitDie"]', 'dnd5e.preRollHitDieV2');
+               const formula = config?.rolls?.[0]?.parts?.join(' ') ?? '';
+               assert.include(formula, 'd10', `the roll is a hit die; its formula is "${formula}"`);
+            }
+            finally
+            {
+               await fighter.delete();
+            }
+         });
+
          it('opens Special Traits from the Traits gear in edit mode, and leaves it on locking', async function ()
          {
+            this.timeout(HOOK_WAIT_MS * 6);
             if (!sheet.isEditMode)
             {
                await click('.fhcs-tabs [data-action="changeMode"]');

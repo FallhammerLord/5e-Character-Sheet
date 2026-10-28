@@ -647,6 +647,12 @@ export function setResourceUses(actor, key, value)
    return item.update({ 'system.uses.spent': max - Math.clamp(Math.round(value), 0, max) });
 }
 
+/** The HD chip in play mode: dnd5e rolls a hit die of its first class with one left, without its dialog (SCOPE §6.4). */
+export function rollHitDie(actor, event)
+{
+   return actor.rollHitDie({ event }, { configure: false });
+}
+
 /** − and + on a panel (user, 2026-10-28): one use spent or regained, within 0 and most. */
 export function stepResource(actor, key, delta)
 {

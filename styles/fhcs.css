@@ -66,10 +66,14 @@
    --fhcs-combat: 125px;
 }
 
+/* Dark; and a theme with one look, dark whatever Foundry's mode (Forge, user 2026-10-28: "no difference between F&F
+   light and dark ... default them to dark ... only worry about 1 style per style"). */
 .theme-dark .fhcs-sheet,
 .fhcs-sheet.theme-dark,
 .theme-dark .fhcs-chat,
-.fhcs-chat.theme-dark
+.fhcs-chat.theme-dark,
+.fhcs-sheet[data-fhcs-theme="forge"],
+.fhcs-chat[data-fhcs-theme="forge"]
 {
    --fhcs-success: #7ed08a;
    --fhcs-failure: #ff8a80;

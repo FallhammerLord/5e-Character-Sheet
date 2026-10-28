@@ -218,7 +218,9 @@
             <button type="button" class="fhcs-chip fhcs-label" data-action="showConfiguration" data-config="hitDice"
                     aria-label="{{ text.hdConfig }}" data-fhcs-tip="{{ text.hdConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}{{ hd.text }}</button>
             {{else}}
-            <span class="fhcs-chip fhcs-chip-static fhcs-label" role="img" aria-label="{{ hd.label }}">{{ hd.text }}</span>
+            {{!-- Play mode: one click rolls a hit die, dnd5e's first class with one left, with no dialog (§6.4). --}}
+            <button type="button" class="fhcs-chip fhcs-label" data-action="fhcsRollHitDie" aria-label="{{ hd.rollLabel }}"
+                    data-fhcs-tip="{{ hd.rollLabel }}"{{#unless hd.canRoll}} disabled{{/unless}}>{{ hd.text }}</button>
             {{/if}}
          </div>
       </div>
