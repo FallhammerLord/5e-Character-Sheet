@@ -35,8 +35,17 @@
    --fhcs-theme-mortar: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='32'%3E%3Cg fill='%23b3a089'%3E%3Crect y='14' width='36' height='2'/%3E%3Crect y='30' width='36' height='2'/%3E%3Crect x='34' width='2' height='14'/%3E%3Crect x='16' y='16' width='2' height='14'/%3E%3C/g%3E%3C/svg%3E");
    /* The hearth's heat follows HP; at 0 it's ash. */
    --fhcs-theme-heat: var(--fhcs-hp, 1);
-   --fhcs-theme-fire: color-mix(in srgb, var(--fhcs-theme-ember) calc(var(--fhcs-theme-heat) * 70%), transparent);
-   --fhcs-theme-coal: color-mix(in srgb, var(--fhcs-theme-ember) calc(20% + var(--fhcs-theme-heat) * 80%), var(--fhcs-theme-ash));
+   /* The heat colour (docs/research/forge-theme.md): iron cools as HP falls, the way a smith reads it: yellow-orange
+      forging heat at full, through orange to cherry at half, dull red below, black iron at 0. Two ramps in oklab,
+      the upper half's chosen above 50% HP. */
+   --fhcs-theme-hot-hi: color-mix(in oklab, #ffcf5a calc(clamp(0, (var(--fhcs-theme-heat) - 0.5) * 2, 1) * 100%), #d8341f);
+   --fhcs-theme-hot-lo: color-mix(in oklab, #c8301f calc(clamp(0, var(--fhcs-theme-heat) * 2, 1) * 100%), #2a201c);
+   --fhcs-theme-hot: color-mix(in oklab, var(--fhcs-theme-hot-hi) calc(clamp(0, (var(--fhcs-theme-heat) - 0.5) * 1000, 1) * 100%), var(--fhcs-theme-hot-lo));
+   --fhcs-theme-fire: color-mix(in srgb, var(--fhcs-theme-hot) calc(25% + var(--fhcs-theme-heat) * 50%), transparent);
+   --fhcs-theme-coal: var(--fhcs-theme-hot);
+   /* Temper colours on polished steel, straw to bronze: frame rims. Purple and blue come next on real steel; they
+      mean Pact Magic and prepared spells here (§5.1), so the sheen stops at bronze. */
+   --fhcs-theme-temper: linear-gradient(to right, transparent, #e2c278 20%, #c99a3a 50%, #9c6a2c 80%, transparent);
 }
 
 .theme-dark .fhcs-sheet[data-fhcs-theme="forge"],
@@ -70,7 +79,7 @@
    isolation: isolate;
    background-color: var(--fhcs-surface);
    background-image:
-      radial-gradient(ellipse 90% 70% at 50% 108%, color-mix(in srgb, var(--fhcs-theme-ember) calc(var(--fhcs-theme-heat) * 55%), transparent), transparent 80%),
+      radial-gradient(ellipse 90% 70% at 50% 108%, color-mix(in srgb, var(--fhcs-theme-hot) calc(var(--fhcs-theme-heat) * 60%), transparent), transparent 80%),
       var(--fhcs-theme-rack),
       linear-gradient(to bottom, color-mix(in srgb, var(--fhcs-theme-iron) 30%, transparent), transparent 35%),
       /* Mortar: a brick tile, joints staggered course by course. */
@@ -173,7 +182,7 @@
    inset: 0;
    z-index: 1;
    pointer-events: none;
-   background: linear-gradient(to top, color-mix(in srgb, var(--fhcs-theme-ember) calc(var(--fhcs-theme-heat) * 45%), transparent), transparent 55%);
+   background: linear-gradient(to top, color-mix(in srgb, var(--fhcs-theme-hot) calc(var(--fhcs-theme-heat) * 50%), transparent), transparent 55%);
    mix-blend-mode: screen;
 }
 
@@ -239,24 +248,25 @@
    box-shadow: 0 -2px 10px -2px var(--fhcs-theme-fire), inset 0 0 0 1px var(--fhcs-theme-edge);
 }
 
-/* Hammered metal: a faint grain on every frame (4%, under the texture limit). */
+/* Hammered metal: a faint grain on every frame (4%, under the texture limit), and a temper sheen along its top rim. */
 .fhcs-sheet[data-fhcs-theme="forge"] .fhcs-frame:not(.fhcs-portrait)
 {
    background-image:
+      var(--fhcs-theme-temper),
       radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
       radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
       radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
       radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
       url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0'/%3E%3C/filter%3E%3Crect width='96' height='96' filter='url(%23n)'/%3E%3C/svg%3E");
-   background-position: 0 0, 100% 0, 0 100%, 100% 100%, 0 0;
-   background-size: 8px 8px, 8px 8px, 8px 8px, 8px 8px, 96px 96px;
-   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat;
+   background-position: 50% 0, 0 0, 100% 0, 0 100%, 100% 100%, 0 0;
+   background-size: 50% 2px, 8px 8px, 8px 8px, 8px 8px, 8px 8px, 96px 96px;
+   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, repeat;
 }
 
 /* Bloodied: the window band's seams glow red-hot. Down: frost of ash on the band and the frames. */
 .fhcs-sheet[data-fhcs-theme="forge"][data-fhcs-hp="bloodied"] .window-content::after
 {
-   box-shadow: inset 0 0 0 3px var(--fhcs-theme-iron), inset 0 0 0 4px #c0391b, inset 0 0 14px -4px #c0391b;
+   box-shadow: inset 0 0 0 3px var(--fhcs-theme-iron), inset 0 0 0 4px var(--fhcs-theme-hot), inset 0 0 14px -4px var(--fhcs-theme-hot);
 }
 
 .fhcs-sheet[data-fhcs-theme="forge"][data-fhcs-hp="down"] .window-content::after
@@ -274,6 +284,11 @@
    .fhcs-sheet[data-fhcs-theme="forge"]:not([data-fhcs-motion="off"]) .fhcs-frame:hover
    {
       box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent), 0 0 6px var(--fhcs-theme-glow);
+   }
+   /* Hover: the temper sheen gleams along the rim, once. */
+   .fhcs-sheet[data-fhcs-theme="forge"]:not([data-fhcs-motion="off"]) .fhcs-frame:not(.fhcs-portrait):hover
+   {
+      animation: fhcs-forge-gleam 0.3s ease-out;
    }
    /* A press lands like a hammer: a 1px dip and a spark ring, once. */
    .fhcs-sheet[data-fhcs-theme="forge"]:not([data-fhcs-motion="off"]) :is(.fhcs-button, .fhcs-toggle, .fhcs-chip, .fhcs-tab):active
@@ -347,4 +362,11 @@
 @keyframes fhcs-forge-vignette
 {
    15% { box-shadow: inset 0 0 0 3px var(--fhcs-theme-iron), inset 0 0 0 4px #ff7a2a, inset 0 0 60px -10px #ff7a2a; }
+}
+
+@keyframes fhcs-forge-gleam
+{
+   /* The sheen is half the rim's width: -100% puts it off the left, 300% off the right. */
+   from { background-position: -100% 0, 0 0, 100% 0, 0 100%, 100% 100%, 0 0; }
+   to { background-position: 300% 0, 0 0, 100% 0, 0 100%, 100% 100%, 0 0; }
 }
