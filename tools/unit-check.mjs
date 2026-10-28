@@ -251,13 +251,23 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const fx = attributesView({ ...facts, favorites: [{ ...row('Ward', 'effects'), toggle: { on: false } }] }, { format, localize }).favorites[0].rows[0];
    if (fx.toggle?.on !== false || !fx.toggle.label) { problems.push(`favorited effect switch: ${JSON.stringify(fx.toggle)}`); }
    // The traits panel folds, remembered with the favorites groups; folded it summarizes what's set.
-   // Resources: all three always; an unnamed one gets "Resource N"; recovery in words.
-   const res = attributesView({ ...facts, resources: [
-      { key: 'primary', label: 'Ki', value: 2, max: 4, sourceMax: 4, sr: true, lr: false },
-      { key: 'secondary', label: '', value: 0, max: 0, sourceMax: 0, sr: false, lr: false },
-      { key: 'tertiary', label: 'Rage', value: 1, max: 3, sourceMax: 3, sr: false, lr: true }
-   ] }, { format, localize }).resources.map((r) => `${r.title}|${r.recovery}|${r.named}`);
-   try { deepStrictEqual(res, ['Ki|SR|true', 'Resource 2||false', 'Rage|LR|true']); }
+   // Resources (SCOPE §4.10): in play only those set; with the lock off all three; a linked panel's recovery is its
+   // item's periods, and its cog's tray marks the item shown.
+   const resFacts = { ...facts, linkable: [{ id: 'ki', name: 'Ki', img: 'ki.svg' }], resources: [
+      { key: 'primary', link: { id: 'ki', name: 'Ki', img: 'ki.svg' }, label: 'Ki', value: 2, max: 4, sourceMax: 4, sr: false, lr: false, periods: ['SR'] },
+      { key: 'secondary', link: null, label: '', value: 0, max: 0, sourceMax: 0, sr: false, lr: false, periods: null },
+      { key: 'tertiary', link: null, label: 'Rage', value: 1, max: 3, sourceMax: 3, sr: false, lr: true, periods: null }
+   ] };
+   const show = (over) => attributesView({ ...resFacts, ...over }, { format, localize }).resources
+      .map((r) => `${r.title}|${r.recovery}|${r.linked}|${r.options.filter((o) => o.on).map((o) => o.id || 'own')}`);
+   const res = { play: show({ editing: false }), edit: show({ editing: true }) };
+   try
+   {
+      deepStrictEqual(res, {
+         play: ['Ki|SR|true|ki', 'Rage|LR|false|own'],
+         edit: ['Ki|SR|true|ki', 'Resource 2||false|own', 'Rage|LR|false|own']
+      });
+   }
    catch { problems.push(`resources: ${JSON.stringify(res)}`); }
    const folded = attributesView({ ...facts, folded: ['traits'] }, { format, localize });
    if (!view.traitsOpen || folded.traitsOpen || folded.traitsSummary !== 'Common') { problems.push(`traits fold: ${folded.traitsOpen} "${folded.traitsSummary}"`); }

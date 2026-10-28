@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH } from '../constants.js';
-import { attributesFacts, biographyFacts, changeHp, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, changeHp, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
@@ -145,6 +145,37 @@ function skillAbility(event, target)
 {
    target.closest('details')?.removeAttribute('open');
    return saveSkillAbility(this.actor, target.closest('[data-key]')?.dataset.key, target.dataset.fhcsAbility);
+}
+
+/** A resource panel's cog tray: show an item's uses on the panel, or its own counter again (SCOPE §4.10). */
+function linkResourceAction(event, target)
+{
+   target.closest('details')?.removeAttribute('open');
+   return linkResource(this.actor, target.dataset.key, target.dataset.itemId);
+}
+
+/** A resource panel's Restore: uses back to most. */
+function refreshResourceAction(event, target)
+{
+   return refreshResource(this.actor, target.dataset.key);
+}
+
+/**
+ * A linked panel's uses field is not one of the actor's fields: its change saves the item's uses itself and must not
+ * submit the sheet's form.
+ */
+function wireResourceUses(element, actor)
+{
+   for (const field of element.querySelectorAll('[data-fhcs-resource-uses]'))
+   {
+      if (field.dataset.fhcsWired) { continue; }
+      field.dataset.fhcsWired = 'true';
+      field.addEventListener('change', (event) =>
+      {
+         event.stopPropagation();
+         setResourceUses(actor, field.dataset.fhcsResourceUses, Number(field.value));
+      });
+   }
 }
 
 /** Level down, from the level tray in edit mode (SCOPE §4.9). */
@@ -309,7 +340,7 @@ export function makeCharacterSheet(Base)
             fhcsToggleContainer: toggleContainer, fhcsPinFilter: pinFilter, fhcsOpenConcentration: openConcentration,
             fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails,
             fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange, fhcsFrame: frame, fhcsLevelDown: levelDown, fhcsPortraitShape: portraitShape,
-            fhcsSkillAbility: skillAbility }
+            fhcsSkillAbility: skillAbility, fhcsLinkResource: linkResourceAction, fhcsRefreshResource: refreshResourceAction }
       };
 
       static PARTS = ourParts(Base.PARTS);
@@ -417,6 +448,7 @@ export function makeCharacterSheet(Base)
          keepFolds(this.element, `sheet-${this.id}`);
          closeTraysOnClickOff();
          wireHpTray(this.element);
+         wireResourceUses(this.element, this.actor);
          const items = this.element.querySelector('.fhcs-inventory .fhcs-items');
          if (items && !items.dataset.fhcsWatched)
          {

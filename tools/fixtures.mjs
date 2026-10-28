@@ -244,11 +244,17 @@ const attributesFacts = (over = {}) => ({
       fav('Bless', 'effects', { subtitle: '7 rounds', toggle: { on: true } }),
       fav('Cloak of Protection', 'effects', { toggle: { on: false } })
    ],
-   // dnd5e's three legacy resources: one set, one with a long name and both rests, one never set (user, 2026-10-28).
+   // Three resource panels (SCOPE §4.10): one linked to an item, one of dnd5e's own with a long name and both rests, one
+   // never set (shown only with the lock off).
    resources: [
-      { key: 'primary', label: 'Harness Divine Power', value: 1, max: 1, sourceMax: 1, sr: false, lr: true },
-      { key: 'secondary', label: 'Superiority Dice from the Battle Master Feat', value: 3, max: 4, sourceMax: 4, sr: true, lr: true },
-      { key: 'tertiary', label: '', value: 0, max: 0, sourceMax: 0, sr: false, lr: false }
+      { key: 'primary', link: { id: 'cd', uuid: 'Actor.x.Item.cd', name: 'Channel Divinity', img: CLASS_ICON('#c9a227') },
+         label: 'Channel Divinity', value: 1, max: 2, sourceMax: 2, sr: false, lr: false, periods: ['SR', 'LR'] },
+      { key: 'secondary', link: null, label: 'Superiority Dice from the Battle Master Feat', value: 3, max: 4, sourceMax: 4, sr: true, lr: true, periods: null },
+      { key: 'tertiary', link: null, label: '', value: 0, max: 0, sourceMax: 0, sr: false, lr: false, periods: null }
+   ],
+   linkable: [
+      { id: 'cd', uuid: 'Actor.x.Item.cd', name: 'Channel Divinity', img: CLASS_ICON('#c9a227') },
+      { id: 'wild', uuid: 'Actor.x.Item.wild', name: 'Wand of Magic Missiles with a Long Name', img: CLASS_ICON('#3a6a5a') }
    ],
    slots: { 1: { value: 3, max: 4 }, 3: { value: 3, max: 3 } },
    editing: false, folded: [], ...over
@@ -572,6 +578,7 @@ export const CASES = [
       // The traits heading sits on the Skills heading's line, folded or open (user, 2026-10-27).
       align: [['.fhcs-attributes-side .fhcs-panel-head', 'top', '.fhcs-traits-panel .fhcs-panel-head', 'top'], ['.fhcs-attributes-side .fhcs-panel-head', 'bottom', '.fhcs-traits-panel .fhcs-panel-head', 'bottom']] },
    { name: 'attributes-editing', template: 'sheet/attributes', context: attributes({ editing: true }), rows: '.fhcs-skills > li, .fhcs-traits > dt', marks: '.fhcs-skill-name, .fhcs-skill-mod', sameRowsAs: 'attributes' },
+   { name: 'attributes-resource-tray', template: 'sheet/attributes', open: ['resource-primary'], context: attributes({ editing: true }) },
    { name: 'attributes-ability-tray', template: 'sheet/attributes', open: ['skill-ability-ath'], context: attributes({ editing: true }) },
    { name: 'attributes-empty', template: 'sheet/attributes', context: attributes({ favorites: [], resources: [], traits: [] }) },
    { name: 'tabs', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }) },

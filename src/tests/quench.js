@@ -763,19 +763,54 @@ export function registerQuenchTests(quench)
             }
          });
 
-         it('keeps all three resources on the Attributes tab, and saves uses typed into one', async function ()
+         it('shows set resource panels in play and all three in edit mode, links an item, saves uses and restores them', async function ()
          {
-            const before = foundry.utils.deepClone(actor._source.system.resources.primary);
+            this.timeout(HOOK_WAIT_MS * 12);
+            const resources = foundry.utils.deepClone(actor._source.system.resources);
+            const flag = foundry.utils.deepClone(actor.getFlag('fhcs', 'resources') ?? null);
+            let feat = null;
+            const panels = () => [...sheet.element.querySelectorAll('.fhcs-attributes .fhcs-resource')].map((p) => p.dataset.resource);
             try
             {
+               await actor.update({ 'system.resources': {
+                  primary: { label: 'FHCS test ki', max: 4, value: 4, sr: true, lr: false },
+                  secondary: { label: '', max: 0, value: 0 }, tertiary: { label: '', max: 0, value: 0 } } });
+               await actor.unsetFlag('fhcs', 'resources');
                await click('.fhcs-tabs [data-tab="details"]');
-               const rows = sheet.element.querySelectorAll('.fhcs-attributes .fhcs-resource');
-               assert.strictEqual(rows.length, 3, `the Resources category lists all three; it holds ${rows.length}`);
-               await actor.update({ 'system.resources.primary': { label: 'FHCS test ki', max: 4, value: 4 } });
+               await until(() => panels().join() === 'primary', () => `play mode shows only the set resource; it shows ${panels().join() || 'none'}`);
                await enter('.fhcs-attributes [name="system.resources.primary.value"]', '2');
                await until(() => actor._source.system.resources.primary.value === 2, () => `the uses save; they hold ${actor._source.system.resources.primary.value}`);
+               await click('.fhcs-attributes .fhcs-resource[data-resource="primary"] [data-action="fhcsRefreshResource"]');
+               await until(() => actor._source.system.resources.primary.value === 4, () => `Restore sets uses back to most; they hold ${actor._source.system.resources.primary.value}`);
+
+               [feat] = await createItems([{ name: 'FHCS test channel', type: 'feat', system: { uses: { max: '3', spent: 0, recovery: [{ period: 'sr', type: 'recoverAll' }] } } }]);
+               if (!sheet.isEditMode)
+               {
+                  await click('.fhcs-tabs [data-action="changeMode"]');
+                  await until(() => sheet.isEditMode, 'the lock switches to edit mode');
+               }
+               await until(() => panels().join() === 'primary,secondary,tertiary', () => `edit mode shows all three panels; it shows ${panels().join()}`);
+               await click('.fhcs-attributes .fhcs-resource[data-resource="secondary"] .fhcs-resource-link > summary');
+               await click(`.fhcs-attributes .fhcs-resource[data-resource="secondary"] [data-action="fhcsLinkResource"][data-item-id="${feat.id}"]`);
+               await until(() => actor.getFlag('fhcs', 'resources')?.secondary === feat.id,
+                  () => `the cog's tray links the item; the flag holds ${JSON.stringify(actor.getFlag('fhcs', 'resources'))}`);
+               await until(() => sheet.element.querySelector('.fhcs-resource[data-resource="secondary"] .fhcs-resource-name')?.textContent.trim() === feat.name,
+                  () => `the linked panel shows the item; it reads "${sheet.element.querySelector('.fhcs-resource[data-resource="secondary"] .fhcs-resource-name')?.textContent.trim()}"`);
+               await enter('.fhcs-attributes [data-fhcs-resource-uses="secondary"]', '1');
+               await until(() => feat.system.uses.spent === 2, () => `uses typed into the linked panel save on the item; it has spent ${feat.system.uses.spent}`);
+               await click('.fhcs-attributes .fhcs-resource[data-resource="secondary"] [data-action="fhcsRefreshResource"]');
+               await until(() => feat.system.uses.spent === 0, () => `Restore gives the item its uses back; it has spent ${feat.system.uses.spent}`);
+               await leaveEditMode();
+               await until(() => panels().join() === 'primary,secondary', () => `play mode shows the set and the linked panel; it shows ${panels().join()}`);
             }
-            finally { await actor.update({ 'system.resources.primary': before }); }
+            finally
+            {
+               await leaveEditMode();
+               await actor.update({ 'system.resources': resources });
+               if (flag) { await actor.setFlag('fhcs', 'resources', flag); }
+               else { await actor.unsetFlag('fhcs', 'resources'); }
+               await feat?.delete();
+            }
          });
 
          it('shows and hides Spellbook columns from edit mode', async function ()

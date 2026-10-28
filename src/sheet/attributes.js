@@ -113,24 +113,35 @@ export function attributesView(facts, { format, localize })
       traitsSummary: traits.filter((t) => t.text !== '—').map((t) => t.text).join(' · '),
       favorites,
       editing: !!facts.editing,
-      // The Resources category (user, 2026-10-28): all three always, folded like a favorites group.
+      // Resources (user, 2026-10-28, SCOPE §4.10): three panels in a row; in play only those set, with the lock off all
+      // three. A panel linked to an item shows its uses and recovery; the cog's tray picks the item.
       resources: facts.resources.map((r, i) =>
       {
          const title = r.label || format('FHCS.Attributes.ResourceN', { n: i + 1 });
-         const recovery = [r.sr && localize('FHCS.Attributes.ShortRestAbbr'), r.lr && localize('FHCS.Attributes.LongRestAbbr')].filter(Boolean).join(' · ');
+         const recovery = r.periods ? r.periods.join(' · ')
+            : [r.sr && localize('FHCS.Attributes.ShortRestAbbr'), r.lr && localize('FHCS.Attributes.LongRestAbbr')].filter(Boolean).join(' · ');
+         const linkId = r.link?.id ?? '';
          return {
-            ...r, title, named: !!r.label, recovery,
+            ...r, title, named: !!r.label, recovery, linked: !!r.link,
+            set: !!(r.link || r.label || r.max),
             groupLabel: format('FHCS.Attributes.ResourceLabel', { title, value: r.value, max: r.max }),
             nameLabel: format('FHCS.Attributes.ResourceName', { n: i + 1 }),
             valueLabel: format('FHCS.Attributes.ResourceValue', { title }),
-            maxLabel: format('FHCS.Attributes.ResourceMax', { title })
+            maxLabel: format('FHCS.Attributes.ResourceMax', { title }),
+            refreshLabel: format('FHCS.Attributes.ResourceRefresh', { title }),
+            linkLabel: format('FHCS.Attributes.ResourceLink', { title }),
+            options: [
+               { id: '', name: localize('FHCS.Attributes.ResourceOwn'), img: '', on: !linkId },
+               ...(facts.linkable ?? []).map((item) => ({ id: item.id, name: item.name, img: item.img, on: item.id === linkId }))
+            ]
          };
-      }),
+      }).filter((r) => facts.editing || r.set),
       resourcesOpen: !(facts.folded ?? []).includes('resources'),
       text: {
          skills: localize('FHCS.Attributes.Skills'),
          traits: localize('FHCS.Attributes.Traits'),
          resources: localize('FHCS.Attributes.Resources'),
+         linkTitle: localize('FHCS.Attributes.ResourceLinkTitle'),
          shortRest: localize('FHCS.Attributes.ShortRestAbbr'),
          longRest: localize('FHCS.Attributes.LongRestAbbr'),
          skillsConfig: localize('FHCS.Attributes.SkillsConfig'),

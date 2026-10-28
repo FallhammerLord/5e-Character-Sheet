@@ -20,3 +20,6 @@ export const PORTRAIT_FLAG = 'portrait';
 
 /** The actor flag holding the portrait's shape (user, 2026-10-27): 'round' or 'square'; unset, a token is round. */
 export const SHAPE_FLAG = 'portraitShape';
+
+/** Actor flag: which item, by id, each resource panel shows in place of dnd5e's own resource ({ primary: id }). */
+export const RESOURCES_FLAG = 'resources';

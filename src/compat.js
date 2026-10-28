@@ -6,7 +6,7 @@
 import { countingDie, MAX_PER_SIDE, modeForSides } from './chat/d20.js';
 import { diceMath } from './chat/math.js';
 import { canCast, spellKind } from './sheet/spellbook.js';
-import { PORTRAIT_FLAG, SHAPE_FLAG } from './constants.js';
+import { MODULE_ID, PORTRAIT_FLAG, RESOURCES_FLAG, SHAPE_FLAG } from './constants.js';
 
 /** dnd5e's own character sheet, which ours extends so every mechanic keeps working. Set by dnd5e before init. */
 export function systemCharacterSheet()
@@ -179,15 +179,11 @@ export async function attributesFacts(sheet, context, { folded, open = new Set()
       { key: 'tool', title: title('tool'), values: sheet._prepareSkillsTools(context, 'tools').map((t) => t.label) }
    ];
 
-   // dnd5e's three legacy resources, all of them, set or not (user, 2026-10-28: an always-there Resources category);
-   // dnd5e lists one as a favorite only once it has a label and a max, so they're read from the actor, not the favorites.
-   const resources = ['primary', 'secondary', 'tertiary'].map((key) =>
-   {
-      const r = actor.system.resources?.[key] ?? {};
-      const source = actor._source.system.resources?.[key] ?? {};
-      return { key, label: source.label ?? '', value: source.value ?? 0, max: r.max ?? source.max ?? 0, sourceMax: source.max ?? 0,
-         sr: !!source.sr, lr: !!source.lr };
-   });
+   // dnd5e's three legacy resources, read from the actor (dnd5e lists one as a favorite only once it has a label and a
+   // max); a panel linked to an item with uses shows that item instead (user, 2026-10-28, SCOPE §4.10).
+   const resources = RESOURCE_KEYS.map((key) => resourceFacts(actor, key));
+   const linkable = actor.items.filter((item) => item.system.uses?.max).map(docFacts)
+      .sort((a, b) => a.name.localeCompare(b.name));
    const favorites = [];
    for (const f of await sheet._prepareFavorites(context))
    {
@@ -240,7 +236,7 @@ export async function attributesFacts(sheet, context, { folded, open = new Set()
       if (slot?.max) { slots[level] = { value: slot.value ?? 0, max: slot.max }; }
    }
    const abilities = Object.entries(config.abilities ?? {}).map(([key, a]) => ({ key, abbr: a.abbreviation ?? key }));
-   return { skills, abilities, traits, favorites, resources, slots, editing: sheet.isEditMode, folded };
+   return { skills, abilities, traits, favorites, resources, linkable, slots, editing: sheet.isEditMode, folded };
 }
 
 /** dnd5e's summary of an expanded item (inventory.mjs `_onToggleExpand`), drawn again when the sheet re-renders. */
@@ -587,6 +583,67 @@ function recoveryWords(item)
       if (r.period === 'recharge') { return item.labels?.recharge ?? ''; }
       return periods[r.period] ? game.i18n.localize(periods[r.period].label) : '';
    }).filter(Boolean).join(', ');
+}
+
+/** dnd5e's three legacy resources, in its order. */
+const RESOURCE_KEYS = ['primary', 'secondary', 'tertiary'];
+
+/** @returns {Item|null} The item a resource panel is linked to, while it still has uses. */
+function linkedResourceItem(actor, key)
+{
+   const id = actor.getFlag(MODULE_ID, RESOURCES_FLAG)?.[key];
+   const item = id ? actor.items.get(id) : null;
+   return item?.system.uses?.max ? item : null;
+}
+
+/**
+ * One resource panel's facts: the linked item's uses and recovery periods (abbreviated, as dnd5e's own lists show
+ * them), or dnd5e's legacy resource.
+ */
+function resourceFacts(actor, key)
+{
+   const item = linkedResourceItem(actor, key);
+   if (item)
+   {
+      const periods = CONFIG.DND5E.limitedUsePeriods ?? {};
+      const recovery = (item.system.uses.recovery ?? []).map((r) =>
+      {
+         if (r.period === 'recharge') { return item.labels?.recharge ?? ''; }
+         const period = periods[r.period];
+         return period ? game.i18n.localize(period.abbreviation ?? period.label) : '';
+      }).filter(Boolean);
+      return { key, link: docFacts(item), label: item.name, value: item.system.uses.value ?? 0, max: item.system.uses.max,
+         sourceMax: item.system.uses.max, sr: false, lr: false, periods: recovery };
+   }
+   const r = actor.system.resources?.[key] ?? {};
+   const source = actor._source.system.resources?.[key] ?? {};
+   return { key, link: null, label: source.label ?? '', value: source.value ?? 0, max: r.max ?? source.max ?? 0,
+      sourceMax: source.max ?? 0, sr: !!source.sr, lr: !!source.lr, periods: null };
+}
+
+/** Links a resource panel to an item with uses, or back to dnd5e's own resource (no id). */
+export function linkResource(actor, key, itemId)
+{
+   if (!RESOURCE_KEYS.includes(key)) { return null; }
+   return itemId ? actor.setFlag(MODULE_ID, `${RESOURCES_FLAG}.${key}`, itemId) : actor.unsetFlag(MODULE_ID, `${RESOURCES_FLAG}.${key}`);
+}
+
+/** Uses left typed into a linked panel: dnd5e stores what's spent (inventory.mjs:565). */
+export function setResourceUses(actor, key, value)
+{
+   const item = linkedResourceItem(actor, key);
+   if (!item || !Number.isFinite(value)) { return null; }
+   const max = item.system.uses.max;
+   return item.update({ 'system.uses.spent': max - Math.clamp(Math.round(value), 0, max) });
+}
+
+/** Refresh: uses back to most, the linked item's or dnd5e's own resource's. */
+export function refreshResource(actor, key)
+{
+   const item = linkedResourceItem(actor, key);
+   if (item) { return item.update({ 'system.uses.spent': 0 }); }
+   if (!RESOURCE_KEYS.includes(key)) { return null; }
+   return actor.update({ [`system.resources.${key}.value`]: actor.system.resources?.[key]?.max ?? 0 });
 }
 
 /** @returns {{id, uuid, name, img}} What our cards need of an item. */

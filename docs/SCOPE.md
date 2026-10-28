@@ -146,7 +146,7 @@ From the user's screenshot after Phase 6's play check. Mockups: the layout check
 - **The class level in a ring at the card's top right;** the name reads "Fighter" over "Rune Knight". The class name takes the display style. The word "Class" goes to screen readers only (Claude, 2026-10-28, carried further than asked: at 644px with "+N" the ring cut it to "CL…"; the ring, display name and split art mark the card).
 - **The milestone tray drops its key** of class names and levels: the badges say it. Level up and Level down stay.
 - **An effect favorite shows its duration only when it runs out:** dnd5e's label read "None" for an endless effect.
-- **Resources: three panels in a row,** each several lines (as Classic's): name; uses left / most and a refresh button; recovery (SR, LR, or a linked item's periods). In play only the resources that are set show; with the lock off all three show, for editing and adding. Edit mode: the name and most uses become fields, recovery two checkboxes, and a cog opens a tray to link an item with uses to that panel. A linked panel shows and edits the item's uses and recovery (stored in `flags.fhcs.resources`); unlinked keeps dnd5e's own resource. Refresh sets uses back to most. A linked item may also be a favorite (Claude's pick; the user didn't object).
+- **Resources: three panels in a row,** each several lines (as Classic's): name (wrapping to two lines before it's cut); uses left / most; recovery (SR, LR, or a linked item's periods) and Restore. In play only the resources that are set show; with the lock off all three show, for editing and adding. Edit mode: the name and most uses become fields, recovery two checkboxes, and a cog opens a tray to link an item with uses to that panel. A linked panel shows and edits the item's uses and recovery (stored in `flags.fhcs.resources`); unlinked keeps dnd5e's own resource. Refresh sets uses back to most. A linked item may also be a favorite (Claude's pick; the user didn't object).
 - **Sections fold on Inventory, Spellbook, Features and Effects,** as favorites groups do, remembered per player. A search shows matches inside folded sections and clearing it puts the folds back; a spell level's slot pips stay usable while folded.
 
 ## 5. ADHD rules carried over
@@ -226,12 +226,13 @@ Check here before choosing a mark, and add new ones. Every tint has an icon, mar
 | Number in a ring | The class's level | Each class card's top right (user, 2026-10-28) |
 | Light green fill inside the HP bar | HP left, with the numbers written over it | The portrait card's band (user, 2026-10-27) |
 | Heart with a crack; heart with a plus; shield with a plus | Damage; heal; temporary HP | The HP tray, each with its word; Damage solid as the main action (user, 2026-10-27) |
-| Gear | Settings: opens one of dnd5e's settings windows, or a tray of settings | Edit mode only: beside AC, Init, each ability, speed, HP, skills and traits; on the HD chip; alone in a chip at the portrait's top centre (its options tray) (user, 2026-10-27) |
+| Gear | Settings: opens one of dnd5e's settings windows, or a tray of settings | Edit mode only: beside AC, Init, each ability, speed, HP, skills and traits; on the HD chip; alone in a chip at the portrait's top centre (its options tray) (user, 2026-10-27); each resource panel's name line, the item to show (2026-10-28) |
 | Two opposed arrows; solid when on, outline when off | Show the token in place of the portrait | Edit mode, the portrait's options tray (dnd5e's own switch) |
 | Circle; solid when on, outline when off | Round portrait | Edit mode, the portrait's options tray (user, 2026-10-27) |
 | Crop corners | Frame the portrait (pan and zoom) | Edit mode, the portrait's options tray; not for a token (user, 2026-10-27) |
 | Dashed edge on the portrait | Framing: drag the art | While framing (user, 2026-10-27) |
-| Radio dot: filled, ring | The main spellcasting ability; another | Edit mode, each casting card on the Spellbook (user, 2026-10-27) |
+| Radio dot: filled, ring | The one chosen; another | Edit mode: each casting card on the Spellbook, the main spellcasting ability (user, 2026-10-27); a resource panel's cog tray, the item shown (2026-10-28) |
+| Circular arrow | Restore: uses back to most | Each resource panel's foot (user, 2026-10-28) |
 | Down arrow | Level down | Edit mode, the level tray (user, 2026-10-27) |
 
 Chat cards keep their own scheme (§6.6): the primary d20 black (white in dark themes), disadvantage dice red, advantage dice blue.
