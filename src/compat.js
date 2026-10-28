@@ -1345,7 +1345,9 @@ function watchForPlayer(log, stop)
 /** Shows Foundry's tooltip on an element, above it (our delayed tooltips; chat/card.js). */
 export function showTooltip(element, text)
 {
-   game.tooltip?.activate?.(element, { text, direction: 'UP' });
+   // A themed sheet's tips wear its theme (SCOPE §4.11); Foundry's tooltip lives outside the sheet.
+   const look = element.closest?.('[data-fhcs-theme]')?.dataset.fhcsTheme;
+   game.tooltip?.activate?.(element, { text, direction: 'UP', ...(look ? { cssClass: `fhcs-tip fhcs-tip-${look}` } : {}) });
 }
 
 /** Hides Foundry's tooltip. */

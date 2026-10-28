@@ -24,5 +24,10 @@ export const SHAPE_FLAG = 'portraitShape';
 /** Actor flag: which item, by id, each resource panel shows in place of dnd5e's own resource ({ primary: id }). */
 export const RESOURCES_FLAG = 'resources';
 
+/** The sheet's themes (SCOPE §4.11), by key; `plain` is today's look. Actor flag `flags.fhcs.theme` picks one per
+    character; without it, the world setting `fhcs.theme` applies. */
+export const THEMES = ['plain', 'forge', 'wind', 'sand', 'valley'];
+export const THEME_FLAG = 'theme';
+
 /** Message flag: what a card's Apply did, one entry per target and click (`compat.watchApplications`). */
 export const APPLIED_FLAG = 'applied';

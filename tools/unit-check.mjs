@@ -236,6 +236,12 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    if (edit !== 'details,inventory,spells,features,effects,specialTraits') { problems.push(`tab row in edit mode: ${edit}`); }
    const names = tabRow(dnd5eTabs, { canEdit: true, editing: false }, localize).tabs.map((t) => t.label);
    if (names[0] !== 'Attributes' || names[2] !== 'Spellbook') { problems.push(`tab names: ${names.join()}`); }
+   // The theme picker (SCOPE §4.11): edit mode only; the world default first, named, then each theme; one pressed.
+   const theme = { chosen: '', world: 'forge', keys: ['plain', 'forge'] };
+   const pick = (editing) => tabRow(dnd5eTabs, { canEdit: true, editing, theme }, localize, format).themes;
+   const options = pick(true)?.options.map((o) => `${o.value || 'world'}:${o.name}:${o.on}`);
+   try { deepStrictEqual({ play: pick(false), options }, { play: null, options: ['world:World default (Fire and Forge):true', 'plain:Plain:false', 'forge:Fire and Forge:false'] }); }
+   catch { problems.push(`theme picker: ${JSON.stringify(options)}`); }
 }
 
 // Attributes: every passive, every trait in both modes, favorites grouped in Classic's order with slot pips.

@@ -265,7 +265,7 @@ export const TAB_ORDER = ['details', 'inventory', 'spells', 'features', 'effects
  * @param {object} tabs   dnd5e's `context.tabs`, by tab ID.
  * @param {{canEdit: boolean, editing: boolean}} mode
  */
-export function tabRow(tabs, { canEdit, editing }, localize)
+export function tabRow(tabs, { canEdit, editing, theme = null }, localize, format = localize)
 {
    const names = { details: 'FHCS.Tabs.Attributes', spells: 'FHCS.Tabs.Spellbook' };
    const rank = (id) => { const i = TAB_ORDER.indexOf(id); return i < 0 ? TAB_ORDER.length : i; };
@@ -276,6 +276,15 @@ export function tabRow(tabs, { canEdit, editing }, localize)
          .sort((a, b) => rank(a.id) - rank(b.id)).map((t) => ({ id: t.id, active: !!t.active, label: localize(names[t.id] ?? t.label) })),
       canEdit,
       editing,
-      lockLabel: localize(editing ? 'FHCS.Tabs.Lock' : 'FHCS.Tabs.Unlock')
+      lockLabel: localize(editing ? 'FHCS.Tabs.Lock' : 'FHCS.Tabs.Unlock'),
+      // The character's theme (SCOPE §4.11), chosen in edit mode: the world default, or one of its own.
+      themes: theme && canEdit && editing ? {
+         label: localize('FHCS.Theme.Label'),
+         title: localize('FHCS.Theme.Title'),
+         options: [
+            { value: '', name: format('FHCS.Theme.WorldDefault', { name: localize(`FHCS.Theme.${theme.world}`) }), on: !theme.chosen },
+            ...theme.keys.map((key) => ({ value: key, name: localize(`FHCS.Theme.${key}`), on: theme.chosen === key }))
+         ]
+      } : null
    };
 }

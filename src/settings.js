@@ -1,4 +1,4 @@
-import { MODULE_ID, SHEET_CLASS_NAME } from './constants.js';
+import { MODULE_ID, SHEET_CLASS_NAME, THEMES } from './constants.js';
 import { rerenderSheets } from './compat.js';
 import { DEFAULT_COLUMNS } from './sheet/inventory.js';
 import { DEFAULT_SPELL_COLUMNS } from './sheet/spellbook.js';
@@ -15,6 +15,29 @@ export function registerSettings()
       type: Boolean,
       default: true,
       requiresReload: true
+   });
+
+   // The table's sheet theme (SCOPE §4.11, user 2026-10-28): a character's own choice wins; Plain is today's look.
+   game.settings.register(MODULE_ID, 'theme', {
+      name: 'FHCS.Settings.Theme.Name',
+      hint: 'FHCS.Settings.Theme.Hint',
+      scope: 'world',
+      config: true,
+      type: String,
+      choices: Object.fromEntries(THEMES.map((key) => [key, `FHCS.Theme.${key}`])),
+      default: 'plain',
+      onChange: () => rerenderSheets(SHEET_CLASS_NAME)
+   });
+
+   // A theme's motion, each player's own (SCOPE §4.11): off, the sheet keeps still, as under reduced motion.
+   game.settings.register(MODULE_ID, 'motion', {
+      name: 'FHCS.Settings.Motion.Name',
+      hint: 'FHCS.Settings.Motion.Hint',
+      scope: 'client',
+      config: true,
+      type: Boolean,
+      default: true,
+      onChange: () => rerenderSheets(SHEET_CLASS_NAME)
    });
 
    // Which Inventory columns show (user, 2026-10-26: each player's choice, made from the tab in edit mode).

@@ -30,6 +30,14 @@
       "FeatureColumns": {
         "Name": "Features columns",
         "Hint": "Which columns the Features tab shows. Change them from the tab's Columns menu in edit mode."
+      },
+      "Theme": {
+        "Name": "Sheet theme",
+        "Hint": "The theme every character sheet wears unless a character picks its own (edit mode, the theme chip beside the lock)."
+      },
+      "Motion": {
+        "Name": "Theme motion",
+        "Hint": "Off: themed sheets keep still (no sparks, gleams or moments). Your own choice; your system's reduced-motion setting also turns it off."
       }
     },
     "Chat": {
@@ -367,6 +375,16 @@
     },
     "Biography": {
       "Empty": "Nothing written yet."
+    },
+    "Theme": {
+      "Label": "Sheet theme",
+      "Title": "Sheet theme",
+      "WorldDefault": "World default ({name})",
+      "plain": "Plain",
+      "forge": "Fire and Forge",
+      "wind": "Wind and Wrath",
+      "sand": "Sand and Sanctuary",
+      "valley": "Valley and Valor"
     }
   }
 }

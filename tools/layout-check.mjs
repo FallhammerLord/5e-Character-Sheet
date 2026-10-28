@@ -76,7 +76,7 @@ function findProblems()
    for (const el of app.querySelectorAll('.window-content *'))
    {
       const cs = getComputedStyle(el);
-      if (cs.display === 'none' || cs.visibility === 'hidden' || el.closest('[hidden], .sr-only, .fhcs-sr-only')) { continue; }
+      if (cs.display === 'none' || cs.visibility === 'hidden' || el.closest('[hidden], .sr-only, .fhcs-sr-only, details:not([open]) > :not(summary)')) { continue; }
       // Shapes inside one SVG drawing overlap by design.
       if (el.ownerSVGElement) { continue; }
       const r = el.getBoundingClientRect();
@@ -316,7 +316,7 @@ function findProblems()
    const ratio = (a, b) => { const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x); return (hi + 0.05) / (lo + 0.05); };
    for (const el of app.querySelectorAll('.window-content *'))
    {
-      if (el.ownerSVGElement || el.closest('[hidden]') || !el.getClientRects().length) { continue; }
+      if (el.ownerSVGElement || el.closest('[hidden], details:not([open]) > :not(summary)') || !el.getClientRects().length) { continue; }
       const text = [...el.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent).join('').trim();
       if (!text) { continue; }
       const cs = getComputedStyle(el);
@@ -379,7 +379,7 @@ function findProblems()
    // Spacing is 4 or 8 (SCOPE §5.2 rule 3, user 2026-10-28), every gap, padding and margin on the sheet, except:
    // a hang (rule 21: a control reaching into the space around its line, a negative margin on the named controls),
    // an indent that lines text up with a column (the name column, a container's contents, the footer's last column),
-   // the screen-reader clip, and the lock's automatic margin.
+   // the screen-reader clip, and the lock's automatic margin (the theme chip's, when it stands before the lock).
    if (app.matches('.fhcs-sheet'))
    {
       const HANGS = '.fhcs-shield, .fhcs-gear-button, .fhcs-more, .fhcs-class-level';
@@ -388,7 +388,7 @@ function findProblems()
       const off = new Map();
       for (const el of app.querySelectorAll('.window-content *'))
       {
-         if (el.ownerSVGElement || !el.getClientRects().length || el.matches('.fhcs-sr-only, .fhcs-lock')) { continue; }
+         if (el.ownerSVGElement || !el.getClientRects().length || el.matches('.fhcs-sr-only, .fhcs-lock, .fhcs-theme-pick')) { continue; }
          // Ours only: inside our markup (a plain page's paragraph keeps the browser's margins).
          if (!el.closest('.window-content [class*="fhcs-"]')) { continue; }
          const cs = getComputedStyle(el);

@@ -1,4 +1,4 @@
-import { MODULE_ID, MODULE_PATH } from '../constants.js';
+import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES } from '../constants.js';
 import { attributesFacts, biographyFacts, changeHp, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
@@ -74,15 +74,17 @@ async function toggleGroup(event, target)
 const MOMENT_MS = 650;
 
 /**
- * The sheet's state for its theme (SCOPE §4.11): the character's theme (`flags.fhcs.theme`; the picker and world
- * default come next), HP as a 0–1 ratio and full / bloodied / down for the theme's art, and a moment when HP falls or
+ * The sheet's state for its theme (SCOPE §4.11): the character's theme (`flags.fhcs.theme`, else the world's), the
+ * player's Motion switch, HP as a 0–1 ratio and full / bloodied / down for the theme's art, and a moment when HP falls or
  * rises between two draws.
  */
 function themeState(element, actor)
 {
-   const theme = actor.getFlag(MODULE_ID, 'theme');
-   if (theme) { element.dataset.fhcsTheme = theme; }
+   const theme = actor.getFlag(MODULE_ID, THEME_FLAG) || game.settings.get(MODULE_ID, 'theme');
+   if (theme && theme !== 'plain') { element.dataset.fhcsTheme = theme; }
    else { delete element.dataset.fhcsTheme; }
+   if (game.settings.get(MODULE_ID, 'motion')) { delete element.dataset.fhcsMotion; }
+   else { element.dataset.fhcsMotion = 'off'; }
    const hp = actor.system.attributes?.hp ?? {};
    const value = Number(hp.value) || 0;
    const ratio = hp.max > 0 ? Math.clamp(value / hp.max, 0, 1) : 1;
@@ -95,6 +97,15 @@ function themeState(element, actor)
    element.classList.remove('fhcs-moment-hit', 'fhcs-moment-heal');
    element.classList.add(moment);
    setTimeout(() => element.classList.remove(moment), MOMENT_MS);
+}
+
+/** The theme tray (edit mode): a theme of the character's own, or back to the world default (no value). */
+function setTheme(event, target)
+{
+   target.closest('details')?.removeAttribute('open');
+   const value = target.dataset.theme;
+   if (value && !THEMES.includes(value)) { return null; }
+   return value ? this.actor.setFlag(MODULE_ID, THEME_FLAG, value) : this.actor.unsetFlag(MODULE_ID, THEME_FLAG);
 }
 
 /** Folds or opens a section on a list tab (user, 2026-10-28), and remembers it with the favorites groups. */
@@ -381,7 +392,7 @@ export function makeCharacterSheet(Base)
             fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails,
             fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange, fhcsFrame: frame, fhcsLevelDown: levelDown, fhcsPortraitShape: portraitShape,
             fhcsSkillAbility: skillAbility, fhcsLinkResource: linkResourceAction, fhcsRefreshResource: refreshResourceAction,
-            fhcsToggleSection: toggleSection }
+            fhcsToggleSection: toggleSection, fhcsSetTheme: setTheme }
       };
 
       static PARTS = ourParts(Base.PARTS);
@@ -447,7 +458,8 @@ export function makeCharacterSheet(Base)
          }
          if (partId === 'tabs')
          {
-            context.fhcsTabs = tabRow(context.tabs, { canEdit: this.isEditable, editing: this.isEditMode }, i18n.localize);
+            const theme = { chosen: this.actor.getFlag(MODULE_ID, THEME_FLAG) ?? '', world: game.settings.get(MODULE_ID, 'theme'), keys: THEMES };
+            context.fhcsTabs = tabRow(context.tabs, { canEdit: this.isEditable, editing: this.isEditMode, theme }, i18n.localize, i18n.format);
          }
          return context;
       }

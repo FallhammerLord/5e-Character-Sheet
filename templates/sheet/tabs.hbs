@@ -6,6 +6,21 @@
    <button type="button" class="fhcs-tab fhcs-body{{#if active}} active{{/if}}" data-action="tab" data-group="primary"
            data-tab="{{ id }}">{{ label }}</button>
    {{/each}}
+   {{#if fhcsTabs.themes}}
+   {{!-- Edit mode: the character's theme (SCOPE §4.11), beside the lock. --}}
+   <details class="fhcs-fold fhcs-theme-pick" data-fold-key="theme">
+      <summary class="fhcs-toggle fhcs-theme-chip" aria-label="{{ fhcsTabs.themes.label }}" data-fhcs-tip="{{ fhcsTabs.themes.label }}">
+         <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.2 0 1.8-.8 1.8-1.6 0-1.1-.9-1.4-.9-2.4 0-.9.7-1.5 1.6-1.5H17a4 4 0 0 0 4-4C21 6.6 17 3 12 3z"/><circle cx="7.5" cy="11" r="1.2"/><circle cx="10" cy="7" r="1.2"/><circle cx="15" cy="7.5" r="1.2"/></svg>
+      </summary>
+      <div class="fhcs-tray fhcs-theme-tray">
+         <span class="fhcs-label">{{ fhcsTabs.themes.title }}</span>
+         {{#each fhcsTabs.themes.options}}
+         <button type="button" class="fhcs-button fhcs-body fhcs-theme-option" data-action="fhcsSetTheme" data-theme="{{ value }}"
+                 aria-pressed="{{#if on}}true{{else}}false{{/if}}"><span class="fhcs-radio-mark" aria-hidden="true"></span>{{ name }}</button>
+         {{/each}}
+      </div>
+   </details>
+   {{/if}}
    {{#if fhcsTabs.canEdit}}
    <button type="button" class="fhcs-button fhcs-lock" data-action="changeMode" aria-pressed="{{#if fhcsTabs.editing}}true{{else}}false{{/if}}"
            aria-label="{{ fhcsTabs.lockLabel }}" data-fhcs-tip="{{ fhcsTabs.lockLabel }}">

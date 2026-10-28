@@ -851,6 +851,44 @@ export function registerQuenchTests(quench)
             }
          });
 
+         it('wears the world theme, picks its own from the edit-mode theme tray, and keeps still with Motion off', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 12);
+            const world = game.settings.get(MODULE_ID, 'theme');
+            const motion = game.settings.get(MODULE_ID, 'motion');
+            const flag = actor.getFlag(MODULE_ID, 'theme') ?? null;
+            const look = () => sheet.element.dataset.fhcsTheme ?? 'plain';
+            try
+            {
+               await actor.unsetFlag(MODULE_ID, 'theme');
+               await game.settings.set(MODULE_ID, 'theme', 'forge');
+               await until(() => look() === 'forge', () => `the world theme applies; the sheet wears ${look()}`);
+               if (!sheet.isEditMode)
+               {
+                  await click('.fhcs-tabs [data-action="changeMode"]');
+                  await until(() => sheet.isEditMode, 'the lock switches to edit mode');
+               }
+               await click('.fhcs-tabs .fhcs-theme-pick > summary');
+               await click('.fhcs-tabs [data-action="fhcsSetTheme"][data-theme="sand"]');
+               await until(() => actor.getFlag(MODULE_ID, 'theme') === 'sand' && look() === 'sand',
+                  () => `the tray sets the character's own theme; the flag holds ${actor.getFlag(MODULE_ID, 'theme')}, the sheet wears ${look()}`);
+               await click('.fhcs-tabs .fhcs-theme-pick > summary');
+               await click('.fhcs-tabs [data-action="fhcsSetTheme"][data-theme=""]');
+               await until(() => !actor.getFlag(MODULE_ID, 'theme') && look() === 'forge',
+                  () => `World default clears the character's own; the flag holds ${actor.getFlag(MODULE_ID, 'theme')}, the sheet wears ${look()}`);
+               await game.settings.set(MODULE_ID, 'motion', false);
+               await until(() => sheet.element.dataset.fhcsMotion === 'off', () => `Motion off keeps the sheet still; it holds ${sheet.element.dataset.fhcsMotion}`);
+            }
+            finally
+            {
+               await game.settings.set(MODULE_ID, 'motion', motion);
+               await game.settings.set(MODULE_ID, 'theme', world);
+               if (flag) { await actor.setFlag(MODULE_ID, 'theme', flag); }
+               else { await actor.unsetFlag(MODULE_ID, 'theme'); }
+               await leaveEditMode();
+            }
+         });
+
          it('shows and hides Spellbook columns from edit mode', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 4);
