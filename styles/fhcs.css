@@ -2167,8 +2167,8 @@
 /* Edit mode's two checkboxes need the blank's width at 644px; they centre in what's left of Restore. */
 .fhcs-sheet .fhcs-resource-foot:has(input) { grid-template-columns: minmax(0, 1fr) 24px; }
 .fhcs-sheet .fhcs-resource-foot:has(input) > :first-child { grid-column: 1; }
-.fhcs-sheet .fhcs-resource-head:not(:has(.fhcs-resource-link)) { grid-template-columns: minmax(0, 1fr); }
-.fhcs-sheet .fhcs-resource-head:not(:has(.fhcs-resource-link)) > :first-child { grid-column: 1; }
+.fhcs-sheet .fhcs-resource-head { grid-template-columns: minmax(0, 1fr); }
+.fhcs-sheet .fhcs-resource-head > :first-child { grid-column: 1; }
 /* The name line holds two lines of body in both modes, so a wrapped name and edit mode's field keep the panels' size. */
 .fhcs-sheet .fhcs-resource-head { height: calc(2em * var(--fhcs-body-line)); font-size: var(--fhcs-body-size); }
 /* A panel's name wraps to a second line before it's cut (a third of the row is about 120px at 644). */
@@ -2178,9 +2178,18 @@
 .fhcs-sheet .fhcs-resource-head > .fhcs-resource-field { min-width: 0; height: 24px; min-height: 0; text-align: center; }
 
 /* Uses left / most, centred in the panel. */
-.fhcs-sheet .fhcs-resource-count { display: flex; align-items: center; justify-content: center; gap: var(--fhcs-s1); min-height: var(--fhcs-control); }
-.fhcs-sheet .fhcs-resource-count .fhcs-input { flex: 0 1 3rem; width: 3rem; min-width: 0; height: var(--fhcs-control); min-height: 0; text-align: center; }
-.fhcs-sheet .fhcs-resource-max { min-width: 1.5rem; text-align: left; }
+.fhcs-sheet .fhcs-resource-count { display: flex; align-items: center; justify-content: center; gap: var(--fhcs-s1); min-width: 0; min-height: var(--fhcs-control); }
+.fhcs-sheet .fhcs-resource-count > :is(.fhcs-resource-step, .fhcs-resource-link, .fhcs-resource-blank) { flex: none; width: 24px; }
+.fhcs-sheet .fhcs-resource-value { text-align: right; }
+.fhcs-sheet .fhcs-resource-count .fhcs-input { flex: 0 1 2.5rem; width: 2.5rem; min-width: 0; height: var(--fhcs-control); min-height: 0; text-align: center; }
+.fhcs-sheet .fhcs-resource-max { text-align: left; }
+/* − and + either side of the count (user, 2026-10-28): 24px targets, their marks centred; at an end, the step that
+   can't be taken is disabled, not hidden, so nothing moves. */
+.fhcs-sheet .fhcs-toggle.fhcs-resource-step { flex: none; width: 24px; height: 24px; }
+.fhcs-sheet .fhcs-resource-step:disabled { cursor: default; }
+/* A linked panel's name is a button that uses the item; it keeps the panel's centred label (user, 2026-10-28). */
+.fhcs-sheet .fhcs-resource-use { margin: 0; padding: 0; border: 0; background: none; color: inherit; font-family: inherit; text-align: center; cursor: pointer; }
+.fhcs-sheet .fhcs-resource-use:hover { text-decoration: underline; }
 
 .fhcs-sheet .fhcs-resource-recovery { display: flex; justify-content: center; align-items: center; gap: var(--fhcs-s1); min-width: 0; min-height: 24px; white-space: nowrap; }
 /* Recovery in words (a linked item's periods can run long) gives way; the edit-mode checkboxes never do. */
@@ -2194,7 +2203,7 @@
 .fhcs-sheet .fhcs-resource-link { position: relative; flex: none; }
 .fhcs-sheet .fhcs-resource-link > summary { list-style: none; }
 .fhcs-sheet .fhcs-resource-link > summary::-webkit-details-marker { display: none; }
-.fhcs-sheet .fhcs-resource-tray { left: auto; right: 0; z-index: 3; width: 15rem; max-height: 20rem; overflow-y: auto; scrollbar-gutter: stable; }
+.fhcs-sheet .fhcs-resource-link > .fhcs-resource-tray { left: 0; right: auto; z-index: 3; width: 15rem; max-height: 20rem; overflow-y: auto; scrollbar-gutter: stable; }
 .fhcs-sheet .fhcs-resource-option { justify-content: flex-start; gap: var(--fhcs-s1); padding: 0 var(--fhcs-s1); }
 /* The one shown: the radio dot filled, as the main spellcasting ability's (SCOPE §5.1). */
 .fhcs-sheet .fhcs-resource-option > .fhcs-radio-mark { flex: none; }

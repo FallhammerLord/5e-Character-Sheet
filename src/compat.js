@@ -637,6 +637,22 @@ export function setResourceUses(actor, key, value)
    return item.update({ 'system.uses.spent': max - Math.clamp(Math.round(value), 0, max) });
 }
 
+/** − and + on a panel (user, 2026-10-28): one use spent or regained, within 0 and most. */
+export function stepResource(actor, key, delta)
+{
+   const item = linkedResourceItem(actor, key);
+   if (item) { return setResourceUses(actor, key, (item.system.uses.value ?? 0) + Math.sign(delta)); }
+   if (!RESOURCE_KEYS.includes(key)) { return null; }
+   const r = actor.system.resources?.[key] ?? {};
+   return actor.update({ [`system.resources.${key}.value`]: Math.clamp((r.value ?? 0) + Math.sign(delta), 0, r.max ?? 0) });
+}
+
+/** A linked panel's name uses its item, as a row's name does (dnd5e's `Item5e#use`). */
+export function useResourceItem(actor, key, event)
+{
+   return linkedResourceItem(actor, key)?.use({ event });
+}
+
 /** Refresh: uses back to most, the linked item's or dnd5e's own resource's. */
 export function refreshResource(actor, key)
 {

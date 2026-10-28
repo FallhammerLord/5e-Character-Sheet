@@ -14,13 +14,24 @@
             <li class="fhcs-resource fhcs-frame{{#if linked}} fhcs-resource-linked{{/if}}" role="group" aria-label="{{ groupLabel }}" data-resource="{{ key }}">
                {{!-- A linked item's art as the panel's underlay (user, 2026-10-28), as the header's cards carry theirs. --}}
                {{#if link}}<span class="fhcs-resource-art" aria-hidden="true"><img src="{{ link.img }}" alt=""></span>{{/if}}
+               {{!-- The name: a field for dnd5e's own resource in edit mode; a linked item's name uses the item (user,
+                     2026-10-28). It has the panel's whole width in both modes, so it wraps the same (rule 6). --}}
                <span class="fhcs-resource-head">
                   {{#if ../editing}}{{#unless linked}}
                   <input type="text" class="fhcs-input fhcs-body fhcs-resource-field" name="system.resources.{{ key }}.label" value="{{ label }}"
                          placeholder="{{ title }}" aria-label="{{ nameLabel }}">
-                  {{else}}
-                  <span class="fhcs-body fhcs-resource-name">{{ title }}</span>
-                  {{/unless}}
+                  {{/unless}}{{/if}}
+                  {{#if linked}}
+                  <button type="button" class="fhcs-body fhcs-resource-name fhcs-resource-use" data-action="fhcsUseResource" data-key="{{ key }}"
+                          aria-label="{{ useLabel }}" data-fhcs-tip="{{ useLabel }}">{{ title }}</button>
+                  {{else}}{{#unless ../editing}}
+                  <span class="fhcs-body fhcs-resource-name{{#unless named}} fhcs-muted{{/unless}}">{{ title }}</span>
+                  {{/unless}}{{/if}}
+               </span>
+               {{!-- Uses left / most between two 24px places: in play − and + (user, 2026-10-28), in edit mode the cog
+                     (which item the panel shows) and a blank, with fields for the numbers. --}}
+               <span class="fhcs-resource-count">
+                  {{#if ../editing}}
                   <details class="fhcs-fold fhcs-resource-link" data-fold-key="resource-{{ key }}">
                      <summary class="fhcs-toggle fhcs-gear-button" aria-label="{{ linkLabel }}" data-fhcs-tip="{{ linkLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</summary>
                      <div class="fhcs-tray fhcs-resource-tray">
@@ -33,27 +44,28 @@
                         {{/each}}
                      </div>
                   </details>
-                  {{else}}
-                  <span class="fhcs-body fhcs-resource-name{{#unless named}} fhcs-muted{{/unless}}">{{ title }}</span>
-                  {{/if}}
-               </span>
-               <span class="fhcs-resource-count">
                   {{#if linked}}
                   {{!-- Not a form field: the item's uses, saved by our change handler (it stores what's spent). --}}
                   <input type="text" class="fhcs-input fhcs-body" data-fhcs-resource-uses="{{ key }}" inputmode="numeric"
                          value="{{ value }}" placeholder="0" aria-label="{{ valueLabel }}">
+                  <span class="fhcs-body fhcs-muted">/</span>
+                  <span class="fhcs-body fhcs-resource-max">{{ max }}</span>
                   {{else}}
                   <input type="text" class="fhcs-input fhcs-body" name="system.resources.{{ key }}.value" data-dtype="Number" inputmode="numeric"
                          value="{{ value }}" placeholder="0" aria-label="{{ valueLabel }}">
-                  {{/if}}
                   <span class="fhcs-body fhcs-muted">/</span>
-                  {{#if ../editing}}{{#unless linked}}
                   <input type="text" class="fhcs-input fhcs-body" name="system.resources.{{ key }}.max" data-dtype="Number" inputmode="numeric"
                          value="{{ sourceMax }}" placeholder="0" aria-label="{{ maxLabel }}">
+                  {{/if}}
+                  <span class="fhcs-resource-blank" aria-hidden="true"></span>
                   {{else}}
+                  <button type="button" class="fhcs-toggle fhcs-resource-step" data-action="fhcsStepResource" data-key="{{ key }}" data-delta="-1"
+                          aria-label="{{ spend.label }}" data-fhcs-tip="{{ spend.label }}"{{#unless spend.can}} disabled{{/unless}}><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+                  <span class="fhcs-body fhcs-resource-value" aria-label="{{ valueLabel }}">{{ value }}</span>
+                  <span class="fhcs-body fhcs-muted">/</span>
                   <span class="fhcs-body fhcs-resource-max">{{ max }}</span>
-                  {{/unless}}{{else}}
-                  <span class="fhcs-body fhcs-resource-max">{{ max }}</span>
+                  <button type="button" class="fhcs-toggle fhcs-resource-step" data-action="fhcsStepResource" data-key="{{ key }}" data-delta="1"
+                          aria-label="{{ regain.label }}" data-fhcs-tip="{{ regain.label }}"{{#unless regain.can}} disabled{{/unless}}><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
                   {{/if}}
                </span>
                <span class="fhcs-resource-foot">

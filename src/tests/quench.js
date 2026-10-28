@@ -765,7 +765,7 @@ export function registerQuenchTests(quench)
             }
          });
 
-         it('shows set resource panels in play and all three in edit mode, links an item, saves uses and restores them', async function ()
+         it('shows set resource panels in play and all three in edit mode, steps uses with − and +, links an item, saves uses and restores them', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 12);
             const resources = foundry.utils.deepClone(actor._source.system.resources);
@@ -780,8 +780,12 @@ export function registerQuenchTests(quench)
                await actor.unsetFlag('fhcs', 'resources');
                await click('.fhcs-tabs [data-tab="details"]');
                await until(() => panels().join() === 'primary', () => `play mode shows only the set resource; it shows ${panels().join() || 'none'}`);
-               await enter('.fhcs-attributes [name="system.resources.primary.value"]', '2');
-               await until(() => actor._source.system.resources.primary.value === 2, () => `the uses save; they hold ${actor._source.system.resources.primary.value}`);
+               await click('.fhcs-attributes .fhcs-resource[data-resource="primary"] [data-action="fhcsStepResource"][data-delta="-1"]');
+               await until(() => actor._source.system.resources.primary.value === 3, () => `− spends one; the uses hold ${actor._source.system.resources.primary.value}`);
+               await click('.fhcs-attributes .fhcs-resource[data-resource="primary"] [data-action="fhcsStepResource"][data-delta="-1"]');
+               await until(() => actor._source.system.resources.primary.value === 2, () => `− again; the uses hold ${actor._source.system.resources.primary.value}`);
+               await click('.fhcs-attributes .fhcs-resource[data-resource="primary"] [data-action="fhcsStepResource"][data-delta="1"]');
+               await until(() => actor._source.system.resources.primary.value === 3, () => `+ regains one; the uses hold ${actor._source.system.resources.primary.value}`);
                await click('.fhcs-attributes .fhcs-resource[data-resource="primary"] [data-action="fhcsRefreshResource"]');
                await until(() => actor._source.system.resources.primary.value === 4, () => `Restore sets uses back to most; they hold ${actor._source.system.resources.primary.value}`);
 

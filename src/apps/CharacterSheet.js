@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES } from '../constants.js';
-import { attributesFacts, biographyFacts, changeHp, inspirationFacts, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, changeHp, stepResource, useResourceItem, inspirationFacts, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, renderTemplate, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
@@ -338,6 +338,18 @@ function followPointer(element)
    });
 }
 
+/** A resource panel's − and + (user, 2026-10-28). */
+function stepResourceAction(event, target)
+{
+   return stepResource(this.actor, target.dataset.key, Number(target.dataset.delta));
+}
+
+/** A linked resource panel's name: uses its item. */
+function useResourceAction(event, target)
+{
+   return useResourceItem(this.actor, target.dataset.key, event);
+}
+
 /** A resource panel's Restore: uses back to most. */
 function refreshResourceAction(event, target)
 {
@@ -530,7 +542,7 @@ export function makeCharacterSheet(Base)
             fhcsToggleContainer: toggleContainer, fhcsPinFilter: pinFilter, fhcsOpenConcentration: openConcentration,
             fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails,
             fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange, fhcsFrame: frame, fhcsLevelDown: levelDown, fhcsPortraitShape: portraitShape,
-            fhcsSkillAbility: skillAbility, fhcsLinkResource: linkResourceAction, fhcsRefreshResource: refreshResourceAction,
+            fhcsSkillAbility: skillAbility, fhcsLinkResource: linkResourceAction, fhcsRefreshResource: refreshResourceAction, fhcsStepResource: stepResourceAction, fhcsUseResource: useResourceAction,
             fhcsToggleSection: toggleSection, fhcsSetTheme: setTheme, fhcsThemeTray: themeTray, fhcsSpecialTraits: openSpecialTraits,
             fhcsInspiration: inspirationAction, fhcsLinkInspiration: linkInspirationAction }
       };

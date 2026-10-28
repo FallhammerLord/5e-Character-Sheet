@@ -129,6 +129,10 @@ export function attributesView(facts, { format, localize })
             valueLabel: format('FHCS.Attributes.ResourceValue', { title }),
             maxLabel: format('FHCS.Attributes.ResourceMax', { title }),
             refreshLabel: format('FHCS.Attributes.ResourceRefresh', { title }),
+            // − and + step the uses left (user, 2026-10-28); each stops at its end.
+            spend: { label: format('FHCS.Attributes.ResourceSpend', { title }), can: r.value > 0 },
+            regain: { label: format('FHCS.Attributes.ResourceRegain', { title }), can: r.value < r.max },
+            useLabel: format('FHCS.Attributes.ResourceUse', { title }),
             linkLabel: format('FHCS.Attributes.ResourceLink', { title }),
             options: [
                { id: '', name: localize('FHCS.Attributes.ResourceOwn'), img: '', on: !linkId },
