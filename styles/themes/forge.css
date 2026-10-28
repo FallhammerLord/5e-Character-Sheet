@@ -45,6 +45,14 @@
    --fhcs-theme-coal: var(--fhcs-theme-hot);
    /* Temper colours on polished steel, straw to bronze: frame rims. Purple and blue come next on real steel; they
       mean Pact Magic and prepared spells here (§5.1), so the sheen stops at bronze. */
+   /* Pattern-welded steel (docs/research/forge-theme.md): light and dark layers folded and warped by turbulence,
+      16% white at most on the dark heading bar, which keeps its light letters above 7:1. One tile wider than any bar,
+      so no seam shows. */
+   --fhcs-theme-damascus: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='960'%20height='28'%3E%3Cdefs%3E%3Cpattern%20id='l'%20width='960'%20height='5'%20patternUnits='userSpaceOnUse'%3E%3Crect%20width='960'%20height='2'%20fill='%23fff'%20opacity='0.16'/%3E%3Crect%20y='2'%20width='960'%20height='2'%20fill='%23000'%20opacity='0.18'/%3E%3C/pattern%3E%3Cfilter%20id='d'%20x='-5%25'%20y='-40%25'%20width='110%25'%20height='180%25'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.0125%200.05'%20numOctaves='2'%20seed='4'%20result='t'/%3E%3CfeDisplacementMap%20in='SourceGraphic'%20in2='t'%20scale='22'%20xChannelSelector='R'%20yChannelSelector='G'/%3E%3C/filter%3E%3C/defs%3E%3Crect%20x='-40'%20y='-14'%20width='1040'%20height='56'%20fill='url(%23l)'%20filter='url(%23d)'/%3E%3C/svg%3E");
+   /* The maker's mark: a hammer over an anvil, stamped into the nameplate. */
+   --fhcs-theme-mark: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cg%20fill='%235a4320'%3E%3Cpath%20d='M3%2015h12c0%201.8%201.8%202.8%205%202.8V20h-6l-1%201.5h2V23H7v-1.5h2L8%2020c-3-.5-5-2.4-5-5z'/%3E%3Cpath%20d='M6%203h8v3H11v7H9V6H6z'/%3E%3C/g%3E%3C/svg%3E");
+   /* Runes stamped along the tab rail, light at 14%. */
+   --fhcs-theme-runes: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='120'%20height='28'%3E%3Cg%20fill='none'%20stroke='%23fff'%20stroke-width='1.4'%20stroke-linecap='square'%20opacity='0.14'%3E%3Cpath%20d='M8%207v14M8%2010l6-3M8%2014l6-3'/%3E%3Cpath%20d='M24%2021V7l6%204v10'/%3E%3Cpath%20d='M40%207v14M40%2010l5%204-5%204'/%3E%3Cpath%20d='M58%207v14M54%2011l4-4%204%204'/%3E%3Cpath%20d='M72%2021l4-14%204%2014M74%2015h4'/%3E%3Cpath%20d='M94%207v14M90%2010l8%207M98%2010l-8%207'/%3E%3Cpath%20d='M108%207l6%207-6%207M114%207v14'/%3E%3C/g%3E%3C/svg%3E");
    --fhcs-theme-temper: linear-gradient(to right, transparent, #e2c278 20%, #c99a3a 50%, #9c6a2c 80%, transparent);
 }
 
@@ -150,7 +158,7 @@
 
 /* ---------- Type: Grenze for the display style and headings ---------- */
 
-.fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-display, .fhcs-panel-head > .fhcs-label, .fhcs-group-head .fhcs-label, .fhcs-section-toggle > .fhcs-label)
+.fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-display, .fhcs-panel-head .fhcs-label, .fhcs-group-head .fhcs-label, .fhcs-section-toggle > .fhcs-label)
 {
    font-family: 'FHCS Grenze', var(--font-body, serif);
 }
@@ -193,13 +201,19 @@
 .fhcs-sheet[data-fhcs-theme="forge"] .fhcs-name
 {
    padding: 0 var(--fhcs-s2);
+   /* The right border is the mark's room: brass like the plate (the background runs under it), so a long name
+      never runs under the mark. */
    border: 1px solid #5a4320;
+   border-right-width: 24px;
+   border-right-color: transparent;
    border-radius: 3px;
    color: #2a1a0c;
    background:
       radial-gradient(circle, #5a4320 1.5px, transparent 2px) left 2px center / 4px 4px no-repeat,
-      radial-gradient(circle, #5a4320 1.5px, transparent 2px) right 2px center / 4px 4px no-repeat,
+      var(--fhcs-theme-mark) right 4px center / 16px 16px no-repeat,
       linear-gradient(to bottom, #e3c27a, #c9a258 55%, #b48c45) #b48c45;
+   background-origin: border-box;
+   background-clip: border-box;
    box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 45%, transparent), 0 1px 2px color-mix(in srgb, #000 40%, transparent);
 }
 
@@ -213,6 +227,7 @@
    background:
       radial-gradient(circle, #8d847b 1.2px, transparent 1.7px) left 3px center / 4px 4px no-repeat,
       radial-gradient(circle, #8d847b 1.2px, transparent 1.7px) right 3px center / 4px 4px no-repeat,
+      var(--fhcs-theme-damascus) 0 0 / 960px 100% no-repeat,
       linear-gradient(to bottom, #3a332e, var(--fhcs-theme-bar)) var(--fhcs-theme-bar);
 }
 
@@ -223,6 +238,11 @@
    color: #efe3d2;
    background-color: #2b2521;
    border-bottom: 1px solid #000;
+   background-image: var(--fhcs-theme-emblem), linear-gradient(to right, transparent, var(--fhcs-theme-fire) 50%, transparent), var(--fhcs-theme-runes);
+   /* One band of seven runes, between the last tab and the anvil, so no tab name sits on them. */
+   background-position: right calc(var(--fhcs-control) + 2 * var(--fhcs-s2)) center, 0 100%, right calc(var(--fhcs-control) + 2 * var(--fhcs-s2) + 28px) center;
+   background-size: 20px, 100% 2px, 120px 100%;
+   background-repeat: no-repeat;
 }
 
 .fhcs-sheet[data-fhcs-theme="forge"] .fhcs-tab.active
