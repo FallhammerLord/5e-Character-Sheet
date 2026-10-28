@@ -35,6 +35,7 @@ class SystemCharacterSheet
 
 globalThis.Hooks = { on: (name, fn) => { hooks[name] = fn; }, once: (name, fn) => { hooks[name] = fn; } };
 globalThis.Actor = class {};
+globalThis.Item = class {};
 const preloaded = [];
 globalThis.foundry = {
    applications: {
@@ -57,14 +58,28 @@ class FakeChatLog
 }
 const chatLog = new FakeChatLog();
 globalThis.ui = { chat: chatLog };
-globalThis.dnd5e = { applications: { actor: { CharacterActorSheet: SystemCharacterSheet } } };
+// dnd5e's item sheet, as its PARTS stand in 6.0.6 (item-sheet.mjs:56).
+class SystemItemSheet
+{
+   static PARTS = {
+      header: { template: 'systems/dnd5e/templates/items/header.hbs' },
+      tabs: { template: 'systems/dnd5e/templates/shared/horizontal-tabs.hbs', templates: ['templates/generic/tab-navigation.hbs'] },
+      activities: { template: 'systems/dnd5e/templates/items/activities.hbs', scrollable: [''] },
+      advancement: { template: 'systems/dnd5e/templates/items/advancement.hbs', scrollable: [''] },
+      description: { template: 'systems/dnd5e/templates/items/description.hbs', scrollable: [''] },
+      details: { template: 'systems/dnd5e/templates/items/details.hbs', scrollable: [''] },
+      effects: { template: 'systems/dnd5e/templates/items/effects.hbs', scrollable: [''] },
+      warnings: { template: 'systems/dnd5e/templates/shared/sheet-warnings-dialog.hbs' }
+   };
+}
+globalThis.dnd5e = { applications: { actor: { CharacterActorSheet: SystemCharacterSheet }, item: { ItemSheet5e: SystemItemSheet } } };
 class SystemUsageMessageData {}
 class SystemCheckMessageData {}
 class SystemSaveMessageData {}
 class SystemRequestMessageData {}
 const systemModels = { usage: SystemUsageMessageData, check: SystemCheckMessageData, save: SystemSaveMessageData,
    request: SystemRequestMessageData };
-globalThis.CONFIG = { ChatMessage: { dataModels: { ...systemModels } } };
+globalThis.CONFIG = { ChatMessage: { dataModels: { ...systemModels } }, Item: { dataModels: { weapon: {}, spell: {}, feat: {}, container: {} } } };
 
 const problems = [];
 try
@@ -108,8 +123,32 @@ catch (err)
    process.exit(1);
 }
 
-const [documentClass, scope, sheet, options] = registered[0] ?? [];
-if (registered.length !== 1) { problems.push(`expected one sheet registration, got ${registered.length}`); }
+// The item sheet (SCOPE §4.13): every item type but containers, not the default, dnd5e's class with our header, tab
+// row and Description tab, each part's partials loaded with it.
+const itemRegistration = registered.find(([doc]) => doc === globalThis.Item);
+if (!itemRegistration) { problems.push('the item sheet is not registered'); }
+else
+{
+   const [, itemScope, itemSheet, itemOptions] = itemRegistration;
+   if (itemScope !== 'fhcs') { problems.push(`item sheet registered under "${itemScope}", not "fhcs"`); }
+   if (!(itemSheet.prototype instanceof SystemItemSheet)) { problems.push('item sheet does not extend dnd5e\'s item sheet'); }
+   if (itemOptions?.types?.join() !== 'weapon,spell,feat') { problems.push(`item sheet types are ${itemOptions?.types}, not every type but containers`); }
+   if (itemOptions?.makeDefault) { problems.push('item sheet must not make itself the default'); }
+   const itemParts = itemSheet.PARTS ?? {};
+   for (const id of ['header', 'tabs', 'description'])
+   {
+      const part = itemParts[id];
+      if (!part?.template.startsWith('modules/fhcs/')) { problems.push(`the item sheet's ${id} part is still dnd5e's`); continue; }
+      if (!existsSync(new URL(`../${part.template.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`item part template ${part.template} is missing`); }
+      for (const path of part.templates ?? []) { if (!existsSync(new URL(`../${path.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`item ${id} partial ${path} is missing`); } }
+   }
+   if (!itemParts.header?.templates?.some((p) => p.endsWith('/conc-c.hbs'))) { problems.push('the item header part does not load conc-c.hbs'); }
+   if (!itemParts.details?.template.startsWith('systems/dnd5e/')) { problems.push('the item sheet lost dnd5e\'s details form'); }
+}
+
+const characterRegistrations = registered.filter(([doc]) => doc !== globalThis.Item);
+const [documentClass, scope, sheet, options] = characterRegistrations[0] ?? [];
+if (characterRegistrations.length !== 1) { problems.push(`expected one character sheet registration, got ${characterRegistrations.length}`); }
 else
 {
    if (documentClass !== globalThis.Actor) { problems.push('sheet is not registered for Actor'); }

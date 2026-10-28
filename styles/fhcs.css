@@ -3388,3 +3388,66 @@
 
 /* A heading's toggle cells are one height in both modes, empty or holding edit mode's gear (rule 6). */
 .fhcs-sheet .fhcs-item-head > .fhcs-col-toggle { display: flex; align-items: center; justify-content: center; min-height: 24px; }
+
+/* ---------- The item sheet (SCOPE §4.13, user 2026-10-28) ----------
+   Its header (icon, name, one line of what it is, the toggles), our tab row with the lock, and the Description tab: a
+   column of properties beside the description, Tidy Classic's way. dnd5e's other tabs keep its forms. */
+.fhcs-item-sheet .fhcs-item-header
+{
+   display: flex;
+   flex: none;
+   align-items: flex-start;
+   gap: var(--fhcs-s2);
+   /* As the character's header: right under the title bar (rule 14), a line under it, no box. */
+   padding: var(--fhcs-s1) var(--fhcs-s2) var(--fhcs-s2);
+   border-bottom: 1px solid var(--fhcs-line-soft);
+   background: var(--fhcs-surface);
+}
+.fhcs-item-sheet .fhcs-item-icon
+{
+   flex: none;
+   width: 64px;
+   height: 64px;
+   margin: 0;
+   padding: 0;
+   overflow: hidden;
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-fill);
+   cursor: pointer;
+}
+.fhcs-item-sheet .fhcs-item-icon > img { display: block; width: 100%; height: 100%; border: 0; object-fit: cover; }
+.fhcs-item-sheet .fhcs-item-titles { display: flex; flex: 1; flex-direction: column; gap: var(--fhcs-s1); min-width: 0; }
+.fhcs-item-sheet .fhcs-item-name { display: flex; align-items: center; min-height: var(--fhcs-control); overflow-wrap: anywhere; }
+.fhcs-item-sheet input.fhcs-item-name { box-sizing: border-box; width: 100%; height: var(--fhcs-control); }
+.fhcs-item-sheet .fhcs-item-subtitle { display: flex; flex-wrap: wrap; align-items: center; gap: var(--fhcs-s1); }
+.fhcs-item-sheet .fhcs-item-mark { display: inline-flex; align-items: center; gap: var(--fhcs-s1); }
+/* Concentration's mark and word in its gold (§5.1), the word saying it, so not by colour alone. */
+.fhcs-item-sheet .fhcs-item-conc { color: var(--fhcs-conc); }
+.fhcs-item-sheet .fhcs-item-conc .fhcs-icon { width: 16px; height: 16px; }
+.fhcs-item-sheet .fhcs-item-toggles { display: flex; flex: none; gap: var(--fhcs-s1); }
+.fhcs-item-sheet .fhcs-item-toggle:disabled { cursor: default; }
+
+.fhcs-item-sheet .fhcs-item-body { display: grid; grid-template-columns: 160px minmax(0, 1fr); align-items: start; gap: var(--fhcs-s2); }
+.fhcs-item-sheet :is(.fhcs-item-props, .fhcs-item-text)
+{
+   min-width: 0;
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-surface);
+}
+.fhcs-item-sheet .fhcs-item-props { padding: var(--fhcs-s1) var(--fhcs-s2); }
+.fhcs-item-sheet .fhcs-item-prop-list { margin: 0; }
+.fhcs-item-sheet .fhcs-item-prop { display: flex; flex-direction: column; padding: var(--fhcs-s1) 0; border-bottom: 1px solid var(--fhcs-line-soft); }
+.fhcs-item-sheet .fhcs-item-prop > :is(dt, dd) { margin: 0; }
+/* A value, or edit mode's field with its unit, one line of the control's height in both modes (rule 6). */
+.fhcs-item-sheet .fhcs-item-prop > dd { display: flex; align-items: center; gap: var(--fhcs-s1); min-width: 0; min-height: var(--fhcs-control); overflow-wrap: anywhere; }
+.fhcs-item-sheet .fhcs-item-prop .fhcs-input { flex: 1; min-width: 0; height: var(--fhcs-control); text-align: left; }
+.fhcs-item-sheet .fhcs-item-tags { display: flex; flex-wrap: wrap; gap: var(--fhcs-s1); margin: 0; padding: var(--fhcs-s2) 0 var(--fhcs-s1); list-style: none; }
+.fhcs-item-sheet .fhcs-item-tags > li { display: flex; align-items: center; min-height: 24px; padding: 0 var(--fhcs-s1); border: 1px solid var(--fhcs-line); border-radius: var(--fhcs-radius); }
+.fhcs-item-sheet .fhcs-item-text { display: flex; flex-direction: column; overflow: hidden; }
+.fhcs-item-sheet .fhcs-item-text > :not(.fhcs-panel-head) { margin: 0; padding: var(--fhcs-s2); }
+.fhcs-item-sheet .fhcs-item-text :is(p, li, ul, ol, h1, h2, h3, h4, blockquote) { margin: 0 0 var(--fhcs-s2); font-size: var(--fhcs-body-size); line-height: var(--fhcs-body-line); }
+.fhcs-item-sheet .fhcs-item-text :is(p, li, ul, ol, h1, h2, h3, h4, blockquote):last-child { margin-bottom: 0; }
+/* Headings inside a description keep the body size, bold: emphasis by weight within body text, not a fourth style. */
+.fhcs-item-sheet .fhcs-item-text :is(h1, h2, h3, h4) { font-weight: bold; border: 0; }

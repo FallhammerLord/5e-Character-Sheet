@@ -279,15 +279,20 @@ export const SETTINGS_TABS = ['specialTraits'];
 /** Classic's tab order; tabs dnd5e adds that aren't listed follow in dnd5e's order. */
 export const TAB_ORDER = ['details', 'inventory', 'spells', 'features', 'effects', 'biography', 'bastion', 'specialTraits'];
 
+/** Our names for the character's tabs where they differ from dnd5e's; the item sheet keeps dnd5e's own. */
+export const CHARACTER_TAB_NAMES = { details: 'FHCS.Tabs.Attributes', spells: 'FHCS.Tabs.Spellbook' };
+
 /**
  * The tab row (SCOPE §4.2): dnd5e's tabs in Classic's order, with our names where Classic's differ.
  * @param {object} tabs   dnd5e's `context.tabs`, by tab ID.
  * @param {{canEdit: boolean, editing: boolean}} mode
+ * @param {object} [names]  Our name for a tab, by ID (the character's by default).
+ * @param {string[]} [order]  Our order, by ID (Classic's for a character); an empty one keeps dnd5e's.
  */
-export function tabRow(tabs, { canEdit, editing }, localize)
+
+export function tabRow(tabs, { canEdit, editing }, localize, names = CHARACTER_TAB_NAMES, order = TAB_ORDER)
 {
-   const names = { details: 'FHCS.Tabs.Attributes', spells: 'FHCS.Tabs.Spellbook' };
-   const rank = (id) => { const i = TAB_ORDER.indexOf(id); return i < 0 ? TAB_ORDER.length : i; };
+   const rank = (id) => { const i = order.indexOf(id); return i < 0 ? order.length : i; };
    return {
       label: localize('FHCS.Tabs.Label'),
       // Special Traits is settings, not play: it opens from a gear, like dnd5e's other settings (SCOPE §4.5).

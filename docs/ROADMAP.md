@@ -149,7 +149,7 @@ Third pass, from the user's play (2026-10-28):
 - [x] Item sheet mocked up (canvas row "Phase 6.7 · the item sheet": a weapon light, a spell dark, a feature in Forge, 500px edit mode), waits on the user's review
 - [ ] Mockups for the NPC and the rest
 - [x] Chat cards in the world theme (world setting "Themed chat cards", on by default); Forge's card: a riveted iron plate, Grenze title and totals, iron-edged bands that heat on hover; every card case checked in Forge; Quench test added
-- [ ] Item sheet (every type, spells included)
+- [x] Item sheet (every type, spells included): header, our tab row and lock, Description with the properties column and Category; dnd5e's forms for the rest; layout cases (500–740px, Forge), unit and load checks, a Quench test (built 2026-10-28; waits on Quench and play)
 - [ ] NPC sheet
 - [ ] Container, group, encounter, vehicle
 - [ ] The smaller windows: a skin

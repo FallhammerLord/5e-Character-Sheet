@@ -20,7 +20,7 @@ mkdirSync(out, { recursive: true });
 // Classic Tidy opens at 740 wide (SCOPE §4); dnd5e's own sheet at 800. Foundry's chat sidebar is about 300 wide;
 // players drag it narrower or wider, and pop messages out.
 // The sheet never goes narrower than its ability row needs (headerMinWidth).
-const WIDTHS = { sheet: [headerMinWidth(6), 740, 900], chat: [240, 300, 380] };
+const WIDTHS = { sheet: [headerMinWidth(6), 740, 900], chat: [240, 300, 380], item: [500, 560, 740] };
 const HEIGHT = 810;
 // Every stylesheet module.json loads, in its order.
 const css = JSON.parse(readFileSync(`${root}module.json`, 'utf8')).styles
@@ -32,6 +32,8 @@ const css = JSON.parse(readFileSync(`${root}module.json`, 'utf8')).styles
 /** The classes and wrapper Foundry and dnd5e give each kind of frame. */
 const FRAMES = {
    sheet: { classes: 'sheet actor character fhcs-sheet', wrap: (body) => body },
+   // The item sheet (SCOPE §4.13): its header, tab row and Description tab, as Foundry stacks a sheet's parts.
+   item: { classes: 'sheet item fhcs-sheet fhcs-item-sheet', wrap: (body) => body },
    // A card's theme sits on its message, as `themeCard` puts it (the world's theme, SCOPE §5.3 rule 10).
    chat: {
       classes: 'chat-sidebar',
@@ -48,7 +50,7 @@ const THEMES = { light: 'background:#f4f1ea;color:#191813', dark: 'background:#2
 const frame = (kind, width, theme, body, { look = '', hp = null, titleBar = '', titleTray = '' } = {}) => `<section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"${look ? ` data-fhcs-theme="${look}"` : ''}${hp === null ? '' : ` data-fhcs-hp="${hp <= 0 ? 'down' : hp <= 0.5 ? 'bloodied' : 'full'}"`}
    style="${hp === null ? '' : `--fhcs-hp:${hp};`}position:relative;width:${width}px;height:${HEIGHT}px;display:flex;flex-direction:column;border:1px solid #000;margin:8px;
    ${THEMES[theme]}">
-   ${kind === 'sheet'
+   ${kind !== 'chat'
       // Foundry's title bar as it draws one, with a module's extra button that must wait in the ⋮ menu (rule 14).
       ? `<header class="window-header"><h1 class="window-title">${width}px</h1>${titleBar}<button type="button" class="header-control icon fa-solid fa-ellipsis-vertical" data-action="toggleControls" aria-label="Controls"></button><button type="button" class="header-control icon fa-solid fa-id-badge" data-action="moduleExtra" aria-label="A module's button"></button><button type="button" class="header-control icon fa-solid fa-xmark" data-action="close" aria-label="Close"></button></header>`
       : `<header style="background:#111;color:#eee;padding:4px 8px;font:13px sans-serif">${width}px</header>`}

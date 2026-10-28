@@ -1,9 +1,10 @@
 import { MODULE_ID } from './constants.js';
-import { extendChatModel, preloadTemplates, quietPosts, recordLevelOrder, registerCharacterSheet,
+import { extendChatModel, preloadTemplates, quietPosts, recordLevelOrder, registerCharacterSheet, registerItemSheet, systemItemSheet,
    systemCharacterSheet, watchApplications, watchItemCategories } from './compat.js';
 import { levelOrder } from './sheet/header.js';
 import { keepStable } from './sheet/death.js';
 import { makeCharacterSheet } from './apps/CharacterSheet.js';
+import { makeItemSheet } from './apps/ItemSheet.js';
 import { registerQuenchTests } from './tests/quench.js';
 import { registerSettings } from './settings.js';
 import { CARD_PARTS, makeUsageMessageData } from './chat/card.js';
@@ -31,6 +32,10 @@ Hooks.once('init', () =>
    }
    registerCharacterSheet(makeCharacterSheet(Base), 'FHCS.SheetLabel');
    console.log(`${MODULE_ID} | Character sheet registered (dnd5e ${game.system?.version}).`);
+   // The item sheet (SCOPE §4.13): every item type but containers, offered beside dnd5e's own.
+   const ItemBase = systemItemSheet();
+   if (ItemBase) { registerItemSheet(makeItemSheet(ItemBase), 'FHCS.Item.SheetLabel'); }
+   else { console.error(`${MODULE_ID} | dnd5e's item sheet was not found; the item sheet is not registered.`); }
 });
 
 // One card per action: rolls made from a card draw in its bands.

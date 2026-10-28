@@ -48,7 +48,7 @@ npm run load    # loads the module with Foundry and dnd5e mocked: sheet registra
                 # settings, manifest files, lang keys, and the Quench redraw rule
 npm run unit    # pure view functions offline (roll outcomes, card bands, header and its cards, attributes, inventory, spellbook,
                 # features, effects, biography)
-npm run layout  # renders templates (cases in tools/fixtures.mjs) in light and dark themes at sheet widths 644 (the minimum)–900 or chat widths 240–380;
+npm run layout  # renders templates (cases in tools/fixtures.mjs) in light and dark themes at sheet widths 644 (the minimum)–900, item sheet 500–740 or chat widths 240–380;
                 # fails on overflow, overlapping siblings, text below WCAG contrast or a fourth text style; self-tests first.
                 # Imitates Foundry's button styles (min-height, centered content). Screenshots in tools/out/.
                 # Set CHROMIUM_PATH (here: /opt/pw-browsers/chromium)

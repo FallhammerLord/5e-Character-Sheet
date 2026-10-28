@@ -6,6 +6,7 @@
  */
 import { appliedLines, cardParts, d20Band, damageBand, saveRow } from '../src/chat/card.js';
 import { headerView, inspirationBar, tabRow, themePicker } from '../src/sheet/header.js';
+import { itemSheetView } from '../src/sheet/item.js';
 import { attributesView } from '../src/sheet/attributes.js';
 import { inventoryView } from '../src/sheet/inventory.js';
 import { spellbookView } from '../src/sheet/spellbook.js';
@@ -799,6 +800,45 @@ for (const c of CASES.filter((x) => x.sameRowsAs && !x.look))
       CASES.push({ ...base, name: `forge-parity-${name}`, look: 'forge', sameRowsAs: base.sameRowsAs ? `forge-parity-${base.sameRowsAs}` : undefined });
    }
 }
+
+// The item sheet (SCOPE §4.13): a weapon, a spell and a feature, each in play and edit mode; a long name at 500px.
+const ITEM_TABS = Object.fromEntries(['description', 'details', 'activities', 'effects']
+   .map((id, i) => [id, { id, label: ['Description', 'Details', 'Activities', 'Effects'][i], active: id === 'description' }]));
+const ITEMS = {
+   weapon: { type: 'weapon', name: 'Sun Blade', nameField: 'name', img: ICON('#c9a227'), editable: true, concealed: false,
+      subtitles: ['Martial Melee', 'Rare', 'DMG 2024'], typeLabel: 'Weapon',
+      toggles: [{ key: 'equipped', on: true }, { key: 'attuned', on: true }, { key: 'identified', on: true }],
+      physical: { quantity: 1, weight: 3, weightUnit: 'lb', price: { value: 12000, unit: 'gp' } }, uses: null, spell: null,
+      tags: ['Finesse', 'Versatile', 'Magical'], category: 'Sun relics', categoryField: 'flags.fhcs.section',
+      description: { name: 'system.description.value', source: '', enriched: '<p>This item appears to be a longsword hilt. While grasping the hilt, you can take a Bonus Action to cause a blade of pure radiance to spring into existence.</p><p>You gain a +2 bonus to attack rolls and damage rolls made with this weapon.</p>' },
+      uuid: 'Actor.a.Item.sun' },
+   spell: { type: 'spell', name: 'Spirit Guardians', nameField: 'name', img: ICON('#7fb0ec'), editable: true, concealed: false,
+      subtitles: [], typeLabel: 'Spell', toggles: [{ key: 'prepared', on: true }], physical: null, uses: null,
+      spell: { level: '3rd Level', school: 'Conjuration', components: 'V, S, M', concentration: true, ritual: false,
+         time: '1 Action', range: 'Self (15 ft)', duration: 'Up to 10 minutes', target: '', materials: 'A prayer scroll' },
+      tags: ['Concentration'], category: '', categoryField: 'flags.fhcs.section',
+      description: { name: 'system.description.value', source: '', enriched: '<p>Protective spirits flit around you in a 15-foot Emanation for the duration.</p>' },
+      uuid: 'Actor.a.Item.sg' },
+   feature: { type: 'feat', name: 'Second Wind', nameField: 'name', img: ICON('#c96a3a'), editable: true, concealed: false,
+      subtitles: ['Fighter 1', 'Class Feature'], typeLabel: 'Feature', toggles: [], physical: null,
+      uses: { value: 2, max: 3, recovery: 'Short Rest, Long Rest' }, spell: null, tags: [], category: '', categoryField: 'flags.fhcs.section',
+      description: { name: 'system.description.value', source: '', enriched: '' }, uuid: 'Actor.a.Item.sw' }
+};
+const itemSheet = (kind, { editing = false, ...over } = {}) =>
+{
+   const view = itemSheetView({ ...ITEMS[kind], editing, ...over }, { localize, format });
+   const tab = { id: 'description', group: 'primary', cssClass: 'active' };
+   return template('item/header')({ fhcsItem: view })
+      + template('sheet/tabs')({ fhcsTabs: tabRow(ITEM_TABS, { canEdit: true, editing }, localize, {}, []) })
+      + `<div class="tab-body">${template('item/description')({ fhcsItem: view, tab })}</div>`;
+};
+for (const kind of Object.keys(ITEMS))
+{
+   CASES.push({ name: `item-${kind}`, frame: 'item', html: itemSheet(kind), rows: '.fhcs-item-header, .fhcs-tabs, .fhcs-item-prop' });
+   CASES.push({ name: `item-${kind}-editing`, frame: 'item', html: itemSheet(kind, { editing: true }), rows: '.fhcs-item-header, .fhcs-tabs, .fhcs-item-prop', sameRowsAs: `item-${kind}` });
+   CASES.push({ name: `theme-forge-item-${kind}`, frame: 'item', look: 'forge', html: itemSheet(kind) });
+}
+CASES.push({ name: 'item-long-name', frame: 'item', html: itemSheet('weapon', { name: 'Sun Blade of the Dawnwarden, Twice-Forged in the Ember Halls' }) });
 
 // Chat cards in the world's theme (SCOPE §5.3 rule 10): every card case again in Forge.
 for (const base of CASES.filter((c) => c.frame === 'chat' && !c.look))

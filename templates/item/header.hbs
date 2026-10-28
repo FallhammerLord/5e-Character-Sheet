@@ -1,0 +1,32 @@
+{{!-- The item sheet's header (SCOPE §4.13, user 2026-10-28): the icon, the name in display, one line of what it is (a
+      spell: level · school · components, with the concentration and ritual marks of §5.1), and the toggles in our
+      marks. dnd5e's `editImage` changes the icon in edit mode; `showIcon` shows it in play. --}}
+<header class="fhcs-item-header fhcs-frame">
+   {{#with fhcsItem}}
+   <button type="button" class="fhcs-item-icon" {{#if fields}}data-action="editImage" data-edit="img"{{else}}data-action="showIcon"{{/if}}
+           aria-label="{{ text.icon }}"><img src="{{ img }}" alt=""></button>
+   <div class="fhcs-item-titles">
+      {{#if fields}}
+      <input type="text" class="fhcs-input fhcs-display fhcs-item-name" name="{{ nameField }}" value="{{ name }}" aria-label="{{ text.name }}">
+      {{else}}
+      <div class="fhcs-display fhcs-item-name">{{ name }}</div>
+      {{/if}}
+      <div class="fhcs-body fhcs-muted fhcs-item-subtitle">
+         <span>{{ subtitle }}</span>
+         {{#each marks}}
+         <span class="fhcs-item-mark{{#if concentration}} fhcs-item-conc{{/if}}">{{#if concentration}}{{> "modules/fhcs/templates/sheet/conc-c.hbs" }}{{/if}}{{#if ritual}}<span class="fhcs-label" aria-hidden="true">R</span>{{/if}}<span>{{ word }}</span></span>
+         {{/each}}
+      </div>
+   </div>
+   {{#if toggles.length}}
+   <div class="fhcs-item-toggles">
+      {{#each toggles}}
+      <button type="button" class="fhcs-chip fhcs-item-toggle{{#if on}} fhcs-on{{/if}}" data-action="fhcsItemToggle" data-key="{{ key }}"
+              aria-pressed="{{#if on}}true{{else}}false{{/if}}" aria-label="{{ label }}" data-fhcs-tip="{{ label }}"{{#unless can}} disabled{{/unless}}>
+         <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ path }}"/></svg>
+      </button>
+      {{/each}}
+   </div>
+   {{/if}}
+   {{/with}}
+</header>

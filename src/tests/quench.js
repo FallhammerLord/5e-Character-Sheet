@@ -898,6 +898,30 @@ export function registerQuenchTests(quench)
             }
          });
 
+         it('opens an item in our item sheet: header, Description with the category, and the equipped toggle', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 8);
+            const [blade] = await createItems([{ name: 'FHCS test blade', type: 'weapon', flags: { core: { sheetClass: `${MODULE_ID}.FHCSItemSheet` }, fhcs: { section: 'FHCS test relics' } },
+               system: { equipped: false } }]);
+            const itemSheet = blade.sheet;
+            const inSheet = (selector) => itemSheet.element?.querySelector(selector);
+            try
+            {
+               await itemSheet.render({ force: true });
+               await until(() => inSheet('.fhcs-item-header'), () => `our header draws; the sheet is ${itemSheet.constructor.name}`);
+               await until(() => [...itemSheet.element.querySelectorAll('.fhcs-item-prop')].some((p) => p.textContent.includes('FHCS test relics')),
+                  () => `the Description tab shows the category; its rows read ${[...itemSheet.element.querySelectorAll('.fhcs-item-prop')].map((p) => p.textContent.trim().replace(/\s+/g, ' ')).join(' | ')}`);
+               await itemSheet.render();
+               inSheet('[data-action="fhcsItemToggle"][data-key="equipped"]').click(); // redraw-safe: found after the render settled, clicked at once
+               await until(() => blade.system.equipped === true, () => `the equipped toggle equips it; it holds ${blade.system.equipped}`);
+            }
+            finally
+            {
+               await itemSheet.close();
+               await blade.delete();
+            }
+         });
+
          it('files an item under a category of its own, and moves that section with the arrows', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 8);

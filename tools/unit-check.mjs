@@ -16,6 +16,7 @@ import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js
 import { effectsView } from '../src/sheet/effects.js';
 import { biographyView, paragraphs } from '../src/sheet/biography.js';
 import { arrangeSections, categoryId, pinView } from '../src/sheet/lists.js';
+import { itemSheetView } from '../src/sheet/item.js';
 import { comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, levelOrder, levelTrack, portraitFrame, signed, tabRow, themePicker } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
@@ -246,6 +247,25 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
 {
    const got = [600, 650, 657, 700, 709, 731, 733, 812, 850, 1030].map((w) => comfortWidth(w, 644)).join(' ');
    if (got !== '644 644 657 700 720 720 733 800 850 1024') { problems.push(`comfort widths: ${got}`); }
+}
+
+// The item sheet (SCOPE §4.13): a spell's line is level · school · components with its marks; a weapon's dnd5e's
+// subtitles; toggles off for a viewer and for always prepared; the category shows "—" in play when unset, a field in
+// edit mode; an empty row is left out in play.
+{
+   const base = { name: 'X', nameField: 'name', img: '', editable: true, concealed: false, subtitles: [], typeLabel: 'Spell', physical: null, uses: null,
+      tags: [], category: '', categoryField: 'flags.fhcs.section', description: { enriched: '' }, uuid: 'u' };
+   const spell = itemSheetView({ ...base, type: 'spell', toggles: [{ key: 'prepared', on: true, locked: true }],
+      spell: { level: '3rd Level', school: 'Conjuration', components: 'V, S, M', concentration: true, ritual: false, time: '1 Action', range: '', duration: '', target: '', materials: '' } },
+   { localize, format });
+   const props = spell.props.map((p) => `${p.key}=${p.value}`).join(' ');
+   if (spell.subtitle !== '3rd Level · Conjuration · V, S, M' || spell.marks.length !== 1 || !spell.marks[0].concentration) { problems.push(`item sheet, a spell's line: ${spell.subtitle}, marks ${JSON.stringify(spell.marks)}`); }
+   if (spell.toggles[0].can) { problems.push('item sheet: an always-prepared spell can be switched'); }
+   if (props !== 'time=1 Action category=—') { problems.push(`item sheet, a spell's properties in play: ${props}`); }
+   const editing = itemSheetView({ ...base, type: 'weapon', editing: true, subtitles: ['Martial Melee', 'Rare'], toggles: [{ key: 'equipped', on: false }],
+      physical: { quantity: 1, weight: 3, weightUnit: 'lb', price: null } }, { localize, format });
+   const fields = editing.props.map((p) => `${p.key}:${p.field || '-'}`).join(' ');
+   if (editing.subtitle !== 'Martial Melee · Rare' || fields !== 'quantity:system.quantity weight:system.weight.value category:flags.fhcs.section' || !editing.fields) { problems.push(`item sheet, a weapon in edit mode: ${editing.subtitle}; ${fields}`); }
 }
 
 // Categories and their order (SCOPE §4.13): one ID per name whatever its case and spacing; the saved order first, the

@@ -1,0 +1,37 @@
+{{!-- The item sheet's Description tab (SCOPE §4.13, user 2026-10-28), Tidy Classic's way: a column of properties
+      (quantity, weight, price, uses, a spell's casting lines, the category) beside the description. Fields in edit
+      mode; the description is a prose-mirror that shows its text until the player chooses to edit (quest log rule). --}}
+<section class="tab fhcs-item-description {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
+   {{#with fhcsItem}}
+   <div class="fhcs-item-body">
+      <div class="fhcs-frame fhcs-item-props" role="group" aria-label="{{ text.properties }}">
+         <dl class="fhcs-item-prop-list">
+            {{#each props}}
+            <div class="fhcs-item-prop">
+               <dt class="fhcs-label fhcs-muted">{{ label }}</dt>
+               <dd class="fhcs-body">
+                  {{#if ../fields}}{{#if field}}
+                  <input type="text" class="fhcs-input fhcs-body" name="{{ field }}" value="{{ value }}" placeholder="{{ placeholder }}"
+                         aria-label="{{ label }}"{{#if number}} data-dtype="Number" inputmode="decimal"{{/if}}>{{#if unit}}<span class="fhcs-muted">{{ unit }}</span>{{/if}}
+                  {{else}}{{ value }}{{/if}}{{else}}{{ value }}{{ unitText }}{{/if}}
+               </dd>
+            </div>
+            {{/each}}
+         </dl>
+         {{#if tags.length}}
+         <ul class="fhcs-item-tags">
+            {{#each tags}}<li class="fhcs-body">{{ this }}</li>{{/each}}
+         </ul>
+         {{/if}}
+      </div>
+      <div class="fhcs-frame fhcs-item-text">
+         <div class="fhcs-panel-head"><span class="fhcs-label">{{ text.description }}</span></div>
+         {{#if editable}}
+         <prose-mirror name="{{ description.name }}" value="{{ description.source }}" document-uuid="{{ uuid }}" toggled>{{{ description.enriched }}}</prose-mirror>
+         {{else}}
+         {{#if description.empty}}<p class="fhcs-body fhcs-muted">{{ text.empty }}</p>{{else}}<div class="fhcs-body fhcs-item-prose">{{{ description.enriched }}}</div>{{/if}}
+         {{/if}}
+      </div>
+   </div>
+   {{/with}}
+</section>

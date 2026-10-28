@@ -186,6 +186,37 @@
       "Unlock": "Unlock to edit",
       "Lock": "Lock the sheet"
     },
+    "Item": {
+      "Icon": "{name}: icon",
+      "Name": "Name",
+      "Properties": "Properties",
+      "Description": "Description",
+      "Empty": "No description yet.",
+      "UsesOf": "{value} of {max}",
+      "CategoryNone": "Its usual place",
+      "Concentration": "Concentration",
+      "Ritual": "Ritual",
+      "SheetLabel": "Fallhammer item sheet",
+      "Toggle": {
+        "equipped": "Equipped",
+        "attuned": "Attuned",
+        "identified": "Identified",
+        "prepared": "Prepared"
+      },
+      "Prop": {
+        "quantity": "Quantity",
+        "weight": "Weight",
+        "price": "Price",
+        "uses": "Uses",
+        "recovery": "Recovery",
+        "time": "Casting time",
+        "range": "Range",
+        "duration": "Duration",
+        "target": "Target",
+        "materials": "Materials",
+        "category": "Category"
+      }
+    },
     "Section": {
       "Up": "Move {name} up",
       "Down": "Move {name} down"

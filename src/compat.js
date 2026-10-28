@@ -759,6 +759,96 @@ export async function linkInspiration(actor, itemId)
    return syncInspiration(actor, item.system.uses.value ?? 0);
 }
 
+/* ---------- The item sheet (SCOPE §4.13, user 2026-10-28) ---------- */
+
+/** dnd5e's item sheet, which ours extends so every form and mechanic keeps working. */
+export function systemItemSheet()
+{
+   return globalThis.dnd5e?.applications?.item?.ItemSheet5e;
+}
+
+/** Registers our item sheet for every item type but containers, offered beside dnd5e's own (not the default). */
+export function registerItemSheet(sheetClass, label)
+{
+   const types = Object.keys(CONFIG.Item?.dataModels ?? {}).filter((type) => type !== 'container');
+   foundry.applications.apps.DocumentSheetConfig.registerSheet(Item, 'fhcs', sheetClass, { types, makeDefault: false, label });
+}
+
+/** Which header toggles an item has, from its data model: equipped, attuned, identified, prepared. */
+function itemToggles(item)
+{
+   const system = item.system;
+   const toggles = [];
+   if ('equipped' in system) { toggles.push({ key: 'equipped', on: !!system.equipped }); }
+   if (system.attunement) { toggles.push({ key: 'attuned', on: !!system.attuned }); }
+   if ('identified' in system && (game.user.isGM || item.isOwner)) { toggles.push({ key: 'identified', on: system.identified !== false }); }
+   // A spell prepares only by the Spellcasting method; always prepared (2) is shown on but can't be switched.
+   if (item.type === 'spell' && system.method === 'spell') { toggles.push({ key: 'prepared', on: system.prepared > 0, locked: system.prepared === 2 }); }
+   return toggles;
+}
+
+/** Flips one of the header's toggles (`itemToggles`), as dnd5e's own row toggles do. */
+export function toggleItemField(item, key)
+{
+   const system = item.system;
+   if (key === 'prepared') { return system.prepared === 2 ? null : item.update({ 'system.prepared': system.prepared > 0 ? 0 : 1 }); }
+   if (key === 'identified') { return item.update({ 'system.identified': system.identified === false }); }
+   if (key === 'equipped' || key === 'attuned') { return item.update({ [`system.${key}`]: !system[key] }); }
+   return null;
+}
+
+/**
+ * Plain facts for our item sheet's header and Description tab (src/sheet/item.js), from what dnd5e's item sheet puts on
+ * the context (item-sheet.mjs:194 and its header and description parts): the name and icon, dnd5e's own subtitles, the
+ * header toggles, the physical numbers, the item's uses, a spell's casting lines, the property tags, the category and
+ * the description.
+ */
+export function itemSheetFacts(sheet, context)
+{
+   const item = sheet.item;
+   const system = item.system;
+   const config = CONFIG.DND5E;
+   const labels = item.labels ?? {};
+   const concealed = !!context.concealDetails;
+   const abbr = (map, key) => game.i18n.localize(map?.[key]?.abbreviation ?? map?.[key]?.label ?? key ?? '');
+   const physical = 'quantity' in system ? {
+      quantity: system._source?.quantity ?? system.quantity ?? 0,
+      weight: system._source?.weight?.value ?? system.weight?.value ?? 0,
+      weightUnit: abbr(config.weightUnits, system.weight?.units),
+      price: game.user.isGM || !concealed ? { value: system._source?.price?.value ?? system.price?.value ?? 0, unit: abbr(config.currencies, system.price?.denomination) } : null
+   } : null;
+   const spell = item.type === 'spell' ? {
+      level: labels.level ?? '', school: labels.school ?? '', components: labels.components?.vsm ?? '',
+      concentration: !!system.properties?.has?.('concentration'), ritual: !!system.properties?.has?.('ritual'),
+      time: labels.activation ?? '', range: labels.range ?? '', duration: labels.duration ?? '', target: labels.target ?? '',
+      materials: labels.materials ?? ''
+   } : null;
+   return {
+      type: item.type,
+      name: context.name?.value ?? item.name,
+      nameField: concealed || system.identified === false ? 'system.unidentified.name' : 'name',
+      img: item.img,
+      editable: sheet.isEditable,
+      editing: sheet.isEditMode,
+      concealed,
+      subtitles: (context.subtitles ?? []).filter((s) => s.label && !(s.requiresIdentification && concealed)).map((s) => game.i18n.localize(s.label)),
+      typeLabel: game.i18n.localize(CONFIG.Item.typeLabels?.[item.type] ?? item.type),
+      toggles: itemToggles(item),
+      physical,
+      uses: system.uses?.max ? { value: system.uses.value ?? 0, max: system.uses.max, recovery: recoveryWords(item) } : null,
+      spell,
+      tags: concealed ? [] : (context.properties?.active ?? []).map((p) => (typeof p === 'string' ? p : p.label)).filter(Boolean),
+      category: itemCategory(item),
+      categoryField: `flags.${MODULE_ID}.${CATEGORY_FLAG}`,
+      description: {
+         name: concealed ? 'system.unidentified.description' : 'system.description.value',
+         enriched: (concealed ? context.enriched?.unidentified : context.enriched?.description) ?? '',
+         source: (concealed ? system._source?.unidentified?.description : system._source?.description?.value) ?? ''
+      },
+      uuid: item.uuid
+   };
+}
+
 /* ---------- Categories of the player's own, and the sections' order (SCOPE §4.13, user 2026-10-28) ---------- */
 
 /**

@@ -21,6 +21,8 @@
    --fhcs-surface: #eee4d4;
    /* The sheet's success green, a step darker (same hue): on this warmer surface it fell to 4.46:1. */
    --fhcs-success: #17612a;
+   /* Concentration's gold a step darker too (same hue): 4.48:1 on this surface. */
+   --fhcs-conc: #6e5100;
    --fhcs-ink: #221913;
    --fhcs-die-ink: #221913;
    --fhcs-die-on-ink: #f6efe4;
@@ -84,6 +86,7 @@
 {
    --fhcs-surface: #221b18;
    --fhcs-success: #7ed08a;
+   --fhcs-conc: #e0b84a;
    --fhcs-ink: #eee3d6;
    --fhcs-die-ink: #f1e5d8;
    --fhcs-die-on-ink: #221b18;
