@@ -151,3 +151,17 @@ dnd5e's CSS is built from LESS at release (`dnd5e.css` isn't in the repository),
 Tidy's Classic sheet (`Tidy5eActorSheetClassicV2Base`, Tidy commit `54fdbad4`) extends Foundry's plain `ActorSheetV2` through a Svelte mixin. It does **not** extend dnd5e's sheet: Tidy reimplements each mechanic through its own adapter layer. That's why it needs a release for every dnd5e version. Ours inherits from `CharacterActorSheet` to avoid that cost; the trade-off is that our markup must keep dnd5e's class names and actions.
 
 **Tidy Classic's portrait** (checked 2026-10-27, v13.0.0 `src/sheets/classic/actor/ActorProfile.svelte`, `.less`; `character/parts/CharacterProfile.svelte`): a fixed square frame (`--t5e-portrait-size`), rounded or square by a setting, so tall art is cropped. On it: exhaustion (top left), inspiration (top right), death saves, HP current / max laid over the bottom center (`CharacterHitPoints.svelte`, absolute, `bottom: 0`), Rest and Hit Dice on the bottom corners. Temp HP sits under the frame.
+
+## Categories: custom ones and their order (2026-10-28)
+
+- **dnd5e 6.0.6 has neither.** Inventory sections come from item types (`base-actor-sheet.mjs:331`, each with an
+  `order`, sorted by `Inventory.prepareSections`); Features from origin or activation (`_applyGrouping` moves rows by
+  their `data-group-*`); the Spellbook by level and method. No flag names a category, none stores an order. Ours had
+  neither (the user remembered one; it was Tidy's).
+- **Tidy** (`src/foundry/TidyFlags.ts`): an item's custom section is a name, `flags.tidy5e-sheet.section` (and
+  `actionSection` for its Actions tab), chosen from the item's context menu; a document's section order and
+  visibility per tab is `flags.tidy5e-sheet.sheet-section-config` = `{ [tabId]: { [key]: { key, order, show } } }`,
+  set in a section-selector window; `SheetSections.sortKeyedSections` sorts by it.
+- **For us:** Inventory rows are placed by our own `compat.inventoryFacts` (type), so a custom section is ours to add
+  there; Features rows are moved by dnd5e's `_applyGrouping`, so a custom section must be a real section carrying the
+  same `data-group-*` value as its rows, in both groupings.

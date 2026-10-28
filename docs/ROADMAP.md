@@ -127,7 +127,7 @@ Third pass, from the user's play (2026-10-28):
 - [x] 16. Forge's sparks only on inspiration gain (rule: big effects answer events, never timers)
 - [x] 17. Panel gleam follows the pointer (not the portrait); no texture under item entries
 - [x] 18. Traits' fold bar a whole-bar button; species and background wrap (their names' height no longer fixed)
-- [ ] 19. Categories: reorder and custom ones, every tab
+- [ ] 19. Categories: reorder and custom ones, every tab (researched 2026-10-28; design questions with the user)
 
 ## Phase 6.6: Themes (user, 2026-10-28; SCOPE §4.11)
 
@@ -143,6 +143,7 @@ Third pass, from the user's play (2026-10-28):
 
 - [x] Research: dnd5e's NPC, vehicle, group, encounter, item and container sheets, and its smaller windows
 - [x] Design answers (rebuild item and NPC; reuse Inventory for the rest; skin the smaller windows; theme by owner, else world)
+- [x] Item sheet decisions (SCOPE §4.13, user 2026-10-28)
 - [ ] Mockups (canvas: a row per sheet)
 - [x] Chat cards in the world theme (world setting "Themed chat cards", on by default); Forge's card: a riveted iron plate, Grenze title and totals, iron-edged bands that heat on hover; every card case checked in Forge; Quench test added
 - [ ] Item sheet (every type, spells included)

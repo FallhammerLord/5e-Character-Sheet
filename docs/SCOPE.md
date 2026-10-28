@@ -184,6 +184,7 @@ Ours:
 - **Which theme:** an item wears its owner's theme, else the world's; an NPC, vehicle, group or encounter has its own choice like a character (`flags.fhcs.theme`), else the world's; chat cards the world's (§5.3 rule 10).
 - **Order:** chat cards in the world theme; the item sheet; the NPC; container, group, encounter, vehicle; the smaller windows.
 - **Limited views need nothing:** every user sees the sheet's chosen styling (user, 2026-10-28).
+- **The item sheet** (user, 2026-10-28, agreeing to Claude's picks): rebuilt are the header and the Description tab, Tidy Classic's way (a properties column of quantity, weight, price and property tags beside the description); Details, Activities, Effects and Advancement keep dnd5e's forms under our skin (field names in label style, values in body, our spacing and tokens). The header: the icon in the theme's frame; the name in display; one line under it, type · rarity · source (a spell: level · school · V S M, with the ritual and concentration marks of §5.1); toggles in our marks, equipped (the check), attuned (the star), identified. The lock at the tab row's end, as on the character sheet. 500px at the least, 560px to start; the comfort stops carry over.
 
 ## 5. ADHD rules carried over
 
