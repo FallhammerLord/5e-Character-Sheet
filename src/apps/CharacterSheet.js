@@ -8,7 +8,7 @@ import { featureColumnChoice, featuresView } from '../sheet/features.js';
 import { effectsView } from '../sheet/effects.js';
 import { biographyView } from '../sheet/biography.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
-import { headerMinWidth, headerView, hpPreview, inspirationBar, tabRow, themePicker } from '../sheet/header.js';
+import { comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, tabRow, themePicker } from '../sheet/header.js';
 import { scheduleSparks, stopSparks } from './sparks.js';
 import { delayTips, keepFolds } from '../chat/card.js';
 import { startFraming } from './framing.js';
@@ -542,11 +542,21 @@ export function makeCharacterSheet(Base)
          return passesExtraFilters(this.actor, item, filters, EXTRA_SPELL_FILTERS);
       }
 
-      /** Never narrower than the ability row needs, so it never wraps. */
+      /**
+       * Never narrower than the ability row needs, so it never wraps; held at comfort stops while dragged; never shorter
+       * than the tab row's foot, so the tabs always show (user, 2026-10-28).
+       */
       _updatePosition(position)
       {
          const min = headerMinWidth(Object.keys(CONFIG.DND5E?.abilities ?? {}).length || 6);
-         if (typeof position.width === 'number') { position.width = Math.max(position.width, min); }
+         if (typeof position.width === 'number') { position.width = comfortWidth(position.width, min); }
+         const tabs = this.element?.querySelector('.fhcs-tabs');
+         if (typeof position.height === 'number' && tabs && !this.minimized)
+         {
+            const border = parseFloat(getComputedStyle(this.element).borderBottomWidth) || 0;
+            const least = Math.ceil(tabs.getBoundingClientRect().bottom - this.element.getBoundingClientRect().top + border);
+            position.height = Math.max(position.height, least);
+         }
          return super._updatePosition(position);
       }
 

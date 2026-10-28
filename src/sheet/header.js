@@ -20,6 +20,21 @@ export function headerMinWidth(abilityCount)
    return 8 + 160 + 8 + COMBAT_WIDTH + 6 + (2 + 8 + abilityCount * 48 + (abilityCount - 1) * 3) + 8 + 2 * 8;
 }
 
+/** Common sheet widths, past the least one (user, 2026-10-28): 720 is where the inspiration stars show. */
+export const WIDTH_STOPS = [720, 800, 900, 1024, 1280];
+
+/**
+ * Comfort stops while the sheet is dragged wider or narrower (user, 2026-10-28): a width within `pull` of a stop
+ * holds at it, so the common widths are easy to land on: the least width and `WIDTH_STOPS`.
+ * @param {number} width  The width asked for.
+ * @param {number} least  The narrowest the sheet may be.
+ */
+export function comfortWidth(width, least, pull = 12)
+{
+   const near = [least, ...WIDTH_STOPS.filter((w) => w > least)].find((stop) => Math.abs(width - stop) <= pull);
+   return Math.max(least, near ?? width);
+}
+
 /** @returns {string} A modifier with its sign: +3, +0, −1 (a true minus sign). */
 export function signed(n)
 {

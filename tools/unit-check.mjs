@@ -17,7 +17,7 @@ import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js
 import { effectsView } from '../src/sheet/effects.js';
 import { biographyView, paragraphs } from '../src/sheet/biography.js';
 import { pinView } from '../src/sheet/lists.js';
-import { headerMinWidth, headerView, hpPreview, inspirationBar, levelOrder, levelTrack, portraitFrame, signed, tabRow, themePicker } from '../src/sheet/header.js';
+import { comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, levelOrder, levelTrack, portraitFrame, signed, tabRow, themePicker } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
 const facts = (over) => ({
@@ -246,6 +246,12 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const options = themePicker({ chosen: '', world: 'forge', keys: ['plain', 'forge'] }, { localize, format }).options.map((o) => `${o.value || 'world'}:${o.name}:${o.on}`);
    try { deepStrictEqual(options, ['world:World default (Fire and Forge):true', 'plain:Plain:false', 'forge:Fire and Forge:false']); }
    catch { problems.push(`theme picker: ${JSON.stringify(options)}`); }
+}
+
+// Width comfort stops (user, 2026-10-28): within 12px of a stop holds at it; never under the least width.
+{
+   const got = [600, 650, 657, 700, 709, 731, 733, 812, 850, 1030].map((w) => comfortWidth(w, 644)).join(' ');
+   if (got !== '644 644 657 700 720 720 733 800 850 1024') { problems.push(`comfort widths: ${got}`); }
 }
 
 // Inspiration (SCOPE §4.12): one star without a bank; a star per use with one, filled ones spend and empty ones bank;

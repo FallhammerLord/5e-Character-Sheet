@@ -20,7 +20,7 @@ The user's table: players used to Tidy 5e's classic layout. Private use for now 
 
 ## 4. Layout
 
-Target: Tidy 5e Classic, as in `docs/reference/` (screenshots) and its source at Tidy commit `54fdbad4` (the last before Classic was removed, 2026-09-01; tag `v13.0.0` has it too; `src/sheets/classic/`). Default window 740 × 810; minimum 644 wide.
+Target: Tidy 5e Classic, as in `docs/reference/` (screenshots) and its source at Tidy commit `54fdbad4` (the last before Classic was removed, 2026-09-01; tag `v13.0.0` has it too; `src/sheets/classic/`). Default window 740 × 810; minimum 644 wide. Never shorter than the tab row's foot, so the tabs always show; dragging the width holds for a moment (within 12px) at 644, 720 (where the inspiration stars show), 800, 900, 1024 and 1280 (user, 2026-10-28: comfort stops at common breakpoints; the stops Claude's).
 
 **Skeleton, our style** (user, 2026-10-24): every part sits where Classic puts it, so muscle memory carries over; type, spacing, contrast and controls follow our rules (§5, CLAUDE.md). Everything visual goes through tokens, so themes beyond light and dark can follow the first working sheet.
 

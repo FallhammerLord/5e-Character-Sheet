@@ -815,6 +815,25 @@ export function registerQuenchTests(quench)
             }
          });
 
+         it('keeps the window as tall as the tab row and holds widths at comfort stops', async function ()
+         {
+            const { width, height } = sheet.position;
+            try
+            {
+               sheet.setPosition({ width: 805, height: 60 });
+               const tabs = sheet.element.querySelector('.fhcs-tabs').getBoundingClientRect();
+               const frame = sheet.element.getBoundingClientRect();
+               assert.ok(frame.bottom >= tabs.bottom, `the window ends at ${Math.round(frame.bottom)}, the tab row at ${Math.round(tabs.bottom)}`);
+               assert.strictEqual(sheet.position.width, 800, `805 holds at the 800 stop; the width is ${sheet.position.width}`);
+               sheet.setPosition({ width: 830 });
+               assert.strictEqual(sheet.position.width, 830, `830 is past the stop's pull; the width is ${sheet.position.width}`);
+            }
+            finally
+            {
+               sheet.setPosition({ width, height });
+            }
+         });
+
          it('banks inspiration in an item from the tab row: links it, banks and spends with the stars, keeps dnd5e in step', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 12);
