@@ -24,7 +24,10 @@ const WIDTHS = { sheet: [headerMinWidth(6), 740, 900], chat: [240, 300, 380] };
 const HEIGHT = 810;
 // Every stylesheet module.json loads, in its order.
 const css = JSON.parse(readFileSync(`${root}module.json`, 'utf8')).styles
-   .map((path) => readFileSync(`${root}${path}`, 'utf8')).join('\n');
+   .map((path) => readFileSync(`${root}${path}`, 'utf8')
+      // A stylesheet's relative url()s (a theme's font) resolve against the stylesheet, as Foundry serves it.
+      .replace(/url\((['"]?)(\.\.?\/[^'")]+)\1\)/g, (m, q, rel) => `url(${q}${new URL(rel, `file://${root}${path}`).href}${q})`))
+   .join('\n');
 
 /** The classes and wrapper Foundry and dnd5e give each kind of frame. */
 const FRAMES = {
@@ -41,8 +44,8 @@ const FRAMES = {
 const THEMES = { light: 'background:#f4f1ea;color:#191813', dark: 'background:#26252b;color:#e8e6e3' };
 
 /** A window like Foundry's, with the classes dnd5e, Foundry's theme and our code put on it. */
-const frame = (kind, width, theme, body, look = '') => `<section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"${look ? ` data-fhcs-theme="${look}"` : ''}
-   style="width:${width}px;height:${HEIGHT}px;display:flex;flex-direction:column;border:1px solid #000;margin:8px;
+const frame = (kind, width, theme, body, { look = '', hp = null } = {}) => `<section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"${look ? ` data-fhcs-theme="${look}"` : ''}${hp === null ? '' : ` data-fhcs-hp="${hp <= 0 ? 'down' : hp <= 0.5 ? 'bloodied' : 'full'}"`}
+   style="${hp === null ? '' : `--fhcs-hp:${hp};`}width:${width}px;height:${HEIGHT}px;display:flex;flex-direction:column;border:1px solid #000;margin:8px;
    ${THEMES[theme]}">
    ${kind === 'sheet'
       // Foundry's title bar as it draws one, with a module's extra button that must wait in the ⋮ menu (rule 14).
@@ -291,6 +294,19 @@ function findProblems()
    const chain = (el) => { const list = []; for (let n = el; n && n !== app; n = n.parentElement) { list.unshift(n); } return list; };
    const backdrop = (el) => chain(el).reduce((bg, n) => over(parse(getComputedStyle(n).backgroundColor), bg),
       parse(getComputedStyle(app).backgroundColor));
+   // Art (SCOPE §4.11): an element a theme marks `--fhcs-art: 1` carries a picture whose colors the check can't know.
+   // Text over it must read with pure black or pure white in the art's place, through the plates between them.
+   // Custom properties inherit, so the art is where the mark starts, not every element under it.
+   const marked = (n) => !!n && getComputedStyle(n).getPropertyValue('--fhcs-art').trim() === '1';
+   const isArt = (n) => marked(n) && !marked(n.parentElement);
+   const backdrops = (el) =>
+   {
+      const list = chain(el);
+      const at = list.findLastIndex(isArt);
+      if (at < 0 && !isArt(app)) { return [backdrop(el)]; }
+      return [{ r: 0, g: 0, b: 0, a: 1 }, { r: 255, g: 255, b: 255, a: 1 }]
+         .map((base) => list.slice(at + 1).reduce((bg, n) => over(parse(getComputedStyle(n).backgroundColor), bg), base));
+   };
    const opacity = (el) => [app, ...chain(el)].reduce((o, n) => o * Number(getComputedStyle(n).opacity), 1);
    const luminance = ({ r, g, b }) =>
    {
@@ -305,17 +321,18 @@ function findProblems()
       if (!text) { continue; }
       const cs = getComputedStyle(el);
       if (cs.visibility === 'hidden') { continue; }
-      let bg = backdrop(el);
       // A drawing behind the text (positioned under it), like a die's face or the AC shield, is its backdrop.
       const drawing = [...(el.parentElement?.children ?? [])].find((n) => n.tagName === 'svg' && getComputedStyle(n).position === 'absolute');
       const shape = drawing?.querySelector(':scope :is(polygon, path)');
-      if (shape) { bg = over(parse(getComputedStyle(shape).fill), bg); }
       const fg = parse(cs.color);
-      const seen = over({ ...fg, a: fg.a * opacity(el) }, bg);
       const size = parseFloat(cs.fontSize);
       const large = size >= 24 || (size >= 18.66 && Number(cs.fontWeight) >= 700);
       const needed = large ? 3 : 4.5;
-      const got = ratio(seen, bg);
+      const got = Math.min(...backdrops(el).map((under) =>
+      {
+         const bg = shape ? over(parse(getComputedStyle(shape).fill), under) : under;
+         return ratio(over({ ...fg, a: fg.a * opacity(el) }, bg), bg);
+      }));
       if (got < needed) { issues.push(`contrast ${got.toFixed(2)}:1 below ${needed}:1: ${el.tagName.toLowerCase()}.${[...el.classList].join('.')} "${text.slice(0, 30)}"`); }
    }
 
@@ -416,6 +433,8 @@ const SELF_TEST = [
    { id: 'self-tab', expect: true, body: '<nav><button type="button" data-action="tab" data-tab="a">A</button></nav>' },
    { id: 'self-container', expect: true, body: '<div style="container-type:inline-size"><input type="text"></div>' },
    { id: 'self-styles', expect: true, body: '<div class="fhcs-chat"><p style="font-size:10px">a</p><p style="font-size:11px">b</p><p style="font-size:12px">c</p><p style="font-size:13px">d</p></div>' },
+   { id: 'self-art-thin-plate', expect: true, body: '<div style="--fhcs-art:1;background:#888"><p style="color:#111;background:rgba(255,255,255,.3)">Text on a thin plate over art</p></div>' },
+   { id: 'self-art-plate', expect: false, body: '<div style="--fhcs-art:1;background:#888"><p style="color:#111;background:rgba(255,255,255,.92)">Text on a plate over art</p></div>' },
    { id: 'self-contrast', expect: true, body: '<p style="color:#bbb">Too faint to read</p>' },
    { id: 'self-oval', expect: true, body: '<button style="width:40px;height:24px;min-height:0;border-radius:50%"></button>' },
    { id: 'self-tray', expect: false, body: '<div style="position:relative;width:40px"><div class="fhcs-tray" style="position:absolute;width:200px">A tray</div></div>' },
@@ -535,7 +554,7 @@ for (const c of CASES)
       for (const width of WIDTHS[kind])
       {
          const id = `${c.name}-${theme}-${width}`;
-         for (const issue of await check(id, frame(kind, width, theme, body, c.look), true, c)) { problems.push(`${id}: ${issue}`); }
+         for (const issue of await check(id, frame(kind, width, theme, body, c), true, c)) { problems.push(`${id}: ${issue}`); }
          // `sameRowsAs` names the play-mode case this edit-mode one must match row for row (rule 6).
          if (c.sameRowsAs)
          {

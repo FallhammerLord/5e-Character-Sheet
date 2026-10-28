@@ -1,7 +1,18 @@
-/* Fire and Forge (SCOPE §4.11, user 2026-10-28): smithy iron and banked coals. Riveted iron frames, a quench-dark
-   heading line, an anvil on the tab row; a hover heats a frame's edge, a press lands like a hammer strike.
-   A theme changes the ground, surfaces, frames, decals and motion; never a meaning color's hue (§5.1). The ember
-   accent decorates frames only. Texture under text stays at or under 4%. */
+/* Fire and Forge (SCOPE §4.11, user 2026-10-28): the sheet as a smithy. The window is an iron-banded object; a
+   hearth glows up from its foot, as hot as the character's HP (`--fhcs-hp`, 0–1, set by the sheet), down to cold
+   ash at 0 HP; a rack of smith's tools hangs in the lower corner; embers drift up now and then. Text sits on plates
+   (the surface at 88% with a blur: at 85% muted text on a tinted row fell to 4.35:1), so the art glows through them and shows plainly in the gutters and under short
+   lists.
+   The ember accent decorates frames only; meaning colors keep their hue (§5.1). The window is marked `--fhcs-art`,
+   so the layout check reads every text against pure black and pure white in the art's place. */
+
+@font-face
+{
+   font-family: 'FHCS Grenze';
+   src: url('../../fonts/grenze/grenze-latin-700-normal.woff2') format('woff2');
+   font-weight: 700;
+   font-display: swap;
+}
 
 .fhcs-sheet[data-fhcs-theme="forge"]
 {
@@ -10,10 +21,22 @@
    --fhcs-die-ink: #221913;
    --fhcs-die-on-ink: #f6efe4;
    --fhcs-theme-edge: #6b625a;
+   --fhcs-theme-iron: #3d3833;
    --fhcs-theme-accent: #9c4317;
+   --fhcs-theme-ember: #e0702c;
+   --fhcs-theme-ash: #8c8680;
    --fhcs-theme-glow: color-mix(in srgb, #d86a28 45%, transparent);
+   --fhcs-theme-plate: color-mix(in srgb, var(--fhcs-surface) 88%, transparent);
+   --fhcs-theme-frame: color-mix(in srgb, var(--fhcs-surface) 90%, var(--fhcs-theme-edge));
    --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%239c4317' d='M2 7h14c0 2.2 2.2 3.4 6 3.4V13h-7l-1.4 2.2H17V19H6v-3.8h3.4L8 13C4.4 12.4 2 10.2 2 7z'/%3E%3C/svg%3E");
-   --fhcs-theme-grain: radial-gradient(circle at 30% 40%, color-mix(in srgb, currentColor 4%, transparent) 0 1px, transparent 1.5px);
+   --fhcs-theme-rack: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 140'%3E%3Cg fill='%233d3833'%3E%3Crect x='0' y='6' width='120' height='6' rx='2'/%3E%3Crect x='14' y='12' width='5' height='92'/%3E%3Crect x='4' y='96' width='25' height='16' rx='2'/%3E%3Cpath d='M48 12h4l3 70 8 22-5 2-8-21-6 21-5-2 7-22z'/%3E%3Crect x='82' y='12' width='4' height='60'/%3E%3Cpath d='M74 72h20l-3 50h-14z'/%3E%3C/g%3E%3C/svg%3E");
+   --fhcs-theme-brick: #d9c6ae;
+   --fhcs-theme-ash-brick: #cfcac4;
+   --fhcs-theme-mortar: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='32'%3E%3Cg fill='%23b3a089'%3E%3Crect y='14' width='36' height='2'/%3E%3Crect y='30' width='36' height='2'/%3E%3Crect x='34' width='2' height='14'/%3E%3Crect x='16' y='16' width='2' height='14'/%3E%3C/g%3E%3C/svg%3E");
+   /* The hearth's heat follows HP; at 0 it's ash. */
+   --fhcs-theme-heat: var(--fhcs-hp, 1);
+   --fhcs-theme-fire: color-mix(in srgb, var(--fhcs-theme-ember) calc(var(--fhcs-theme-heat) * 70%), transparent);
+   --fhcs-theme-coal: color-mix(in srgb, var(--fhcs-theme-ember) calc(20% + var(--fhcs-theme-heat) * 80%), var(--fhcs-theme-ash));
 }
 
 .theme-dark .fhcs-sheet[data-fhcs-theme="forge"],
@@ -24,20 +47,86 @@
    --fhcs-die-ink: #f1e5d8;
    --fhcs-die-on-ink: #221b18;
    --fhcs-theme-edge: #8d847b;
+   --fhcs-theme-iron: #0f0c0b;
    --fhcs-theme-accent: #e2793a;
+   --fhcs-theme-ember: #ff7a2a;
+   --fhcs-theme-ash: #5c5650;
+   --fhcs-theme-brick: #3a2620;
+   --fhcs-theme-ash-brick: #2e2c2b;
+   --fhcs-theme-mortar: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='32'%3E%3Cg fill='%23160f0c'%3E%3Crect y='14' width='36' height='2'/%3E%3Crect y='30' width='36' height='2'/%3E%3Crect x='34' width='2' height='14'/%3E%3Crect x='16' y='16' width='2' height='14'/%3E%3C/g%3E%3C/svg%3E");
    --fhcs-theme-glow: color-mix(in srgb, #f08a40 50%, transparent);
    --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23e2793a' d='M2 7h14c0 2.2 2.2 3.4 6 3.4V13h-7l-1.4 2.2H17V19H6v-3.8h3.4L8 13C4.4 12.4 2 10.2 2 7z'/%3E%3C/svg%3E");
+   --fhcs-theme-rack: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 140'%3E%3Cg fill='%230f0c0b'%3E%3Crect x='0' y='6' width='120' height='6' rx='2'/%3E%3Crect x='14' y='12' width='5' height='92'/%3E%3Crect x='4' y='96' width='25' height='16' rx='2'/%3E%3Cpath d='M48 12h4l3 70 8 22-5 2-8-21-6 21-5-2 7-22z'/%3E%3Crect x='82' y='12' width='4' height='60'/%3E%3Cpath d='M74 72h20l-3 50h-14z'/%3E%3C/g%3E%3C/svg%3E");
 }
 
-/* The ground: a faint hammered grain. */
-.fhcs-sheet[data-fhcs-theme="forge"] .window-content { background-image: var(--fhcs-theme-grain); background-size: 7px 7px; }
+/* ---------- The smithy: the window's ground is the art ---------- */
 
-/* Iron frames: a heavier edge, a lit top, a cast shadow, and a rivet in each corner. */
+/* The forge's brick wall across the whole window, warmed from below by the hearth (its heat is the character's HP),
+   with the tool rack in the lower corner. Crisp in the gutters, faint through the plates. */
+.fhcs-sheet[data-fhcs-theme="forge"] .window-content
+{
+   --fhcs-art: 1;
+   position: relative;
+   isolation: isolate;
+   background-color: var(--fhcs-surface);
+   background-image:
+      radial-gradient(ellipse 90% 70% at 50% 108%, color-mix(in srgb, var(--fhcs-theme-ember) calc(var(--fhcs-theme-heat) * 55%), transparent), transparent 80%),
+      var(--fhcs-theme-rack),
+      linear-gradient(to bottom, color-mix(in srgb, var(--fhcs-theme-iron) 30%, transparent), transparent 35%),
+      /* Mortar: a brick tile, joints staggered course by course. */
+      var(--fhcs-theme-mortar),
+      linear-gradient(var(--fhcs-theme-brick), var(--fhcs-theme-brick));
+   background-position: 0 0, left 12px bottom 40px, 0 0, 0 0, 0 0;
+   background-size: 100% 100%, 96px 112px, 100% 100%, 36px 32px, 100% 100%;
+   background-repeat: no-repeat, no-repeat, no-repeat, repeat, no-repeat;
+}
+
+/* Cold at 0 HP: no glow, the wall grey with ash. */
+.fhcs-sheet[data-fhcs-theme="forge"][data-fhcs-hp="down"] .window-content
+{
+   --fhcs-theme-heat: 0;
+   --fhcs-theme-brick: var(--fhcs-theme-ash-brick);
+}
+
+/* The window's iron band, drawn over the content's edge and never catching a click: thin at the top (the header
+   sits close under it), a grate of coals along the foot, inside the tab's 8px padding. The coals burn with HP. */
+.fhcs-sheet[data-fhcs-theme="forge"] .window-content::after
+{
+   content: '';
+   position: absolute;
+   inset: 0;
+   z-index: 4;
+   pointer-events: none;
+   box-shadow: inset 0 0 0 3px var(--fhcs-theme-iron), inset 0 0 0 4px var(--fhcs-theme-edge);
+   background:
+      radial-gradient(circle, var(--fhcs-theme-coal) 1.5px, transparent 2.5px) left 6px bottom 1px / 10px 6px repeat-x,
+      linear-gradient(to top, var(--fhcs-theme-iron) 0 7px, var(--fhcs-theme-edge) 7px 8px, transparent 8px) 0 100% / 100% 8px no-repeat;
+}
+
+/* ---------- Plates: every text sits on one ---------- */
+
+.fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-header, .fhcs-tabs, .fhcs-attributes-side > .fhcs-panel, .fhcs-attributes-main > *,
+   .fhcs-list-bar, .fhcs-section, .fhcs-inventory-foot, .fhcs-casting, .fhcs-characteristics, .fhcs-bio-column, .fhcs-empty,
+   .fhcs-conditions)
+{
+   background-color: var(--fhcs-theme-plate);
+   backdrop-filter: blur(3px);
+}
+
+/* The header: a plate with soot along its top. */
+.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-header
+{
+   background-image: linear-gradient(to bottom, color-mix(in srgb, var(--fhcs-theme-iron) 10%, transparent), transparent 40%);
+}
+
+/* ---------- Iron frames ---------- */
+
 .fhcs-sheet[data-fhcs-theme="forge"] .fhcs-frame
 {
    border-color: var(--fhcs-theme-edge);
    border-radius: 3px;
-   box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent), 0 1px 2px color-mix(in srgb, #000 30%, transparent);
+   background-color: var(--fhcs-theme-frame);
+   box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent), 0 1px 2px color-mix(in srgb, #000 35%, transparent);
    background-image:
       radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
       radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
@@ -48,15 +137,48 @@
    background-repeat: no-repeat;
 }
 
-/* Hover heats the edge (state, so it shows with motion off too; the transition is motion). */
 .fhcs-sheet[data-fhcs-theme="forge"] .fhcs-frame:hover { border-color: var(--fhcs-theme-accent); }
 
-/* Heading lines and the open tab: quenched steel running to ember. */
-.fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-panel-head, .fhcs-group-head) { border-image: linear-gradient(to right, var(--fhcs-theme-accent), var(--fhcs-theme-edge) 40%, transparent) 1; }
-.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-tab.active { border-image: linear-gradient(to right, var(--fhcs-theme-accent), var(--fhcs-ink)) 1; }
+/* ---------- Type: Grenze for the display style and headings ---------- */
 
-/* The anvil, on the tab row before the lock. */
-.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-tabs { background: var(--fhcs-theme-emblem) right calc(var(--fhcs-control) + 2 * var(--fhcs-s2)) center / 20px no-repeat; }
+.fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-display, .fhcs-panel-head > .fhcs-label, .fhcs-group-head .fhcs-label, .fhcs-section-toggle > .fhcs-label)
+{
+   font-family: 'FHCS Grenze', var(--font-body, serif);
+}
+
+.fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-panel-head, .fhcs-group-head) { border-image: linear-gradient(to right, var(--fhcs-theme-accent), var(--fhcs-theme-edge) 40%, transparent) 1; }
+
+/* The open tab: a bar of hot iron. */
+.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-tab.active
+{
+   border-bottom-color: var(--fhcs-theme-accent);
+   box-shadow: 0 3px 6px -3px var(--fhcs-theme-glow);
+}
+
+.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-tabs
+{
+   /* The emblem, and the rail under the tabs warm with the hearth. */
+   background-image: var(--fhcs-theme-emblem), linear-gradient(to right, transparent, var(--fhcs-theme-fire) 50%, transparent);
+   background-position: right calc(var(--fhcs-control) + 2 * var(--fhcs-s2)) center, 0 100%;
+   background-size: 20px, 100% 2px;
+   background-repeat: no-repeat;
+}
+
+/* ---------- The portrait, lit from below by the hearth ---------- */
+
+.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-portrait-clip { isolation: isolate; }
+.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-portrait-clip::before
+{
+   content: '';
+   position: absolute;
+   inset: 0;
+   z-index: 1;
+   pointer-events: none;
+   background: linear-gradient(to top, color-mix(in srgb, var(--fhcs-theme-ember) calc(var(--fhcs-theme-heat) * 45%), transparent), transparent 55%);
+   mix-blend-mode: screen;
+}
+
+/* ---------- Motion: answers, moments, and embers now and then ---------- */
 
 @media (prefers-reduced-motion: no-preference)
 {
@@ -71,10 +193,63 @@
       transform: translateY(1px);
       animation: fhcs-forge-strike 0.25s ease-out;
    }
+
+   /* Embers: a handful rise from the hearth for three seconds in every twenty, never at 0 HP. */
+   .fhcs-sheet[data-fhcs-theme="forge"]:not([data-fhcs-motion="off"]):not([data-fhcs-hp="down"]) .window-content::before
+   {
+      content: '';
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 45%;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0;
+      background:
+         radial-gradient(circle at 38% 100%, var(--fhcs-theme-ember) 0 1.5px, transparent 2px),
+         radial-gradient(circle at 52% 100%, var(--fhcs-theme-ember) 0 1px, transparent 1.5px),
+         radial-gradient(circle at 61% 100%, var(--fhcs-theme-ember) 0 1.5px, transparent 2px),
+         radial-gradient(circle at 46% 100%, var(--fhcs-theme-ember) 0 1px, transparent 1.5px);
+      animation: fhcs-forge-embers 20s ease-out infinite;
+   }
+
+   /* A hit: the portrait jolts and flares, sparks fly from the header (about 600ms). */
+   .fhcs-sheet[data-fhcs-theme="forge"].fhcs-moment-hit:not([data-fhcs-motion="off"]) .fhcs-portrait { animation: fhcs-forge-jolt 0.4s ease-out; }
+   .fhcs-sheet[data-fhcs-theme="forge"].fhcs-moment-hit:not([data-fhcs-motion="off"]) .fhcs-portrait-clip::before { animation: fhcs-forge-flare 0.6s ease-out; }
+   /* A heal: the hearth's light swells on the portrait. */
+   .fhcs-sheet[data-fhcs-theme="forge"].fhcs-moment-heal:not([data-fhcs-motion="off"]) .fhcs-portrait-clip::before { animation: fhcs-forge-swell 0.6s ease-in-out; }
 }
 
 @keyframes fhcs-forge-strike
 {
    from { box-shadow: 0 0 0 0 var(--fhcs-theme-glow); }
    to { box-shadow: 0 0 0 6px transparent; }
+}
+
+@keyframes fhcs-forge-embers
+{
+   0% { opacity: 0; transform: translateY(0); }
+   2% { opacity: 1; }
+   15% { opacity: 0; transform: translateY(-70%); }
+   100% { opacity: 0; transform: translateY(-70%); }
+}
+
+@keyframes fhcs-forge-jolt
+{
+   20% { transform: translate(-2px, 1px); }
+   45% { transform: translate(2px, -1px); }
+   70% { transform: translate(-1px, 0); }
+   to { transform: none; }
+}
+
+@keyframes fhcs-forge-flare
+{
+   0% { opacity: 1; filter: none; }
+   20% { opacity: 1; filter: brightness(2.2) saturate(1.4); background-color: color-mix(in srgb, var(--fhcs-theme-ember) 30%, transparent); }
+   to { opacity: 1; filter: none; }
+}
+
+@keyframes fhcs-forge-swell
+{
+   50% { filter: brightness(1.8); }
+   to { filter: none; }
 }

@@ -111,8 +111,10 @@ From the user's screenshot after Phase 6 (2026-10-28). Decisions: SCOPE §4.10.
 ## Phase 6.6: Themes (user, 2026-10-28; SCOPE §4.11)
 
 - [ ] 1. Theme layer: `data-fhcs-theme` on the sheet, `fhcs-frame` on every panel, the four themes in light and dark (colors, frames, decals, motion); layout cases per theme; mockup page for the user (built 2026-10-28; waits on the user's review of `tools/theme-mockup.mjs`'s page)
+- [ ] 1b. Fire and Forge as artwork (user, 2026-10-28): the window a smithy, state art from HP, plates, Grenze, moments, embers; the layout check reads text over art against black and white (`--fhcs-art`); `tools/forge-mockup.html` (built 2026-10-28; waits on the user's review). The sheet already applies a character's `flags.fhcs.theme` and its HP state.
 - [ ] 2. Choosing: world default setting, per-character choice in edit mode (`flags.fhcs.theme`), the player's Motion switch
 - [ ] 3. Chat cards in the world theme, with the setting to keep them plain
+- [ ] Banked inspiration (SCOPE §4.12; scoped, waits on the user)
 - [ ] Quench and play
 
 ## Phase 7: The ADHD layer

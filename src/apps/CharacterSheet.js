@@ -70,6 +70,33 @@ async function toggleGroup(event, target)
    await game.user.setFlag(MODULE_ID, PREFS.folded, [...folded]);
 }
 
+/** How long a theme's moment (a hit taken, a heal) stays marked on the sheet: its animation runs within it. */
+const MOMENT_MS = 650;
+
+/**
+ * The sheet's state for its theme (SCOPE §4.11): the character's theme (`flags.fhcs.theme`; the picker and world
+ * default come next), HP as a 0–1 ratio and full / bloodied / down for the theme's art, and a moment when HP falls or
+ * rises between two draws.
+ */
+function themeState(element, actor)
+{
+   const theme = actor.getFlag(MODULE_ID, 'theme');
+   if (theme) { element.dataset.fhcsTheme = theme; }
+   else { delete element.dataset.fhcsTheme; }
+   const hp = actor.system.attributes?.hp ?? {};
+   const value = Number(hp.value) || 0;
+   const ratio = hp.max > 0 ? Math.clamp(value / hp.max, 0, 1) : 1;
+   element.style.setProperty('--fhcs-hp', ratio.toFixed(2));
+   element.dataset.fhcsHp = value <= 0 ? 'down' : ratio <= 0.5 ? 'bloodied' : 'full';
+   const before = element.dataset.fhcsHpValue;
+   element.dataset.fhcsHpValue = String(value);
+   if (before === undefined || Number(before) === value) { return; }
+   const moment = value < Number(before) ? 'fhcs-moment-hit' : 'fhcs-moment-heal';
+   element.classList.remove('fhcs-moment-hit', 'fhcs-moment-heal');
+   element.classList.add(moment);
+   setTimeout(() => element.classList.remove(moment), MOMENT_MS);
+}
+
 /** Folds or opens a section on a list tab (user, 2026-10-28), and remembers it with the favorites groups. */
 async function toggleSection(event, target)
 {
@@ -465,6 +492,7 @@ export function makeCharacterSheet(Base)
          closeTraysOnClickOff();
          wireHpTray(this.element);
          wireResourceUses(this.element, this.actor);
+         themeState(this.element, this.actor);
          const items = this.element.querySelector('.fhcs-inventory .fhcs-items');
          if (items && !items.dataset.fhcsWatched)
          {

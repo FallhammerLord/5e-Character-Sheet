@@ -744,3 +744,10 @@ for (const look of LOOKS)
       CASES.push({ ...base, name: `theme-${look}-${name}`, look, sameRowsAs: undefined });
    }
 }
+
+// Fire and Forge's hearth follows HP (SCOPE §4.11): bloodied and down, beside the full cases above.
+for (const [state, hp] of [['bloodied', 0.4], ['down', 0]])
+{
+   const base = CASES.find((c) => c.name === 'attributes');
+   CASES.push({ ...base, name: `theme-forge-attributes-${state}`, look: 'forge', hp, sameRowsAs: undefined });
+}

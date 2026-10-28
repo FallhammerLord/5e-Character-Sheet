@@ -157,15 +157,29 @@ Four themes for players who want them, ahead of the rest of Phase 7: **Fire and 
 - **Light and dark for each theme:** every theme token has both values, as now.
 - **Chat cards follow the world theme,** not the speaker's; a world setting switches themed cards off (plain cards). A later slice than the sheet.
 - **Not shared with the quest log** for now; the user may carry the themes there later, so each theme stays one self-contained CSS file.
-- **SVG and CSS only:** decals are SVG inside the theme's CSS (masks tinted by theme tokens), frames are CSS. Room for custom images later, not now.
+- **SVG and CSS, plus a display font per theme** (user, 2026-10-28, widening "SVG and CSS only"): decals are SVG inside the theme's CSS, frames are CSS, and a theme may ship one OFL display font for the display style and panel headings (Forge: Grenze, `fonts/grenze/`). Room for custom images later, not now.
+- **A theme is artwork, readability its north star** (user, 2026-10-28): text sits on plates; the art lives in the window's frame, the gutters, the space under short lists, and faintly through the plates. An element whose background carries art is marked `--fhcs-art: 1`, and the layout check reads every text over it against pure black and pure white in the art's place.
+- **Motion, widened** (user, 2026-10-28): answers to the player stay under 300ms; rare moments (a hit taken, a heal) may run to about 600ms, once; some ambient motion is fine if not constant (Forge: embers rise for three seconds in every twenty).
+- **State art** (user, 2026-10-28, "a nifty plan"): a theme's art follows the character's state, beside the marks that already say it, never in their place. The sheet sets `--fhcs-hp` (0–1), `data-fhcs-hp` (full, bloodied, down) and a moment class when HP falls or rises.
 - **What a theme may change** (Claude's rule, 2026-10-28): the ground, panel surfaces and frames, corners, decals, heading bands, the tab underline, and motion. Never the meaning colors of §5.1: it may shift their lightness to keep contrast on its ground, never their hue. Its accent colors decorate frames only, never a control or a mark.
 - **Contrast:** text sits on a solid theme surface or on texture no stronger than 15% (worst case worked out per theme); the layout check renders every theme in light and dark at every width.
-- **Motion:** only in answer to the player (hover, press, a fold opening), under 300ms, never looping, never flashing more than three times a second; off under the system's reduced-motion setting and with the player's Motion switch.
+- **Motion:** in answer to the player (hover, press, a fold opening) under 300ms; never flashing more than three times a second; off under the system's reduced-motion setting and with the player's Motion switch.
 - **The four, as first mocked up** (Claude, 2026-10-28, for the user's review; `styles/themes/*.css`, `tools/theme-mockup.mjs`). The panels carry `fhcs-frame`; a round portrait keeps no frame. Each theme puts its emblem on the tab row before the lock.
-  - *Fire and Forge:* warm soot and ash parchment; riveted iron frames; heading lines quenched steel to ember; an anvil. Hover heats a frame's edge; a press dips 1px with a spark ring.
+  - *Fire and Forge* (taken further first, user 2026-10-28): the window as a smithy. A brick wall across the window, warmed from below by a hearth whose heat is the character's HP (cold grey at 0); a tool rack in the lower corner; an iron band round the window with a grate of coals along its foot that burn with HP; plates at 88%; riveted iron frames; Grenze for the display style and headings; the portrait lit from below by the hearth; an anvil on the tab row and the rail under the tabs warm. Hover heats a frame's edge; a press dips 1px with a spark ring; embers rise now and then; a hit jolts the portrait and flares it, a heal swells its light.
   - *Wind and Wrath:* storm slate and overcast; square frames with a cut top-right corner and a storm-light left edge; faint wind lines in the ground; a bolt. Hover sends a gust across a heading; a press is shoved sideways.
   - *Sand and Sanctuary:* sandstone and shade-brown; carved frames with stepped corners and a terracotta inlay along the top; a tile lattice; a sun. Hover passes a shaft of light down the portrait; a press settles like stone.
   - *Valley and Valor:* meadow parchment and forest night; tooled frames, a brass edge with a second line inside (solid, since dashed means choose); a meadow tint rising from the foot; a crimson pennant, which also notches the open tab's line. Hover runs a gleam along a heading; a press pulses like a shield bash.
+
+### 4.12 Banked inspiration (scoped, not built; Claude, 2026-10-28, for the user's review)
+
+Modern Tidy (checked in its source, 2026-10-28): a world "homebrew" setting turns it on, a second limits managing it to the GM; the player marks a feature with uses as the inspiration source (its context menu), stored on the actor (`flags.tidy5e-sheet.inspiration-source`); the badge then shows that item's uses with − and +. Without a source, dnd5e's on/off inspiration (`system.attributes.inspiration`, a boolean).
+
+Proposed for ours:
+- **The same switch:** a world setting, off by default, with Tidy's GM-only option.
+- **The source:** an item with uses, picked from the inspiration chip's tray in edit mode, as a resource panel links one (`flags.fhcs.inspiration`). When ours is unset we read Tidy's flag, so a character keeps its bank across sheets.
+- **A bar, not a number:** segments along the portrait's top edge, one per use, each a star; filled ones are banked. A click on a filled segment spends one, on an empty one banks one (as slot pips). Gaining fills a segment with a gleam (a moment, about 600ms); spending drains it.
+- **dnd5e stays in step:** its boolean is on while the bank holds any, so whatever reads dnd5e's inspiration still works.
+- **To decide:** where the bar sits (the portrait's top edge, or beside the HP bar), and the most segments drawn before it becomes "5 / 8".
 
 ## 5. ADHD rules carried over
 
