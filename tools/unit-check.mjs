@@ -286,6 +286,11 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
       { key: 'secondary', link: null, label: '', value: 0, max: 0, sourceMax: 0, sr: false, lr: false, periods: null },
       { key: 'tertiary', link: null, label: 'Rage', value: 1, max: 3, sourceMax: 3, sr: false, lr: true, periods: null }
    ] };
+   // Where the group sits: leading the column while any is set; none set, only in edit mode, at the foot (rule 6).
+   const none = { ...resFacts, resources: resFacts.resources.map((r) => ({ ...r, link: null, label: '', max: 0 })) };
+   const place = (f, editing) => { const v = attributesView({ ...f, editing }, { format, localize }); return `${v.resourcesAtTop}/${v.resourcesAtFoot}`; };
+   const placed = [place(resFacts, false), place(resFacts, true), place(none, false), place(none, true)].join(' ');
+   if (placed !== 'true/false true/false false/false false/true') { problems.push(`resources placement: ${placed}`); }
    const show = (over) => attributesView({ ...resFacts, ...over }, { format, localize }).resources
       .map((r) => `${r.title}|${r.recovery}|${r.linked}|${r.options.filter((o) => o.on).map((o) => o.id || 'own')}`);
    const res = { play: show({ editing: false }), edit: show({ editing: true }) };

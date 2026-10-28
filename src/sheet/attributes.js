@@ -136,6 +136,9 @@ export function attributesView(facts, { format, localize })
             ]
          };
       }).filter((r) => facts.editing || r.set),
+      // Any set: Resources lead the column in both modes. None set: only edit mode shows them, at the column's foot.
+      resourcesAtTop: facts.resources.some((r) => r.link || r.label || r.max),
+      resourcesAtFoot: !!facts.editing && !facts.resources.some((r) => r.link || r.label || r.max),
       resourcesOpen: !(facts.folded ?? []).includes('resources'),
       text: {
          skills: localize('FHCS.Attributes.Skills'),

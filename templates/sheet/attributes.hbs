@@ -1,3 +1,82 @@
+{{#*inline "fhcs-resources"}}
+      {{!-- Resources (user, 2026-10-28, SCOPE §4.10): three panels in a row, first among the favorites, folding like the
+            other groups. In play only those set show; with the lock off all three, for editing and adding. Each panel:
+            name; uses left / most; recovery and Restore. A panel linked to an item (the cog's tray) shows its uses. --}}
+      <div class="fhcs-group fhcs-frame fhcs-resources-panel" data-fhcs-group="resources">
+         <div class="fhcs-group-head">
+            <button type="button" class="fhcs-group-toggle" data-action="fhcsToggleGroup" aria-expanded="{{#if resourcesOpen}}true{{else}}false{{/if}}">
+               <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+               <span class="fhcs-label">{{ text.resources }}</span>
+            </button>
+         </div>
+         <ul class="fhcs-favorites fhcs-resources"{{#unless resourcesOpen}} hidden{{/unless}}>
+            {{#each resources}}
+            <li class="fhcs-resource fhcs-frame{{#if linked}} fhcs-resource-linked{{/if}}" role="group" aria-label="{{ groupLabel }}" data-resource="{{ key }}">
+               {{!-- A linked item's art as the panel's underlay (user, 2026-10-28), as the header's cards carry theirs. --}}
+               {{#if link}}<span class="fhcs-resource-art" aria-hidden="true"><img src="{{ link.img }}" alt=""></span>{{/if}}
+               <span class="fhcs-resource-head">
+                  {{#if ../editing}}{{#unless linked}}
+                  <input type="text" class="fhcs-input fhcs-body fhcs-resource-field" name="system.resources.{{ key }}.label" value="{{ label }}"
+                         placeholder="{{ title }}" aria-label="{{ nameLabel }}">
+                  {{else}}
+                  <span class="fhcs-body fhcs-resource-name">{{ title }}</span>
+                  {{/unless}}
+                  <details class="fhcs-fold fhcs-resource-link" data-fold-key="resource-{{ key }}">
+                     <summary class="fhcs-toggle fhcs-gear-button" aria-label="{{ linkLabel }}" data-fhcs-tip="{{ linkLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</summary>
+                     <div class="fhcs-tray fhcs-resource-tray">
+                        <span class="fhcs-label">{{ ../text.linkTitle }}</span>
+                        {{#each options}}
+                        <button type="button" class="fhcs-button fhcs-body fhcs-resource-option" data-action="fhcsLinkResource" data-key="{{ ../key }}"
+                                data-item-id="{{ id }}" aria-pressed="{{#if on}}true{{else}}false{{/if}}">
+                           <span class="fhcs-radio-mark" aria-hidden="true"></span>{{#if img}}<img class="fhcs-resource-img" src="{{ img }}" alt="">{{/if}}<span class="fhcs-resource-name">{{ name }}</span>
+                        </button>
+                        {{/each}}
+                     </div>
+                  </details>
+                  {{else}}
+                  <span class="fhcs-body fhcs-resource-name{{#unless named}} fhcs-muted{{/unless}}">{{ title }}</span>
+                  {{/if}}
+               </span>
+               <span class="fhcs-resource-count">
+                  {{#if linked}}
+                  {{!-- Not a form field: the item's uses, saved by our change handler (it stores what's spent). --}}
+                  <input type="text" class="fhcs-input fhcs-body" data-fhcs-resource-uses="{{ key }}" inputmode="numeric"
+                         value="{{ value }}" placeholder="0" aria-label="{{ valueLabel }}">
+                  {{else}}
+                  <input type="text" class="fhcs-input fhcs-body" name="system.resources.{{ key }}.value" data-dtype="Number" inputmode="numeric"
+                         value="{{ value }}" placeholder="0" aria-label="{{ valueLabel }}">
+                  {{/if}}
+                  <span class="fhcs-body fhcs-muted">/</span>
+                  {{#if ../editing}}{{#unless linked}}
+                  <input type="text" class="fhcs-input fhcs-body" name="system.resources.{{ key }}.max" data-dtype="Number" inputmode="numeric"
+                         value="{{ sourceMax }}" placeholder="0" aria-label="{{ maxLabel }}">
+                  {{else}}
+                  <span class="fhcs-body fhcs-resource-max">{{ max }}</span>
+                  {{/unless}}{{else}}
+                  <span class="fhcs-body fhcs-resource-max">{{ max }}</span>
+                  {{/if}}
+               </span>
+               <span class="fhcs-resource-foot">
+                  {{#if ../editing}}{{#unless linked}}
+                  <span class="fhcs-resource-recovery">
+                     <label class="fhcs-label fhcs-muted"><input type="checkbox" name="system.resources.{{ key }}.sr"{{#if sr}} checked{{/if}}>{{ ../text.shortRest }}</label>
+                     <label class="fhcs-label fhcs-muted"><input type="checkbox" name="system.resources.{{ key }}.lr"{{#if lr}} checked{{/if}}>{{ ../text.longRest }}</label>
+                  </span>
+                  {{else}}
+                  <span class="fhcs-label fhcs-muted fhcs-resource-recovery">{{ recovery }}</span>
+                  {{/unless}}{{else}}
+                  <span class="fhcs-label fhcs-muted fhcs-resource-recovery">{{ recovery }}</span>
+                  {{/if}}
+                  <button type="button" class="fhcs-toggle fhcs-resource-refresh" data-action="fhcsRefreshResource" data-key="{{ key }}"
+                          aria-label="{{ refreshLabel }}" data-fhcs-tip="{{ refreshLabel }}">
+                     <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg>
+                  </button>
+               </span>
+            </li>
+            {{/each}}
+         </ul>
+      </div>
+{{/inline}}
 {{!-- The Attributes tab (SCOPE §4.3): skills and traits on the left, favorites on the right. It takes dnd5e's
       "details" tab, so dnd5e's tab switching and part ID still apply. --}}
 <section class="tab fhcs-attributes {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
@@ -81,85 +160,9 @@
          </dl>
       </div>
       {{/if}}
-      {{#if resources.length}}
-      {{!-- Resources (user, 2026-10-28, SCOPE §4.10): three panels in a row, first among the favorites, folding like the
-            other groups. In play only those set show; with the lock off all three, for editing and adding. Each panel:
-            name; uses left / most; recovery and Restore. A panel linked to an item (the cog's tray) shows its uses. --}}
-      <div class="fhcs-group fhcs-frame fhcs-resources-panel" data-fhcs-group="resources">
-         <div class="fhcs-group-head">
-            <button type="button" class="fhcs-group-toggle" data-action="fhcsToggleGroup" aria-expanded="{{#if resourcesOpen}}true{{else}}false{{/if}}">
-               <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-               <span class="fhcs-label">{{ text.resources }}</span>
-            </button>
-         </div>
-         <ul class="fhcs-favorites fhcs-resources"{{#unless resourcesOpen}} hidden{{/unless}}>
-            {{#each resources}}
-            <li class="fhcs-resource fhcs-frame{{#if linked}} fhcs-resource-linked{{/if}}" role="group" aria-label="{{ groupLabel }}" data-resource="{{ key }}">
-               {{!-- A linked item's art as the panel's underlay (user, 2026-10-28), as the header's cards carry theirs. --}}
-               {{#if link}}<span class="fhcs-resource-art" aria-hidden="true"><img src="{{ link.img }}" alt=""></span>{{/if}}
-               <span class="fhcs-resource-head">
-                  {{#if ../editing}}{{#unless linked}}
-                  <input type="text" class="fhcs-input fhcs-body fhcs-resource-field" name="system.resources.{{ key }}.label" value="{{ label }}"
-                         placeholder="{{ title }}" aria-label="{{ nameLabel }}">
-                  {{else}}
-                  <span class="fhcs-body fhcs-resource-name">{{ title }}</span>
-                  {{/unless}}
-                  <details class="fhcs-fold fhcs-resource-link" data-fold-key="resource-{{ key }}">
-                     <summary class="fhcs-toggle fhcs-gear-button" aria-label="{{ linkLabel }}" data-fhcs-tip="{{ linkLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</summary>
-                     <div class="fhcs-tray fhcs-resource-tray">
-                        <span class="fhcs-label">{{ ../text.linkTitle }}</span>
-                        {{#each options}}
-                        <button type="button" class="fhcs-button fhcs-body fhcs-resource-option" data-action="fhcsLinkResource" data-key="{{ ../key }}"
-                                data-item-id="{{ id }}" aria-pressed="{{#if on}}true{{else}}false{{/if}}">
-                           <span class="fhcs-radio-mark" aria-hidden="true"></span>{{#if img}}<img class="fhcs-resource-img" src="{{ img }}" alt="">{{/if}}<span class="fhcs-resource-name">{{ name }}</span>
-                        </button>
-                        {{/each}}
-                     </div>
-                  </details>
-                  {{else}}
-                  <span class="fhcs-body fhcs-resource-name{{#unless named}} fhcs-muted{{/unless}}">{{ title }}</span>
-                  {{/if}}
-               </span>
-               <span class="fhcs-resource-count">
-                  {{#if linked}}
-                  {{!-- Not a form field: the item's uses, saved by our change handler (it stores what's spent). --}}
-                  <input type="text" class="fhcs-input fhcs-body" data-fhcs-resource-uses="{{ key }}" inputmode="numeric"
-                         value="{{ value }}" placeholder="0" aria-label="{{ valueLabel }}">
-                  {{else}}
-                  <input type="text" class="fhcs-input fhcs-body" name="system.resources.{{ key }}.value" data-dtype="Number" inputmode="numeric"
-                         value="{{ value }}" placeholder="0" aria-label="{{ valueLabel }}">
-                  {{/if}}
-                  <span class="fhcs-body fhcs-muted">/</span>
-                  {{#if ../editing}}{{#unless linked}}
-                  <input type="text" class="fhcs-input fhcs-body" name="system.resources.{{ key }}.max" data-dtype="Number" inputmode="numeric"
-                         value="{{ sourceMax }}" placeholder="0" aria-label="{{ maxLabel }}">
-                  {{else}}
-                  <span class="fhcs-body fhcs-resource-max">{{ max }}</span>
-                  {{/unless}}{{else}}
-                  <span class="fhcs-body fhcs-resource-max">{{ max }}</span>
-                  {{/if}}
-               </span>
-               <span class="fhcs-resource-foot">
-                  {{#if ../editing}}{{#unless linked}}
-                  <span class="fhcs-resource-recovery">
-                     <label class="fhcs-label fhcs-muted"><input type="checkbox" name="system.resources.{{ key }}.sr"{{#if sr}} checked{{/if}}>{{ ../text.shortRest }}</label>
-                     <label class="fhcs-label fhcs-muted"><input type="checkbox" name="system.resources.{{ key }}.lr"{{#if lr}} checked{{/if}}>{{ ../text.longRest }}</label>
-                  </span>
-                  {{else}}
-                  <span class="fhcs-label fhcs-muted fhcs-resource-recovery">{{ recovery }}</span>
-                  {{/unless}}{{else}}
-                  <span class="fhcs-label fhcs-muted fhcs-resource-recovery">{{ recovery }}</span>
-                  {{/if}}
-                  <button type="button" class="fhcs-toggle fhcs-resource-refresh" data-action="fhcsRefreshResource" data-key="{{ key }}"
-                          aria-label="{{ refreshLabel }}" data-fhcs-tip="{{ refreshLabel }}">
-                     <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.7"/><path d="M20 4v5h-5"/></svg>
-                  </button>
-               </span>
-            </li>
-            {{/each}}
-         </ul>
-      </div>
-      {{/if}}
+      {{!-- Resources lead the column while any is set; with none set they show only in edit mode, at the column's foot,
+            so nothing above moves when the lock opens (rule 6; user, 2026-10-28). --}}
+      {{#if resourcesAtTop}}{{> fhcs-resources }}{{/if}}
 
       {{#each favorites}}
       {{!-- Each group folds and stays as the player left it (user, 2026-10-24); its slot pips sit outside the fold button. --}}
@@ -223,6 +226,7 @@
       {{else}}
       <p class="fhcs-body fhcs-muted fhcs-empty">{{ text.noFavorites }}</p>
       {{/each}}
+      {{#if resourcesAtFoot}}{{> fhcs-resources }}{{/if}}
    </div>
    {{/with}}
 </section>

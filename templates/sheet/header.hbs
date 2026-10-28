@@ -365,7 +365,8 @@
                </span>
                {{#if sub}}
                <span class="fhcs-origin-line fhcs-origin-sub" data-uuid="{{ sub.uuid }}">
-                  <button type="button" class="fhcs-origin-name fhcs-body fhcs-muted" data-action="showDocument" aria-label="{{ sub.openLabel }}">{{ sub.name }}</button>
+                  {{!-- The subclass may shorten (beside "+N", at 644px); resting on it shows it whole. --}}
+                  <button type="button" class="fhcs-origin-name fhcs-body fhcs-muted" data-action="showDocument" aria-label="{{ sub.openLabel }}" data-fhcs-tip="{{ sub.name }}" data-fhcs-tip-cut>{{ sub.name }}</button>
                   {{#if sub.clear}}<button type="button" class="fhcs-toggle fhcs-origin-clear" data-action="deleteDocument" data-uuid="{{ sub.clear.uuid }}" aria-label="{{ sub.clear.label }}" data-fhcs-tip="{{ sub.clear.label }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>{{/if}}
                   {{#if more}}{{> fhcs-more }}{{/if}}
                </span>

@@ -758,6 +758,26 @@ for (const name of ['features', 'effects', 'biography', 'attributes-editing', 'a
    CASES.push({ ...base, name: `theme-forge-${name}`, look: 'forge', sameRowsAs: undefined });
 }
 
+// A character with no resource set (the user's Cúán, 2026-10-28): play shows no Resources group, edit mode all three
+// panels; and a character with four classes; each must keep the rows above from moving between modes.
+const NO_RESOURCES = ['primary', 'secondary', 'tertiary'].map((key) => ({ key, link: null, label: '', value: 0, max: 0, sourceMax: 0, sr: false, lr: false, periods: null }));
+CASES.push({ ...CASES.find((c) => c.name === 'attributes'), name: 'attributes-no-resources', context: attributes({ resources: NO_RESOURCES }) });
+CASES.push({ ...CASES.find((c) => c.name === 'attributes-editing'), name: 'attributes-no-resources-editing', context: attributes({ resources: NO_RESOURCES, editing: true }), sameRowsAs: 'attributes-no-resources' });
+CASES.push({ name: 'header-four-classes-play', template: 'sheet/header', context: header({ originCards: FOUR_CLASSES() }), rows: '.fhcs-header, .fhcs-ability' });
+CASES.push({ name: 'header-four-classes-editing', template: 'sheet/header', context: { ...header({ originCards: FOUR_CLASSES({ editing: true }) }), editable: true }, rows: '.fhcs-header, .fhcs-ability', sameRowsAs: 'header-four-classes-play' });
+
+// Play and edit mode must match row for row in Forge too (rule 6; user, 2026-10-28: "toggling edit mode causes the
+// sheet to jump around again"): each play/edit pair again, themed.
+for (const c of CASES.filter((x) => x.sameRowsAs && !x.look))
+{
+   for (const name of [c.sameRowsAs, c.name])
+   {
+      if (CASES.some((x) => x.name === `forge-parity-${name}`)) { continue; }
+      const base = CASES.find((x) => x.name === name);
+      CASES.push({ ...base, name: `forge-parity-${name}`, look: 'forge', sameRowsAs: base.sameRowsAs ? `forge-parity-${base.sameRowsAs}` : undefined });
+   }
+}
+
 // Fire and Forge's hearth follows HP (SCOPE §4.11): bloodied and down, beside the full cases above.
 for (const [state, hp] of [['bloodied', 0.4], ['down', 0]])
 {
