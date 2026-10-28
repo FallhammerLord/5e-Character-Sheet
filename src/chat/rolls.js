@@ -4,8 +4,6 @@
  * - A roll made from one of our usage cards is drawn in that card's band, and a request's result in the request's
  *   rows, so its own card is hidden. dnd5e re-renders
  *   the usage card when the roll arrives (`system.origin`); see docs/research/dnd5e-6.0-chat.md.
- * - With "always roll two d20s", every d20 roll carries one more d20 rolled in advance, for late advantage or
- *   disadvantage to use first.
  * - Roll on use (SCOPE §6.6): dnd5e already rolls an attack after an attack is used, and damage after a damage or
  *   healing activity (`subsequentActions`); our settings switch those off, and add damage after each attack and
  *   right after a save spell.
@@ -13,7 +11,7 @@
  * - Folded rolls post quietly: no scroll to the bottom of the chat log, no notification (compat.quietPosts).
  */
 import { MODULE_ID } from '../constants.js';
-import { d20Now, isD20Roll, refreshCard, requestOf, rollCardDamage, skipKeyHeld, usageOrigin } from '../compat.js';
+import { refreshCard, requestOf, rollCardDamage, skipKeyHeld, usageOrigin } from '../compat.js';
 
 const setting = (key) => game.settings.get(MODULE_ID, key);
 
@@ -41,21 +39,6 @@ export function isFolded(message)
    if (!FOLDED_TYPES.has(message.type) || !game.settings.get(MODULE_ID, 'cards')) { return false; }
    const origin = usageOrigin(message);
    return Boolean((origin && !origin.content) || requestOf(message));
-}
-
-/**
- * `dnd5e.postRollConfiguration`: adds a spare d20 to each d20 roll, before it is evaluated.
- *
- * @param {Roll[]} rolls
- */
-export function addSpareD20(rolls)
-{
-   if (!game.settings.get(MODULE_ID, 'twoD20s')) { return; }
-   for (const roll of rolls)
-   {
-      if (!isD20Roll(roll) || !roll.validD20Roll) { continue; }
-      roll.options.fhcs = { ...roll.options.fhcs, spare: d20Now() };
-   }
 }
 
 /**

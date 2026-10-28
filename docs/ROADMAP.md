@@ -127,7 +127,7 @@ Done and verified in play (2026-10-24). Runs alongside the sheet phases; works w
 - [x] Damage band: drawn in the card, crits double without asking, dice math on click (verified 2026-10-24)
 - [x] Save / check band: roll for selected tokens, one row per token with its result in words (verified 2026-10-24)
 - [x] Apply: dnd5e's damage and effect trays in "selected" mode, labelled, at least 24px (verified 2026-10-24)
-- [x] Settings: roll attack on use, roll damage on use, always two d20s (world, on by default) (verified 2026-10-24)
+- [x] Settings: roll attack on use, roll damage on use (verified 2026-10-24); always two d20s removed 2026-10-28 (SCOPE §6.6)
 - [x] No roll pop-ups (SCOPE §6.4): roll dialogs skipped; dnd5e's spellcasting and activity chooser windows stay (verified 2026-10-24)
 - [x] Late adds: advantage, disadvantage, + bonus (a number or a die) on any roll, shown as its own term (verified 2026-10-24)
 - [x] Standalone rolls (sheet checks, saves, death saves, GM requests) in the same frame (verified 2026-10-24)

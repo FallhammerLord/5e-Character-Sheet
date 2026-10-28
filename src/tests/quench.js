@@ -1276,12 +1276,10 @@ export function registerQuenchTests(quench)
                const first = attack().rolls[0];
                const primary = first.d20.results[0].result;
                const bonus = first.total - first.d20.total;
-               const spare = first.options.fhcs?.spare;
 
                await addD20(attack(), 'adv');
                let roll = attack().rolls[0];
                const advDie = roll.d20.results.at(-1).result;
-               if (spare) { assert.strictEqual(advDie, spare, 'the spare d20 is used first'); }
                assert.strictEqual(roll.options.advantageMode, 1);
                assert.strictEqual(roll.total, Math.max(primary, advDie) + bonus, 'higher die counts');
 

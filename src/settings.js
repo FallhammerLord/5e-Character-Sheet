@@ -63,14 +63,4 @@ export function registerSettings()
          default: true
       });
    }
-
-   // The spare d20 is part of every d20 roll's data.
-   game.settings.register(MODULE_ID, 'twoD20s', {
-      name: 'FHCS.Settings.TwoD20s.Name',
-      hint: 'FHCS.Settings.TwoD20s.Hint',
-      scope: 'world',
-      config: true,
-      type: Boolean,
-      default: true
-   });
 }

@@ -39,7 +39,7 @@ const FIREBALL = [
 const attack = (over = {}) => ({
    kind: 'attack', who: 'Kira', what: 'Longsword', total: 28, natural: 20, target: null, showResult: true,
    success: null, isCritical: true, targets: [{ name: 'Goblin Boss', isMiss: false }],
-   dice: [{ result: 20, active: true }], advantageMode: 0, sides: [], spare: 7,
+   dice: [{ result: 20, active: true }], advantageMode: 0, sides: [], 
    formula: '1d20 + 5 + 3', math: '20 + 5 + 3', messageId: 'a1', canEdit: true, bonuses: [], ...over
 });
 
@@ -63,7 +63,7 @@ const rolledAttack = (facts, earlier = [], damageFacts = null) =>
 /** Facts for one token's save, as compat.rollFacts returns them. */
 const save = (who, total, natural, success, over = {}) => ({
    kind: 'save', who, what: 'Dexterity Saving Throw', total, natural, target: 15, showResult: true, success,
-   isCritical: false, targets: [], dice: [{ result: natural, active: true }], advantageMode: 0, sides: [], spare: 11,
+   isCritical: false, targets: [], dice: [{ result: natural, active: true }], advantageMode: 0, sides: [], 
    formula: '1d20 + 2', math: `${natural} + 2`, canResist: false, messageId: who, canEdit: true, bonuses: [], ...over
 });
 
@@ -76,7 +76,7 @@ const fireball = () =>
    band.rows = [
       saveRow(save('Goblin', 9, 7, false), format),
       saveRow(save('Bugbear', 17, 15, true), format),
-      { ...saveRow(save('Adult Red Dragon of the Smoking Peaks', 4, 1, false, { canResist: true, sides: ['dis'], spare: null,
+      { ...saveRow(save('Adult Red Dragon of the Smoking Peaks', 4, 1, false, { canResist: true, sides: ['dis'], 
          dice: [{ result: 3, active: false, discarded: true }, { result: 1, active: true }] }), format), open: true }
    ];
    context.fhcs.bands[1].rolled = damageBand({ healing: false, critical: false, total: 28, parts: [{ type: 'fire', label: 'Fire', total: 28 }],
@@ -641,7 +641,7 @@ export const CASES = [
       template: 'chat/usage-card',
       frame: 'chat',
       context: rolledAttack(attack({
-         total: 10, natural: 2, isCritical: false, spare: null, sides: ['adv', 'dis', 'dis', 'dis', 'dis', 'dis'],
+         total: 10, natural: 2, isCritical: false, sides: ['adv', 'dis', 'dis', 'dis', 'dis', 'dis'],
          dice: [{ result: 12, active: false, discarded: true }, { result: 17, active: false, discarded: true },
             { result: 9, active: false, discarded: true }, { result: 5, active: false, discarded: true },
             { result: 14, active: false, discarded: true }, { result: 2, active: true }, { result: 11, active: false, discarded: true }],
@@ -698,7 +698,7 @@ export const CASES = [
       template: 'chat/usage-card',
       frame: 'chat',
       context: rolledAttack(attack({
-         total: 26, natural: 18, isCritical: false, advantageMode: 1, spare: null,
+         total: 26, natural: 18, isCritical: false, advantageMode: 1, 
          dice: [{ result: 12, active: false, discarded: true }, { result: 15, active: false, discarded: true }, { result: 18, active: true }],
          math: '18 + 5 + 3', targets: [{ name: 'Hobgoblin Captain of the Iron Legion', isMiss: false }, { name: 'Bugbear', isMiss: true }]
       }))

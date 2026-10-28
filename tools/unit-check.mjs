@@ -152,7 +152,7 @@ for (const [name, facts, options, expected] of DAMAGE_CASES)
 }
 
 // Save rows: the verdict as one word; the rest of the outcome stays in the opened row.
-const saveFacts = (over) => ({ ...facts({}), dice: [{ result: 11, active: true }], advantageMode: 0, sides: [], spare: null,
+const saveFacts = (over) => ({ ...facts({}), dice: [{ result: 11, active: true }], advantageMode: 0, sides: [], 
    formula: '1d20 + 3', math: '11 + 3', canResist: false, messageId: 'm1', ...over });
 const SAVE_CASES = [
    ['failure', saveFacts({}), { verdict: 'failure', verdictWord: 'Failure', words: [] }],

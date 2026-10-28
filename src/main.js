@@ -8,7 +8,7 @@ import { registerQuenchTests } from './tests/quench.js';
 import { registerSettings } from './settings.js';
 import { CARD_PARTS, makeUsageMessageData } from './chat/card.js';
 import { makeRequestMessageData, makeRollMessageData } from './chat/roll-card.js';
-import { addSpareD20, damageAfterAttack, damageAfterUse, foldIntoCard, isFolded, refreshOnRollChange, rollOnUse,
+import { damageAfterAttack, damageAfterUse, foldIntoCard, isFolded, refreshOnRollChange, rollOnUse,
    skipRollDialog } from './chat/rolls.js';
 
 Hooks.once('init', () =>
@@ -33,7 +33,7 @@ Hooks.once('init', () =>
    console.log(`${MODULE_ID} | Character sheet registered (dnd5e ${game.system?.version}).`);
 });
 
-// One card per action: rolls made from a card draw in its bands; d20 rolls carry a spare die.
+// One card per action: rolls made from a card draw in its bands.
 Hooks.on('dnd5e.renderChatMessage', foldIntoCard);
 // ...and post without scrolling the chat log away from the card being used.
 // ...and keep a record on each card of what its Apply did.
@@ -42,7 +42,6 @@ Hooks.once('ready', () =>
    quietPosts(isFolded);
    watchApplications();
 });
-Hooks.on('dnd5e.postRollConfiguration', addSpareD20);
 Hooks.on('updateChatMessage', refreshOnRollChange);
 // Roll on use and no roll dialogs (world settings).
 Hooks.on('dnd5e.preUseActivity', rollOnUse);

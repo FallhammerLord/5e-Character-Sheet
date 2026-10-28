@@ -90,10 +90,12 @@ try
       await chatLog.updateMessage({ id: 'old' });
       if (chatLog.scrolled !== 2) { problems.push('an older card redrawing moved the chat log'); }
    }
-   for (const name of ['dnd5e.renderChatMessage', 'dnd5e.postRollConfiguration', 'updateChatMessage', 'dnd5e.preRoll'])
+   for (const name of ['dnd5e.renderChatMessage', 'updateChatMessage', 'dnd5e.preRoll'])
    {
       if (typeof hooks[name] !== 'function') { problems.push(`chat rolls are not hooked to ${name}`); }
    }
+   // No d20 is rolled in advance (user, 2026-10-28: it sat in the message's data, where a player could read it).
+   if (typeof hooks['dnd5e.postRollConfiguration'] === 'function') { problems.push('a d20 roll is changed before it is evaluated'); }
    for (const [type, Model] of Object.entries(systemModels))
    {
       const ours = globalThis.CONFIG.ChatMessage.dataModels[type];

@@ -994,7 +994,6 @@ export function rollFacts(message)
          rerolled: Boolean(r.rerolled) })),
       advantageMode: roll.options.advantageMode ?? 0,
       sides: roll.options.fhcs?.sides ?? [],
-      spare: roll.options.fhcs?.spare ?? null,
       formula: roll.formula,
       math: diceMath(mathTerms(roll)).sum,
       canResist: Boolean(system.canResist),
@@ -1155,12 +1154,6 @@ export function requestOf(message)
    return requestId ? (game.messages.get(requestId) ?? null) : null;
 }
 
-/** One d20 rolled now, from Foundry's random source (synchronous, for roll hooks that can't wait). */
-export function d20Now()
-{
-   return Math.ceil(CONFIG.Dice.randomUniform() * 20);
-}
-
 /** Whether a roll is one of dnd5e's d20 rolls (checks, saves, attacks). */
 export function isD20Roll(roll)
 {
@@ -1194,8 +1187,8 @@ function editable(message, index)
 
 /**
  * Late advantage or disadvantage (SCOPE §6.6): adds a d20 on one side of a d20 roll (at most five a side), keeps
- * every die already there, recomputes which die counts by click order, and saves the roll in place. The first die
- * added is the spare rolled in advance.
+ * every die already there, recomputes which die counts by click order, and saves the roll in place. Each die is rolled
+ * when it's added (user, 2026-10-28: a die rolled in advance sat in the message's data, where a player could read it).
  *
  * @param {ChatMessage} message   A check, save or attack message.
  * @param {'adv'|'dis'} side
@@ -1209,7 +1202,7 @@ export async function addD20(message, side)
    const mode = copy.options.advantageMode ?? 0;
    const sides = copy.options.fhcs.sides ?? live.slice(1).map(() => (mode === -1 ? 'dis' : 'adv'));
    if (sides.filter((s) => s === side).length >= MAX_PER_SIDE) { return; }
-   const value = copy.options.fhcs.spare ?? await freshD20();
+   const value = await freshD20();
    const added = { result: value, active: true };
    d20.results.push(added);
    const all = [...live, added];
@@ -1220,7 +1213,8 @@ export async function addD20(message, side)
    copy.options.advantageMode = modeForSides(sides);
    d20.options.advantageMode = copy.options.advantageMode;
    copy.options.fhcs.sides = sides;
-   copy.options.fhcs.spare = null;
+   // Rolls from before carry a die rolled in advance; it goes unused, and leaves the message here.
+   delete copy.options.fhcs.spare;
    await save();
 }
 

@@ -7,10 +7,6 @@
         "Name": "One card per action",
         "Hint": "Draw each item use as one chat card: portrait, title, folded description, and a full-width band for each roll. Turn off to keep dnd5e's cards."
       },
-      "TwoD20s": {
-        "Name": "Always roll two d20s",
-        "Hint": "Every d20 roll also rolls a second d20 in advance. Late advantage or disadvantage on the card uses it first."
-      },
       "RollAttackOnUse": {
         "Name": "Roll the attack on use",
         "Hint": "Using an item with an attack rolls the attack into its card at once. Off: the attack is a button on the card."

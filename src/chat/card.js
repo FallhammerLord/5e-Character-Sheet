@@ -141,7 +141,6 @@ export function d20Band(facts, earlier, format)
       rollId: facts.messageId,
       bonus: bonusField(facts, format),
       mathLines: [{ formula: facts.formula, result: `${facts.math} = ${facts.total}` }],
-      // The spare d20 is never shown before it's used (user, 2026-10-28: players mustn't see the next die).
       notes: bonusNotes(facts.bonuses ?? [], format),
       history: earlierNote(earlier, format),
       historyLabel: format('FHCS.Card.History', {}),
