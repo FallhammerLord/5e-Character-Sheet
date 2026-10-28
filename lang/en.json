@@ -70,7 +70,6 @@
       "DiceLabel": "d20s: {dice}",
       "DieCounts": "{value} counts",
       "DieDropped": "{value} dropped",
-      "Spare": "Next d20 ready: {value}",
       "Earlier": "Earlier: {math}",
       "RollAgain": "Roll again",
       "HiddenRoll": "Rolled (hidden)",
