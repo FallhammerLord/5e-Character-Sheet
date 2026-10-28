@@ -2563,32 +2563,26 @@
    background: color-mix(in srgb, var(--fhcs-conc) 12%, transparent);
 }
 
+/* Concentration's mark: the drawn head, 18px in a 20px box, outlined; held now, filled gold with the arrow cut out. */
 .fhcs-sheet .fhcs-conc-mark
 {
    display: inline-flex;
    flex: none;
    align-items: center;
    justify-content: center;
-   box-sizing: border-box;
    width: 20px;
    height: 20px;
-   border: 2px solid currentColor;
-   border-radius: 50%;
    color: var(--fhcs-muted);
-   letter-spacing: 0;
 }
 
-.fhcs-sheet .fhcs-conc-c { width: 12px; height: 12px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+.fhcs-sheet .fhcs-conc-c { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.fhcs-sheet .fhcs-col-conc > .fhcs-conc-c { width: 16px; height: 16px; }
 
 .fhcs-sheet .fhcs-concentration.fhcs-on > .fhcs-conc-mark { color: var(--fhcs-conc); }
 
-/* On a row: the spell being concentrated on now, filled. */
-.fhcs-sheet .fhcs-col-conc .fhcs-conc-mark.fhcs-on
-{
-   border-color: var(--fhcs-conc);
-   background: var(--fhcs-conc);
-   color: var(--fhcs-surface);
-}
+.fhcs-sheet .fhcs-conc-mark.fhcs-on { color: var(--fhcs-conc); }
+.fhcs-sheet .fhcs-conc-mark.fhcs-on .fhcs-conc-head { fill: currentColor; }
+.fhcs-sheet .fhcs-conc-mark.fhcs-on .fhcs-conc-arrow { stroke: var(--fhcs-surface); }
 
 .fhcs-sheet .fhcs-conc-spell
 {

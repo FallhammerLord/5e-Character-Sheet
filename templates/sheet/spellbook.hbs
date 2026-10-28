@@ -62,7 +62,7 @@
                   {{/if}}
                </span>
                {{#if ../columns.components}}<span class="fhcs-label fhcs-muted fhcs-col-components">{{ ../text.head.components }}</span>{{/if}}
-               {{#if ../columns.concentration}}<span class="fhcs-label fhcs-muted fhcs-col-conc" role="img" aria-label="{{ ../text.head.concentration }}">C</span>{{/if}}
+               {{#if ../columns.concentration}}<span class="fhcs-muted fhcs-col-conc" role="img" aria-label="{{ ../text.head.concentration }}">{{> "modules/fhcs/templates/sheet/conc-c.hbs" }}</span>{{/if}}
                {{#if ../columns.time}}<span class="fhcs-label fhcs-muted fhcs-col-time">{{ ../text.head.time }}</span>{{/if}}
                {{#if ../columns.range}}<span class="fhcs-label fhcs-muted fhcs-col-range">{{ ../text.head.range }}</span>{{/if}}
                {{#if ../columns.school}}<span class="fhcs-label fhcs-muted fhcs-col-school">{{ ../text.head.school }}</span>{{/if}}
