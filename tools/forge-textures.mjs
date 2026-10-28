@@ -3,9 +3,8 @@
  * the `--fhcs-theme-damascus` and `--fhcs-theme-rune-*` data URIs into styles/themes/forge.css. Run after changing a
  * number here: `node tools/forge-textures.mjs`.
  *
- * Damascus: layers of folded steel as smooth Bézier lines, light and dark by turns. Every wave's period divides the
- * tile's width, so the tile repeats with no seam. (A hammered grain lived here too, dropped 2026-10-28: on panels it
- * read as rocks.)
+ * Damascus: folded steel in three tones, ladder rungs and raindrops (see `damascus`). (A hammered grain lived here too,
+ * dropped 2026-10-28: on panels it read as rocks.)
  */
 
 import { readFileSync, writeFileSync } from 'node:fs';
@@ -14,47 +13,108 @@ const CSS = new URL('../styles/themes/forge.css', import.meta.url);
 
 const r1 = (n) => Math.round(n * 10) / 10;
 
-/** A smooth path through points (Catmull-Rom as cubic Béziers). */
-function smooth(points)
-{
-   let d = `M${r1(points[0][0])} ${r1(points[0][1])}`;
-   for (let i = 0; i < points.length - 1; i++)
-   {
-      const [p0, p1, p2, p3] = [points[i - 1] ?? points[i], points[i], points[i + 1], points[i + 2] ?? points[i + 1]];
-      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
-      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
-      d += `C${r1(c1[0])} ${r1(c1[1])} ${r1(c2[0])} ${r1(c2[1])} ${r1(p2[0])} ${r1(p2[1])}`;
-   }
-   return d;
-}
 
 /**
- * Pattern-welded steel: lines 3.5px apart, each bent by two waves whose periods divide the tile, and pulled together
- * where a fold (a smooth periodic bump) passes, as the layers bunch in a ladder pattern.
+ * Pattern-welded steel (user, 2026-10-28: "folded pattern steel, not wood grain"; research note, Damascus): the layers'
+ * depth as a field, cut into bands of three steels (bright nickel, grey steel, dark etched high-carbon) by turns, and
+ * drawn as the bands' edges. Ladder rungs (grooves cut across the billet, the layers swung up into nested arches) and
+ * raindrops (punched drops, concentric eyes) bend the field; a slow wave keeps it forged, not machined. Every term's
+ * period divides the tile's width, so the tile repeats with no seam. The edges are traced by marching squares and
+ * chained into paths, one per steel.
  */
 function damascus()
 {
    const W = 320;
    const H = 28;
    const TAU = Math.PI * 2;
-   const folds = [40, 150, 250];
-   const bump = (x) => folds.reduce((sum, x0) => sum + ((1 + Math.cos(TAU * (x - x0) / W)) / 2) ** 10, 0);
-   const lines = [];
-   for (let k = -3; k * 3.5 < H + 10; k++)
+   const STEP = 2;
+   const BAND = 2.6;
+   // Periodic distance in x, so terms near the tile's ends meet their copies across the seam.
+   const dx = (x, x0) => ((x - x0) % W + W * 1.5) % W - W / 2;
+   const rungs = [30, 130, 230];
+   const drops = [[80, 9, 1], [180, 19, 0.9], [280, 11, 1.1]];
+   const field = (x, y) =>
    {
-      const y0 = k * 3.5;
-      const points = [];
-      for (let x = 0; x <= W; x += 10)
-      {
-         const wave = 3.2 * Math.sin(TAU * x / W + k * 0.35) + 1.6 * Math.sin(TAU * 3 * x / W + k * 0.8);
-         // Near a fold the layers swing up into a ladder rung.
-         const rung = 6 * bump(x) * Math.sin(k * 0.9);
-         points.push([x, y0 + wave + rung]);
-      }
-      const light = k % 2 === 0;
-      lines.push(`<path d='${smooth(points)}' stroke='${light ? '#fff' : '#000'}' stroke-opacity='${light ? 0.16 : 0.18}' stroke-width='1.3'/>`);
+      let f = y + 2.2 * Math.sin(TAU * x / W) + 1.1 * Math.sin(TAU * 3 * x / W + 1);
+      for (const x0 of rungs) { f += 22 * Math.exp(-((dx(x, x0) / 9) ** 2)); }
+      for (const [x0, y0, s] of drops) { f += 11 * s * Math.exp(-((dx(x, x0) / 13) ** 2) - ((y - y0) / 6) ** 2); }
+      return f;
+   };
+   const cols = W / STEP;
+   const rows = Math.ceil(H / STEP) + 2;
+   const value = [];
+   for (let j = 0; j <= rows; j++)
+   {
+      value.push([]);
+      for (let i = 0; i <= cols; i++) { value[j].push(field(i * STEP, (j - 1) * STEP)); }
    }
-   return `<svg xmlns='http://www.w3.org/2000/svg' width='${W}' height='${H}'><g fill='none'>${lines.join('')}</g></svg>`;
+   const lo = Math.floor(Math.min(...value.flat()) / BAND);
+   const hi = Math.ceil(Math.max(...value.flat()) / BAND);
+   const steels = [[], [], []];
+   for (let n = lo; n <= hi; n++)
+   {
+      const c = n * BAND;
+      const segments = [];
+      const at = (i0, j0, i1, j1) =>
+      {
+         const a = value[j0][i0];
+         const b = value[j1][i1];
+         const t = (c - a) / (b - a);
+         return [r1((i0 + (i1 - i0) * t) * STEP), r1((j0 - 1 + (j1 - j0) * t) * STEP)];
+      };
+      for (let j = 0; j < rows; j++)
+      {
+         for (let i = 0; i < cols; i++)
+         {
+            const corners = [[i, j], [i + 1, j], [i + 1, j + 1], [i, j + 1]];
+            const cut = [];
+            for (let e = 0; e < 4; e++)
+            {
+               const [i0, j0] = corners[e];
+               const [i1, j1] = corners[(e + 1) % 4];
+               if ((value[j0][i0] < c) !== (value[j1][i1] < c)) { cut.push(at(i0, j0, i1, j1)); }
+            }
+            if (cut.length === 2) { segments.push(cut); }
+            if (cut.length === 4) { segments.push([cut[0], cut[1]], [cut[2], cut[3]]); }
+         }
+      }
+      steels[((n % 3) + 3) % 3].push(...chain(segments));
+   }
+   const look = [['#f4efe6', 0.2, 1.3], ['#9aa3ad', 0.22, 1.1], ['#000', 0.4, 1.6]];
+   const paths = steels.map((lines, k) => `<path d='${lines.join('')}' stroke='${look[k][0]}' stroke-opacity='${look[k][1]}' stroke-width='${look[k][2]}'/>`);
+   return `<svg xmlns='http://www.w3.org/2000/svg' width='${W}' height='${H}'><g fill='none' stroke-linejoin='round'>${paths.join('')}</g></svg>`;
+}
+
+/** Joins segments that share ends into polylines, as path data. */
+function chain(segments)
+{
+   const key = (p) => `${p[0]},${p[1]}`;
+   const ends = new Map();
+   segments.forEach((s, i) => { for (const p of s) { ends.set(key(p), [...(ends.get(key(p)) ?? []), i]); } });
+   const used = new Set();
+   const lines = [];
+   for (let i = 0; i < segments.length; i++)
+   {
+      if (used.has(i)) { continue; }
+      used.add(i);
+      const line = [...segments[i]];
+      for (const forward of [true, false])
+      {
+         for (;;)
+         {
+            const tip = forward ? line[line.length - 1] : line[0];
+            const next = (ends.get(key(tip)) ?? []).find((n) => !used.has(n));
+            if (next === undefined) { break; }
+            used.add(next);
+            const [a, b] = segments[next];
+            const far = key(a) === key(tip) ? b : a;
+            if (forward) { line.push(far); }
+            else { line.unshift(far); }
+         }
+      }
+      lines.push(`M${line.map((p) => `${p[0]} ${p[1]}`).join('L')}`);
+   }
+   return lines;
 }
 
 /**

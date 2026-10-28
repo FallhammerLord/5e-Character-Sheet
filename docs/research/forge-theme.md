@@ -42,8 +42,16 @@ network, so package pages weren't read. Several "chart" results were low-quality
 - **Temper colours** (oxide on polished steel): straw, gold, bronze, then purple and blue as it gets hotter.
   *For us:* a straw-to-bronze sheen along frame rims, a gleam on hover. Stop before purple and blue: those mean
   Pact Magic and prepared spells on our sheet (§5.1).
-- **Pattern-welded (Damascus) steel:** two steels folded and etched, light and dark layers in ladder, raindrop or
-  twist patterns. *For us:* a ladder pattern etched into the steel heading bars: smooth vector lines bunched at folds (first built with SVG turbulence and displacement, replaced 2026-10-28: textures are vectors).
+- **Pattern-welded (Damascus) steel:** steels of different carbon (often with nickel) forged into one billet, folded,
+  then etched: the high-carbon layers etch dark, the nickel stays bright. The pattern comes from how the layers are
+  pushed before the final forging. *Random*: hammering alone, flowing lines like wood grain (what the first texture
+  looked like; the user wanted folded steel instead, 2026-10-28). *Ladder*: grooves cut or pressed across the billet,
+  then forged flat, so deeper layers show as nested arches in rungs along the blade. *Raindrop*: round dimples punched
+  or drilled, then forged flat, each leaving concentric eyes. *Twist*: the bar twisted, a star at each twist's centre.
+  Ladder and raindrop want some 200 to 300 layers. *For us:* a vector tile of three steels by turns (bright nickel,
+  grey steel, dark etched) with ladder rungs and raindrop eyes, the band edges traced from a depth field
+  (`tools/forge-textures.mjs`). Sources: blademag.com/?p=24001; scienceinsights.org/why-does-damascus-steel-have-patterns;
+  redlabelabrasives.com/blogs/news/types-of-damascus-patterns.
 - **Moradin's marks:** a hammer, an anvil wreathed in flame, a hammer whose heads are carved as dwarves' heads.
   *For us:* the emblem family, and a maker's mark stamped into the nameplate.
 

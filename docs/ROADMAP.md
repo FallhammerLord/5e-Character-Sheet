@@ -131,6 +131,7 @@ Third pass, from the user's play (2026-10-28):
 - [x] 20. Grain off every panel; inspiration's moment on the star clicked; sparks from the mark struck; five marks at every width (Special Traits to a gear on Traits)
 - [x] 21. Resource panels: the name uses the linked item; − and + spend and regain; edit mode's cog in −'s place
 - [x] 23. Item sheet: no lock (editable when Foundry says so), Foundry's icons for equipped and identified, resizable, room at the sides
+- [x] 24. Traits as ledger rows, as the other categories; Damascus redrawn as folded steel (three steels, ladder rungs, raindrops), middle-click opens a row's sheet
 - [x] 22. From the Quench run and play (2026-10-28): item sheet unlocks (always-interactive), Special Traits gear opens, HD rolls in play, Forge one look (dark), Traits and Resources reorderable, Traits' left padding (and a check for text on a panel's edge)
 
 ## Phase 6.6: Themes (user, 2026-10-28; SCOPE §4.11)

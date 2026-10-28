@@ -2054,12 +2054,26 @@
    align-items: center;
    column-gap: var(--fhcs-s2);
    margin: 0;
-   padding: var(--fhcs-s1) var(--fhcs-s1) var(--fhcs-s1) var(--fhcs-s2);
+   padding: 0;
 }
+/* Each trait a ledger row, as a favorites group's (user, 2026-10-28): the favorite row's height, inset and line, every
+   other one filled; the rows share the list's three columns. */
+.fhcs-sheet .fhcs-traits > .fhcs-trait-row
+{
+   display: grid;
+   grid-column: 1 / -1;
+   grid-template-columns: subgrid;
+   align-items: center;
+   min-height: 32px;
+   border-bottom: 1px solid var(--fhcs-line-soft);
+}
+.fhcs-sheet .fhcs-traits > .fhcs-trait-row:nth-child(even) { background: var(--fhcs-fill); }
 
 .fhcs-sheet .fhcs-traits[hidden] { display: none; }
-.fhcs-sheet .fhcs-traits > :is(dt, dd) { display: flex; align-items: center; min-height: 24px; margin: 0; }
-.fhcs-sheet .fhcs-traits > .fhcs-trait-gear { justify-content: center; }
+.fhcs-sheet .fhcs-trait-row > :is(dt, dd) { display: flex; align-items: center; min-height: 24px; margin: 0; }
+.fhcs-sheet .fhcs-trait-row > .fhcs-trait-gear { justify-content: center; }
+/* The inset sits on the name, not the row: a subgrid's padding narrows its edge tracks, and the gear's 24px with them. */
+.fhcs-sheet .fhcs-trait-row > dt { padding-left: var(--fhcs-s1); }
 
 /* ---------- Attributes in edit mode (SCOPE §4.9, user, 2026-10-27) ---------- */
 

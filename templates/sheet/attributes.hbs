@@ -19,10 +19,14 @@
          </div>
          <dl class="fhcs-traits"{{#unless traitsOpen}} hidden{{/unless}}>
             {{#each traits}}
-            <dt class="fhcs-label fhcs-muted">{{ title }}</dt>
-            <dd class="fhcs-body{{#if empty}} fhcs-muted{{/if}}">{{ text }}</dd>
-            <dd class="fhcs-trait-gear">{{#if ../editing}}<button type="button" class="fhcs-toggle fhcs-gear-button fhcs-muted" data-action="showConfiguration"
-                    {{#if config}}data-config="{{ config }}"{{else}}data-trait="{{ trait }}"{{/if}} aria-label="{{ configLabel }}" data-fhcs-tip="{{ configLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</dd>
+            {{!-- One row per trait, a ledger like the favorites groups' (user, 2026-10-28: "the same styling as the other
+                  categories"); the rows share the list's columns. --}}
+            <div class="fhcs-trait-row">
+               <dt class="fhcs-label fhcs-muted">{{ title }}</dt>
+               <dd class="fhcs-body{{#if empty}} fhcs-muted{{/if}}">{{ text }}</dd>
+               <dd class="fhcs-trait-gear">{{#if ../editing}}<button type="button" class="fhcs-toggle fhcs-gear-button fhcs-muted" data-action="showConfiguration"
+                       {{#if config}}data-config="{{ config }}"{{else}}data-trait="{{ trait }}"{{/if}} aria-label="{{ configLabel }}" data-fhcs-tip="{{ configLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</dd>
+            </div>
             {{/each}}
          </dl>
       </div>
