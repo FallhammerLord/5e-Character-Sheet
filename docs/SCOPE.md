@@ -58,14 +58,13 @@ Planned, not built: the Actions tab (§4.4, backburner); players choosing and or
 ### 4.3 Attributes tab
 
 - **Side panel** (about 240px, left): the skills list (proficiency, name, ability, modifier, passive).
-- **Main panel:** the traits panel (senses, languages, damage immunities, resistances and vulnerabilities, condition immunities, weapon, armor and tool proficiencies), then the favorites grouped: Resources first (user, 2026-10-28: dnd5e's three legacy resources, always listed, set or not, on the panel underlay, folding like the other groups; in play each row is name, recovery (SR, LR) and uses left as a field / most; edit mode makes the name and most uses fields and recovery two checkboxes), then Inventory, Features, Cantrips, Spell level N with its slot pips, Effects, Skills and tools). Each row: picture, name, details (components, activation), uses.
+- **Main panel:** the traits panel (senses, languages, damage immunities, resistances and vulnerabilities, condition immunities, weapon, armor and tool proficiencies), then the favorites grouped: Resources first (three panels in a row, §4.10; replaced the 2026-10-28 rows), then Inventory, Features, Cantrips, Spell level N with its slot pips, Effects, Skills and tools). Each row: picture, name, details (components, activation), uses.
 
 Attributes decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, Attributes boards):
 - **Skills:** one 28px roll button per skill. Proficiency is a mark, not bold text: empty circle none, half-filled half (Jack of All Trades), filled proficient, ringed expertise.
 - **Passive scores:** every skill shows its passive, in play mode, in the row's last cell (user, 2026-10-27: the key-only toggle in the Skills heading did little and broke the rows' flow; replaced the 2026-10-24 toggle).
 - **Traits** (user, 2026-10-27, replacing "empty ones hidden in play, all shown in edit mode" and their place under the skills): a panel at the main column's top, so it shows without scrolling, its heading on the Skills heading's line, folded or open (rule 1). It folds, remembered with the favorites groups; folded, one line of what's set. Every trait in both modes, one line each with a short label ("Weapons"), "—" when empty; edit mode adds a gear in the last column and the rows keep their height.
 - **Favorites:** each group folds, and stays as the player left it. Rows carry their home tab's marks (§5.1); slot pips sit in each spell level's heading.
-- **Resources:** counters above the favorites, only when the character has any.
 - **Favorite rows act and look as on their home tab** (user, 2026-10-26): the picture uses the item; the name (with fold caret) opens its details in place, no item window; equipped and preparation kinds keep their tints and marks, and innate and at-will spells are also named in words. Skills and effects stay one button. No favorite glow here: every row is one.
 - **Death saves** go in the header, shown only at 0 HP.
 
@@ -137,6 +136,18 @@ Research note, "Edit mode and lifecycle". dnd5e keeps the settings windows; we a
 - **HP tray** opens from the HP number in play mode (damage is play): an amount box, then Damage, Heal and Temp, through dnd5e's `applyDamage` (temp first) and `applyTempHP`. Setting HP to an exact number is edit mode.
 - **Skills in edit mode:** the dot becomes dnd5e's proficiency cycle (none, half, full, expertise); the ability label becomes a dropdown.
 - **Level down** sits in the level tray beside Level up, edit mode only, through dnd5e's confirm dialog.
+
+### 4.10 Phase 6.5: Polish (user, 2026-10-28)
+
+From the user's screenshot after Phase 6's play check. Mockups: the layout check's renders (light, dark, 644px), not canvas boards; the canvas still shows the Phase 1–5 look.
+
+- **Portrait art runs to the frame's foot:** the band has no ground of its own; HP, Temp and Max ± sit at its bottom, each on a scrim (the surface at 85% with a blur behind), so the art shows above and between them. The gap under Temp and Max ± goes. Round and tall portraits stay as the player framed them (the framing already governs the image).
+- **Class cards split class | subclass art** down the middle, on both class cards, accepting that the second gets tight at 644px. Without a subclass, the class art alone as before.
+- **The class level in a ring at the card's top right;** the name reads "Fighter" over "Rune Knight". The class name takes the display style. The word "Class" goes to screen readers only (Claude, 2026-10-28, carried further than asked: at 644px with "+N" the ring cut it to "CL…"; the ring, display name and split art mark the card).
+- **The milestone tray drops its key** of class names and levels: the badges say it. Level up and Level down stay.
+- **An effect favorite shows its duration only when it runs out:** dnd5e's label read "None" for an endless effect.
+- **Resources: three panels in a row,** each several lines (as Classic's): name; uses left / most and a refresh button; recovery (SR, LR, or a linked item's periods). In play only the resources that are set show; with the lock off all three show, for editing and adding. Edit mode: the name and most uses become fields, recovery two checkboxes, and a cog opens a tray to link an item with uses to that panel. A linked panel shows and edits the item's uses and recovery (stored in `flags.fhcs.resources`); unlinked keeps dnd5e's own resource. Refresh sets uses back to most. A linked item may also be a favorite (Claude's pick; the user didn't object).
+- **Sections fold on Inventory, Spellbook, Features and Effects,** as favorites groups do, remembered per player. A search shows matches inside folded sections and clearing it puts the folds back; a spell level's slot pips stay usable while folded.
 
 ## 5. ADHD rules carried over
 
@@ -212,6 +223,7 @@ Check here before choosing a mark, and add new ones. Every tint has an icon, mar
 | Cup; bed | Short rest; long rest | The status group in the name row (user, 2026-10-28) |
 | Small ringed dot | Exhaustion 0; rest on it to show the chip | The status group's first segment (user, 2026-10-28) |
 | "+N" in a small box | N more classes, in the class tray | The last class card's label line (user, 2026-10-27) |
+| Number in a ring | The class's level | Each class card's top right (user, 2026-10-28) |
 | Light green fill inside the HP bar | HP left, with the numbers written over it | The portrait card's band (user, 2026-10-27) |
 | Heart with a crack; heart with a plus; shield with a plus | Damage; heal; temporary HP | The HP tray, each with its word; Damage solid as the main action (user, 2026-10-27) |
 | Gear | Settings: opens one of dnd5e's settings windows, or a tray of settings | Edit mode only: beside AC, Init, each ability, speed, HP, skills and traits; on the HD chip; alone in a chip at the portrait's top centre (its options tray) (user, 2026-10-27) |

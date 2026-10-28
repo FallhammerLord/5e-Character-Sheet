@@ -271,11 +271,6 @@
                         <span class="fhcs-pip{{#if filled}} fhcs-on{{/if}}" role="img" aria-label="{{ label }}">{{#if img}}<img src="{{ img }}" alt="">{{/if}}</span>
                         {{/each}}
                      </div>
-                     <div class="fhcs-track-key">
-                        {{#each milestones.key}}
-                        <span class="fhcs-body"><img src="{{ img }}" alt="">{{ text }}</span>
-                        {{/each}}
-                     </div>
                      {{#if levelUp}}{{> "modules/fhcs/templates/sheet/level-up.hbs" levelUp }}{{/if}}
                   </div>
                </details>
@@ -316,10 +311,15 @@
                is missing; in edit mode a remove (dnd5e's deleteDocument, which asks first) after the name. Two class
                cards at most: the last carries a "+N" chip opening the class tray (user, 2026-10-27). --}}
          <div class="fhcs-origin-card{{#if isClass}} fhcs-class-card{{/if}}" style="grid-column: span {{ span }}"{{#if item}} data-item-id="{{ item.id }}" data-uuid="{{ item.uuid }}"{{/if}}>
-            {{#if art}}<span class="fhcs-origin-art" aria-hidden="true"><img class="fhcs-origin-underlay" src="{{ art }}" alt=""></span>{{/if}}
+            {{#if subArt}}
+            {{!-- Class and subclass art side by side, the card split down the middle (user, 2026-10-28). --}}
+            <span class="fhcs-origin-art fhcs-origin-split" aria-hidden="true"><img class="fhcs-origin-underlay" src="{{ art }}" alt=""><img class="fhcs-origin-underlay" src="{{ subArt }}" alt=""></span>
+            {{else if art}}<span class="fhcs-origin-art" aria-hidden="true"><img class="fhcs-origin-underlay" src="{{ art }}" alt=""></span>{{/if}}
             <span class="fhcs-origin-text">
                <span class="fhcs-origin-head">
-                  <span class="fhcs-label fhcs-muted fhcs-line">{{ kind }}</span>
+                  {{!-- A class card's kind is for screen readers only (user, 2026-10-28): the level ring, the name in display and
+                        the split art say it, and at 644px with "+N" the word was cut. --}}
+                  <span class="fhcs-label fhcs-muted fhcs-line{{#if isClass}} fhcs-sr-only{{/if}}">{{ kind }}</span>
                   {{#if more}}
                   <details class="fhcs-fold fhcs-more" data-fold-key="classes">
                      <summary class="fhcs-toggle fhcs-label fhcs-more-chip" aria-label="{{ more.label }}" data-fhcs-tip="{{ more.label }}">{{ more.text }}</summary>
@@ -346,10 +346,11 @@
                      </div>
                   </details>
                   {{/if}}
+                  {{#if level}}<span class="fhcs-label fhcs-class-level" role="img" aria-label="{{ levelLabel }}" data-fhcs-tip="{{ levelLabel }}">{{ level }}</span>{{/if}}
                </span>
                <span class="fhcs-origin-line">
                   {{#if item}}
-                  <button type="button" class="fhcs-origin-name fhcs-body" data-action="showDocument" aria-label="{{ item.openLabel }}">{{ item.name }}{{#if level}} {{ level }}{{/if}}</button>
+                  <button type="button" class="fhcs-origin-name {{#if isClass}}fhcs-display{{else}}fhcs-body{{/if}}" data-action="showDocument" aria-label="{{ item.openLabel }}">{{ item.name }}</button>
                   {{#if item.clear}}<button type="button" class="fhcs-toggle fhcs-origin-clear" data-action="deleteDocument" data-uuid="{{ item.clear.uuid }}" aria-label="{{ item.clear.label }}" data-fhcs-tip="{{ item.clear.label }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>{{/if}}
                   {{/if}}
                   {{#if choose}}

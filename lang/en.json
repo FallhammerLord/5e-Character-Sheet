@@ -143,6 +143,7 @@
       "Milestones": "Milestones",
       "ShowMilestones": "{level}: show milestones",
       "LevelPip": "Level {n}: {name} {level}",
+      "ClassLevel": "{name}, level {level}",
       "LevelEmpty": "Level {n}: not reached",
       "HPLabel": "Hit points {value} of {max}; click to change",
       "Exhaustion": "Exhaustion {n}",

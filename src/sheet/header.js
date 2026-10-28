@@ -58,7 +58,8 @@ export function levelOrder(order, classes, originalId)
 
 /**
  * The milestone track: one pip per level up to 20, each gained level showing its class's image in gain order.
- * @returns {{pips: object[], key: object[], filled: number, total: number}}
+ * No key of class names under it (user, 2026-10-28): the badges say it, and the class cards carry the levels.
+ * @returns {{pips: object[], filled: number, total: number}}
  */
 export function levelTrack(classes, order, originalId, format)
 {
@@ -75,8 +76,7 @@ export function levelTrack(classes, order, originalId, format)
    {
       pips.push({ filled: false, img: '', label: format('FHCS.Header.LevelEmpty', { n }) });
    }
-   const key = classes.map((c) => ({ img: c.img, text: `${c.name} ${c.levels}` }));
-   return { pips, key, filled: gained.length, total: Math.max(TRACK_PIPS, gained.length) };
+   return { pips, filled: gained.length, total: Math.max(TRACK_PIPS, gained.length) };
 }
 
 /** @returns {number} A whole percentage, 0–100. */

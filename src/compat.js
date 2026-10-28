@@ -196,7 +196,15 @@ export async function attributesFacts(sheet, context, { folded, open = new Set()
       let group = 'other';
       let state = null;
       let kind = null;
-      if (f.type === 'effect') { group = 'effects'; }
+      let subtitle = plainSubtitle(f.subtitle);
+      if (f.type === 'effect')
+      {
+         group = 'effects';
+         // dnd5e shows the duration's label whenever `remaining` is truthy, and an endless effect's label read "None"
+         // on the favorites (user, 2026-10-28): keep it only for a duration that runs out.
+         const remaining = fromUuidSync(f.id, { relative: actor })?.duration?.remaining;
+         if (!(Number.isFinite(remaining) && remaining > 0)) { subtitle = ''; }
+      }
       else if (f.type === 'skill' || f.type === 'tool') { group = 'skills'; }
       else if (item?.type === 'spell')
       {
@@ -214,7 +222,7 @@ export async function attributesFacts(sheet, context, { folded, open = new Set()
       // Name opens the item's details in place, as on its own tab (user, 2026-10-26); the picture uses it.
       const expanded = !!item && open.has(f.id);
       favorites.push({
-         id: f.id, type: f.type, title: f.title, subtitle: plainSubtitle(f.subtitle), img: f.img,
+         id: f.id, type: f.type, title: f.title, subtitle, img: f.img,
          expandable: !!item, expanded,
          summary: expanded ? await renderTemplate(ITEM_SUMMARY, await item.getChatData({ secrets: item.isOwner })) : '',
          uses: f.uses?.max ? { value: f.uses.value, max: f.uses.max } : null, quantity: Number(f.quantity) || 0,

@@ -857,6 +857,8 @@ export function registerQuenchTests(quench)
             await settled();
             const card = () => sheet.element.querySelector(`.fhcs-header .fhcs-origin-card[data-item-id="${cls.id}"]`);
             await until(() => card()?.querySelector('[data-action="showDocument"]'), 'the class has a card under the abilities that opens it');
+            const ring = card().querySelector('.fhcs-class-level')?.textContent.trim();
+            assert.equal(ring, '1', `the class card's ring shows its level; it holds "${ring}"`);
             assert.notOk(sheet.element.querySelector('.fhcs-features .fhcs-origin-card'), 'the Features tab no longer holds the cards');
             for (const type of ['race', 'background'])
             {

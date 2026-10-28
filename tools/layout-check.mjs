@@ -73,7 +73,7 @@ function findProblems()
    for (const el of app.querySelectorAll('.window-content *'))
    {
       const cs = getComputedStyle(el);
-      if (cs.display === 'none' || cs.visibility === 'hidden' || el.closest('[hidden], .sr-only')) { continue; }
+      if (cs.display === 'none' || cs.visibility === 'hidden' || el.closest('[hidden], .sr-only, .fhcs-sr-only')) { continue; }
       // Shapes inside one SVG drawing overlap by design.
       if (el.ownerSVGElement) { continue; }
       const r = el.getBoundingClientRect();
@@ -365,7 +365,7 @@ function findProblems()
    // the screen-reader clip, and the lock's automatic margin.
    if (app.matches('.fhcs-sheet'))
    {
-      const HANGS = '.fhcs-shield, .fhcs-gear-button, .fhcs-more';
+      const HANGS = '.fhcs-shield, .fhcs-gear-button, .fhcs-more, .fhcs-class-level';
       const INDENTS = '.fhcs-favorite-details, .fhcs-item-details > .wrapper, .fhcs-contents, .fhcs-inventory-foot';
       const SPACING = ['rowGap', 'columnGap', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft', 'marginTop', 'marginRight', 'marginBottom', 'marginLeft'];
       const off = new Map();

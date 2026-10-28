@@ -43,9 +43,13 @@ export function originCards(facts, columns, { format, localize })
       isClass: true,
       kind: localize('FHCS.Features.Class'),
       art: k.img,
+      // The subclass's art beside the class's, the card split down the middle (user, 2026-10-28).
+      subArt: k.subclass?.img ?? '',
       item: { ...open(k), clear: clear(k) },
-      // The level beside the name ("Cleric 9"); Level up itself is in the level pill's tray.
+      // The level in a ring at the card's top right, so the name reads "Fighter" (user, 2026-10-28); Level up itself is
+      // in the level pill's tray.
       level: String(k.level),
+      levelLabel: format('FHCS.Header.ClassLevel', { name: k.name, level: k.level }),
       // The subclass takes its own line (user, 2026-10-27: the cards reach the portrait card's foot, so there's room).
       sub: k.subclass ? { ...open(k.subclass), clear: clear(k.subclass) } : null,
       // A subclass due: its Subclass advancement reached and none owned, dnd5e's own test (character-sheet.mjs:400).

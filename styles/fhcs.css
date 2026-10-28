@@ -54,6 +54,9 @@
    /* The HP bar's fill: a light tint of success, so ink on it keeps 4.5:1 in both themes (the dark block's success and
       surface feed it there). */
    --fhcs-hp-fill: color-mix(in srgb, var(--fhcs-success) 28%, var(--fhcs-surface));
+   /* The portrait's bars over the art (user, 2026-10-28): the surface at 85% with a blur behind. Worst case, ink on it
+      over pure black art (light) or pure white (dark): 10:1 and 6.9:1; muted text 5.3:1 and 4.9:1, above 4.5:1. */
+   --fhcs-scrim: color-mix(in srgb, var(--fhcs-surface) 85%, transparent);
    /* The combat panel's width (COMBAT_WIDTH in src/sheet/header.js). */
    --fhcs-combat: 125px;
 }
@@ -1101,9 +1104,8 @@
 
 /* Round (user, 2026-10-27): the art in a circle at the stage's top, the frame's width less a step; the band stays
    square below it. The card's own edge and fill step back around the art, so the frame reads as a circle, not a
-   square box with a round picture in it (user, 2026-10-28); the band keeps an edge of its own. */
+   square box with a round picture in it (user, 2026-10-28). */
 .fhcs-sheet .fhcs-portrait.fhcs-shape-round { border-color: transparent; background: transparent; }
-.fhcs-sheet .fhcs-shape-round > .fhcs-portrait-band { border: 1px solid var(--fhcs-line); border-radius: var(--fhcs-radius); }
 .fhcs-sheet .fhcs-shape-round .fhcs-portrait-art.fhcs-fit-contain { object-position: center; }
 .fhcs-sheet .fhcs-shape-round > .fhcs-portrait-clip
 {
@@ -1155,18 +1157,26 @@
 .fhcs-sheet .fhcs-portrait-stage { position: relative; grid-row: 1; min-height: 120px; pointer-events: none; }
 .fhcs-sheet .fhcs-portrait-stage > * { pointer-events: auto; }
 
+/* The band lets the art run to the frame's foot (user, 2026-10-28): no ground of its own; its bars sit at the bottom,
+   each on the scrim, so the art shows above and between them. */
 .fhcs-sheet .fhcs-portrait-band
 {
    position: relative;
    grid-row: 2;
    display: flex;
    flex-direction: column;
+   justify-content: flex-end;
    gap: var(--fhcs-s1);
    padding: var(--fhcs-s1);
-   border-top: 1px solid var(--fhcs-line);
-   border-radius: 0 0 var(--fhcs-radius) var(--fhcs-radius);
-   background: var(--fhcs-surface);
 }
+
+.fhcs-sheet .fhcs-portrait-band :is(.fhcs-hp-meter, .fhcs-hp-bar, .fhcs-gear-button)
+{
+   background-color: var(--fhcs-scrim);
+   backdrop-filter: blur(6px);
+}
+
+.fhcs-sheet .fhcs-portrait-band .fhcs-gear-button { border-radius: var(--fhcs-radius); }
 
 /* The status group at the name row's right (user, 2026-10-28): exhaustion, Short rest, Long rest, hit dice joined into
    one bar, a 1px divider between, rounded at its ends only. Exhaustion's tray hangs from the bar's right edge, so it
@@ -1561,8 +1571,7 @@
    background: var(--fhcs-die-ink);
 }
 
-.fhcs-sheet .fhcs-pip img,
-.fhcs-sheet .fhcs-track-key img
+.fhcs-sheet .fhcs-pip img
 {
    display: block;
    width: 100%;
@@ -1570,22 +1579,6 @@
    border: 0;
    object-fit: cover;
 }
-
-.fhcs-sheet .fhcs-track-key
-{
-   display: flex;
-   flex-wrap: wrap;
-   gap: var(--fhcs-s1) var(--fhcs-s2);
-}
-
-.fhcs-sheet .fhcs-track-key > span
-{
-   display: inline-flex;
-   align-items: center;
-   gap: var(--fhcs-s1);
-}
-
-.fhcs-sheet .fhcs-track-key img { width: 16px; height: 16px; border-radius: 50%; }
 
 /* The stats row (user, 2026-10-27): the combat panel and the abilities panel side by side, never wrapped. Both share
    three lines: a 24px label line, then two 28px control lines. Each panel is an underlay with an edge (rule 3). Below
@@ -2763,6 +2756,30 @@
 
 .fhcs-sheet .fhcs-origin-card > :not(.fhcs-origin-art) { position: relative; }
 
+/* Class and subclass art split down the middle (user, 2026-10-28), each at the underlay's 25%, crossfading at the
+   seam; the contrast note above holds for both halves. */
+.fhcs-sheet .fhcs-origin-split > .fhcs-origin-underlay { width: 55%; }
+.fhcs-sheet .fhcs-origin-split > :first-child { inset: 0 auto 0 0; mask-image: linear-gradient(to right, #000 80%, transparent); }
+.fhcs-sheet .fhcs-origin-split > :last-child { inset: 0 0 0 auto; mask-image: linear-gradient(to right, transparent, #000 20%); }
+
+/* A class's level in a ring at the card's top right (user, 2026-10-28). 24px in the 14px label line: it hangs into the
+   card's top padding, as the "+N" chip does, so every card keeps its height. */
+.fhcs-sheet .fhcs-class-level
+{
+   display: inline-grid;
+   flex: none;
+   place-items: center;
+   box-sizing: border-box;
+   min-width: 24px;
+   height: 24px;
+   margin-block: calc(0px - var(--fhcs-s1)) -6px;
+   margin-right: var(--fhcs-s1);
+   padding: 0 var(--fhcs-s1);
+   border: 1px solid var(--fhcs-line);
+   border-radius: 12px;
+   background: var(--fhcs-surface);
+}
+
 /* Every card alike: the kind as a label, then a 24px line with the name (or a Choose button). */
 /* No gap between a card's lines: three lines (a name whose × wrapped, at 644px in edit mode) fit the band's height. */
 .fhcs-sheet .fhcs-origin-text { display: flex; flex: 1; flex-direction: column; align-items: flex-start; gap: 0; min-width: 0; }
@@ -2772,6 +2789,8 @@
 /* The kind, with a card's remove and the "+N" chip at its right. */
 .fhcs-sheet .fhcs-origin-head { display: flex; align-self: stretch; align-items: center; gap: var(--fhcs-s1); min-width: 0; }
 .fhcs-sheet .fhcs-origin-head > .fhcs-line { flex: 1; }
+/* A class card's head holds only "+N" and the level ring, at its right. */
+.fhcs-sheet .fhcs-class-card > .fhcs-origin-text > .fhcs-origin-head { justify-content: flex-end; }
 
 /* "+N": more classes than the two cards; opens the class tray (user, 2026-10-27). */
 /* 24px in a 14px label line: it hangs into the card's top padding and below, so the kind line keeps every card's height. */

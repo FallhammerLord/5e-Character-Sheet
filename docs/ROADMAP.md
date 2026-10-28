@@ -97,6 +97,16 @@ Already in place before the phase: portrait picker (edit mode), rests, death sav
 - [x] 7. Styling and space pass, by SCOPE §5.2 (user, 2026-10-27): sort ring, slot gear, Additional Spells uses, title band, two-row header, mode parity, round or square portrait, drawn C, like elements alike (rules 16–19, every element compared across modes), skill rows on dnd5e's model, the combat and abilities panels and the traits panel, the title bar and status group, resources, one chip look, spacing 4 or 8 (2026-10-28); play passes, user 2026-10-28
 - ~~Limited and Observer views~~ skipped (user, 2026-10-27): Observers get our sheet read-only; Limited keeps dnd5e's small layout
 
+## Phase 6.5: Polish
+
+From the user's screenshot after Phase 6 (2026-10-28). Decisions: SCOPE §4.10.
+
+- [x] Research: dnd5e has no section folding (ours, as favorites groups); an effect favorite's subtitle is its duration's label whenever `remaining` is truthy; item uses change through `system.uses.spent`, recovery periods in `CONFIG.DND5E.limitedUsePeriods`
+- [x] 1. Portrait art to the frame's foot, HP, Temp and Max ± on a scrim; class cards split class | subclass art, level ring, name in display; milestone tray without its key; effect favorites without "None"
+- [ ] 2. Resources: three panels in a row; only set ones in play; link an item from the cog in edit mode; refresh
+- [ ] 3. Sections fold on Inventory, Spellbook, Features and Effects
+- [ ] Quench and play
+
 ## Phase 7: The ADHD layer
 
 Skills column on every tab (user, 2026-10-26): the Attributes skills column stays beside every tab, as in Tidy's current sheet (its sidebar; Classic showed skills on Attributes only, checked in Tidy v13.0.0 source). Tab bodies then lose about 240px; recheck Inventory and Spellbook rows at 644px. Optional "Now" strip: action, bonus action, reaction and movement, with spent ones dimmed until the next turn. Favorites capped at five. Panels fold; HP, AC and conditions stay pinned.

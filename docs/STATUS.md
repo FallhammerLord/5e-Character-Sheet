@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6 is closed** (play, user 2026-10-28; on `main`). Ask the user what comes next: Phase 7, the ADHD layer (ROADMAP), or the Actions tab (on the backburner, user 2026-10-26; SCOPE §4.4).
+1. **Phase 6.5, Polish** (ROADMAP; SCOPE §4.10): slice 1 built, offline checks pass, not yet seen in Foundry. Next: slice 2, the resource panels, then folding sections. Phase 7 or the Actions tab after.
 2. **One Quench test to rerun:** "switches an effect off and on, favorites it…" failed once after favoriting (2026-10-28); the user's hand test passed, so likely the test. Its messages now report what the row holds; if it fails again, read them before changing anything.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
