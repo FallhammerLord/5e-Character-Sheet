@@ -784,10 +784,12 @@
 
 /* Our own surface and ink: dnd5e's sheet styles never reach this window (its classes are removed). The header and
    tab row stay put; the tab bodies scroll under them. */
+.fhcs-sheet > .window-content,
 .fhcs-sheet .window-content
 {
    display: flex;
    flex-direction: column;
+   margin: 0;
    padding: 0;
    overflow: hidden;
    background: var(--fhcs-surface);
@@ -846,7 +848,9 @@
 {
    position: relative;
    display: flex;
-   flex: none;
+   /* Exactly a control tall, whatever height Foundry gives its title bar (user's screenshot, 2026-10-28: a wide gap). */
+   flex: 0 0 var(--fhcs-control);
+   max-height: var(--fhcs-control);
    align-items: center;
    justify-content: flex-end;
    gap: var(--fhcs-s1);
@@ -938,6 +942,11 @@
 /* The open tab: an underline, so it isn't told by color alone. */
 .fhcs-sheet .fhcs-tab.active { border-bottom-color: currentColor; }
 
+/* No glow and no box (user, 2026-10-28): Foundry glows the open tab and boxes a clicked button, and both drew the eye
+   and stayed after a click. The underline says which tab is open; a keyboard's focus still shows, as an outline. */
+.fhcs-sheet .fhcs-tabs > :is(.fhcs-tab, .fhcs-lock):is(*, :hover, :focus, .active) { box-shadow: none; text-shadow: none; outline: none; }
+.fhcs-sheet .fhcs-tabs > :is(.fhcs-tab, .fhcs-lock):focus-visible { outline: 2px solid var(--fhcs-ink); outline-offset: -2px; }
+
 .fhcs-sheet .fhcs-tabs .fhcs-lock
 {
    flex: none;
@@ -961,7 +970,8 @@
    grid-template-columns: 160px minmax(0, 1fr);
    grid-template-rows: auto auto;
    column-gap: var(--fhcs-s2);
-   padding: var(--fhcs-s2);
+   /* The title bar above gives the room on top (user, 2026-10-28: too much padding beneath it). */
+   padding: 0 var(--fhcs-s2) var(--fhcs-s2);
    min-width: 0;
    border-bottom: 1px solid var(--fhcs-line-soft);
 }

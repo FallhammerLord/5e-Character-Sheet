@@ -51,7 +51,7 @@ Header decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrdDsbn
 
 ### 4.2 Tabs
 
-A tab row across the top, under the header, in Classic's order: Attributes, Inventory, Spellbook, Features, Effects, Biography (Bastion when the character has one; no Journal, §4.8); Special Traits only in edit mode. The sheet lock (play and edit) sits at the far right of the row.
+A tab row across the top, under the header, in Classic's order: Attributes, Inventory, Spellbook, Features, Effects, Biography (Bastion when the character has one; no Journal, §4.8); Special Traits only in edit mode. The sheet lock (play and edit) sits at the far right of the row. The open tab is marked by its underline alone: no glow, and no box left on a tab after a click; keyboard focus shows as an outline (user, 2026-10-28). *check*
 
 Planned, not built: the Actions tab (§4.4, backburner); players choosing and ordering their tabs (Classic's tab selection window); the Attributes skills column kept beside every tab, as Tidy's current sheet does with its sidebar (user, 2026-10-26; Phase 7, where tab bodies narrow by about 240px and the list tabs need a recheck at 644).
 
@@ -172,7 +172,7 @@ One set of rules for every tab and both modes (user, 2026-10-27: "apply as unifo
 13. **Empty states** are one short line in body, muted (a new sheet's empty favorites is normal, user 2026-10-27).
 
 **Window**
-14. **The title bar: a plain row above the sheet** (user, 2026-10-28, replacing "no title band" with controls floating over the header): about 28px, no fill or edge, its whole width a grip; it holds only ⋮ and × (and dnd5e's warnings triangle while a character has warnings). Every other title-bar button, Foundry's or a module's, waits in the ⋮ menu: hidden in the bar, listed in dnd5e's menu, and its entry clicks the button itself. *check (offline and Quench)*
+14. **The title bar: a plain row above the sheet** (user, 2026-10-28, replacing "no title band" with controls floating over the header): about 28px, no fill or edge, its whole width a grip; it holds only ⋮ and × (and dnd5e's warnings triangle while a character has warnings). The sheet starts right under it, whatever height Foundry gives its own title bar (user, 2026-10-28: too much padding beneath it). Every other title-bar button, Foundry's or a module's, waits in the ⋮ menu: hidden in the bar, listed in dnd5e's menu, and its entry clicks the button itself. *check (offline and Quench)*
 15. **Round or square portrait,** the player's choice in edit mode, saved on the character (user, 2026-10-27). Round drops the card's edge and fill around the art, so the frame reads as a circle; the HP band keeps its own edge. A token shows whole in either shape, never cropped (user, 2026-10-28).
 
 **Like elements alike** (user, 2026-10-27: "HP is different sized than the hp value itself", "the portrait buttons are … different size than the inspiration button")

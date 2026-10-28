@@ -53,7 +53,11 @@ const frame = (kind, width, theme, body) => `<section class="application ${FRAME
 const page = (html) => `<!doctype html><html><head><meta charset="utf-8">
    <style>body{margin:0;background:#444;font-family:sans-serif}*{box-sizing:border-box}button,input,select{font:inherit}
    /* Foundry core's control defaults, roughly (v13/v14 foundry.css): ours must override them. */
-   button{min-height:var(--button-size,2rem);padding:0 .5rem;line-height:1.5;justify-content:center}input[type=text],select{height:var(--input-height,2rem)}
+   button{min-height:var(--button-size,2rem);padding:0 .5rem;line-height:1.5;justify-content:center}
+   /* Foundry's glow on the open tab and its box on a focused button (the user's screenshot, 2026-10-28). */
+   nav.tabs [data-tab].active{text-shadow:0 0 10px #c33}button:focus{box-shadow:0 0 6px #c33}
+   /* Foundry's window frame, roughly (v13/v14): a 36px title bar and padded content; ours must override both. */
+   .application .window-header{display:flex;flex:0 0 36px;align-items:center;padding:0 .5rem;border-bottom:1px solid #888}.application .window-content{padding:1rem}input[type=text],select{height:var(--input-height,2rem)}
    /* Foundry's form groups stretch each control across the row (the user's Special Traits screenshot, 2026-10-27). */
    .form-group{display:flex;flex-wrap:wrap;align-items:center;gap:4px}.form-group>label{flex:2}.form-fields{display:flex;flex:3;gap:4px}.form-fields>*{flex:1}.form-group>.hint{flex:0 0 100%}
    ${css}</style></head><body>${html}</body></html>`;
@@ -332,6 +336,23 @@ function findProblems()
       issues.push(`${styles.size} text styles (3 allowed): ${[...styles].map(([k, v]) => `${k} (${v})`).join('; ')}`);
    }
 
+   // The title bar is one control tall, and the sheet starts right under it (user's screenshot, 2026-10-28: a wide gap).
+   const bar = app.querySelector(':scope > .window-header'), content = app.querySelector(':scope > .window-content');
+   if (bar && content && app.matches('.fhcs-sheet') && content.firstElementChild?.matches('[class*="fhcs-"]'))
+   {
+      // The first thing drawn: the topmost box inside the first part (a part's own padding is space, not content).
+      const b = bar.getBoundingClientRect();
+      const tops = [...content.firstElementChild.querySelectorAll('*')].filter((el) => !el.ownerSVGElement && el.getClientRects().length).map((el) => el.getBoundingClientRect().top);
+      const first = tops.length ? { top: Math.min(...tops) } : null;
+      if (Math.abs(b.height - 28) > 1) { issues.push(`title bar is ${Math.round(b.height)}px tall, not 28`); }
+      if (first && first.top - b.bottom > 4.5) { issues.push(`${Math.round(first.top - b.bottom)}px between the title bar and the sheet`); }
+   }
+   // The tab row draws no glow or box of its own (user, 2026-10-28): the underline marks the open tab.
+   for (const tab of app.querySelectorAll('.window-content .fhcs-tabs > :is(.fhcs-tab, .fhcs-lock)'))
+   {
+      const cs = getComputedStyle(tab);
+      if (cs.textShadow !== 'none' || cs.boxShadow !== 'none') { issues.push(`tab ${tab.dataset.tab ?? 'lock'} glows: ${cs.textShadow !== 'none' ? cs.textShadow : cs.boxShadow}`); }
+   }
    // The title bar holds only ⋮ and × (rule 14, user 2026-10-28); any other button waits in the ⋮ menu.
    for (const control of app.querySelectorAll(':scope > .window-header > .header-control'))
    {
