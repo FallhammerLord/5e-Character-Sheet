@@ -225,7 +225,7 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
 {
    if (signed(n) !== text) { problems.push(`signed(${n}) is ${signed(n)}, not ${text}`); }
 }
-// Tab row: Classic's order and names; Special Traits only in edit mode.
+// Tab row: Classic's order and names; Special Traits never in the row (it opens from the Traits panel's gear).
 {
    const dnd5eTabs = Object.fromEntries(['details', 'inventory', 'features', 'spells', 'effects', 'specialTraits']
       .map((id) => [id, { id, label: id, active: id === 'inventory' }]));
@@ -233,7 +233,7 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const play = ids(false);
    const edit = ids(true);
    if (play !== 'details,inventory,spells,features,effects') { problems.push(`tab row in play: ${play}`); }
-   if (edit !== 'details,inventory,spells,features,effects,specialTraits') { problems.push(`tab row in edit mode: ${edit}`); }
+   if (edit !== 'details,inventory,spells,features,effects') { problems.push(`tab row in edit mode: ${edit}`); }
    const names = tabRow(dnd5eTabs, { canEdit: true, editing: false }, localize).tabs.map((t) => t.label);
    if (names[0] !== 'Attributes' || names[2] !== 'Spellbook') { problems.push(`tab names: ${names.join()}`); }
    // The theme picker on the title bar (SCOPE §4.11): the world default first, named, then each theme; one pressed.

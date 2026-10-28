@@ -198,6 +198,7 @@
     "Attributes": {
       "Skills": "Skills",
       "Traits": "Traits",
+      "SpecialTraits": "Special traits",
       "TraitShort": {
         "senses": "Senses",
         "languages": "Languages",

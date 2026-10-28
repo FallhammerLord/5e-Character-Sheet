@@ -1,6 +1,7 @@
 /**
  * Fire and Forge's sparks (SCOPE §4.11, user 2026-10-28: "a nice 'forge sparks' animation spray ... rendered fresh
- * each time"). A burst sprays from the window's bottom-left corner, up and to the right, each spark with its own
+ * each time"). A burst sprays from the mark that was struck (user, 2026-10-28: the rule for a theme's effects is to
+ * start where the event shows; before, the window's bottom-left corner), fanning up and out, each spark with its own
  * speed, angle, size and life, falling under gravity and cooling from white-gold to red as it goes; drawn on a canvas
  * over the content that never takes a click.
  *
@@ -16,10 +17,10 @@
 const EMIT_S = 0.35;
 const LIFE_S = [1.0, 2.2];
 
-/** A theme's answer to inspiration gained: Forge sprays sparks. */
-export function inspirationGained(element)
+/** A theme's answer to inspiration gained: Forge sprays sparks from the mark that was struck. */
+export function inspirationGained(element, mark)
 {
-   if (element.dataset.fhcsTheme === 'forge') { sparkBurst(element); }
+   if (element.dataset.fhcsTheme === 'forge') { sparkBurst(element, mark); }
 }
 
 /** Whether the sheet may move now. */
@@ -41,10 +42,12 @@ function sparkColour(t, alpha)
 }
 
 /**
- * Sprays one burst of sparks from the bottom-left corner, fresh each time.
+ * Sprays one burst of sparks, fresh each time: from a mark's centre, fanning up and out to both sides, or without one
+ * from the bottom-left corner, up and to the right.
  * @param {HTMLElement} element  The sheet's window element.
+ * @param {HTMLElement} [mark]   Where the event shows (the inspiration mark struck).
  */
-export function sparkBurst(element)
+export function sparkBurst(element, mark = null)
 {
    if (!mayMove(element)) { return; }
    const content = element.querySelector('.window-content') ?? element;
@@ -69,12 +72,16 @@ export function sparkBurst(element)
    const heat = Math.min(1, Math.max(0, Number(getComputedStyle(element).getPropertyValue('--fhcs-hp')) || 1));
    const count = Math.round(14 + 30 * heat);
    const random = (lo, hi) => lo + Math.random() * (hi - lo);
+   const box = content.getBoundingClientRect();
+   const at = mark?.getBoundingClientRect();
+   const origin = at ? { x: at.left + at.width / 2 - box.left, y: at.top + at.height / 2 - box.top } : null;
    const sparks = Array.from({ length: count }, () =>
    {
-      const angle = random(25, 78) * Math.PI / 180;
-      const speed = random(220, 520);
+      // From a mark: a fan from up-left to up-right, slower, as it starts high on the sheet; else the corner's spray.
+      const angle = (origin ? random(20, 160) : random(25, 78)) * Math.PI / 180;
+      const speed = origin ? random(120, 300) : random(220, 520);
       return {
-         x: random(6, 34), y: height - random(10, 18),
+         x: origin ? origin.x + random(-4, 4) : random(6, 34), y: origin ? origin.y + random(-4, 4) : height - random(10, 18),
          vx: Math.cos(angle) * speed, vy: -Math.sin(angle) * speed,
          size: random(0.8, 2.2), born: random(0, EMIT_S), life: random(...LIFE_S),
          wobble: random(-40, 40)

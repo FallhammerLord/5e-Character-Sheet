@@ -149,6 +149,12 @@ function showThemeTray(element, open)
    if (open && bar) { tray.style.top = `${bar.offsetTop + bar.offsetHeight}px`; }
 }
 
+/** The Traits panel's gear (edit mode): dnd5e's Special Traits page, which the tab row no longer draws. */
+function openSpecialTraits()
+{
+   this.changeTab('specialTraits', 'primary');
+}
+
 /** The title bar's palette: opens or closes its tray. */
 function themeTray()
 {
@@ -287,14 +293,15 @@ function inspirationMoment(element)
    delete element.dataset.fhcsInspireSlot;
    const gained = count > Number(before);
    // The star clicked, in the row and in the count's tray; else where a gain or spend from elsewhere shows.
-   const stars = slot !== undefined ? bar.querySelectorAll(`.fhcs-star[data-slot="${slot}"]`)
-      : bar.querySelectorAll(gained ? '.fhcs-star-last' : '.fhcs-star-cooled');
+   const stars = [...(slot !== undefined ? bar.querySelectorAll(`.fhcs-star[data-slot="${slot}"]`)
+      : bar.querySelectorAll(gained ? '.fhcs-star-last' : '.fhcs-star-cooled'))];
    for (const star of stars) { star.classList.add('fhcs-star-moment'); }
    const moment = gained ? 'fhcs-moment-inspire' : 'fhcs-moment-uninspire';
    element.classList.remove('fhcs-moment-inspire', 'fhcs-moment-uninspire');
    element.classList.add(moment);
    setTimeout(() => element.classList.remove(moment), MOMENT_MS);
-   if (gained) { inspirationGained(element); }
+   // A theme's answer to a gain starts at the mark that shows it (user, 2026-10-28).
+   if (gained) { inspirationGained(element, stars.find((star) => star.getClientRects().length) ?? bar); }
 }
 
 /**
@@ -524,7 +531,7 @@ export function makeCharacterSheet(Base)
             fhcsEndConcentration: endConcentrationAction, fhcsToggleFavoriteDetails: toggleFavoriteDetails,
             fhcsLevelUp: levelUp, fhcsCycleGroup: cycleGroup, fhcsHpChange: hpChange, fhcsFrame: frame, fhcsLevelDown: levelDown, fhcsPortraitShape: portraitShape,
             fhcsSkillAbility: skillAbility, fhcsLinkResource: linkResourceAction, fhcsRefreshResource: refreshResourceAction,
-            fhcsToggleSection: toggleSection, fhcsSetTheme: setTheme, fhcsThemeTray: themeTray,
+            fhcsToggleSection: toggleSection, fhcsSetTheme: setTheme, fhcsThemeTray: themeTray, fhcsSpecialTraits: openSpecialTraits,
             fhcsInspiration: inspirationAction, fhcsLinkInspiration: linkInspirationAction }
       };
 
@@ -650,6 +657,8 @@ export function makeCharacterSheet(Base)
          themeState(this.element, this.actor);
          inspirationMoment(this.element);
          followPointer(this.element);
+         // Special Traits is a settings page: locking the sheet leaves it for Attributes.
+         if (!this.isEditMode && this.tabGroups.primary === 'specialTraits') { this.changeTab('details', 'primary'); }
          await drawThemePicker(this);
          const items = this.element.querySelector('.fhcs-inventory .fhcs-items');
          if (items && !items.dataset.fhcsWatched)

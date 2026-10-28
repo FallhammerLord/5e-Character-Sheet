@@ -270,7 +270,11 @@ export function headerView(facts, { format, localize })
 }
 
 /** Tabs shown only in edit mode. */
-export const EDIT_ONLY_TABS = ['specialTraits'];
+/**
+ * Tabs that are settings, never drawn in the tab row: Special Traits opens from the Traits panel's gear in edit mode
+ * (user, 2026-10-28: the row needs its room for five inspiration marks at 644px).
+ */
+export const SETTINGS_TABS = ['specialTraits'];
 
 /** Classic's tab order; tabs dnd5e adds that aren't listed follow in dnd5e's order. */
 export const TAB_ORDER = ['details', 'inventory', 'spells', 'features', 'effects', 'biography', 'bastion', 'specialTraits'];
@@ -286,8 +290,8 @@ export function tabRow(tabs, { canEdit, editing }, localize)
    const rank = (id) => { const i = TAB_ORDER.indexOf(id); return i < 0 ? TAB_ORDER.length : i; };
    return {
       label: localize('FHCS.Tabs.Label'),
-      // Special Traits is settings, not play: like the gear icons, it shows only in edit mode (SCOPE §4.5).
-      tabs: Object.values(tabs).filter((t) => editing || !EDIT_ONLY_TABS.includes(t.id) || t.active)
+      // Special Traits is settings, not play: it opens from a gear, like dnd5e's other settings (SCOPE §4.5).
+      tabs: Object.values(tabs).filter((t) => !SETTINGS_TABS.includes(t.id))
          .sort((a, b) => rank(a.id) - rank(b.id)).map((t) => ({ id: t.id, active: !!t.active, label: localize(names[t.id] ?? t.label) })),
       canEdit,
       editing,

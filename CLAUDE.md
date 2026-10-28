@@ -98,7 +98,8 @@ Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies insta
 - **A blurred, translucent plate is its own layer:** its open tray hides under the next plate unless the plate rises (`:has(details[open] > .fhcs-tray)`).
 - **`getFlag` throws for a module that isn't active:** read another module's flag as `actor.flags['tidy5e-sheet']?.[key]`.
 - **A form that depends on a row's room** (inspiration's stars or count) uses a container query on that row, not the window's width.
-- **The 644px edit-mode tab row is full** (Bastion, Special Traits, inspiration's gear and count): measure in the layout check before adding anything to it.
+- **The 644px edit-mode tab row is full** (Bastion, inspiration's gear and five marks; Special Traits left it for a gear): measure in the layout check before adding anything to it.
+- **Two writes for one click draw twice:** the first redraw shows half the change (inspiration's moment started on the wrong star). Write the first with `{ render: false }`, the last one draws.
 - **Data URIs:** encode `#` once (`%23`); `%2523` draws nothing.
 - **Custom properties inherit:** a check keyed on one (`--fhcs-art`) must count only the element where it starts.
 - **Sideways moves pass the parity check** by design (rule 6 lets columns slide left); only heights and vertical places fail it.

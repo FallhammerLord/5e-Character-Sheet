@@ -834,6 +834,19 @@ export function registerQuenchTests(quench)
             }
          });
 
+         it('opens Special Traits from the Traits gear in edit mode, and leaves it on locking', async function ()
+         {
+            if (!sheet.isEditMode)
+            {
+               await click('.fhcs-tabs [data-action="changeMode"]');
+               await until(() => sheet.isEditMode, 'the lock switches to edit mode');
+            }
+            await click('.fhcs-traits-panel [data-action="fhcsSpecialTraits"]');
+            await until(() => sheet.tabGroups.primary === 'specialTraits', () => `the gear opens Special Traits; the open tab is ${sheet.tabGroups.primary}`);
+            await leaveEditMode();
+            await until(() => sheet.tabGroups.primary === 'details', () => `locking leaves it for Attributes; the open tab is ${sheet.tabGroups.primary}`);
+         });
+
          it('banks inspiration in an item from the tab row: links it, banks and spends any star, keeps dnd5e in step', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 12);

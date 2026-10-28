@@ -702,11 +702,13 @@ export async function setInspirationSlot(actor, slot)
    const filled = bankSlots(actor, item);
    filled[slot] = !filled[slot];
    const value = filled.filter(Boolean).length;
-   await item.update({ 'system.uses.spent': item.system.uses.max - value });
-   return actor.update({
+   // The places first, without a redraw, then the uses: one redraw with both, so the moment starts on the star
+   // clicked (user, 2026-10-28: drawn between the two writes, the bank showed the default place filled first).
+   await actor.update({
       [`flags.${MODULE_ID}.${INSPIRATION_SLOTS_FLAG}`]: { item: item.id, filled: filled.flatMap((on, i) => (on ? [i] : [])) },
       'system.attributes.inspiration': value > 0
-   });
+   }, { render: false });
+   return item.update({ 'system.uses.spent': item.system.uses.max - value });
 }
 
 /** Keeps dnd5e's on-or-off inspiration in step with the bank: on while it holds any, so whatever reads dnd5e's works. */

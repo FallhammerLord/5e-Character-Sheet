@@ -143,7 +143,7 @@ hp.addEventListener('input', setHp);
 hp.addEventListener('change', () => { const v = Number(hp.value); if (v !== last) moment(v < last ? 'fhcs-moment-hit' : 'fhcs-moment-heal'); last = v; });
 document.getElementById('v-hit').addEventListener('click', () => moment('fhcs-moment-hit'));
 document.getElementById('v-heal').addEventListener('click', () => moment('fhcs-moment-heal'));
-document.getElementById('v-embers').addEventListener('click', () => sparkBurst(sheet));
+document.getElementById('v-embers').addEventListener('click', () => sparkBurst(sheet, sheet.querySelector('.fhcs-inspiration .fhcs-star')));
 const motion = document.getElementById('v-motion');
 motion.addEventListener('click', () => { const on = motion.getAttribute('aria-pressed') !== 'true'; motion.setAttribute('aria-pressed', String(on)); motion.textContent = on ? 'On' : 'Off'; if (on) delete sheet.dataset.fhcsMotion; else sheet.dataset.fhcsMotion = 'off'; });
 for (const t of document.querySelectorAll('[data-viewer-tab]')) t.addEventListener('click', () => {

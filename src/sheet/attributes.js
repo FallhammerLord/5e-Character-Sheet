@@ -143,6 +143,7 @@ export function attributesView(facts, { format, localize })
       text: {
          skills: localize('FHCS.Attributes.Skills'),
          traits: localize('FHCS.Attributes.Traits'),
+         specialTraits: localize('FHCS.Attributes.SpecialTraits'),
          resources: localize('FHCS.Attributes.Resources'),
          linkTitle: localize('FHCS.Attributes.ResourceLinkTitle'),
          shortRest: localize('FHCS.Attributes.ShortRestAbbr'),

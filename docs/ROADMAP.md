@@ -127,7 +127,9 @@ Third pass, from the user's play (2026-10-28):
 - [x] 16. Forge's sparks only on inspiration gain (rule: big effects answer events, never timers)
 - [x] 17. Panel gleam follows the pointer (not the portrait); no texture under item entries
 - [x] 18. Traits' fold bar a whole-bar button; species and background wrap (their names' height no longer fixed)
-- [ ] 19. Categories: reorder and custom ones, every tab (researched 2026-10-28; design questions with the user)
+- [ ] 19. Categories: reorder and custom ones, every tab, with the category on the item sheet (user, 2026-10-28: picks agreed)
+- [x] 20. Grain off every panel; inspiration's moment on the star clicked; sparks from the mark struck; five marks at every width (Special Traits to a gear on Traits)
+- [ ] 21. Resource panels: the name uses the linked item; − and + spend and refund
 
 ## Phase 6.6: Themes (user, 2026-10-28; SCOPE §4.11)
 

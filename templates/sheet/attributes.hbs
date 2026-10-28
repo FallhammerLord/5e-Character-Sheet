@@ -149,6 +149,12 @@
                <span class="fhcs-label">{{ text.traits }}</span>
             </button>
             <span class="fhcs-body fhcs-muted fhcs-line fhcs-traits-summary" data-fhcs-folded{{#if traitsOpen}} hidden{{/if}}>{{ traitsSummary }}</span>
+            {{#if editing}}
+            {{!-- dnd5e's Special Traits, a settings page: off the tab row since 2026-10-28 (the row's room went to
+                  inspiration), opened from here like the other settings. --}}
+            <button type="button" class="fhcs-toggle fhcs-gear-button fhcs-special-traits" data-action="fhcsSpecialTraits"
+                    aria-label="{{ text.specialTraits }}" data-fhcs-tip="{{ text.specialTraits }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>
+            {{/if}}
          </div>
          <dl class="fhcs-traits"{{#unless traitsOpen}} hidden{{/unless}}>
             {{#each traits}}

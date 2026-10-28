@@ -1007,8 +1007,8 @@
 
 /* ---------- Inspiration (SCOPE §4.12, user 2026-10-28) ----------
    In the tab row's empty right, before the lock: one star (dnd5e's on or off) or the bank, a star per use, filled
-   ones banked, any one spent or banked by a click. A row too narrow for the stars, or a bank bigger than five, shows
-   the count instead, a chip whose tray holds the stars. Edit mode's gear sits at its left, so nothing moves on the lock. On is a filled star (never colour alone).
+   ones banked, any one spent or banked by a click. Five marks at every width (user, 2026-10-28); only a bank bigger
+   than five shows the count instead, a chip whose tray holds the stars. Edit mode's gear sits at its left, so nothing moves on the lock. On is a filled star (never colour alone).
    No gaps inside: each control is a 24px target round a smaller mark, which spaces them, and the 644px edit row
    (Bastion, Special Traits, the gear) has no room to spare. */
 .fhcs-sheet .fhcs-tabs { container: fhcs-tabs / inline-size; }
@@ -1019,11 +1019,7 @@
 /* The count shows only for a big bank or a narrow row (it is a `details`, which the rule above makes a flex box). */
 .fhcs-sheet .fhcs-inspiration > .fhcs-inspiration-count { display: none; }
 .fhcs-sheet .fhcs-inspiration-compact > .fhcs-inspiration-count { display: flex; }
-@container fhcs-tabs (width < 720px)
-{
-   .fhcs-sheet .fhcs-inspiration > .fhcs-inspiration-stars { display: none; }
-   .fhcs-sheet .fhcs-inspiration > .fhcs-inspiration-count { display: flex; }
-}
+
 .fhcs-sheet .fhcs-star
 {
    display: inline-flex;
@@ -2041,6 +2037,9 @@
 .fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head > .fhcs-group-toggle:is(:hover, :focus, :focus-visible) { outline: none; box-shadow: none; background: none; }
 .fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head:has(> .fhcs-group-toggle:focus-visible) { outline: 2px solid var(--fhcs-ink); outline-offset: -2px; }
 .fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head > .fhcs-traits-summary { pointer-events: none; }
+/* The Special Traits gear sits above the fold button's stretched target. */
+.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head { justify-content: space-between; }
+.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head > .fhcs-special-traits { position: relative; z-index: 1; flex: none; }
 .fhcs-sheet .fhcs-traits-summary { flex: 1; }
 
 .fhcs-sheet .fhcs-traits
