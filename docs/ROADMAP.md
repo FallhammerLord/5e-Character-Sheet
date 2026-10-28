@@ -128,6 +128,19 @@ Second pass, from the user's play (2026-10-28):
 - [ ] 3. Chat cards in the world theme, with the setting to keep them plain
 - [ ] Quench and play
 
+## Phase 6.7: Every sheet (user, 2026-10-28)
+
+"Build our styling to the other sheet styles (npc, item, spell, and the rest), as well as the chat cards." Research: docs/research/dnd5e-6.0-other-sheets.md. Design questions asked 2026-10-28; answers go in SCOPE.
+
+- [x] Research: dnd5e's NPC, vehicle, group, encounter, item and container sheets, and its smaller windows
+- [ ] Design answers and mockups (canvas: a row per sheet)
+- [ ] Chat cards in the world theme, with the setting to keep them plain (Phase 6.6 item 3)
+- [ ] Item sheet (every type, spells included)
+- [ ] NPC sheet
+- [ ] Container, group, encounter, vehicle
+- [ ] The smaller windows: a skin
+- [ ] Quench and play
+
 ## Phase 7: The ADHD layer
 
 Skills column on every tab (user, 2026-10-26): the Attributes skills column stays beside every tab, as in Tidy's current sheet (its sidebar; Classic showed skills on Attributes only, checked in Tidy v13.0.0 source). Tab bodies then lose about 240px; recheck Inventory and Spellbook rows at 644px. Optional "Now" strip: action, bonus action, reaction and movement, with spent ones dimmed until the next turn. Favorites capped at five. Panels fold; HP, AC and conditions stay pinned. An effect that turns all incoming damage into one type (user, 2026-10-28; SCOPE §6.7).

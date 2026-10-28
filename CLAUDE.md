@@ -10,7 +10,7 @@ This file holds how we work and the rules. Everything else lives in `docs/`:
 | `docs/ROADMAP.md` | Phases and their checklists. |
 | `docs/SCOPE.md` | The design and every decision, with who decided and when. §5.1 the icon and color vocabulary, §5.2 the styling rules, §5.3 the theme rules. |
 | `docs/BUILT.md` | How finished, verified parts work, for changing them later. |
-| `docs/research/dnd5e-6.0-sheet.md`, `…-chat.md`, `forge-theme.md` | dnd5e internals we rely on (sheet; chat cards and rolls); the Forge theme's references. |
+| `docs/research/dnd5e-6.0-sheet.md`, `…-chat.md`, `…-other-sheets.md`, `forge-theme.md` | dnd5e internals we rely on (character sheet; chat cards and rolls; NPC, item and the other sheets); the Forge theme's references. |
 
 Mockups: one Design canvas, https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf, a row of boards per phase (header, Attributes, Inventory, Spellbook, Features, Effects, Biography, header cards). Add new boards there.
 
