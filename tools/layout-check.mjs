@@ -50,7 +50,7 @@ const frame = (kind, width, theme, body, look = '') => `<section class="applicat
       : `<header style="background:#111;color:#eee;padding:4px 8px;font:13px sans-serif">${width}px</header>`}
    <div class="window-content" style="flex:1;min-height:0;overflow:auto">${FRAMES[kind].wrap(body)}</div></section>`;
 
-const page = (html) => `<!doctype html><html><head><meta charset="utf-8">
+const page = (html) => `<!doctype html><html lang="en"><head><meta charset="utf-8">
    <style>body{margin:0;background:#444;font-family:sans-serif}*{box-sizing:border-box}button,input,select{font:inherit}
    /* Foundry core's control defaults, roughly (v13/v14 foundry.css): ours must override them. */
    button{min-height:var(--button-size,2rem);padding:0 .5rem;line-height:1.5;justify-content:center}

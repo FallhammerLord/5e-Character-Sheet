@@ -2903,12 +2903,11 @@
 /* The kind, with a card's remove and the "+N" chip at its right. */
 .fhcs-sheet .fhcs-origin-head { display: flex; align-self: stretch; align-items: center; gap: var(--fhcs-s1); min-width: 0; }
 .fhcs-sheet .fhcs-origin-head > .fhcs-line { flex: 1; }
-/* A class card's head holds only "+N" and the level ring, at its right. */
-.fhcs-sheet .fhcs-class-card > .fhcs-origin-text > .fhcs-origin-head { justify-content: flex-end; }
 
-/* "+N": more classes than the two cards; opens the class tray (user, 2026-10-27). */
-/* 24px in a 14px label line: it hangs into the card's top padding and below, so the kind line keeps every card's height. */
-.fhcs-sheet .fhcs-more { position: relative; flex: none; margin-block: calc(0px - var(--fhcs-s1)) -6px; }
+/* "+N": more classes than the two cards; opens the class tray (user, 2026-10-27). At the end of the card's last line
+   (user, 2026-10-28), the name before it filling the line so the chip sits at the right. */
+.fhcs-sheet .fhcs-more { position: relative; flex: none; }
+.fhcs-sheet .fhcs-origin-line:has(> .fhcs-more) > .fhcs-origin-name { flex: 1; }
 .fhcs-sheet .fhcs-more-chip { width: auto; min-width: 24px; height: 24px; min-height: 0; padding: 0 var(--fhcs-s1); list-style: none; cursor: pointer; }
 .fhcs-sheet .fhcs-more-chip::-webkit-details-marker { display: none; }
 .fhcs-sheet .fhcs-more .fhcs-tray { left: auto; right: 0; z-index: 3; width: 15rem; }
@@ -2949,6 +2948,13 @@
 }
 
 .fhcs-sheet .fhcs-origin-name:hover { text-decoration: underline; }
+/* Species and background names, in display like a class's (user, 2026-10-28), wrap rather than cut: at 644px
+   "Dragonborn" is wider than its card, so a long word breaks with a hyphen (Foundry sets the page's language). */
+.fhcs-sheet .fhcs-origin-card:not(.fhcs-class-card) .fhcs-origin-name { white-space: normal; hyphens: auto; overflow-wrap: break-word; }
+/* Edit mode: a species or background's × sits in the card's bottom right, where a class card's "+N" sits, so the name
+   lies out as in play mode (rule 6). The card, not the text column, places it. */
+.fhcs-sheet .fhcs-origin-card:not(.fhcs-class-card) > .fhcs-origin-text { position: static; }
+.fhcs-sheet .fhcs-origin-card:not(.fhcs-class-card) .fhcs-origin-line > .fhcs-origin-clear { position: absolute; right: var(--fhcs-s1); bottom: var(--fhcs-s1); }
 /* A class's name never gives way; its subclass does. */
 .fhcs-sheet .fhcs-class-card .fhcs-origin-line > .fhcs-origin-name { flex: none; }
 
