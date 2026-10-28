@@ -328,7 +328,8 @@ export function inspirationBar(facts, { canEdit, editing }, { localize, format }
       view.stars = view.onlyCompact ? [] : Array.from({ length: bank.max }, (_, i) =>
       {
          const filled = i >= empty;
-         return { filled, last: filled && i === empty, delta: filled ? -1 : 1, label: filled ? spend : add, can: canEdit };
+         // The newest banked, and the one spent last (the empty one by it): where gain and spend show their moments.
+         return { filled, last: filled && i === empty, cooled: !filled && i === empty - 1, delta: filled ? -1 : 1, label: filled ? spend : add, can: canEdit };
       });
    }
    if (editing)

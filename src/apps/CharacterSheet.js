@@ -243,8 +243,8 @@ function linkInspirationAction(event, target)
 }
 
 /**
- * Inspiration gained between two draws: the newest star gleams for a moment (SCOPE §4.12), on every look; styles
- * keep it still under Motion off and reduced motion.
+ * Inspiration gained or spent between two draws: a moment on the newest star, or on the one just spent (SCOPE §4.12);
+ * each theme draws its own (Forge: stamped hot, cooling off). Styles keep it still under Motion off and reduced motion.
  */
 function inspirationMoment(element)
 {
@@ -253,10 +253,11 @@ function inspirationMoment(element)
    const count = Number(bar.dataset.fhcsCount) || 0;
    const before = element.dataset.fhcsInspired;
    element.dataset.fhcsInspired = String(count);
-   if (before === undefined || count <= Number(before)) { return; }
-   element.classList.remove('fhcs-moment-inspire');
-   element.classList.add('fhcs-moment-inspire');
-   setTimeout(() => element.classList.remove('fhcs-moment-inspire'), MOMENT_MS);
+   if (before === undefined || count === Number(before)) { return; }
+   const moment = count > Number(before) ? 'fhcs-moment-inspire' : 'fhcs-moment-uninspire';
+   element.classList.remove('fhcs-moment-inspire', 'fhcs-moment-uninspire');
+   element.classList.add(moment);
+   setTimeout(() => element.classList.remove(moment), MOMENT_MS);
 }
 
 /** A resource panel's Restore: uses back to most. */

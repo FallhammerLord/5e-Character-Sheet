@@ -29,7 +29,7 @@
       {{#if bank}}
       <span class="fhcs-inspiration-stars" aria-label="{{ countLabel }}">
          {{#each stars}}
-         <button type="button" class="fhcs-star{{#if filled}} fhcs-on{{/if}}{{#if last}} fhcs-star-last{{/if}}" data-action="fhcsInspiration"
+         <button type="button" class="fhcs-star{{#if filled}} fhcs-on{{/if}}{{#if last}} fhcs-star-last{{/if}}{{#if cooled}} fhcs-star-cooled{{/if}}" data-action="fhcsInspiration"
                  data-delta="{{ delta }}" aria-label="{{ label }}" data-fhcs-tip="{{ label }}"{{#unless can}} disabled{{/unless}}>{{> fhcs-star-mark }}</button>
          {{/each}}
       </span>
@@ -38,11 +38,11 @@
          <button type="button" class="fhcs-star fhcs-star-add" data-action="fhcsInspiration" data-delta="1"
                  aria-label="{{ add.label }}" data-fhcs-tip="{{ add.label }}"{{#unless add.can}} disabled{{/unless}}><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
          {{/unless}}
-         <button type="button" class="fhcs-star fhcs-star-spend{{#if value}} fhcs-on fhcs-star-last{{/if}}" data-action="fhcsInspiration" data-delta="-1"
+         <button type="button" class="fhcs-star fhcs-star-spend fhcs-star-cooled{{#if value}} fhcs-on fhcs-star-last{{/if}}" data-action="fhcsInspiration" data-delta="-1"
                  aria-label="{{ spend.label }}: {{ countLabel }}" data-fhcs-tip="{{ spend.label }}"{{#unless spend.can}} disabled{{/unless}}>{{> fhcs-star-mark }}<span class="fhcs-label">{{ value }}/{{ max }}</span></button>
       </span>
       {{else}}
-      <button type="button" class="fhcs-star{{#if on}} fhcs-on fhcs-star-last{{/if}}" data-action="toggleInspiration" aria-pressed="{{#if on}}true{{else}}false{{/if}}"
+      <button type="button" class="fhcs-star{{#if on}} fhcs-on fhcs-star-last{{else}} fhcs-star-cooled{{/if}}" data-action="toggleInspiration" aria-pressed="{{#if on}}true{{else}}false{{/if}}"
               aria-label="{{ label }}" data-fhcs-tip="{{ label }}"{{#unless canEdit}} disabled{{/unless}}>{{> fhcs-star-mark }}</button>
       {{/if}}
    </div>

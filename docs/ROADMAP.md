@@ -118,6 +118,7 @@ Second pass, from the user's play (2026-10-28):
 - [x] 10. Textures as vectors (Damascus, frame grain), drawn by `tools/forge-textures.mjs`
 - [x] 11. Inspiration fills from the right; banked marks glow (starlight; Forge embers); each theme its own mark (Forge's runes)
 - [x] 12. Forge portrait hover heats and gleams like every frame, instead of dimming
+- [x] 13. Inspiration's on and off moments, each theme its own (Forge: stamped hot, cooling off)
 
 ## Phase 6.6: Themes (user, 2026-10-28; SCOPE §4.11)
 
