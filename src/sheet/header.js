@@ -300,7 +300,7 @@ export const INSPIRATION_STARS = 5;
 
 /**
  * The inspiration bar at the tab row's right, before the lock (SCOPE §4.12, user 2026-10-28). Without a bank, one star:
- * dnd5e's on or off. With one, a star per use, filled ones banked: a click on a filled star spends one, on an empty
+ * dnd5e's on or off. With one, a star per use, filled ones banked and filling from the right: a click on a filled star spends one, on an empty
  * star banks one. A count with spend and bank buttons ("compact") stands in when the bank is bigger than the stars
  * drawn, and in a narrow row (styles). Edit mode adds a gear whose tray picks the item that banks it.
  * @param {{on: boolean, bank: object|null, linkable: object[]}} facts  From `compat.inspirationFacts`.
@@ -323,10 +323,12 @@ export function inspirationBar(facts, { canEdit, editing }, { localize, format }
       view.spend = { label: spend, can: canEdit && bank.value > 0 };
       view.add = { label: add, can: canEdit && bank.value < bank.max };
       view.onlyCompact = bank.max > INSPIRATION_STARS;
+      // Filled from the right, by the lock (user, 2026-10-28): the newest banked is the leftmost filled.
+      const empty = bank.max - bank.value;
       view.stars = view.onlyCompact ? [] : Array.from({ length: bank.max }, (_, i) =>
       {
-         const filled = i < bank.value;
-         return { filled, last: filled && i === bank.value - 1, delta: filled ? -1 : 1, label: filled ? spend : add, can: canEdit };
+         const filled = i >= empty;
+         return { filled, last: filled && i === empty, delta: filled ? -1 : 1, label: filled ? spend : add, can: canEdit };
       });
    }
    if (editing)

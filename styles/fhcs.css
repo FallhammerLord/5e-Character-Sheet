@@ -37,6 +37,11 @@
    /* The default die, and the number on any filled die. */
    --fhcs-die-ink: #191813;
    --fhcs-die-on-ink: #fff;
+   /* Inspiration's mark, empty and banked, drawn as a mask in the ink's colour (a theme swaps in its own: Forge's
+      runes), and the light it gives off while banked: starlight, gold on light and pale on dark. */
+   --fhcs-mark: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%203l2.7%205.6%206.1.9-4.4%204.3%201%206.1L12%2017l-5.4%202.9%201-6.1L3.2%209.5l6.1-.9z'%20fill='none'%20stroke='%23000'%20stroke-width='2'%20stroke-linejoin='round'/%3E%3C/svg%3E");
+   --fhcs-mark-on: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%3E%3Cpath%20d='M12%203l2.7%205.6%206.1.9-4.4%204.3%201%206.1L12%2017l-5.4%202.9%201-6.1L3.2%209.5l6.1-.9z'%20stroke='%23000'%20stroke-width='2'%20stroke-linejoin='round'/%3E%3C/svg%3E");
+   --fhcs-inspire-glow: #c99a1e;
    /* The sheet's chips, AC shield and filled pips use the die's ink; trays open on the surface. */
    --fhcs-surface: #f4f1ea;
    /* The sheet's own text color, so nothing behind it decides how it reads. */
@@ -83,6 +88,7 @@
    --fhcs-fav: #ff8ac0;
    --fhcs-conc: #e0b84a;
    --fhcs-slot: #7fb0ec;
+   --fhcs-inspire-glow: #fff1b8;
 }
 
 /* ---------- The three text styles ---------- */
@@ -1038,7 +1044,20 @@
 }
 .fhcs-sheet .fhcs-star:disabled { cursor: default; }
 .fhcs-sheet .fhcs-star:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
-.fhcs-sheet .fhcs-star.fhcs-on .fhcs-icon { fill: currentColor; }
+.fhcs-sheet .fhcs-mark
+{
+   display: block;
+   flex: none;
+   width: 16px;
+   height: 16px;
+   background-color: currentColor;
+   -webkit-mask: var(--fhcs-mark) center / contain no-repeat;
+   mask: var(--fhcs-mark) center / contain no-repeat;
+}
+.fhcs-sheet .fhcs-star.fhcs-on > .fhcs-mark { -webkit-mask-image: var(--fhcs-mark-on); mask-image: var(--fhcs-mark-on); }
+/* Banked, it gives off light (user, 2026-10-28): a steady glow, which breathes slowly while motion is allowed, each
+   star a little out of step with the next, so the row twinkles. The filled mark says banked; the glow only adorns. */
+.fhcs-sheet .fhcs-star.fhcs-on { filter: drop-shadow(0 0 2px var(--fhcs-inspire-glow)); }
 /* The count reads from the left: its star, then "3/5". */
 .fhcs-sheet .fhcs-star-spend { justify-content: flex-start; gap: 0; }
 .fhcs-sheet .fhcs-inspiration .fhcs-inspiration-tray { left: auto; right: 0; z-index: 10; width: 15rem; max-height: 20rem; overflow-y: auto; scrollbar-gutter: stable; }
@@ -1052,7 +1071,15 @@
 }
 @media (prefers-reduced-motion: no-preference)
 {
-   .fhcs-sheet.fhcs-moment-inspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-last .fhcs-icon { animation: fhcs-inspire 600ms ease-out; }
+   .fhcs-sheet.fhcs-moment-inspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-last .fhcs-mark { animation: fhcs-inspire 600ms ease-out; }
+   .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-star.fhcs-on { animation: var(--fhcs-inspire-breath, fhcs-starlight 3.6s ease-in-out infinite); }
+   .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-inspiration-stars > .fhcs-star:nth-child(2n) { animation-delay: -1.2s; }
+   .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-inspiration-stars > .fhcs-star:nth-child(3n) { animation-delay: -2.3s; }
+}
+@keyframes fhcs-starlight
+{
+   0%, 100% { filter: drop-shadow(0 0 1px var(--fhcs-inspire-glow)); }
+   50% { filter: drop-shadow(0 0 5px var(--fhcs-inspire-glow)); }
 }
 
 /* The theme picker on the title bar, beside ⋮ (SCOPE §4.11, user 2026-10-28): a title-bar control, its tray under it. */

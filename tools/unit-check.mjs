@@ -254,7 +254,8 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    if (got !== '644 644 657 700 720 720 733 800 850 1024') { problems.push(`comfort widths: ${got}`); }
 }
 
-// Inspiration (SCOPE §4.12): one star without a bank; a star per use with one, filled ones spend and empty ones bank;
+// Inspiration (SCOPE §4.12): one star without a bank; a star per use with one, filled from the right, filled ones
+// spend and empty ones bank;
 // a bank over five shows only the count; edit mode's tray lists the items with uses, the one banking it pressed.
 {
    const item = { id: 'h', uuid: 'Actor.a.Item.h', name: 'Heroic', img: '' };
@@ -264,7 +265,7 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    if (none.bank || none.count !== 1 || none.link) { problems.push(`inspiration without a bank: ${JSON.stringify(none)}`); }
    const bank = inspirationBar({ on: true, bank: { link: item, value: 2, max: 4 }, linkable: [item] }, mode, i18n);
    const stars = bank.stars.map((x) => `${x.filled ? '*' : 'o'}${x.delta}${x.last ? '!' : ''}`).join(' ');
-   if (stars !== '*-1 *-1! o1 o1' || bank.onlyCompact || bank.count !== 2) { problems.push(`inspiration bank 2 of 4: ${stars}, compact ${bank.onlyCompact}`); }
+   if (stars !== 'o1 o1 *-1! *-1' || bank.onlyCompact || bank.count !== 2) { problems.push(`inspiration bank 2 of 4: ${stars}, compact ${bank.onlyCompact}`); }
    const big = inspirationBar({ on: true, bank: { link: item, value: 6, max: 8 }, linkable: [item] }, mode, i18n);
    if (!big.onlyCompact || big.stars.length || big.add.can !== true || big.spend.can !== true) { problems.push(`inspiration bank 6 of 8: ${JSON.stringify(big)}`); }
    const empty = inspirationBar({ on: false, bank: { link: item, value: 0, max: 3 }, linkable: [item] }, { canEdit: true, editing: true }, i18n);

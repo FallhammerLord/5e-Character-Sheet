@@ -1,6 +1,6 @@
 /**
  * Fire and Forge's textures as vectors (user, 2026-10-28: "use vectors rather than pixels", the Damascus first): writes
- * the `--fhcs-theme-damascus` and `--fhcs-theme-grain` data URIs into styles/themes/forge.css. Run after changing a
+ * the `--fhcs-theme-damascus`, `--fhcs-theme-grain` and `--fhcs-theme-rune-*` data URIs into styles/themes/forge.css. Run after changing a
  * number here: `node tools/forge-textures.mjs`.
  *
  * Damascus: layers of folded steel as smooth Bézier lines, light and dark by turns. Every wave's period divides the
@@ -103,14 +103,29 @@ function grain()
    return `<svg xmlns='http://www.w3.org/2000/svg' width='${S}' height='${S}'><defs>${gradient}</defs><g fill='url(#g)'>${marks.join('')}</g></svg>`;
 }
 
+/**
+ * Inspiration's marks in Forge (user, 2026-10-28: "the runes from fire and forge"): five of the stamped runes, one per
+ * place in the bank. Empty, the rune's lines; banked, a struck tile with the rune cut through it, so the shape says
+ * which, not only the glow. Masks: only their shape counts, the sheet colours them.
+ */
+const RUNES = ['M9 5v14M9 8l6-3M9 12l6-3', 'M9 19V5l6 4v10', 'M9 5v14M9 8l5 4-5 4', 'M12 5v14M8 9l4-4 4 4', 'M12 5v14M8 8l8 7M16 8l-8 7'];
+function rune(d, on)
+{
+   const lines = (colour, width) => `<path d='${d}' fill='none' stroke='${colour}' stroke-width='${width}' stroke-linecap='square' stroke-linejoin='miter'/>`;
+   if (!on) { return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'>${lines('#000', 2)}</svg>`; }
+   return `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><mask id='m'><rect width='24' height='24' fill='#fff'/>${lines('#000', 2.2)}</mask>`
+      + `<rect x='2' y='1' width='20' height='22' rx='3' mask='url(#m)'/></svg>`;
+}
+
 const uri = (svg) => `url("data:image/svg+xml,${svg.replace(/#/g, '%23').replace(/</g, '%3C').replace(/>/g, '%3E').replace(/ /g, '%20')}")`;
 
 let css = readFileSync(CSS, 'utf8');
-for (const [name, svg] of [['damascus', damascus()], ['grain', grain()]])
+const runes = RUNES.flatMap((d, i) => [[`rune-${i + 1}`, rune(d, false)], [`rune-${i + 1}-on`, rune(d, true)]]);
+for (const [name, svg] of [['damascus', damascus()], ['grain', grain()], ...runes])
 {
    const line = new RegExp(`(--fhcs-theme-${name}: )url\\("data:image/svg\\+xml,[^"]*"\\);`);
    if (!line.test(css)) { throw new Error(`forge.css has no --fhcs-theme-${name} token to replace`); }
    css = css.replace(line, `$1${uri(svg)};`);
 }
 writeFileSync(CSS, css);
-console.log('Wrote the Damascus and grain textures into styles/themes/forge.css.');
+console.log('Wrote the Damascus, grain and rune marks into styles/themes/forge.css.');

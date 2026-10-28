@@ -116,6 +116,8 @@ Second pass, from the user's play (2026-10-28):
 - [x] 8. Inspiration on the tab row, right-aligned before the lock: one star, or a bank in an item's uses as stars or a count; edit mode's gear links the item; Forge's anvil rides beside it (SCOPE §4.12; Quench test added)
 - [x] 9. Window: least height at the tab row's foot; width comfort stops while dragging (644, 720, 800, 900, 1024, 1280; Quench test added)
 - [x] 10. Textures as vectors (Damascus, frame grain), drawn by `tools/forge-textures.mjs`
+- [x] 11. Inspiration fills from the right; banked marks glow (starlight; Forge embers); each theme its own mark (Forge's runes)
+- [x] 12. Forge portrait hover heats and gleams like every frame, instead of dimming
 
 ## Phase 6.6: Themes (user, 2026-10-28; SCOPE §4.11)
 

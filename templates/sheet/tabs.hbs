@@ -1,14 +1,14 @@
 {{!-- Classic's tab row across the top (SCOPE §4.2), with the sheet lock at its right end. Foundry's `tab` action
       switches tabs; dnd5e's `changeMode` switches play and edit. Foundry finds tab buttons only as children of
       `.tabs`, so the row keeps that class (the layout check fails without it). --}}
-{{#*inline "fhcs-star-mark"}}<svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>{{/inline}}
+{{#*inline "fhcs-star-mark"}}<span class="fhcs-mark" aria-hidden="true"></span>{{/inline}}
 <nav class="tabs fhcs-tabs" data-group="primary" aria-label="{{ fhcsTabs.label }}">
    {{#each fhcsTabs.tabs}}
    <button type="button" class="fhcs-tab fhcs-body{{#if active}} active{{/if}}" data-action="tab" data-group="primary"
            data-tab="{{ id }}">{{ label }}</button>
    {{/each}}
    {{!-- Inspiration at the row's right, before the lock (SCOPE §4.12, user 2026-10-28): one star (dnd5e's on or off)
-         or the bank, a star per use; a count (bank +, then spend) stands in for a big bank or a narrow row. Edit
+         or the bank, a star per use, filling from the right; a count (bank +, then spend) stands in for a big bank or a narrow row. Edit
          mode's gear sits at its left, in the + button's place, so nothing moves on the lock. --}}
    {{#with fhcsTabs.inspiration}}
    <div class="fhcs-inspiration{{#if onlyCompact}} fhcs-inspiration-compact{{/if}}" data-fhcs-count="{{ count }}" role="group" aria-label="{{ label }}">
