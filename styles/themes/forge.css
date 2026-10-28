@@ -1,6 +1,7 @@
 /* Fire and Forge (SCOPE §4.11, user 2026-10-28): the sheet as a smithy. The window is an iron-banded object; a
    hearth glows up from its foot, as hot as the character's HP (`--fhcs-hp`, 0–1, set by the sheet), down to cold
-   ash at 0 HP; a rack of smith's tools hangs in the lower corner; embers drift up now and then. Text sits on plates
+   ash at 0 HP; a rack of smith's tools hangs in the lower corner; sparks spray from the lower-left corner now and then
+   (src/apps/sparks.js). Text sits on plates
    (the surface at 88% with a blur: at 85% muted text on a tinted row fell to 4.35:1), so the art glows through them and shows plainly in the gutters and under short
    lists.
    The ember accent decorates frames only; meaning colors keep their hue (§5.1). The window is marked `--fhcs-art`,
@@ -33,6 +34,8 @@
    --fhcs-theme-brick: #d9c6ae;
    --fhcs-theme-ash-brick: #cfcac4;
    --fhcs-theme-mortar: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='32'%3E%3Cg fill='%23b3a089'%3E%3Crect y='14' width='36' height='2'/%3E%3Crect y='30' width='36' height='2'/%3E%3Crect x='34' width='2' height='14'/%3E%3Crect x='16' y='16' width='2' height='14'/%3E%3C/g%3E%3C/svg%3E");
+   /* The window band's width over the content's edge (the layout check measures the space under the title bar from it). */
+   --fhcs-theme-band: 4px;
    /* The hearth's heat follows HP; at 0 it's ash. */
    --fhcs-theme-heat: var(--fhcs-hp, 1);
    /* The heat colour (docs/research/forge-theme.md): iron cools as HP falls, the way a smith reads it: yellow-orange
@@ -150,9 +153,11 @@
    z-index: 5;
 }
 
-/* The header: a plate with soot along its top. */
+/* The header: a plate with soot along its top, starting below the window's iron band (user, 2026-10-28: "the top is
+   a little cramped"; the band lay over the nameplate's top edge). */
 .fhcs-sheet[data-fhcs-theme="forge"] .fhcs-header
 {
+   padding-top: var(--fhcs-s2);
    background-image: linear-gradient(to bottom, color-mix(in srgb, var(--fhcs-theme-iron) 10%, transparent), transparent 40%);
 }
 
@@ -379,7 +384,10 @@
    box-shadow: 0 4px 12px rgb(0 0 0 / 45%);
 }
 
-/* ---------- Motion: answers, moments, and embers now and then ---------- */
+/* ---------- Motion: answers, moments, and sparks now and then ---------- */
+
+/* The sparks' canvas (src/apps/sparks.js): over the content, under the window band, never catching a click. */
+.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-sparks { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; pointer-events: none; }
 
 @media (prefers-reduced-motion: no-preference)
 {
@@ -400,29 +408,6 @@
       animation: fhcs-forge-strike 0.25s ease-out;
    }
 
-   /* Embers: sparks rise from the coal grate in front of the panels and fade within the window's lowest third, for
-      three seconds in every twenty (user, 2026-10-28: behind the plates they couldn't be seen), never at 0 HP. Below
-      the window band, never catching a click. */
-   .fhcs-sheet[data-fhcs-theme="forge"]:not([data-fhcs-motion="off"]):not([data-fhcs-hp="down"]) .window-content::before
-   {
-      content: '';
-      position: absolute;
-      inset: auto 0 0 0;
-      height: 22%;
-      z-index: 3;
-      pointer-events: none;
-      opacity: 0;
-      background:
-         radial-gradient(circle at 14% 92%, #fff1c2 0 1.5px, var(--fhcs-theme-ember) 2.5px, color-mix(in srgb, var(--fhcs-theme-ember) 35%, transparent) 4px, transparent 6px),
-         radial-gradient(circle at 27% 78%, #fff1c2 0 1px, var(--fhcs-theme-ember) 2px, color-mix(in srgb, var(--fhcs-theme-ember) 35%, transparent) 3px, transparent 4.5px),
-         radial-gradient(circle at 36% 96%, #fff1c2 0 1.5px, var(--fhcs-theme-ember) 2.5px, color-mix(in srgb, var(--fhcs-theme-ember) 35%, transparent) 4px, transparent 6px),
-         radial-gradient(circle at 48% 84%, #fff1c2 0 1px, var(--fhcs-theme-ember) 2px, color-mix(in srgb, var(--fhcs-theme-ember) 35%, transparent) 3px, transparent 4.5px),
-         radial-gradient(circle at 57% 98%, #fff1c2 0 1.5px, var(--fhcs-theme-ember) 2.5px, color-mix(in srgb, var(--fhcs-theme-ember) 35%, transparent) 4px, transparent 6px),
-         radial-gradient(circle at 66% 72%, #fff1c2 0 1px, var(--fhcs-theme-ember) 2px, color-mix(in srgb, var(--fhcs-theme-ember) 35%, transparent) 3px, transparent 4.5px),
-         radial-gradient(circle at 74% 90%, #fff1c2 0 1.5px, var(--fhcs-theme-ember) 2.5px, color-mix(in srgb, var(--fhcs-theme-ember) 35%, transparent) 4px, transparent 6px),
-         radial-gradient(circle at 86% 80%, #fff1c2 0 1px, var(--fhcs-theme-ember) 2px, color-mix(in srgb, var(--fhcs-theme-ember) 35%, transparent) 3px, transparent 4.5px);
-      animation: fhcs-forge-embers 20s ease-out infinite;
-   }
 
    /* A hit: the portrait jolts and flares, sparks fly from the header (about 600ms). */
    .fhcs-sheet[data-fhcs-theme="forge"].fhcs-moment-hit:not([data-fhcs-motion="off"]) .fhcs-portrait { animation: fhcs-forge-jolt 0.4s ease-out; }
@@ -439,14 +424,6 @@
    to { box-shadow: 0 0 0 6px transparent; }
 }
 
-@keyframes fhcs-forge-embers
-{
-   0% { opacity: 0; transform: translate(0, 0); }
-   2% { opacity: 1; }
-   8% { opacity: 0.9; transform: translate(6px, -55%); }
-   15% { opacity: 0; transform: translate(-4px, -110%); }
-   100% { opacity: 0; transform: translate(-4px, -110%); }
-}
 
 @keyframes fhcs-forge-jolt
 {

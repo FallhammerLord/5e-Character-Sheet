@@ -5,6 +5,7 @@
 import { deepStrictEqual } from 'node:assert';
 import { describeRoll } from '../src/chat/outcome.js';
 import { appliedLines, cardParts, damageBand, saveRow } from '../src/chat/card.js';
+import { sparkDelay } from '../src/apps/sparks.js';
 import { countingDie, d20Row, modeForSides } from '../src/chat/d20.js';
 import { diceMath } from '../src/chat/math.js';
 import { attributesView } from '../src/sheet/attributes.js';
@@ -204,6 +205,11 @@ for (const [name, order, classes, original, expected] of ORDER_CASES)
    const expected = { pips: 20, filled: ['c.svg', 'f.svg', 'c.svg'], third: 'Level 3: c 2', fourth: 'Level 4: not reached' };
    try { deepStrictEqual(got, expected); }
    catch { problems.push(`milestone track: got ${JSON.stringify(got)}, expected ${JSON.stringify(expected)}`); }
+}
+// Forge's sparks (user, 2026-10-28): a minute at least, then 1d6 × 10 seconds.
+{
+   const got = [1, 6].map((pip) => sparkDelay(() => pip));
+   if (got.join() !== '70000,120000') { problems.push(`spark timing: ${got}`); }
 }
 // What Apply did, in words (user, 2026-10-28): each type when damage is split, healing, temp HP, none, an effect.
 {

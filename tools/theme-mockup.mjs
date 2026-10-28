@@ -121,15 +121,16 @@ ${inlineFonts(css)}
       <div class="v-group"><label class="v-label" for="v-hp">HP</label>
          <input type="range" id="v-hp" min="0" max="100" value="100"><span class="v-hp" id="v-hp-text">100% · full</span></div>
       <div class="v-group"><span class="v-label">Play</span>
-         <button type="button" id="v-hit">A hit</button><button type="button" id="v-heal">A heal</button><button type="button" id="v-embers">Embers</button></div>
+         <button type="button" id="v-hit">A hit</button><button type="button" id="v-heal">A heal</button><button type="button" id="v-embers">Sparks</button></div>
       <div class="v-group"><span class="v-label">Motion</span>
          <button type="button" id="v-motion" aria-pressed="true">On</button></div>
    </div>
    <p class="v-warn" id="v-reduced" hidden>Your device asks for reduced motion, so the sheet keeps still. That's the theme respecting the setting; turn reduced motion off in your system settings to preview the animations.</p>
-   <p class="v-note">Drag HP to cool the forge: yellow at full, cherry at half, dull red low, cold iron at 0. Hover a panel for the temper gleam along its top rim; press any button on the sheet for the hammer strike. The sheet's tabs switch between Attributes, Inventory and Spellbook. The numbers on the sheet are sample data.</p>
+   <p class="v-note">Drag HP to cool the forge: yellow at full, cherry at half, dull red low, cold iron at 0. Sparks spray from the lower-left corner once a minute plus 1d6 × 10 seconds; the Sparks button throws a burst now, fresh each time. Hover a panel for the temper gleam along its top rim; press any button on the sheet for the hammer strike. The sheet's tabs switch between Attributes, Inventory and Spellbook. The numbers on the sheet are sample data.</p>
    <div class="v-stage">${viewerSheet('forge')}</div>
 </div>
 <script>
+${readFileSync(`${root}src/apps/sparks.js`, 'utf8').replace(/^export /gm, '')}
 const sheet = document.querySelector('.fhcs-sheet');
 const press = (selector, button) => { for (const b of document.querySelectorAll(selector)) { b.setAttribute('aria-pressed', String(b === button)); } };
 for (const b of document.querySelectorAll('[data-mode]')) b.addEventListener('click', () => { sheet.classList.toggle('theme-dark', b.dataset.mode === 'dark'); sheet.classList.toggle('theme-light', b.dataset.mode === 'light'); press('[data-mode]', b); });
@@ -142,7 +143,8 @@ hp.addEventListener('input', setHp);
 hp.addEventListener('change', () => { const v = Number(hp.value); if (v !== last) moment(v < last ? 'fhcs-moment-hit' : 'fhcs-moment-heal'); last = v; });
 document.getElementById('v-hit').addEventListener('click', () => moment('fhcs-moment-hit'));
 document.getElementById('v-heal').addEventListener('click', () => moment('fhcs-moment-heal'));
-document.getElementById('v-embers').addEventListener('click', () => { const was = sheet.dataset.fhcsMotion; sheet.dataset.fhcsMotion = 'off'; void sheet.offsetWidth; if (was) sheet.dataset.fhcsMotion = was; else delete sheet.dataset.fhcsMotion; });
+document.getElementById('v-embers').addEventListener('click', () => sparkBurst(sheet));
+scheduleSparks(sheet);
 const motion = document.getElementById('v-motion');
 motion.addEventListener('click', () => { const on = motion.getAttribute('aria-pressed') !== 'true'; motion.setAttribute('aria-pressed', String(on)); motion.textContent = on ? 'On' : 'Off'; if (on) delete sheet.dataset.fhcsMotion; else sheet.dataset.fhcsMotion = 'off'; });
 for (const t of document.querySelectorAll('[data-viewer-tab]')) t.addEventListener('click', () => {

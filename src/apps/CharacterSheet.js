@@ -9,6 +9,7 @@ import { effectsView } from '../sheet/effects.js';
 import { biographyView } from '../sheet/biography.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
 import { headerMinWidth, headerView, hpPreview, tabRow } from '../sheet/header.js';
+import { scheduleSparks, stopSparks } from './sparks.js';
 import { delayTips, keepFolds } from '../chat/card.js';
 import { startFraming } from './framing.js';
 
@@ -496,6 +497,13 @@ export function makeCharacterSheet(Base)
       }
 
       /** @inheritDoc */
+      _onClose(options)
+      {
+         super._onClose(options);
+         stopSparks(this.element);
+      }
+
+      /** @inheritDoc */
       async _onRender(context, options)
       {
          await super._onRender(context, options);
@@ -505,6 +513,7 @@ export function makeCharacterSheet(Base)
          wireHpTray(this.element);
          wireResourceUses(this.element, this.actor);
          themeState(this.element, this.actor);
+         scheduleSparks(this.element);
          const items = this.element.querySelector('.fhcs-inventory .fhcs-items');
          if (items && !items.dataset.fhcsWatched)
          {

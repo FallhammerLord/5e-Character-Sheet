@@ -362,7 +362,9 @@ function findProblems()
       const tops = [...content.firstElementChild.querySelectorAll('*')].filter((el) => !el.ownerSVGElement && el.getClientRects().length).map((el) => el.getBoundingClientRect().top);
       const first = tops.length ? { top: Math.min(...tops) } : null;
       if (Math.abs(b.height - 28) > 1) { issues.push(`title bar is ${Math.round(b.height)}px tall, not 28`); }
-      if (first && first.top - b.bottom > 4.5) { issues.push(`${Math.round(first.top - b.bottom)}px between the title bar and the sheet`); }
+      // A theme's window band (Forge's iron, `--fhcs-theme-band`) is drawn there, not empty: the air is measured below it.
+      const band = parseFloat(getComputedStyle(app).getPropertyValue('--fhcs-theme-band')) || 0;
+      if (first && first.top - b.bottom - band > 4.5) { issues.push(`${Math.round(first.top - b.bottom - band)}px between the title bar and the sheet`); }
    }
    // The tab row draws no glow or box of its own (user, 2026-10-28): the underline marks the open tab.
    for (const tab of app.querySelectorAll('.window-content .fhcs-tabs > :is(.fhcs-tab, .fhcs-lock)'))
