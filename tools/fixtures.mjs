@@ -606,6 +606,7 @@ export const CASES = [
    { name: 'tabs-bank-editing', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: true }, 'bank'), rows: '.fhcs-tabs', sameRowsAs: 'tabs-bank' },
    { name: 'tabs-bank-big', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }, 'big') },
    { name: 'tabs-inspiration-tray', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: true }, 'bank'), open: ['inspiration'] },
+   { name: 'tabs-bank-tray', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }, 'big'), open: ['inspiration-bank'] },
    { name: 'tabs-observer', template: 'sheet/tabs', context: tabs({ canEdit: false, editing: false }, 'bank') },
    { name: 'title-theme-tray', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }), titleBar: titleBarPick, titleTray: titleTrayOpen },
    { name: 'special-traits', html: SPECIAL_TRAITS },
@@ -768,7 +769,7 @@ for (const look of LOOKS)
 // Fire and Forge, the whole sheet (user, 2026-10-28: "finish the sheet ... trays, tabs, and anything we've missed"):
 // every tab, edit mode, and each tray open.
 for (const name of ['features', 'effects', 'biography', 'attributes-editing', 'attributes-resource-tray', 'inventory-editing',
-   'spellbook-editing', 'features-editing', 'title-theme-tray', 'tabs-bank-big', 'tabs-inspiration-tray', 'header-editing', 'header-hp-tray', 'header-exhaustion-open',
+   'spellbook-editing', 'features-editing', 'title-theme-tray', 'tabs-bank-big', 'tabs-inspiration-tray', 'tabs-bank-tray', 'header-editing', 'header-hp-tray', 'header-exhaustion-open',
    'header-level-up', 'header-classes-open', 'header-milestones'])
 {
    const base = CASES.find((c) => c.name === name);

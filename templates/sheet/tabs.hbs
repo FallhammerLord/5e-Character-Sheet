@@ -2,14 +2,16 @@
       switches tabs; dnd5e's `changeMode` switches play and edit. Foundry finds tab buttons only as children of
       `.tabs`, so the row keeps that class (the layout check fails without it). --}}
 {{#*inline "fhcs-star-mark"}}<span class="fhcs-mark" aria-hidden="true"></span>{{/inline}}
+{{#*inline "fhcs-bank-stars"}}{{#each stars}}<button type="button" class="fhcs-star{{#if filled}} fhcs-on{{/if}}{{#if last}} fhcs-star-last{{/if}}{{#if cooled}} fhcs-star-cooled{{/if}}"
+   data-action="fhcsInspiration" data-slot="{{ slot }}" aria-label="{{ label }}" aria-pressed="{{#if filled}}true{{else}}false{{/if}}" data-fhcs-tip="{{ label }}"{{#unless can}} disabled{{/unless}}>{{> fhcs-star-mark }}</button>{{/each}}{{/inline}}
 <nav class="tabs fhcs-tabs" data-group="primary" aria-label="{{ fhcsTabs.label }}">
    {{#each fhcsTabs.tabs}}
    <button type="button" class="fhcs-tab fhcs-body{{#if active}} active{{/if}}" data-action="tab" data-group="primary"
            data-tab="{{ id }}">{{ label }}</button>
    {{/each}}
    {{!-- Inspiration at the row's right, before the lock (SCOPE §4.12, user 2026-10-28): one star (dnd5e's on or off)
-         or the bank, a star per use, filling from the right; a count (bank +, then spend) stands in for a big bank or a narrow row. Edit
-         mode's gear sits at its left, in the + button's place, so nothing moves on the lock. --}}
+         or the bank, a star per use, any one spent or banked by a click; a count stands in for a big bank or a narrow row, its tray
+         holding the stars. Edit mode's gear sits at the bar's left, so the stars don't move on the lock. --}}
    {{#with fhcsTabs.inspiration}}
    <div class="fhcs-inspiration{{#if onlyCompact}} fhcs-inspiration-compact{{/if}}" data-fhcs-count="{{ count }}" role="group" aria-label="{{ label }}">
       {{#if link}}
@@ -27,20 +29,16 @@
       </details>
       {{/if}}
       {{#if bank}}
-      <span class="fhcs-inspiration-stars" aria-label="{{ countLabel }}">
-         {{#each stars}}
-         <button type="button" class="fhcs-star{{#if filled}} fhcs-on{{/if}}{{#if last}} fhcs-star-last{{/if}}{{#if cooled}} fhcs-star-cooled{{/if}}" data-action="fhcsInspiration"
-                 data-delta="{{ delta }}" aria-label="{{ label }}" data-fhcs-tip="{{ label }}"{{#unless can}} disabled{{/unless}}>{{> fhcs-star-mark }}</button>
-         {{/each}}
-      </span>
-      <span class="fhcs-inspiration-count">
-         {{#unless editing}}
-         <button type="button" class="fhcs-star fhcs-star-add" data-action="fhcsInspiration" data-delta="1"
-                 aria-label="{{ add.label }}" data-fhcs-tip="{{ add.label }}"{{#unless add.can}} disabled{{/unless}}><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
-         {{/unless}}
-         <button type="button" class="fhcs-star fhcs-star-spend fhcs-star-cooled{{#if value}} fhcs-on fhcs-star-last{{/if}}" data-action="fhcsInspiration" data-delta="-1"
-                 aria-label="{{ spend.label }}: {{ countLabel }}" data-fhcs-tip="{{ spend.label }}"{{#unless spend.can}} disabled{{/unless}}>{{> fhcs-star-mark }}<span class="fhcs-label">{{ value }}/{{ max }}</span></button>
-      </span>
+      {{#unless onlyCompact}}
+      <span class="fhcs-inspiration-stars" aria-label="{{ countLabel }}">{{> fhcs-bank-stars }}</span>
+      {{/unless}}
+      <details class="fhcs-fold fhcs-inspiration-count" data-fold-key="inspiration-bank">
+         <summary class="fhcs-star fhcs-star-count{{#if value}} fhcs-on{{/if}}" aria-label="{{ countLabel }}" data-fhcs-tip="{{ label }}">{{> fhcs-star-mark }}<span class="fhcs-label">{{ value }}/{{ max }}</span></summary>
+         <div class="fhcs-tray fhcs-inspiration-bank-tray">
+            <span class="fhcs-label">{{ name }}</span>
+            <span class="fhcs-tray-stars" aria-label="{{ countLabel }}">{{> fhcs-bank-stars }}</span>
+         </div>
+      </details>
       {{else}}
       <button type="button" class="fhcs-star{{#if on}} fhcs-on fhcs-star-last{{else}} fhcs-star-cooled{{/if}}" data-action="toggleInspiration" aria-pressed="{{#if on}}true{{else}}false{{/if}}"
               aria-label="{{ label }}" data-fhcs-tip="{{ label }}"{{#unless canEdit}} disabled{{/unless}}>{{> fhcs-star-mark }}</button>

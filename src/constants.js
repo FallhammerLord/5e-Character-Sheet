@@ -27,6 +27,9 @@ export const RESOURCES_FLAG = 'resources';
 /** Actor flag: the item, by id, whose uses are the character's banked inspiration (SCOPE §4.12). */
 export const INSPIRATION_FLAG = 'inspiration';
 
+/** Actor flag: which places in that bank are filled ({ item: id, filled: [index] }), so any may be spent or banked. */
+export const INSPIRATION_SLOTS_FLAG = 'inspirationSlots';
+
 /** The sheet's themes (SCOPE §4.11), by key; `plain` is today's look. Actor flag `flags.fhcs.theme` picks one per
     character; without it, the world setting `fhcs.theme` applies. */
 export const THEMES = ['plain', 'forge', 'wind', 'sand', 'valley'];

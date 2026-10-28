@@ -6,7 +6,7 @@
 import { countingDie, MAX_PER_SIDE, modeForSides } from './chat/d20.js';
 import { diceMath } from './chat/math.js';
 import { canCast, spellKind } from './sheet/spellbook.js';
-import { APPLIED_FLAG, INSPIRATION_FLAG, MODULE_ID, PORTRAIT_FLAG, RESOURCES_FLAG, SHAPE_FLAG } from './constants.js';
+import { APPLIED_FLAG, INSPIRATION_FLAG, INSPIRATION_SLOTS_FLAG, MODULE_ID, PORTRAIT_FLAG, RESOURCES_FLAG, SHAPE_FLAG } from './constants.js';
 
 /** dnd5e's own character sheet, which ours extends so every mechanic keeps working. Set by dnd5e before init. */
 export function systemCharacterSheet()
@@ -660,17 +660,53 @@ function inspirationItem(actor)
 }
 
 /**
- * Inspiration for the tab row: dnd5e's on or off, and the bank when an item with uses holds it, with the items that
- * could.
+ * Which places in the bank are filled (user, 2026-10-28: "spend and gain inspiration in any visual order based on
+ * clicked icon"): kept on the actor (`flags.fhcs.inspirationSlots`, with the item it belongs to), and brought in step
+ * with the item's uses when something else changed them (a rest): new uses fill from the right, lost ones empty from
+ * the left of the filled.
+ * @returns {boolean[]} One per use, filled or not.
+ */
+function bankSlots(actor, item)
+{
+   const max = item.system.uses.max;
+   const value = Math.clamp(item.system.uses.value ?? 0, 0, max);
+   const stored = actor.getFlag(MODULE_ID, INSPIRATION_SLOTS_FLAG);
+   const filled = new Set(stored?.item === item.id ? (stored.filled ?? []).filter((i) => Number.isInteger(i) && i >= 0 && i < max) : []);
+   for (let i = max - 1; filled.size < value && i >= 0; i--) { filled.add(i); }
+   for (let i = 0; filled.size > value && i < max; i++) { filled.delete(i); }
+   return Array.from({ length: max }, (_, i) => filled.has(i));
+}
+
+/**
+ * Inspiration for the tab row: dnd5e's on or off, and the bank when an item with uses holds it (its places, filled or
+ * not), with the items that could.
  */
 export function inspirationFacts(actor)
 {
    const item = inspirationItem(actor);
    return {
       on: !!actor.system.attributes?.inspiration,
-      bank: item ? { link: docFacts(item), value: item.system.uses.value ?? 0, max: item.system.uses.max } : null,
+      bank: item ? { link: docFacts(item), value: item.system.uses.value ?? 0, max: item.system.uses.max, filled: bankSlots(actor, item) } : null,
       linkable: actor.items.filter((i) => i.system.uses?.max).map(docFacts).sort((a, b) => a.name.localeCompare(b.name))
    };
+}
+
+/**
+ * Fills or empties one place in the bank, the one clicked: dnd5e stores what's spent (inventory.mjs:565), we store
+ * which places; dnd5e's on-or-off stays on while the bank holds any.
+ */
+export async function setInspirationSlot(actor, slot)
+{
+   const item = inspirationItem(actor);
+   if (!item || !Number.isInteger(slot) || slot < 0 || slot >= item.system.uses.max) { return null; }
+   const filled = bankSlots(actor, item);
+   filled[slot] = !filled[slot];
+   const value = filled.filter(Boolean).length;
+   await item.update({ 'system.uses.spent': item.system.uses.max - value });
+   return actor.update({
+      [`flags.${MODULE_ID}.${INSPIRATION_SLOTS_FLAG}`]: { item: item.id, filled: filled.flatMap((on, i) => (on ? [i] : [])) },
+      'system.attributes.inspiration': value > 0
+   });
 }
 
 /** Keeps dnd5e's on-or-off inspiration in step with the bank: on while it holds any, so whatever reads dnd5e's works. */
@@ -678,17 +714,6 @@ function syncInspiration(actor, banked)
 {
    const on = banked > 0;
    return !!actor.system.attributes?.inspiration === on ? null : actor.update({ 'system.attributes.inspiration': on });
-}
-
-/** Banks (+1) or spends (−1) one inspiration: dnd5e stores what's spent (inventory.mjs:565). */
-export async function changeInspiration(actor, delta)
-{
-   const item = inspirationItem(actor);
-   if (!item || !Number.isFinite(delta)) { return null; }
-   const max = item.system.uses.max;
-   const value = Math.clamp((item.system.uses.value ?? 0) + Math.sign(delta), 0, max);
-   await item.update({ 'system.uses.spent': max - value });
-   return syncInspiration(actor, value);
 }
 
 /** Banks inspiration in an item's uses, or goes back to dnd5e's on or off (no id). */

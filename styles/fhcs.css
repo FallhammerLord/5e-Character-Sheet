@@ -1007,22 +1007,22 @@
 
 /* ---------- Inspiration (SCOPE §4.12, user 2026-10-28) ----------
    In the tab row's empty right, before the lock: one star (dnd5e's on or off) or the bank, a star per use, filled
-   ones banked. A row too narrow for the stars, or a bank bigger than five, shows the count: bank (+), then spend.
-   Edit mode's gear sits at its left, in the + button's place, so nothing moves on the lock. On is a filled star (never colour alone).
+   ones banked, any one spent or banked by a click. A row too narrow for the stars, or a bank bigger than five, shows
+   the count instead, a chip whose tray holds the stars. Edit mode's gear sits at its left, so nothing moves on the lock. On is a filled star (never colour alone).
    No gaps inside: each control is a 24px target round a smaller mark, which spaces them, and the 644px edit row
    (Bastion, Special Traits, the gear) has no room to spare. */
 .fhcs-sheet .fhcs-tabs { container: fhcs-tabs / inline-size; }
 .fhcs-sheet .fhcs-inspiration { position: relative; display: flex; flex: 1 0 auto; justify-content: flex-end; align-items: center; gap: 0; }
 .fhcs-sheet .fhcs-tabs .fhcs-inspiration + .fhcs-lock { margin-left: var(--fhcs-s1); }
 .fhcs-sheet .fhcs-inspiration > details { position: static; display: flex; }
-.fhcs-sheet :is(.fhcs-inspiration-stars, .fhcs-inspiration-count) { display: flex; align-items: center; }
-.fhcs-sheet .fhcs-inspiration-count,
-.fhcs-sheet .fhcs-inspiration-compact .fhcs-inspiration-stars { display: none; }
-.fhcs-sheet .fhcs-inspiration-compact .fhcs-inspiration-count { display: flex; }
+.fhcs-sheet .fhcs-inspiration > .fhcs-inspiration-stars { display: flex; align-items: center; }
+/* The count shows only for a big bank or a narrow row (it is a `details`, which the rule above makes a flex box). */
+.fhcs-sheet .fhcs-inspiration > .fhcs-inspiration-count { display: none; }
+.fhcs-sheet .fhcs-inspiration-compact > .fhcs-inspiration-count { display: flex; }
 @container fhcs-tabs (width < 720px)
 {
-   .fhcs-sheet .fhcs-inspiration-stars { display: none; }
-   .fhcs-sheet .fhcs-inspiration-count { display: flex; }
+   .fhcs-sheet .fhcs-inspiration > .fhcs-inspiration-stars { display: none; }
+   .fhcs-sheet .fhcs-inspiration > .fhcs-inspiration-count { display: flex; }
 }
 .fhcs-sheet .fhcs-star
 {
@@ -1059,7 +1059,11 @@
    star a little out of step with the next, so the row twinkles. The filled mark says banked; the glow only adorns. */
 .fhcs-sheet .fhcs-star.fhcs-on { filter: drop-shadow(0 0 2px var(--fhcs-inspire-glow)); }
 /* The count reads from the left: its star, then "3/5". */
-.fhcs-sheet .fhcs-star-spend { justify-content: flex-start; gap: 0; }
+.fhcs-sheet .fhcs-star-count { justify-content: flex-start; gap: var(--fhcs-s1); padding: 0 0 0 var(--fhcs-s1); list-style: none; }
+.fhcs-sheet .fhcs-star-count::-webkit-details-marker { display: none; }
+/* The count's tray holds every star, wrapping when the bank is big. */
+.fhcs-sheet .fhcs-inspiration .fhcs-inspiration-bank-tray { left: auto; right: 0; z-index: 10; max-width: 15rem; }
+.fhcs-sheet .fhcs-tray-stars { display: flex; flex-wrap: wrap; }
 .fhcs-sheet .fhcs-inspiration .fhcs-inspiration-tray { left: auto; right: 0; z-index: 10; width: 15rem; max-height: 20rem; overflow-y: auto; scrollbar-gutter: stable; }
 
 /* Gaining and spending each have a moment (about 600ms; SCOPE §4.12), and every theme draws its own (user, 2026-10-28:
@@ -1101,10 +1105,10 @@
    .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-star.fhcs-on { animation: var(--fhcs-inspire-breath, fhcs-starlight 3.6s ease-in-out infinite); }
    .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-inspiration-stars > .fhcs-star:nth-child(2n) { animation-delay: -1.2s; }
    .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-inspiration-stars > .fhcs-star:nth-child(3n) { animation-delay: -2.3s; }
-   .fhcs-sheet.fhcs-moment-inspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-last { animation: var(--fhcs-inspire-on-glow); }
-   .fhcs-sheet.fhcs-moment-inspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-last > .fhcs-mark { animation: var(--fhcs-inspire-on); }
-   .fhcs-sheet.fhcs-moment-uninspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-cooled { animation: var(--fhcs-inspire-off-glow); }
-   .fhcs-sheet.fhcs-moment-uninspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-cooled > .fhcs-mark { animation: var(--fhcs-inspire-off); }
+   .fhcs-sheet.fhcs-moment-inspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-moment { animation: var(--fhcs-inspire-on-glow); }
+   .fhcs-sheet.fhcs-moment-inspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-moment > .fhcs-mark { animation: var(--fhcs-inspire-on); }
+   .fhcs-sheet.fhcs-moment-uninspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-moment { animation: var(--fhcs-inspire-off-glow); }
+   .fhcs-sheet.fhcs-moment-uninspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-moment > .fhcs-mark { animation: var(--fhcs-inspire-off); }
 }
 @keyframes fhcs-starlight
 {

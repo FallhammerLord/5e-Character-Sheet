@@ -834,7 +834,7 @@ export function registerQuenchTests(quench)
             }
          });
 
-         it('banks inspiration in an item from the tab row: links it, banks and spends with the stars, keeps dnd5e in step', async function ()
+         it('banks inspiration in an item from the tab row: links it, banks and spends any star, keeps dnd5e in step', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 12);
             const flag = actor.getFlag('fhcs', 'inspiration') ?? null;
@@ -857,21 +857,25 @@ export function registerQuenchTests(quench)
                await until(() => sheet.element.querySelectorAll('.fhcs-inspiration-stars .fhcs-star').length === 3,
                   () => `a star per use; the row draws ${sheet.element.querySelectorAll('.fhcs-inspiration-stars .fhcs-star').length}`);
                await leaveEditMode();
-               await click('.fhcs-inspiration-stars [data-delta="1"]');
-               await until(() => feat.system.uses.value === 1 && actor.system.attributes.inspiration === true,
-                  () => `an empty star banks one and turns dnd5e's on; it holds ${uses()}`);
-               await click('.fhcs-inspiration-count [data-delta="1"]');
-               await until(() => feat.system.uses.value === 2, () => `the count's + banks one; it holds ${uses()}`);
-               await click('.fhcs-inspiration-stars [data-delta="-1"]');
-               await click('.fhcs-inspiration-stars [data-delta="-1"]');
+               const places = () => JSON.stringify(actor.getFlag('fhcs', 'inspirationSlots')?.filled ?? []);
+               // Any order (user, 2026-10-28): the leftmost first, then the rightmost, then spend the leftmost again.
+               await click('.fhcs-inspiration-stars [data-slot="0"]');
+               await until(() => feat.system.uses.value === 1 && places() === '[0]' && actor.system.attributes.inspiration === true,
+                  () => `the leftmost empty star banks itself and turns dnd5e's on; it holds ${uses()}, places ${places()}`);
+               await click('.fhcs-inspiration-stars [data-slot="2"]');
+               await until(() => feat.system.uses.value === 2 && places() === '[0,2]', () => `the rightmost banks too; it holds ${uses()}, places ${places()}`);
+               await click('.fhcs-inspiration-stars [data-slot="0"]');
+               await until(() => feat.system.uses.value === 1 && places() === '[2]', () => `the leftmost filled star spends itself; it holds ${uses()}, places ${places()}`);
+               await click('.fhcs-inspiration-bank-tray [data-slot="2"]');
                await until(() => feat.system.uses.value === 0 && actor.system.attributes.inspiration === false,
-                  () => `filled stars spend, and an empty bank turns dnd5e's off; it holds ${uses()}`);
+                  () => `the count's tray spends the last, and an empty bank turns dnd5e's off; it holds ${uses()}, places ${places()}`);
             }
             finally
             {
                await leaveEditMode();
                if (flag) { await actor.setFlag('fhcs', 'inspiration', flag); }
                else { await actor.unsetFlag('fhcs', 'inspiration'); }
+               await actor.unsetFlag('fhcs', 'inspirationSlots');
                await actor.update({ 'system.attributes.inspiration': inspired });
                await feat?.delete();
             }

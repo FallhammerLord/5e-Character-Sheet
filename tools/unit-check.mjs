@@ -5,7 +5,6 @@
 import { deepStrictEqual } from 'node:assert';
 import { describeRoll } from '../src/chat/outcome.js';
 import { appliedLines, cardParts, damageBand, saveRow } from '../src/chat/card.js';
-import { sparkDelay } from '../src/apps/sparks.js';
 import { countingDie, d20Row, modeForSides } from '../src/chat/d20.js';
 import { diceMath } from '../src/chat/math.js';
 import { attributesView } from '../src/sheet/attributes.js';
@@ -206,11 +205,6 @@ for (const [name, order, classes, original, expected] of ORDER_CASES)
    try { deepStrictEqual(got, expected); }
    catch { problems.push(`milestone track: got ${JSON.stringify(got)}, expected ${JSON.stringify(expected)}`); }
 }
-// Forge's sparks (user, 2026-10-28): a minute at least, then 1d6 × 10 seconds.
-{
-   const got = [1, 6].map((pip) => sparkDelay(() => pip));
-   if (got.join() !== '70000,120000') { problems.push(`spark timing: ${got}`); }
-}
 // What Apply did, in words (user, 2026-10-28): each type when damage is split, healing, temp HP, none, an effect.
 {
    const slash = { type: 'slashing', label: 'Slashing', value: 9 };
@@ -254,25 +248,27 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    if (got !== '644 644 657 700 720 720 733 800 850 1024') { problems.push(`comfort widths: ${got}`); }
 }
 
-// Inspiration (SCOPE §4.12): one star without a bank; a star per use with one, filled from the right, filled ones
-// spend and empty ones bank;
-// a bank over five shows only the count; edit mode's tray lists the items with uses, the one banking it pressed.
+// Inspiration (SCOPE §4.12): one star without a bank; a star per use with one, any place filled or empty as stored
+// (user, 2026-10-28: any order), filling from the right when nothing is stored; a bank over five shows only the
+// count; edit mode's tray lists the items with uses, the one banking it pressed.
 {
    const item = { id: 'h', uuid: 'Actor.a.Item.h', name: 'Heroic', img: '' };
    const mode = { canEdit: true, editing: false };
    const i18n = { localize, format };
    const none = inspirationBar({ on: true, bank: null, linkable: [item] }, mode, i18n);
    if (none.bank || none.count !== 1 || none.link) { problems.push(`inspiration without a bank: ${JSON.stringify(none)}`); }
-   const bank = inspirationBar({ on: true, bank: { link: item, value: 2, max: 4 }, linkable: [item] }, mode, i18n);
-   const stars = bank.stars.map((x) => `${x.filled ? '*' : 'o'}${x.delta}${x.last ? '!' : ''}`).join(' ');
-   if (stars !== 'o1 o1 *-1! *-1' || bank.onlyCompact || bank.count !== 2) { problems.push(`inspiration bank 2 of 4: ${stars}, compact ${bank.onlyCompact}`); }
+   const draw = (view) => view.stars.map((x) => `${x.slot}${x.filled ? '*' : 'o'}${x.last ? '!' : ''}${x.cooled ? '_' : ''}`).join(' ');
+   const fresh = inspirationBar({ on: true, bank: { link: item, value: 2, max: 4 }, linkable: [item] }, mode, i18n);
+   if (draw(fresh) !== '0o 1o_ 2*! 3*' || fresh.onlyCompact || fresh.count !== 2) { problems.push(`inspiration bank 2 of 4, nothing stored: ${draw(fresh)}`); }
+   const mixed = inspirationBar({ on: true, bank: { link: item, value: 2, max: 4, filled: [true, false, true, false] }, linkable: [item] }, mode, i18n);
+   if (draw(mixed) !== '0*! 1o 2* 3o_') { problems.push(`inspiration bank with places 0 and 2 filled: ${draw(mixed)}`); }
    const big = inspirationBar({ on: true, bank: { link: item, value: 6, max: 8 }, linkable: [item] }, mode, i18n);
-   if (!big.onlyCompact || big.stars.length || big.add.can !== true || big.spend.can !== true) { problems.push(`inspiration bank 6 of 8: ${JSON.stringify(big)}`); }
-   const empty = inspirationBar({ on: false, bank: { link: item, value: 0, max: 3 }, linkable: [item] }, { canEdit: true, editing: true }, i18n);
-   const options = empty.link?.options.map((o) => `${o.id || 'own'}:${o.on}`).join(' ');
-   if (empty.spend.can || options !== 'own:false h:true') { problems.push(`inspiration empty bank in edit mode: spend ${empty.spend.can}, options ${options}`); }
+   if (!big.onlyCompact || big.stars.length !== 8) { problems.push(`inspiration bank 6 of 8: compact ${big.onlyCompact}, ${big.stars.length} stars for its tray`); }
+   const editing = inspirationBar({ on: false, bank: { link: item, value: 0, max: 3 }, linkable: [item] }, { canEdit: true, editing: true }, i18n);
+   const options = editing.link?.options.map((o) => `${o.id || 'own'}:${o.on}`).join(' ');
+   if (options !== 'own:false h:true') { problems.push(`inspiration's link tray in edit mode: ${options}`); }
    const observer = inspirationBar({ on: true, bank: { link: item, value: 1, max: 3 }, linkable: [] }, { canEdit: false, editing: false }, i18n);
-   if (observer.stars.some((x) => x.can) || observer.add.can) { problems.push('inspiration: an observer can change the bank'); }
+   if (observer.stars.some((x) => x.can)) { problems.push('inspiration: an observer can change the bank'); }
 }
 
 // Attributes: every passive, every trait in both modes, favorites grouped in Classic's order with slot pips.

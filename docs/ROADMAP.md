@@ -120,6 +120,15 @@ Second pass, from the user's play (2026-10-28):
 - [x] 12. Forge portrait hover heats and gleams like every frame, instead of dimming
 - [x] 13. Inspiration's on and off moments, each theme its own (Forge: stamped hot, cooling off)
 
+Third pass, from the user's play (2026-10-28):
+
+- [x] 14. Theme picker works: a title-bar button, its tray hung from the window
+- [x] 15. Inspiration in any order (the star clicked); narrow or big banks a roomy chip with a tray of stars
+- [x] 16. Forge's sparks only on inspiration gain (rule: big effects answer events, never timers)
+- [ ] 17. Panel gleam follows the pointer (not the portrait); no texture under item entries
+- [ ] 18. Traits' fold bar a whole-bar button; species and background wrap
+- [ ] 19. Categories: reorder and custom ones, every tab
+
 ## Phase 6.6: Themes (user, 2026-10-28; SCOPE §4.11)
 
 - [x] 1. Theme layer: `data-fhcs-theme` on the sheet, `fhcs-frame` on every panel, the four themes in light and dark (colors, frames, decals, motion); layout cases per theme; mockup page for the user (built 2026-10-28; waits on the user's review of `tools/theme-mockup.mjs`'s page)

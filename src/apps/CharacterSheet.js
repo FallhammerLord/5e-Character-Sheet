@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES } from '../constants.js';
-import { attributesFacts, biographyFacts, changeHp, changeInspiration, inspirationFacts, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, changeHp, inspirationFacts, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, renderTemplate, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
@@ -9,7 +9,7 @@ import { effectsView } from '../sheet/effects.js';
 import { biographyView } from '../sheet/biography.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
 import { comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, tabRow, themePicker } from '../sheet/header.js';
-import { scheduleSparks, stopSparks } from './sparks.js';
+import { inspirationGained } from './sparks.js';
 import { delayTips, keepFolds } from '../chat/card.js';
 import { startFraming } from './framing.js';
 
@@ -253,10 +253,15 @@ function linkResourceAction(event, target)
    return linkResource(this.actor, target.dataset.key, target.dataset.itemId);
 }
 
-/** The inspiration bar (SCOPE §4.12): a filled star spends one, an empty one banks one. */
+/**
+ * The inspiration bar (SCOPE §4.12): the star clicked is spent if filled, banked if empty (user, 2026-10-28: any
+ * order). The sheet remembers which, so the redraw's moment lands on that star.
+ */
 function inspirationAction(event, target)
 {
-   return changeInspiration(this.actor, Number(target.dataset.delta));
+   const slot = Number(target.dataset.slot);
+   this.element.dataset.fhcsInspireSlot = String(slot);
+   return setInspirationSlot(this.actor, slot);
 }
 
 /** The inspiration gear's tray: bank inspiration in an item's uses, or back to dnd5e's on or off. */
@@ -276,12 +281,20 @@ function inspirationMoment(element)
    if (!bar) { return; }
    const count = Number(bar.dataset.fhcsCount) || 0;
    const before = element.dataset.fhcsInspired;
+   const slot = element.dataset.fhcsInspireSlot;
    element.dataset.fhcsInspired = String(count);
    if (before === undefined || count === Number(before)) { return; }
-   const moment = count > Number(before) ? 'fhcs-moment-inspire' : 'fhcs-moment-uninspire';
+   delete element.dataset.fhcsInspireSlot;
+   const gained = count > Number(before);
+   // The star clicked, in the row and in the count's tray; else where a gain or spend from elsewhere shows.
+   const stars = slot !== undefined ? bar.querySelectorAll(`.fhcs-star[data-slot="${slot}"]`)
+      : bar.querySelectorAll(gained ? '.fhcs-star-last' : '.fhcs-star-cooled');
+   for (const star of stars) { star.classList.add('fhcs-star-moment'); }
+   const moment = gained ? 'fhcs-moment-inspire' : 'fhcs-moment-uninspire';
    element.classList.remove('fhcs-moment-inspire', 'fhcs-moment-uninspire');
    element.classList.add(moment);
    setTimeout(() => element.classList.remove(moment), MOMENT_MS);
+   if (gained) { inspirationGained(element); }
 }
 
 /** A resource panel's Restore: uses back to most. */
@@ -592,13 +605,6 @@ export function makeCharacterSheet(Base)
       }
 
       /** @inheritDoc */
-      _onClose(options)
-      {
-         super._onClose(options);
-         stopSparks(this.element);
-      }
-
-      /** @inheritDoc */
       async _onRender(context, options)
       {
          await super._onRender(context, options);
@@ -609,7 +615,6 @@ export function makeCharacterSheet(Base)
          wireResourceUses(this.element, this.actor);
          themeState(this.element, this.actor);
          inspirationMoment(this.element);
-         scheduleSparks(this.element);
          await drawThemePicker(this);
          const items = this.element.querySelector('.fhcs-inventory .fhcs-items');
          if (items && !items.dataset.fhcsWatched)

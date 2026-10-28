@@ -300,9 +300,9 @@ export const INSPIRATION_STARS = 5;
 
 /**
  * The inspiration bar at the tab row's right, before the lock (SCOPE §4.12, user 2026-10-28). Without a bank, one star:
- * dnd5e's on or off. With one, a star per use, filled ones banked and filling from the right: a click on a filled star spends one, on an empty
- * star banks one. A count with spend and bank buttons ("compact") stands in when the bank is bigger than the stars
- * drawn, and in a narrow row (styles). Edit mode adds a gear whose tray picks the item that banks it.
+ * dnd5e's on or off. With one, a star per use, filled ones banked: a click on a filled star spends it, on an empty
+ * star banks it, in any order. A count ("compact") stands in when the bank is bigger than the stars drawn, and in a
+ * narrow row (styles); its tray holds the stars. Edit mode adds a gear whose tray picks the item that banks it.
  * @param {{on: boolean, bank: object|null, linkable: object[]}} facts  From `compat.inspirationFacts`.
  * @param {{canEdit: boolean, editing: boolean}} mode
  */
@@ -320,17 +320,14 @@ export function inspirationBar(facts, { canEdit, editing }, { localize, format }
       view.max = bank.max;
       view.name = bank.link.name;
       view.countLabel = format('FHCS.Inspiration.Count', { value: bank.value, max: bank.max, name: bank.link.name });
-      view.spend = { label: spend, can: canEdit && bank.value > 0 };
-      view.add = { label: add, can: canEdit && bank.value < bank.max };
+      // A bank too big for the row shows only its count, whose tray holds every star.
       view.onlyCompact = bank.max > INSPIRATION_STARS;
-      // Filled from the right, by the lock (user, 2026-10-28): the newest banked is the leftmost filled.
-      const empty = bank.max - bank.value;
-      view.stars = view.onlyCompact ? [] : Array.from({ length: bank.max }, (_, i) =>
-      {
-         const filled = i >= empty;
-         // The newest banked, and the one spent last (the empty one by it): where gain and spend show their moments.
-         return { filled, last: filled && i === empty, cooled: !filled && i === empty - 1, delta: filled ? -1 : 1, label: filled ? spend : add, can: canEdit };
-      });
+      // Any place may be spent or banked, the one clicked (user, 2026-10-28). Without a click to follow, a gain or a
+      // spend shows its moment on the leftmost filled place or the rightmost empty one.
+      const filled = bank.filled ?? Array.from({ length: bank.max }, (_, i) => i >= bank.max - bank.value);
+      const lastOn = filled.indexOf(true);
+      const lastOff = filled.lastIndexOf(false);
+      view.stars = filled.map((on, slot) => ({ slot, filled: on, last: slot === lastOn, cooled: slot === lastOff, label: on ? spend : add, can: canEdit }));
    }
    if (editing)
    {

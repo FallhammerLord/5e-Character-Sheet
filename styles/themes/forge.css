@@ -247,10 +247,10 @@
    --fhcs-inspire-off: fhcs-forge-cool 600ms ease-in;
    --fhcs-inspire-off-glow: fhcs-forge-cool-glow 600ms ease-in;
 }
-.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-inspiration-stars > :nth-last-child(2) { --fhcs-mark: var(--fhcs-theme-rune-2); --fhcs-mark-on: var(--fhcs-theme-rune-2-on); }
-.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-inspiration-stars > :nth-last-child(3) { --fhcs-mark: var(--fhcs-theme-rune-3); --fhcs-mark-on: var(--fhcs-theme-rune-3-on); }
-.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-inspiration-stars > :nth-last-child(4) { --fhcs-mark: var(--fhcs-theme-rune-4); --fhcs-mark-on: var(--fhcs-theme-rune-4-on); }
-.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-inspiration-stars > :nth-last-child(5) { --fhcs-mark: var(--fhcs-theme-rune-5); --fhcs-mark-on: var(--fhcs-theme-rune-5-on); }
+.fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-inspiration-stars, .fhcs-tray-stars) > :nth-last-child(2) { --fhcs-mark: var(--fhcs-theme-rune-2); --fhcs-mark-on: var(--fhcs-theme-rune-2-on); }
+.fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-inspiration-stars, .fhcs-tray-stars) > :nth-last-child(3) { --fhcs-mark: var(--fhcs-theme-rune-3); --fhcs-mark-on: var(--fhcs-theme-rune-3-on); }
+.fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-inspiration-stars, .fhcs-tray-stars) > :nth-last-child(4) { --fhcs-mark: var(--fhcs-theme-rune-4); --fhcs-mark-on: var(--fhcs-theme-rune-4-on); }
+.fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-inspiration-stars, .fhcs-tray-stars) > :nth-last-child(5) { --fhcs-mark: var(--fhcs-theme-rune-5); --fhcs-mark-on: var(--fhcs-theme-rune-5-on); }
 
 @keyframes fhcs-forge-stamp
 {

@@ -4,24 +4,22 @@
  * speed, angle, size and life, falling under gravity and cooling from white-gold to red as it goes; drawn on a canvas
  * over the content that never takes a click.
  *
- * Timing (user, 2026-10-28): no more than one burst a minute, then 1d6 × 10 seconds more, so 70 to 120 seconds apart.
- * No burst while the player's Motion setting or the system's reduced motion says keep still, or at 0 HP; fewer and
- * dimmer sparks as HP falls (the hearth's heat).
+ * When (user, 2026-10-28, replacing a burst every 70 to 120 seconds): only when inspiration is gained, and that is the
+ * rule for a theme's big effects (SCOPE §5.3 rule 6): they answer an event, never a timer. No burst while the
+ * player's Motion setting or the system's reduced motion says keep still, or at 0 HP; fewer and dimmer sparks as HP
+ * falls (the hearth's heat).
  *
  * Plain DOM and canvas, no Foundry: the theme viewer (tools/theme-mockup.mjs) runs the same code.
  */
 
-/** The least time between bursts, then each die pip adds this much. */
-const MIN_GAP_MS = 60000;
-const PIP_MS = 10000;
 /** How long a burst emits, and the longest a spark lives. */
 const EMIT_S = 0.35;
 const LIFE_S = [1.0, 2.2];
 
-/** @returns {number} Milliseconds to the next burst: a minute, then 1d6 × 10 seconds. */
-export function sparkDelay(d6 = () => 1 + Math.floor(Math.random() * 6))
+/** A theme's answer to inspiration gained: Forge sprays sparks. */
+export function inspirationGained(element)
 {
-   return MIN_GAP_MS + d6() * PIP_MS;
+   if (element.dataset.fhcsTheme === 'forge') { sparkBurst(element); }
 }
 
 /** Whether the sheet may move now. */
@@ -29,34 +27,6 @@ function mayMove(element)
 {
    if (element.dataset.fhcsMotion === 'off' || element.dataset.fhcsHp === 'down') { return false; }
    return !globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-}
-
-/**
- * Keeps a Forge sheet's sparks scheduled; call after each render. Stops them when the sheet wears another theme or
- * has left the page.
- * @param {HTMLElement} element  The sheet's window element (it keeps its timer across renders).
- */
-export function scheduleSparks(element)
-{
-   if (element.dataset.fhcsTheme !== 'forge') { stopSparks(element); return; }
-   if (element.fhcsSparkTimer) { return; }
-   const next = () =>
-   {
-      element.fhcsSparkTimer = setTimeout(() =>
-      {
-         if (!element.isConnected) { stopSparks(element); return; }
-         sparkBurst(element);
-         next();
-      }, sparkDelay());
-   };
-   next();
-}
-
-/** Cancels the next burst. */
-export function stopSparks(element)
-{
-   clearTimeout(element.fhcsSparkTimer);
-   element.fhcsSparkTimer = null;
 }
 
 /** A spark's colour by how far through its life it is: white-gold, gold, orange, then a dull red as it dies. */
