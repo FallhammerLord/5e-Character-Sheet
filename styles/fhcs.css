@@ -1044,7 +1044,6 @@
 }
 
 .fhcs-sheet .fhcs-header-row .fhcs-line { flex: 1; }
-.fhcs-sheet .fhcs-nowrap { white-space: nowrap; }
 /* dnd5e shows and hides the HP field and its label with `hidden`; our display rules must not undo it. */
 .fhcs-sheet .fhcs-header [hidden] { display: none; }
 .fhcs-sheet .fhcs-muted { color: var(--fhcs-muted); }
@@ -1176,7 +1175,7 @@
 .fhcs-sheet .fhcs-status > * { flex: none; }
 .fhcs-sheet .fhcs-status > details { position: static; display: flex; }
 /* On the panels' underlay, not solid ink (user, 2026-10-28): the fill, an edge, ink marks. */
-.fhcs-sheet :is(.fhcs-status > .fhcs-chip, .fhcs-status > details > summary) { border: 0; border-radius: 0; background: var(--fhcs-fill); color: var(--fhcs-ink); }
+.fhcs-sheet :is(.fhcs-status > .fhcs-chip, .fhcs-status > details > summary) { border: 0; border-radius: 0; }
 .fhcs-sheet .fhcs-status { box-sizing: border-box; border: 1px solid var(--fhcs-line); border-radius: var(--fhcs-radius); }
 .fhcs-sheet .fhcs-status > * + * { border-left: 1px solid var(--fhcs-line); }
 .fhcs-sheet .fhcs-status > :first-child, .fhcs-sheet .fhcs-status > :first-child > summary { border-radius: var(--fhcs-radius) 0 0 var(--fhcs-radius); }
@@ -1220,7 +1219,8 @@
 .fhcs-sheet .fhcs-exhaustion-dot:hover .fhcs-dot-chip { visibility: visible; transition: visibility 0s linear 1.5s; }
 .fhcs-sheet :is(.fhcs-exhaustion-dot:focus-visible, details[open] > .fhcs-exhaustion-dot) .fhcs-dot-chip { visibility: visible; }
 
-/* Chips: solid, the size of a control, on the portrait's corners. */
+/* Chips, the size of a control, on the panels' underlay: the fill, an edge, ink marks (user, 2026-10-28: one look for
+   every chip, the status bar's, not solid ink on the art). On is a filled mark. */
 .fhcs-sheet .fhcs-chip
 {
    display: inline-flex;
@@ -1231,10 +1231,10 @@
    height: var(--fhcs-control);
    margin: 0;
    padding: 0 var(--fhcs-s1);
-   border: 1px solid var(--fhcs-die-ink);
+   border: 1px solid var(--fhcs-line);
    border-radius: var(--fhcs-radius);
-   background: var(--fhcs-die-ink);
-   color: var(--fhcs-die-on-ink);
+   background: var(--fhcs-fill);
+   color: var(--fhcs-ink);
    font-family: inherit;
    list-style: none;
    cursor: pointer;
@@ -1244,11 +1244,8 @@
 .fhcs-sheet .fhcs-chip-static { cursor: default; }
 .fhcs-sheet .fhcs-chip.fhcs-on .fhcs-icon { fill: currentColor; }
 
-.fhcs-sheet :is(.fhcs-corner-tl, .fhcs-corner-tr, .fhcs-corner-bl, .fhcs-corner-br) { position: absolute; }
-.fhcs-sheet .fhcs-corner-tl { top: var(--fhcs-s1); left: var(--fhcs-s1); }
-.fhcs-sheet .fhcs-corner-tr { top: var(--fhcs-s1); right: var(--fhcs-s1); }
-.fhcs-sheet .fhcs-corner-bl { bottom: var(--fhcs-s1); left: var(--fhcs-s1); }
-.fhcs-sheet .fhcs-corner-br { bottom: var(--fhcs-s1); right: var(--fhcs-s1); }
+/* Inspiration, the one chip left on the art, at its top right. */
+.fhcs-sheet .fhcs-corner-tr { position: absolute; top: var(--fhcs-s1); right: var(--fhcs-s1); }
 
 /* A fold-out tray: opens beside its chip, over what's below. */
 .fhcs-sheet .fhcs-fold { z-index: 2; }
@@ -1268,16 +1265,19 @@
    box-shadow: 0 4px 12px rgb(0 0 0 / 25%);
 }
 
-.fhcs-sheet .fhcs-corner-bl .fhcs-tray { top: auto; bottom: calc(100% + var(--fhcs-s1)); }
 .fhcs-sheet .fhcs-tray-row { flex-direction: row; }
 
 /* An unfilled exhaustion level: outlined, not solid. */
+/* In a tray of choices (exhaustion levels, the portrait's options), on is solid and off is an outline: a filled mark
+   alone wouldn't tell the levels apart. */
 .fhcs-sheet .fhcs-tray .fhcs-chip:not(.fhcs-on)
 {
    background: transparent;
    color: inherit;
    border-color: var(--fhcs-line);
 }
+
+.fhcs-sheet .fhcs-tray .fhcs-chip.fhcs-on { border-color: var(--fhcs-die-ink); background: var(--fhcs-die-ink); color: var(--fhcs-die-on-ink); }
 
 /* Buttons and fields. */
 .fhcs-sheet .fhcs-button,
