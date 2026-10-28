@@ -2033,6 +2033,14 @@
 .fhcs-sheet .fhcs-traits-panel { border-radius: var(--fhcs-radius); background: var(--fhcs-fill); }
 .fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head { gap: var(--fhcs-s2); }
 .fhcs-sheet .fhcs-traits-panel .fhcs-group-toggle { flex: none; }
+/* The whole bar is the fold button (user, 2026-10-28: the focus box covered only the word): the button's target
+   stretches over the bar, the folded summary beside it too, and its focus box is drawn on the bar. The summary stays
+   outside the button, so one control holds one text size (rule 17). */
+.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head { position: relative; }
+.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head > .fhcs-group-toggle::after { content: ''; position: absolute; inset: 0; }
+.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head > .fhcs-group-toggle:is(:hover, :focus, :focus-visible) { outline: none; box-shadow: none; background: none; }
+.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head:has(> .fhcs-group-toggle:focus-visible) { outline: 2px solid var(--fhcs-ink); outline-offset: -2px; }
+.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head > .fhcs-traits-summary { pointer-events: none; }
 .fhcs-sheet .fhcs-traits-summary { flex: 1; }
 
 .fhcs-sheet .fhcs-traits
@@ -3103,6 +3111,7 @@
 .fhcs-sheet .fhcs-origin-name
 {
    display: block;
+   height: auto;
    min-width: 0;
    min-height: 24px;
    margin: 0;
@@ -3121,7 +3130,7 @@
 .fhcs-sheet .fhcs-origin-name:hover { text-decoration: underline; }
 /* Species and background names, in display like a class's (user, 2026-10-28), wrap rather than cut: at 644px
    "Dragonborn" is wider than its card, so a long word breaks with a hyphen (Foundry sets the page's language). */
-.fhcs-sheet .fhcs-origin-card:not(.fhcs-class-card) .fhcs-origin-name { white-space: normal; hyphens: auto; overflow-wrap: break-word; }
+.fhcs-sheet .fhcs-origin-card:not(.fhcs-class-card) .fhcs-origin-name { height: auto; white-space: normal; hyphens: auto; overflow-wrap: break-word; }
 /* Edit mode: a species or background's × sits in the card's bottom right, where a class card's "+N" sits, so the name
    lies out as in play mode (rule 6). The card, not the text column, places it. */
 .fhcs-sheet .fhcs-origin-card:not(.fhcs-class-card) > .fhcs-origin-text { position: static; }
