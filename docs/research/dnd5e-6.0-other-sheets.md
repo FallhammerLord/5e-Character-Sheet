@@ -42,3 +42,15 @@ where dnd5e's markup mixes more.
 
 Ours already (Track R); left from Phase 6.6: cards in the world theme, with a world setting to keep them plain
 (SCOPE §5.3 rule 10).
+
+## The item sheet, closer (2026-10-28)
+
+- **dnd5e's header** (`templates/items/header.hbs`): the icon (`editImage` / `showIcon`), the name (a field when
+  editable), type-specific subtitles (fields in edit mode, words otherwise; hidden while unidentified), and for physical
+  items quantity, weight and price (price only once identified, or for the GM).
+- **dnd5e's body:** description, details (one template per type, `templates/items/details/details-*.hbs`, 16 of them,
+  built from `formInput` and dnd5e's helpers), activities, effects, advancement; 1,312 lines of templates in all.
+- **Tidy Classic** (`src/sheets/classic/item/`): one sheet per type sharing parts. Header: the picture, the name, the
+  type, a summary line (type, rarity, source), and toggles (equipped, attuned, identified). Description tab: a narrow
+  left column of properties (quantity, weight, price, property tags) beside the description. Details tab: the type's
+  form, with shared field parts (activation, damage, duration, range, targets, uses).
