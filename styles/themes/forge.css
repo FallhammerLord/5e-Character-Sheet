@@ -392,20 +392,28 @@
    box-shadow: 0 -2px 10px -2px var(--fhcs-theme-fire), inset 0 0 0 1px var(--fhcs-theme-edge);
 }
 
-/* Hammered metal: a faint grain on every frame (4%, under the texture limit), and a temper sheen along its top rim. */
+/* Hammered metal: a faint grain on every frame (5% at most), and a temper sheen along its top rim. The sheen sits
+   under the pointer while it moves over the frame (user, 2026-10-28, replacing a gleam that ran across once):
+   `--fhcs-gleam-x` is the pointer's place in px, set by the sheet; the sheen, half the frame wide, is centred on it
+   (in background-position, a percentage counts against the frame less the sheen, so `x - 50%` centres it; unset,
+   `100% - 50%` puts it mid-frame). A frame holding item entries has no grain (user, 2026-10-28: it read as rocks
+   behind the rows); that is the rule for every theme (SCOPE §5.3). */
 .fhcs-sheet[data-fhcs-theme="forge"] .fhcs-frame:not(.fhcs-portrait)
 {
+   --fhcs-frame-texture: var(--fhcs-theme-grain);
    background-image:
       var(--fhcs-theme-temper),
       radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
       radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
       radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
       radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
-      var(--fhcs-theme-grain);
-   background-position: 50% 0, 0 0, 100% 0, 0 100%, 100% 100%, 0 0;
+      var(--fhcs-frame-texture);
+   background-position: calc(var(--fhcs-gleam-x, 100%) - 50%) 0, 0 0, 100% 0, 0 100%, 100% 100%, 0 0;
    background-size: 50% 2px, 8px 8px, 8px 8px, 8px 8px, 8px 8px, 96px 96px;
    background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, repeat;
 }
+
+.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-frame:has(.fhcs-favorites, .fhcs-items, .fhcs-item) { --fhcs-frame-texture: none; }
 
 /* Bloodied: the window band's seams glow red-hot. Down: frost of ash on the band and the frames. */
 .fhcs-sheet[data-fhcs-theme="forge"][data-fhcs-hp="bloodied"] .window-content::after
@@ -476,11 +484,6 @@
    .fhcs-sheet[data-fhcs-theme="forge"]:not([data-fhcs-motion="off"]) .fhcs-frame:hover
    {
       box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 10%, transparent), 0 0 6px var(--fhcs-theme-glow);
-   }
-   /* Hover: the temper sheen gleams along the rim, once. */
-   .fhcs-sheet[data-fhcs-theme="forge"]:not([data-fhcs-motion="off"]) .fhcs-frame:not(.fhcs-portrait):hover
-   {
-      animation: fhcs-forge-gleam 0.3s ease-out;
    }
    /* The portrait answers hover as every frame does (user, 2026-10-28: it dimmed, since the frames' hover glow took the
       place of its hearth light): the arch's rim heats, and a temper gleam crosses the art once, left to right. */
@@ -556,12 +559,6 @@
    to { background-position: -20% 0; }
 }
 
-@keyframes fhcs-forge-gleam
-{
-   /* The sheen is half the rim's width: -100% puts it off the left, 300% off the right. */
-   from { background-position: -100% 0, 0 0, 100% 0, 0 100%, 100% 100%, 0 0; }
-   to { background-position: 300% 0, 0 0, 100% 0, 0 100%, 100% 100%, 0 0; }
-}
 
 /* ---------- Chat cards in Forge (the world's theme, SCOPE §5.3 rule 10; user, 2026-10-28) ----------
    The message a riveted iron plate with the temper sheen along its top and the hammered grain, warmed faintly at its

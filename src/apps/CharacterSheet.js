@@ -297,6 +297,40 @@ function inspirationMoment(element)
    if (gained) { inspirationGained(element); }
 }
 
+/**
+ * A frame's gleam follows the pointer (user, 2026-10-28; SCOPE §5.3): the pointer's place across the frame under it,
+ * as `--fhcs-gleam-x`, for a theme to draw its sheen at. Bound once per window; one write a frame at most; nothing
+ * under Motion off or reduced motion; the portrait keeps its own gleam.
+ */
+function followPointer(element)
+{
+   if (element.dataset.fhcsGleam) { return; }
+   element.dataset.fhcsGleam = 'on';
+   let frame = null;
+   let pending = null;
+   element.addEventListener('pointermove', (event) =>
+   {
+      pending = event;
+      requestAnimationFrame(() =>
+      {
+         if (!pending) { return; }
+         const { target, clientX } = pending;
+         pending = null;
+         const still = element.dataset.fhcsMotion === 'off' || globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+         const next = still ? null : target.closest?.('.fhcs-frame:not(.fhcs-portrait)');
+         if (frame && frame !== next) { frame.style.removeProperty('--fhcs-gleam-x'); }
+         frame = next;
+         if (frame) { frame.style.setProperty('--fhcs-gleam-x', `${Math.round(clientX - frame.getBoundingClientRect().left)}px`); }
+      });
+   });
+   element.addEventListener('pointerleave', () =>
+   {
+      pending = null;
+      frame?.style.removeProperty('--fhcs-gleam-x');
+      frame = null;
+   });
+}
+
 /** A resource panel's Restore: uses back to most. */
 function refreshResourceAction(event, target)
 {
@@ -615,6 +649,7 @@ export function makeCharacterSheet(Base)
          wireResourceUses(this.element, this.actor);
          themeState(this.element, this.actor);
          inspirationMoment(this.element);
+         followPointer(this.element);
          await drawThemePicker(this);
          const items = this.element.querySelector('.fhcs-inventory .fhcs-items');
          if (items && !items.dataset.fhcsWatched)

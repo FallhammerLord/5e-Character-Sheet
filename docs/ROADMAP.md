@@ -125,7 +125,7 @@ Third pass, from the user's play (2026-10-28):
 - [x] 14. Theme picker works: a title-bar button, its tray hung from the window
 - [x] 15. Inspiration in any order (the star clicked); narrow or big banks a roomy chip with a tray of stars
 - [x] 16. Forge's sparks only on inspiration gain (rule: big effects answer events, never timers)
-- [ ] 17. Panel gleam follows the pointer (not the portrait); no texture under item entries
+- [x] 17. Panel gleam follows the pointer (not the portrait); no texture under item entries
 - [ ] 18. Traits' fold bar a whole-bar button; species and background wrap
 - [ ] 19. Categories: reorder and custom ones, every tab
 
