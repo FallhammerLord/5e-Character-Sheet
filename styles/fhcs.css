@@ -1948,6 +1948,7 @@
 
 .fhcs-sheet .fhcs-resource
 {
+   position: relative;
    display: flex;
    flex-direction: column;
    justify-content: space-between;
@@ -1959,25 +1960,49 @@
    background: var(--fhcs-surface);
 }
 
-.fhcs-sheet :is(.fhcs-resource-head, .fhcs-resource-foot) { display: flex; align-items: center; gap: var(--fhcs-s1); min-width: 0; min-height: 24px; }
+/* A linked item's art fills the panel behind its text (user, 2026-10-28). 15%, not the header cards' 25%: the labels
+   sit centred over it, and muted text over pure white art (dark) or pure black (light) keeps 4.9:1 and 5.5:1. */
+.fhcs-sheet .fhcs-resource-art { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; pointer-events: none; }
+.fhcs-sheet .fhcs-resource-art > img { width: 100%; height: 100%; border: 0; object-fit: cover; opacity: 0.15; }
+.fhcs-sheet .fhcs-resource > :not(.fhcs-resource-art) { position: relative; }
+
+/* Labels centred in the panel (user, 2026-10-28); the cog and Restore keep the right edge, a matching blank the left. */
+.fhcs-sheet :is(.fhcs-resource-head, .fhcs-resource-foot)
+{
+   display: grid;
+   grid-template-columns: 24px minmax(0, 1fr) 24px;
+   align-items: center;
+   gap: var(--fhcs-s1);
+   min-width: 0;
+   min-height: 24px;
+}
+
+.fhcs-sheet :is(.fhcs-resource-head, .fhcs-resource-foot) > :first-child { grid-column: 2; }
+/* Edit mode's two checkboxes need the blank's width at 644px; they centre in what's left of Restore. */
+.fhcs-sheet .fhcs-resource-foot:has(input) { grid-template-columns: minmax(0, 1fr) 24px; }
+.fhcs-sheet .fhcs-resource-foot:has(input) > :first-child { grid-column: 1; }
+.fhcs-sheet .fhcs-resource-head:not(:has(.fhcs-resource-link)) { grid-template-columns: minmax(0, 1fr); }
+.fhcs-sheet .fhcs-resource-head:not(:has(.fhcs-resource-link)) > :first-child { grid-column: 1; }
 /* The name line holds two lines of body in both modes, so a wrapped name and edit mode's field keep the panels' size. */
 .fhcs-sheet .fhcs-resource-head { height: calc(2em * var(--fhcs-body-line)); font-size: var(--fhcs-body-size); }
 /* A panel's name wraps to a second line before it's cut (a third of the row is about 120px at 644). */
 .fhcs-sheet .fhcs-resource-name { display: -webkit-box; flex: 1; min-width: 0; overflow: hidden; overflow-wrap: break-word; text-align: left; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.fhcs-sheet .fhcs-resource-head > .fhcs-resource-name { text-align: center; }
 .fhcs-sheet .fhcs-resource-img { flex: none; width: 24px; height: 24px; border: 0; border-radius: var(--fhcs-radius); object-fit: cover; }
-.fhcs-sheet .fhcs-resource-head > .fhcs-resource-field { flex: 1; min-width: 0; height: 24px; min-height: 0; text-align: left; }
+.fhcs-sheet .fhcs-resource-head > .fhcs-resource-field { min-width: 0; height: 24px; min-height: 0; text-align: center; }
 
 /* Uses left / most, centred in the panel. */
 .fhcs-sheet .fhcs-resource-count { display: flex; align-items: center; justify-content: center; gap: var(--fhcs-s1); min-height: var(--fhcs-control); }
 .fhcs-sheet .fhcs-resource-count .fhcs-input { flex: 0 1 3rem; width: 3rem; min-width: 0; height: var(--fhcs-control); min-height: 0; text-align: center; }
 .fhcs-sheet .fhcs-resource-max { min-width: 1.5rem; text-align: left; }
 
-.fhcs-sheet .fhcs-resource-recovery { display: flex; flex: 1; align-items: center; gap: var(--fhcs-s1); min-width: 0; min-height: 24px; white-space: nowrap; }
+.fhcs-sheet .fhcs-resource-recovery { display: flex; justify-content: center; align-items: center; gap: var(--fhcs-s1); min-width: 0; min-height: 24px; white-space: nowrap; }
 /* Recovery in words (a linked item's periods can run long) gives way; the edit-mode checkboxes never do. */
-.fhcs-sheet .fhcs-resource-recovery:not(:has(input)) { display: block; overflow: hidden; text-overflow: ellipsis; line-height: 24px; }
+.fhcs-sheet .fhcs-resource-recovery:not(:has(input)) { display: block; overflow: hidden; text-align: center; text-overflow: ellipsis; line-height: 24px; }
 .fhcs-sheet .fhcs-resource-recovery label { display: inline-flex; align-items: center; gap: var(--fhcs-s1); cursor: pointer; }
 .fhcs-sheet .fhcs-resource-recovery input { width: 16px; height: 16px; margin: 0; }
-.fhcs-sheet .fhcs-resource-refresh { flex: none; width: 24px; height: 24px; }
+/* `.fhcs-toggle` in the selector outranks the toggle's own 28px box. */
+.fhcs-sheet .fhcs-toggle.fhcs-resource-refresh { flex: none; width: 24px; height: 24px; }
 
 /* The cog's tray: its own counter, then each item with uses; the one shown is pressed. */
 .fhcs-sheet .fhcs-resource-link { position: relative; flex: none; }

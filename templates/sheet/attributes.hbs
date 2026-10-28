@@ -95,8 +95,9 @@
          <ul class="fhcs-favorites fhcs-resources"{{#unless resourcesOpen}} hidden{{/unless}}>
             {{#each resources}}
             <li class="fhcs-resource{{#if linked}} fhcs-resource-linked{{/if}}" role="group" aria-label="{{ groupLabel }}" data-resource="{{ key }}">
+               {{!-- A linked item's art as the panel's underlay (user, 2026-10-28), as the header's cards carry theirs. --}}
+               {{#if link}}<span class="fhcs-resource-art" aria-hidden="true"><img src="{{ link.img }}" alt=""></span>{{/if}}
                <span class="fhcs-resource-head">
-                  {{#if link}}<img class="fhcs-resource-img" src="{{ link.img }}" alt="">{{/if}}
                   {{#if ../editing}}{{#unless linked}}
                   <input type="text" class="fhcs-input fhcs-body fhcs-resource-field" name="system.resources.{{ key }}.label" value="{{ label }}"
                          placeholder="{{ title }}" aria-label="{{ nameLabel }}">
