@@ -57,7 +57,7 @@ const page = (html) => `<!doctype html><html><head><meta charset="utf-8">
    /* Foundry's glow on the open tab and its box on a focused button (the user's screenshot, 2026-10-28). */
    nav.tabs [data-tab].active{text-shadow:0 0 10px #c33}button:focus{box-shadow:0 0 6px #c33}
    /* Foundry's window frame, roughly (v13/v14): a 36px title bar and padded content; ours must override both. */
-   .application .window-header{display:flex;flex:0 0 36px;align-items:center;padding:0 .5rem;border-bottom:1px solid #888}.application .window-content{padding:1rem}input[type=text],select{height:var(--input-height,2rem)}
+   .application{gap:1rem}.application .window-header{display:flex;flex:0 0 36px;align-items:center;padding:0 .5rem;border-bottom:1px solid #888}.application .window-content{padding:1rem}input[type=text],select{height:var(--input-height,2rem)}
    /* Foundry's form groups stretch each control across the row (the user's Special Traits screenshot, 2026-10-27). */
    .form-group{display:flex;flex-wrap:wrap;align-items:center;gap:4px}.form-group>label{flex:2}.form-fields{display:flex;flex:3;gap:4px}.form-fields>*{flex:1}.form-group>.hint{flex:0 0 100%}
    ${css}</style></head><body>${html}</body></html>`;

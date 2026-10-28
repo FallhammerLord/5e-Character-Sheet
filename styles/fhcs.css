@@ -863,6 +863,10 @@
    color: var(--fhcs-muted);
 }
 
+/* Foundry lays the window out as a column with a gap between the title bar and the content (the user's inspector,
+   2026-10-28: a purple hatched band, not selectable); the sheet starts right under the bar. */
+.fhcs-sheet:not(.minimized) { gap: 0; }
+
 /* Foundry's other title-bar buttons, and modules', wait in the ⋮ menu instead. */
 .fhcs-sheet:not(.minimized) > .window-header > .header-control:not([data-action="toggleControls"], [data-action="close"], .preparation-warnings) { display: none; }
 
