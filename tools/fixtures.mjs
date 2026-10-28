@@ -801,7 +801,8 @@ for (const c of CASES.filter((x) => x.sameRowsAs && !x.look))
    }
 }
 
-// The item sheet (SCOPE §4.13): a weapon, a spell and a feature, each in play and edit mode; a long name at 500px.
+// The item sheet (SCOPE §4.13): a weapon, a spell and a feature, each as a viewer reads it and as its owner edits it;
+// a long name at 500px.
 const ITEM_TABS = Object.fromEntries(['description', 'details', 'activities', 'effects']
    .map((id, i) => [id, { id, label: ['Description', 'Details', 'Activities', 'Effects'][i], active: id === 'description' }]));
 const ITEMS = {
@@ -826,10 +827,11 @@ const ITEMS = {
 };
 const itemSheet = (kind, { editing = false, ...over } = {}) =>
 {
-   const view = itemSheetView({ ...ITEMS[kind], editing, ...over }, { localize, format });
+   // No lock (SCOPE §4.13): an owner always edits, a viewer only reads; "editing" here is the owner's sheet.
+   const view = itemSheetView({ ...ITEMS[kind], editable: editing, editing, ...over }, { localize, format });
    const tab = { id: 'description', group: 'primary', cssClass: 'active' };
    return template('item/header')({ fhcsItem: view })
-      + template('sheet/tabs')({ fhcsTabs: tabRow(ITEM_TABS, { canEdit: true, editing }, localize, {}, []) })
+      + template('sheet/tabs')({ fhcsTabs: tabRow(ITEM_TABS, { canEdit: false, editing }, localize, {}, []) })
       + `<div class="tab-body">${template('item/description')({ fhcsItem: view, tab })}</div>`;
 };
 for (const kind of Object.keys(ITEMS))

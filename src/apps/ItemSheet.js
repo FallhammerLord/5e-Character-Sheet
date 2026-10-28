@@ -62,11 +62,24 @@ export function makeItemSheet(Base)
 {
    return class FHCSItemSheet extends Base
    {
+      // Resizable the usual way (user, 2026-10-28; dnd5e's own item sheet is not), a height to start from.
       static DEFAULT_OPTIONS = {
          classes: ['fhcs-sheet', 'fhcs-item-sheet'],
-         position: { width: 560 },
+         position: { width: 560, height: 640 },
+         window: { resizable: true },
          actions: { fhcsItemToggle: itemToggle }
       };
+
+      /**
+       * No lock: an item sheet is editable whenever Foundry says it is (the owner, outside a locked compendium:
+       * `DocumentSheetV2#isEditable`), as Foundry's own sheets are (user, 2026-10-28: "presumed editable"). dnd5e's
+       * play mode would disable every field; ours always opens in its edit mode for whoever may edit.
+       */
+      _configureRenderOptions(options)
+      {
+         if (this.isEditable) { options.mode = this.constructor.MODES?.EDIT ?? options.mode; }
+         super._configureRenderOptions(options);
+      }
 
       static PARTS = itemParts(Base.PARTS);
 
@@ -89,7 +102,8 @@ export function makeItemSheet(Base)
          if (partId === 'tabs')
          {
             // dnd5e's own tab names (an item's Details is not the character's Attributes); the lock at the row's end.
-            context.fhcsTabs = tabRow(context.tabs, { canEdit: this.isEditable, editing: this.isEditMode }, i18n.localize, {}, []);
+            // No lock (`canEdit: false` draws none): see `_configureRenderOptions`.
+            context.fhcsTabs = tabRow(context.tabs, { canEdit: false, editing: this.isEditMode }, i18n.localize, {}, []);
          }
          return context;
       }

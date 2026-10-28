@@ -3456,3 +3456,7 @@
 .fhcs-item-sheet .fhcs-item-text :is(p, li, ul, ol, h1, h2, h3, h4, blockquote):last-child { margin-bottom: 0; }
 /* Headings inside a description keep the body size, bold: emphasis by weight within body text, not a fourth style. */
 .fhcs-item-sheet .fhcs-item-text :is(h1, h2, h3, h4) { font-weight: bold; border: 0; }
+/* Foundry's Font Awesome marks in the item header's toggles, at our icons' size. */
+.fhcs-item-sheet .fhcs-item-toggle > .fhcs-fa { font-size: 14px; line-height: 1; }
+/* Breathing room inside the item window (user, 2026-10-28), at the sides and foot; the header keeps its top. */
+.fhcs-item-sheet > .window-content { padding: 0 var(--fhcs-s2) var(--fhcs-s2); }

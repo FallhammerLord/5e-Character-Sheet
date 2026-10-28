@@ -24,7 +24,7 @@
       {{!-- `always-interactive`: dnd5e disables the item sheet's buttons in play mode but those; these work in both. --}}
       <button type="button" class="fhcs-chip fhcs-item-toggle always-interactive{{#if on}} fhcs-on{{/if}}" data-action="fhcsItemToggle" data-key="{{ key }}"
               aria-pressed="{{#if on}}true{{else}}false{{/if}}" aria-label="{{ label }}" data-fhcs-tip="{{ label }}"{{#unless can}} disabled{{/unless}}>
-         <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ path }}"/></svg>
+         {{#if icon}}<i class="{{ icon }} fhcs-fa" aria-hidden="true"></i>{{else}}<svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="{{ path }}"/></svg>{{/if}}
       </button>
       {{/each}}
    </div>

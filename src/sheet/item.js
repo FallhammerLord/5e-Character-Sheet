@@ -3,11 +3,14 @@
  * `compat.itemSheetFacts` gathers. Pure, so unit and layout checks use the same code.
  */
 
-/** Each header toggle's mark, by key (SCOPE §5.1: the check, the star, an eye, the book). */
+/**
+ * Each header toggle's mark, by key (SCOPE §5.1): Foundry's Font Awesome icons where dnd5e has one for the state
+ * (user, 2026-10-28: "foundry should have appropriate icons"; equipped its halved shield, identified its wand with
+ * sparkles), else ours (the attunement star of the inventory rows, the prepared book).
+ */
+const TOGGLE_ICONS = { equipped: 'fa-solid fa-shield-halved', identified: 'fa-solid fa-wand-sparkles' };
 const TOGGLE_MARKS = {
-   equipped: 'M5 12l5 5 9-11',
    attuned: 'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z',
-   identified: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12zM12 9a3 3 0 1 0 0 6 3 3 0 1 0 0-6z',
    prepared: 'M4 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4zM20 4h-6'
 };
 
@@ -28,7 +31,8 @@ export function itemSheetView(facts, { localize, format })
       key: t.key,
       on: !!t.on,
       can: facts.editable && !t.locked,
-      path: TOGGLE_MARKS[t.key] ?? '',
+      icon: TOGGLE_ICONS[t.key] ?? '',
+      path: TOGGLE_ICONS[t.key] ? '' : TOGGLE_MARKS[t.key] ?? '',
       label: localize(`FHCS.Item.Toggle.${t.key}`)
    }));
 
