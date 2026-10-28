@@ -1,5 +1,6 @@
 import { MODULE_ID, SHEET_CLASS_NAME, THEMES } from './constants.js';
 import { rerenderSheets } from './compat.js';
+import { rethemeCards } from './chat/card.js';
 import { DEFAULT_COLUMNS } from './sheet/inventory.js';
 import { DEFAULT_SPELL_COLUMNS } from './sheet/spellbook.js';
 import { DEFAULT_FEATURE_COLUMNS } from './sheet/features.js';
@@ -26,7 +27,22 @@ export function registerSettings()
       type: String,
       choices: Object.fromEntries(THEMES.map((key) => [key, `FHCS.Theme.${key}`])),
       default: 'plain',
-      onChange: () => rerenderSheets(SHEET_CLASS_NAME)
+      onChange: () =>
+      {
+         rerenderSheets(SHEET_CLASS_NAME);
+         rethemeCards();
+      }
+   });
+
+   // Chat cards wear the world's theme (SCOPE §5.3 rule 10, user 2026-10-28); off, they stay plain.
+   game.settings.register(MODULE_ID, 'chatTheme', {
+      name: 'FHCS.Settings.ChatTheme.Name',
+      hint: 'FHCS.Settings.ChatTheme.Hint',
+      scope: 'world',
+      config: true,
+      type: Boolean,
+      default: true,
+      onChange: () => rethemeCards()
    });
 
    // A theme's motion, each player's own (SCOPE §4.11): off, the sheet keeps still, as under reduced motion.

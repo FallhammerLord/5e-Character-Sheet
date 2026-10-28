@@ -125,16 +125,17 @@ Second pass, from the user's play (2026-10-28):
 - [x] 1. Theme layer: `data-fhcs-theme` on the sheet, `fhcs-frame` on every panel, the four themes in light and dark (colors, frames, decals, motion); layout cases per theme; mockup page for the user (built 2026-10-28; waits on the user's review of `tools/theme-mockup.mjs`'s page)
 - [x] 1b. Fire and Forge as artwork, the whole sheet: every tab, edit mode, trays, fields, buttons, tips, scrollbars, light mode in polished steel (user, 2026-10-28): the window a smithy, state art from HP, plates, Grenze, moments, embers; the layout check reads text over art against black and white (`--fhcs-art`); `tools/forge-mockup.html` (built 2026-10-28; waits on the user's review). The sheet already applies a character's `flags.fhcs.theme` and its HP state.
 - [x] 2. Choosing: world default setting, per-character choice from the title bar (`flags.fhcs.theme`), the player's Motion switch (built 2026-10-28; Quench test added)
-- [ ] 3. Chat cards in the world theme, with the setting to keep them plain
+- [x] 3. Chat cards in the world theme, with the setting to keep them plain (done in Phase 6.7, 2026-10-28)
 - [ ] Quench and play
 
 ## Phase 6.7: Every sheet (user, 2026-10-28)
 
-"Build our styling to the other sheet styles (npc, item, spell, and the rest), as well as the chat cards." Research: docs/research/dnd5e-6.0-other-sheets.md. Design questions asked 2026-10-28; answers go in SCOPE.
+"Build our styling to the other sheet styles (npc, item, spell, and the rest), as well as the chat cards." Research: docs/research/dnd5e-6.0-other-sheets.md. Decisions: SCOPE §4.13 (user, 2026-10-28).
 
 - [x] Research: dnd5e's NPC, vehicle, group, encounter, item and container sheets, and its smaller windows
-- [ ] Design answers and mockups (canvas: a row per sheet)
-- [ ] Chat cards in the world theme, with the setting to keep them plain (Phase 6.6 item 3)
+- [x] Design answers (rebuild item and NPC; reuse Inventory for the rest; skin the smaller windows; theme by owner, else world)
+- [ ] Mockups (canvas: a row per sheet)
+- [x] Chat cards in the world theme (world setting "Themed chat cards", on by default); Forge's card: a riveted iron plate, Grenze title and totals, iron-edged bands that heat on hover; every card case checked in Forge; Quench test added
 - [ ] Item sheet (every type, spells included)
 - [ ] NPC sheet
 - [ ] Container, group, encounter, vehicle

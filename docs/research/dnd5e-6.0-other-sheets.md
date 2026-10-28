@@ -28,7 +28,7 @@ Details differ per item type: `templates/items/details/details-*.hbs`, one per t
 - **The item sheet is a different base:** one class for every type, a 500px window, its body a form of fields per type.
   Little of our code carries over beyond styles, tokens, themes and the title bar.
 - **Limited views:** `BaseActorSheet.LIMITED_PARTS` (base-actor-sheet.mjs:110) draws a cut-down sheet for a player with
-  limited permission. Ours hasn't been checked there.
+  limited permission; nothing to do for us (user, 2026-10-28: every user sees the sheet's chosen styling).
 
 ## The smaller windows ("the rest")
 

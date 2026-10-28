@@ -15,9 +15,12 @@
    font-display: swap;
 }
 
-.fhcs-sheet[data-fhcs-theme="forge"]
+.fhcs-sheet[data-fhcs-theme="forge"],
+.fhcs-chat[data-fhcs-theme="forge"]
 {
    --fhcs-surface: #eee4d4;
+   /* The sheet's success green, a step darker (same hue): on this warmer surface it fell to 4.46:1. */
+   --fhcs-success: #17612a;
    --fhcs-ink: #221913;
    --fhcs-die-ink: #221913;
    --fhcs-die-on-ink: #f6efe4;
@@ -77,9 +80,12 @@
 }
 
 .theme-dark .fhcs-sheet[data-fhcs-theme="forge"],
-.fhcs-sheet.theme-dark[data-fhcs-theme="forge"]
+.fhcs-sheet.theme-dark[data-fhcs-theme="forge"],
+.theme-dark .fhcs-chat[data-fhcs-theme="forge"],
+.fhcs-chat.theme-dark[data-fhcs-theme="forge"]
 {
    --fhcs-surface: #221b18;
+   --fhcs-success: #7ed08a;
    --fhcs-ink: #eee3d6;
    --fhcs-die-ink: #f1e5d8;
    --fhcs-die-on-ink: #221b18;
@@ -555,4 +561,57 @@
    /* The sheen is half the rim's width: -100% puts it off the left, 300% off the right. */
    from { background-position: -100% 0, 0 0, 100% 0, 0 100%, 100% 100%, 0 0; }
    to { background-position: 300% 0, 0 0, 100% 0, 0 100%, 100% 100%, 0 0; }
+}
+
+/* ---------- Chat cards in Forge (the world's theme, SCOPE §5.3 rule 10; user, 2026-10-28) ----------
+   The message a riveted iron plate with the temper sheen along its top and the hammered grain, warmed faintly at its
+   foot; the title and totals in Grenze; bands and buttons iron-edged, heating on hover. Sizes stay Plain's. */
+.fhcs-chat[data-fhcs-theme="forge"]
+{
+   color: var(--fhcs-ink);
+   border: 2px solid var(--fhcs-theme-iron);
+   border-radius: 3px;
+   background-color: var(--fhcs-surface);
+   background-image:
+      var(--fhcs-theme-temper),
+      radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
+      radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
+      radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
+      radial-gradient(circle, var(--fhcs-theme-edge) 1.5px, transparent 2px),
+      linear-gradient(to top, color-mix(in srgb, var(--fhcs-theme-ember) 10%, transparent), transparent 30%),
+      var(--fhcs-theme-grain);
+   background-position: 50% 0, 0 0, 100% 0, 0 100%, 100% 100%, 0 0, 0 0;
+   background-size: 50% 2px, 8px 8px, 8px 8px, 8px 8px, 8px 8px, 100% 100%, 96px 96px;
+   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, repeat;
+   box-shadow: inset 0 0 0 1px var(--fhcs-theme-edge);
+}
+.fhcs-chat[data-fhcs-theme="forge"] :is(.fhcs-card-title, .fhcs-band-total, .fhcs-row-total)
+{
+   font-family: 'FHCS Grenze', var(--font-body, serif);
+}
+/* The header underlined with a line of temper, drawn, so it takes no room. */
+.fhcs-chat[data-fhcs-theme="forge"] .fhcs-card-header
+{
+   background: linear-gradient(to right, var(--fhcs-theme-edge), transparent) left bottom / 100% 1px no-repeat;
+}
+.fhcs-chat[data-fhcs-theme="forge"] .fhcs-card-portrait
+{
+   border-color: var(--fhcs-theme-iron);
+   box-shadow: 0 0 0 1px var(--fhcs-theme-edge), 0 2px 6px -2px var(--fhcs-theme-fire, var(--fhcs-theme-ember));
+}
+.fhcs-chat[data-fhcs-theme="forge"] :is(.fhcs-band, .fhcs-button)
+{
+   border-color: var(--fhcs-theme-edge);
+   background-color: color-mix(in srgb, var(--fhcs-surface) 90%, var(--fhcs-theme-edge));
+}
+.fhcs-chat[data-fhcs-theme="forge"] :is(.fhcs-band, .fhcs-button):hover
+{
+   border-color: var(--fhcs-theme-accent);
+   box-shadow: 0 0 6px var(--fhcs-theme-glow);
+}
+.fhcs-chat[data-fhcs-theme="forge"] .fhcs-bonus-input:focus { border-color: var(--fhcs-theme-accent); }
+@media (prefers-reduced-motion: no-preference)
+{
+   .fhcs-chat[data-fhcs-theme="forge"] :is(.fhcs-band, .fhcs-button) { transition: border-color 0.2s, box-shadow 0.2s; }
+   .fhcs-chat[data-fhcs-theme="forge"] :is(.fhcs-band, .fhcs-button):active { transform: translateY(1px); animation: fhcs-forge-strike 0.25s ease-out; }
 }

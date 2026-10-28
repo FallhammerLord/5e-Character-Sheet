@@ -101,6 +101,8 @@ Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies insta
 - **Data URIs:** encode `#` once (`%23`); `%2523` draws nothing.
 - **Custom properties inherit:** a check keyed on one (`--fhcs-art`) must count only the element where it starts.
 - **Sideways moves pass the parity check** by design (rule 6 lets columns slide left); only heights and vertical places fail it.
+- **The layout check's last line counts layouts; it doesn't say they passed.** Read its whole output (failures print above it), or grep for lines that start with a case name.
+- **A theme's light token block reaches dark mode too** unless its dark block sets the same token (Forge's darker success green showed on dark iron).
 - **Headless Chromium has no hyphenation dictionary:** "Dragonbo / rn" in a screenshot is the harness, not the sheet.
 
 ### Checks and tests

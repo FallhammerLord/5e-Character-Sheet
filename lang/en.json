@@ -33,7 +33,11 @@
       },
       "Theme": {
         "Name": "Sheet theme",
-        "Hint": "The theme every character sheet wears unless a character picks its own (edit mode, the theme chip beside the lock)."
+        "Hint": "The theme every character sheet wears unless a character picks its own (the palette on its title bar). Chat cards wear it too."
+      },
+      "ChatTheme": {
+        "Name": "Themed chat cards",
+        "Hint": "Chat cards wear the sheet theme above. Off: cards stay plain."
       },
       "Motion": {
         "Name": "Theme motion",

@@ -8,7 +8,7 @@
  */
 import { MODULE_ID } from '../constants.js';
 import { actorArtwork, requestOf, rollFacts, usageOrigin } from '../compat.js';
-import { bindCardActions, d20Band, saveRow } from './card.js';
+import { bindCardActions, d20Band, saveRow, themeCard } from './card.js';
 
 export const ROLL_TEMPLATE = `modules/${MODULE_ID}/templates/chat/roll-card.hbs`;
 export const REQUEST_TEMPLATE = `modules/${MODULE_ID}/templates/chat/request-card.hbs`;
@@ -84,6 +84,7 @@ export function makeRollMessageData(Base)
          super._onRender(element, options);
          if (options.summary || !standalone(this)) { return; }
          element.classList.add('fhcs-chat', 'fhcs-card-message');
+         themeCard(element);
          bindCardActions(element, null);
       }
    };
@@ -158,6 +159,7 @@ export function makeRequestMessageData(Base)
          super._onRender(element, options);
          if (!cardsOn()) { return; }
          element.classList.add('fhcs-chat', 'fhcs-card-message');
+         themeCard(element);
          bindCardActions(element, null);
       }
    };

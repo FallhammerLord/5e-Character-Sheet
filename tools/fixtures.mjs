@@ -792,6 +792,12 @@ for (const c of CASES.filter((x) => x.sameRowsAs && !x.look))
    }
 }
 
+// Chat cards in the world's theme (SCOPE §5.3 rule 10): every card case again in Forge.
+for (const base of CASES.filter((c) => c.frame === 'chat' && !c.look))
+{
+   CASES.push({ ...base, name: `theme-forge-${base.name}`, look: 'forge' });
+}
+
 // Fire and Forge's hearth follows HP (SCOPE §4.11): bloodied and down, beside the full cases above.
 for (const [state, hp] of [['bloodied', 0.4], ['down', 0]])
 {

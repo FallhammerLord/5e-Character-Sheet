@@ -1183,6 +1183,28 @@ export function registerQuenchTests(quench)
             assert.isTrue(html.classList.contains('fhcs-chat'));
          });
 
+         it('wears the world theme on a card, and stays plain with themed cards off', async function ()
+         {
+            if (!game.user.isGM) { this.skip(); }
+            const theme = game.settings.get(MODULE_ID, 'theme');
+            const themed = game.settings.get(MODULE_ID, 'chatTheme');
+            try
+            {
+               await game.settings.set(MODULE_ID, 'theme', 'forge');
+               await game.settings.set(MODULE_ID, 'chatTheme', true);
+               let { html } = await renderCard();
+               assert.strictEqual(html.dataset.fhcsTheme, 'forge', `the card wears the world's Forge; it holds ${html.dataset.fhcsTheme}`);
+               await game.settings.set(MODULE_ID, 'chatTheme', false);
+               ({ html } = await renderCard());
+               assert.isUndefined(html.dataset.fhcsTheme, `themed cards off keeps the card plain; it holds ${html.dataset.fhcsTheme}`);
+            }
+            finally
+            {
+               await game.settings.set(MODULE_ID, 'chatTheme', themed);
+               await game.settings.set(MODULE_ID, 'theme', theme);
+            }
+         });
+
          it('rolls the attack when the band is clicked', async function ()
          {
             // dnd5e's card clicks find the message in game.messages, so this card is posted privately and deleted.

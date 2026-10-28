@@ -13,6 +13,23 @@ import { actorArtwork, addBonus, addD20, answersButton, appliedFacts, canApplyDa
 import { describeRoll } from './outcome.js';
 import { d20Row, dieClasses, MAX_PER_SIDE } from './d20.js';
 
+/**
+ * A card wears the world's theme, not the speaker's (SCOPE §5.3 rule 10), unless the world keeps cards plain
+ * (`fhcs.chatTheme`). On the message element, beside `fhcs-chat`.
+ */
+export function themeCard(element)
+{
+   const theme = game.settings.get(MODULE_ID, 'chatTheme') ? game.settings.get(MODULE_ID, 'theme') : 'plain';
+   if (theme && theme !== 'plain') { element.dataset.fhcsTheme = theme; }
+   else { delete element.dataset.fhcsTheme; }
+}
+
+/** Every card in the page takes the world's theme again, when the theme or the chat setting changes. */
+export function rethemeCards()
+{
+   for (const element of document.querySelectorAll('.fhcs-chat.fhcs-card-message')) { themeCard(element); }
+}
+
 export const CARD_TEMPLATE = `modules/${MODULE_ID}/templates/chat/usage-card.hbs`;
 
 /** Parts the card templates include by path; preloaded at init. */
@@ -458,6 +475,7 @@ export function makeUsageMessageData(Base)
          super._onRender(element, options);
          if (options.summary || !useCard(this)) { return; }
          element.classList.add('fhcs-chat', 'fhcs-card-message');
+         themeCard(element);
          preferSelected(this.parent);
          openTrays(element);
          bindCardActions(element, this.parent);

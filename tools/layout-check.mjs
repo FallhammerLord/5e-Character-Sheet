@@ -32,10 +32,11 @@ const css = JSON.parse(readFileSync(`${root}module.json`, 'utf8')).styles
 /** The classes and wrapper Foundry and dnd5e give each kind of frame. */
 const FRAMES = {
    sheet: { classes: 'sheet actor character fhcs-sheet', wrap: (body) => body },
+   // A card's theme sits on its message, as `themeCard` puts it (the world's theme, SCOPE §5.3 rule 10).
    chat: {
       classes: 'chat-sidebar',
-      wrap: (body) => `<ol class="chat-log" style="list-style:none;margin:0;padding:6px">
-         <li class="chat-message message dnd5e2 fhcs-chat">
+      wrap: (body, look) => `<ol class="chat-log" style="list-style:none;margin:0;padding:6px">
+         <li class="chat-message message dnd5e2 fhcs-chat fhcs-card-message"${look ? ` data-fhcs-theme="${look}"` : ''}>
          <div class="message-content">${body}</div></li></ol>`
    }
 };
@@ -51,7 +52,7 @@ const frame = (kind, width, theme, body, { look = '', hp = null, titleBar = '' }
       // Foundry's title bar as it draws one, with a module's extra button that must wait in the ⋮ menu (rule 14).
       ? `<header class="window-header"><h1 class="window-title">${width}px</h1>${titleBar}<button type="button" class="header-control icon fa-solid fa-ellipsis-vertical" data-action="toggleControls" aria-label="Controls"></button><button type="button" class="header-control icon fa-solid fa-id-badge" data-action="moduleExtra" aria-label="A module's button"></button><button type="button" class="header-control icon fa-solid fa-xmark" data-action="close" aria-label="Close"></button></header>`
       : `<header style="background:#111;color:#eee;padding:4px 8px;font:13px sans-serif">${width}px</header>`}
-   <div class="window-content" style="flex:1;min-height:0;overflow:auto">${FRAMES[kind].wrap(body)}</div></section>`;
+   <div class="window-content" style="flex:1;min-height:0;overflow:auto">${FRAMES[kind].wrap(body, look)}</div></section>`;
 
 const page = (html) => `<!doctype html><html lang="en"><head><meta charset="utf-8">
    <style>body{margin:0;background:#444;font-family:sans-serif}*{box-sizing:border-box}button,input,select{font:inherit}
