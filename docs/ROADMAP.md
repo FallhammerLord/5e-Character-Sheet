@@ -160,7 +160,8 @@ Third pass, from the user's play (2026-10-28):
 - [ ] 8. State art (stretch): Night's moon wanes with HP (full, bloodied, down); Day's light lowers toward dusk
 - [ ] 9. Emblems and marks: a sun for Day, a moon for Night on the tab row; Night's inspiration mark a moon, not a star; Sand's emblem a sanctuary arch
 - [ ] 10. "Theme motion" becomes "Sheet motion"; the load check fails an animation outside the reduced-motion and Motion-off gates
-- [ ] Mockups (Day, Night, 644px), Quench and play
+- [x] Mockups: canvas row "Phase 6.55 · Plain as Day and Night" (Day, Night, 644px bloodied and edit mode, down; the marks, pips, shields, tabs and HP tray click through to their moments); waits on the user's review (2026-10-29)
+- [ ] Quench and play
 
 ## Phase 6.7: Every sheet (user, 2026-10-28)
 
