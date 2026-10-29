@@ -1118,6 +1118,56 @@
    50% { filter: drop-shadow(0 0 5px var(--fhcs-inspire-glow)); }
 }
 
+/* Toggles turning on and off (SCOPE §5.3 rule 6, Phase 6.55): the toggle clicked, once its redraw lands
+   (`fhcs-toggled-on`, `-off`, set by the sheet). Under 300ms, an answer to the player. Plain's: inked in, the mark
+   filling out from its centre; erased, its fill fading with a smudge. A theme swaps its own in through
+   `--fhcs-toggle-on`, `-off` (the mark) and `-off-fill` (a filled pip's fill, from `--fhcs-erase-ink`). */
+.fhcs-sheet
+{
+   --fhcs-toggle-on: fhcs-ink-in 240ms ease-out;
+   --fhcs-toggle-off: fhcs-erase 260ms ease-out;
+   --fhcs-toggle-off-fill: fhcs-erase-fill 260ms ease-out;
+   --fhcs-erase-ink: currentColor;
+}
+.fhcs-sheet .fhcs-slot { --fhcs-erase-ink: var(--fhcs-slot); }
+.fhcs-sheet .fhcs-death-success .fhcs-death-pip { --fhcs-erase-ink: var(--fhcs-success); }
+.fhcs-sheet .fhcs-death-failure .fhcs-death-pip { --fhcs-erase-ink: var(--fhcs-failure); }
+
+@media (prefers-reduced-motion: no-preference)
+{
+   /* (A pseudo-element can't sit inside :is(), so each pip's mark has its own selector.) */
+   .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-slot.fhcs-toggled-on::before,
+   .fhcs-sheet:not([data-fhcs-motion="off"]) :is(.fhcs-death-pip.fhcs-toggled-on, .fhcs-toggled-on:not(.fhcs-switch, .fhcs-condition) > svg) { animation: var(--fhcs-toggle-on); animation-delay: var(--fhcs-toggle-at, 0ms); }
+   .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-toggled-off:not(.fhcs-switch, .fhcs-condition) > svg { animation: var(--fhcs-toggle-off); animation-delay: var(--fhcs-toggle-at, 0ms); }
+   .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-slot.fhcs-toggled-off::before,
+   .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-death-pip.fhcs-toggled-off { animation: var(--fhcs-toggle-off-fill); animation-delay: var(--fhcs-toggle-at, 0ms); }
+   /* A switch's knob slides across. */
+   .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-toggled-on .fhcs-switch-mark circle { animation: fhcs-switch-on 200ms ease-out; animation-delay: var(--fhcs-toggle-at, 0ms); }
+   .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-toggled-off .fhcs-switch-mark circle { animation: fhcs-switch-off 200ms ease-out; animation-delay: var(--fhcs-toggle-at, 0ms); }
+}
+
+@keyframes fhcs-ink-in
+{
+   from { transform: scale(0.4); opacity: 0.3; }
+   to { transform: none; opacity: 1; }
+}
+
+@keyframes fhcs-erase
+{
+   from { opacity: 0.35; filter: blur(1px); }
+   to { opacity: 1; filter: none; }
+}
+
+@keyframes fhcs-erase-fill
+{
+   from { background-color: var(--fhcs-erase-ink); filter: blur(0.5px); }
+   60% { background-color: color-mix(in srgb, var(--fhcs-erase-ink) 30%, transparent); }
+   to { background-color: transparent; filter: none; }
+}
+
+@keyframes fhcs-switch-on { from { cx: 6px; } }
+@keyframes fhcs-switch-off { from { cx: 14px; } }
+
 /* The theme picker on the title bar, beside ⋮ (SCOPE §4.11, user 2026-10-28): a title-bar control, its tray under it. */
 .fhcs-sheet > .window-header > .fhcs-theme-chip { display: grid; flex: none; place-items: center; cursor: pointer; }
 .fhcs-sheet > .window-header > .fhcs-theme-chip .fhcs-icon { width: 16px; height: 16px; }

@@ -597,6 +597,29 @@ export function registerQuenchTests(quench)
             await ring.delete();
          });
 
+         it('gives the toggle clicked its on and off moment once the redraw lands (Phase 6.55)', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 4);
+            const [item] = await actor.createEmbeddedDocuments('Item', [{
+               name: 'FHCS test lantern', type: 'equipment', system: { equipped: false, quantity: 1 }
+            }]);
+            await sheet.render();
+            const equip = `.fhcs-inventory [data-item-id="${item.id}"] [data-action="equip"]`;
+            // On a failure, say what the toggle held: its pressed state and its classes.
+            const held = (step) => () =>
+            {
+               const toggle = sheet.element.querySelector(equip);
+               return toggle ? `${step}; the toggle is pressed ${toggle.getAttribute('aria-pressed')}, classes: ${toggle.className}`
+                  : `${step}; the toggle is missing`;
+            };
+            await click(equip);
+            await until(() => sheet.element.querySelector(`${equip}.fhcs-toggled-on`), held('equipping marks the redrawn toggle on'));
+            await until(() => !sheet.element.querySelector(`${equip}.fhcs-toggled-on`), held('the on moment ends'));
+            await click(equip);
+            await until(() => sheet.element.querySelector(`${equip}.fhcs-toggled-off`), held('unequipping marks it off'));
+            await item.delete();
+         });
+
          it('lists a container\'s contents under it, folds them, and takes items dropped on it', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 4);

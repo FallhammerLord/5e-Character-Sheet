@@ -305,6 +305,73 @@ function inspirationMoment(element)
    if (gained) { inspirationGained(element, stars.find((star) => star.getClientRects().length) ?? bar); }
 }
 
+/** The toggles that get an on and an off moment (SCOPE §5.3 rule 6; Phase 6.55): pips, marks and switches. */
+const TOGGLES = '.fhcs-slot, .fhcs-death-pip, .fhcs-toggle-equip, .fhcs-toggle-attune, .fhcs-toggle-prep, .fhcs-toggle-fav, '
+   + '.fhcs-switch, .fhcs-condition';
+
+/** How long a clicked toggle waits for its redraw. */
+const TOGGLE_WAIT_MS = 3000;
+
+/** The data that names a toggle across a redraw: its action and place, its row's item or effect, its pips' field. */
+const TOGGLE_NAMES = ['itemId', 'effectId', 'parentId', 'prop', 'conditionId'];
+
+/** A toggle's name: its action, its own data, then each named place it sits in, out to the window. */
+function toggleName(toggle)
+{
+   const parts = [toggle.dataset.action ?? '', toggle.dataset.n ?? '', toggle.dataset.conditionId ?? ''];
+   for (let node = toggle.parentElement; node && !node.matches('.window-content'); node = node.parentElement)
+   {
+      for (const key of TOGGLE_NAMES) { if (node.dataset[key]) { parts.push(`${key}=${node.dataset[key]}`); } }
+   }
+   return parts.join('|');
+}
+
+/**
+ * Remembers the toggle a click lands on, so the redraw that click causes can give that one toggle its moment (the
+ * redraw replaces the markup). Bound once per window, in the capture phase, ahead of dnd5e's own handlers.
+ */
+function rememberToggles(sheet)
+{
+   const content = sheet.element.querySelector(':scope > .window-content');
+   if (!content || content.dataset.fhcsToggles) { return; }
+   content.dataset.fhcsToggles = 'true';
+   content.addEventListener('click', (event) =>
+   {
+      const toggle = event.target.closest?.(TOGGLES);
+      if (toggle && content.contains(toggle)) { sheet.fhcsToggled = { name: toggleName(toggle), was: toggle.getAttribute('aria-pressed'), at: Date.now() }; }
+   }, { capture: true });
+}
+
+/**
+ * After a redraw, the toggle last clicked turns on or off with its moment (`fhcs-toggled-on`, `-off`), if its state
+ * changed; each theme draws its own through `--fhcs-toggle-on` and `-off`. A further redraw while the moment runs
+ * (two saves for one click) carries it on from where it was (`--fhcs-toggle-at`), so it never starts over. Styles keep
+ * it still under Motion off and reduced motion.
+ */
+function toggleMoment(sheet)
+{
+   const clicked = sheet.fhcsToggled;
+   // A click whose redraw never came (nothing changed) is forgotten, so a later change from elsewhere keeps still.
+   if (!clicked || Date.now() - clicked.at > TOGGLE_WAIT_MS) { return; }
+   const found = [...sheet.element.querySelectorAll(TOGGLES)].filter((toggle) => toggleName(toggle) === clicked.name);
+   if (!clicked.start)
+   {
+      const changed = found.find((toggle) => toggle.getAttribute('aria-pressed') !== clicked.was);
+      if (!changed) { return; }
+      clicked.start = Date.now();
+      clicked.now = changed.getAttribute('aria-pressed');
+   }
+   const elapsed = Date.now() - clicked.start;
+   if (elapsed >= MOMENT_MS) { sheet.fhcsToggled = null; return; }
+   const moment = clicked.now === 'true' ? 'fhcs-toggled-on' : 'fhcs-toggled-off';
+   for (const toggle of found.filter((each) => each.getAttribute('aria-pressed') === clicked.now))
+   {
+      toggle.style.setProperty('--fhcs-toggle-at', `-${elapsed}ms`);
+      toggle.classList.add(moment);
+      setTimeout(() => toggle.classList.remove(moment), MOMENT_MS - elapsed);
+   }
+}
+
 /**
  * A frame's gleam follows the pointer (user, 2026-10-28; SCOPE §5.3): the pointer's place across the frame under it,
  * as `--fhcs-gleam-x`, for a theme to draw its sheen at. Bound once per window; one write a frame at most; nothing
@@ -720,6 +787,8 @@ export function makeCharacterSheet(Base)
          wireResourceUses(this.element, this.actor);
          themeState(this.element, this.actor);
          inspirationMoment(this.element);
+         rememberToggles(this);
+         toggleMoment(this);
          followPointer(this.element);
          middleClickOpens(this.element, this.actor);
          // Special Traits is a settings page: locking the sheet leaves it for Attributes.
