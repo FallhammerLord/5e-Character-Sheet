@@ -150,7 +150,7 @@ Third pass, from the user's play (2026-10-28):
 
 "Bringing plain light & dark in line with subdued textures and animations." Plain becomes Day (sunlight) and Night (moonlight) with a ledger subtheme; particles are scripts. All ten agreed (user, 2026-10-29); Night is moonlight and moonbeams, never stars or sparks (SCOPE §4.11).
 
-- [ ] 1. Ground: ledger ruling in the window's gutters; Day lit warm from the upper left, Night cool from the upper right
+- [ ] 1. (in progress 2026-10-29: `styles/themes/plain.css`, character sheet only; layout check running) Ground: ledger ruling in the window's gutters; Day lit warm from the upper left, Night cool from the upper right
 - [ ] 2. Heading bars: a double hairline (the ledger's totals rule); frames a 1px top highlight (sun or moon catching the edge)
 - [ ] 3. Toggle moments for every toggle Plain lacks (slot pips, death saves, equip, attune, prepared, favorite, effect switch): inked in, erased
 - [ ] 4. Hit and heal at the HP line (the hooks exist for every theme)

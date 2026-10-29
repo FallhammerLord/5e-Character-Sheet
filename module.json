@@ -30,6 +30,7 @@
   ],
   "styles": [
     "styles/fhcs.css",
+    "styles/themes/plain.css",
     "styles/themes/forge.css",
     "styles/themes/wind.css",
     "styles/themes/sand.css",
