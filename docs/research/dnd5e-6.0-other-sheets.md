@@ -54,3 +54,15 @@ Ours already (Track R); left from Phase 6.6: cards in the world theme, with a wo
   type, a summary line (type, rarity, source), and toggles (equipped, attuned, identified). Description tab: a narrow
   left column of properties (quantity, weight, price, property tags) beside the description. Details tab: the type's
   form, with shared field parts (activation, damage, duration, range, targets, uses).
+
+## What a replaced item part must keep (2026-10-29)
+
+- **Header-only fields:** `context.subtitles` entries with a `field` (a physical item's `rarities`, a SetField; a
+  feature's `requirements`), and the physical item's `weight.units` and `price.denomination` selects
+  (`templates/items/header.hbs`). The Details tab doesn't hold them.
+- **Descriptions:** `description.value`, `unidentified.description` (GM, identifiable items) and `description.chat`
+  (owner, or set), enriched in `context.enriched` (`item-sheet.mjs:336`).
+- **The add button:** `PrimarySheetMixin._onFirstRender` appends `.create-child` (`addDocument`) to the window; dnd5e's
+  CSS shows it only on `tab-inventory`, `-features`, `-spells`, `-effects`, `-advancement`, `-activities`, `-crew`,
+  `-changes` (`less/v2/sheets.less:304`), the class `changeTab` puts on the window. `_addDocument` opens the dialog
+  for the open tab.

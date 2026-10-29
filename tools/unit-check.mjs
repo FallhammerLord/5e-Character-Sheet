@@ -265,6 +265,12 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const editing = itemSheetView({ ...base, type: 'weapon', editing: true, subtitles: ['Martial Melee', 'Rare'], toggles: [{ key: 'equipped', on: false }],
       physical: { quantity: 1, weight: 3, weightUnit: 'lb', price: null } }, { localize, format });
    const fields = editing.props.map((p) => `${p.key}:${p.field || '-'}`).join(' ');
+   // dnd5e's header fields become rows with its inputs; the other descriptions follow the first.
+   const more = itemSheetView({ ...base, type: 'weapon', editing: true, toggles: [], physical: { quantity: 1, weight: 3, weightUnit: 'lb', weightUnitInput: '<select name="u"></select>', price: null },
+      headerFields: [{ key: 'rarities', label: 'Rarity', value: 'Rare', input: '<select name="r"></select>' }], descriptions: [{ key: 'chat', label: 'Chat', enriched: '' }] }, { localize, format });
+   const weight = more.props.find((p) => p.key === 'weight'), rarity = more.props.find((p) => p.key === 'rarities');
+   if (!weight?.unitInput || rarity?.input !== '<select name="r"></select>' || rarity.label !== 'Rarity') { problems.push(`item sheet, dnd5e's header fields: ${JSON.stringify(more.props)}`); }
+   if (more.descriptions.map((d) => `${d.key}${d.empty ? '-' : ''}`).join(' ') !== 'description- chat-') { problems.push(`item sheet, descriptions: ${JSON.stringify(more.descriptions)}`); }
    if (editing.subtitle !== 'Martial Melee · Rare' || fields !== 'quantity:system.quantity weight:system.weight.value category:flags.fhcs.section' || !editing.fields) { problems.push(`item sheet, a weapon in edit mode: ${editing.subtitle}; ${fields}`); }
 }
 

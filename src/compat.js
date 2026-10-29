@@ -823,6 +823,14 @@ export function toggleItemField(item, key)
  * header toggles, the physical numbers, the item's uses, a spell's casting lines, the property tags, the category and
  * the description.
  */
+/** A field's own input, as dnd5e's `formInput` helper draws it, as HTML (a template can't call dnd5e's helpers). */
+function fieldInput(field, options)
+{
+   const input = field?.toInput?.(options);
+   if (!input) { return ''; }
+   return input instanceof DocumentFragment ? [...input.children].map((n) => n.outerHTML).join('') : input.outerHTML ?? '';
+}
+
 export function itemSheetFacts(sheet, context)
 {
    const item = sheet.item;
@@ -831,12 +839,33 @@ export function itemSheetFacts(sheet, context)
    const labels = item.labels ?? {};
    const concealed = !!context.concealDetails;
    const abbr = (map, key) => game.i18n.localize(map?.[key]?.abbreviation ?? map?.[key]?.label ?? key ?? '');
+   const fieldOf = (path) => system.schema?.getField?.(path);
    const physical = 'quantity' in system ? {
       quantity: system._source?.quantity ?? system.quantity ?? 0,
       weight: system._source?.weight?.value ?? system.weight?.value ?? 0,
       weightUnit: abbr(config.weightUnits, system.weight?.units),
-      price: game.user.isGM || !concealed ? { value: system._source?.price?.value ?? system.price?.value ?? 0, unit: abbr(config.currencies, system.price?.denomination) } : null
+      // dnd5e's header holds the unit and currency choices; ours draws the same inputs beside the numbers.
+      weightUnitInput: fieldInput(fieldOf('weight.units'), { value: system._source?.weight?.units, choices: config.weightUnits, labelAttr: 'abbreviation', localize: true }),
+      price: game.user.isGM || !concealed ? { value: system._source?.price?.value ?? system.price?.value ?? 0, unit: abbr(config.currencies, system.price?.denomination),
+         unitInput: fieldInput(fieldOf('price.denomination'), { value: system._source?.price?.denomination, choices: config.currencies, labelAttr: 'abbreviation', localize: true }) } : null
    } : null;
+   // dnd5e's subtitles that are fields (a physical item's rarity, a feature's requirements): edited only in its header,
+   // so ours lists them as properties with dnd5e's own inputs.
+   const headerFields = (context.subtitles ?? []).filter((s) => s.field && !(s.requiresIdentification && concealed)).map((s) => ({
+      key: s.field.name ?? s.field.fieldPath ?? '',
+      label: game.i18n.localize(s.field.label || s.placeholder || ''),
+      value: s.label ?? '',
+      input: fieldInput(s.field, { value: s.value, choices: s.choices, options: s.options, blank: s.blank, localize: true,
+         placeholder: s.placeholder ? game.i18n.localize(s.placeholder) : undefined })
+   }));
+   // The other descriptions, as dnd5e shows them: the unidentified one for the GM, the chat one for its owner (or when set).
+   const identifiable = 'identified' in system;
+   const descriptions = concealed ? [] : [
+      identifiable && game.user.isGM && { key: 'unidentified', label: game.i18n.localize('DND5E.DescriptionUnidentified'), name: 'system.unidentified.description',
+         enriched: context.enriched?.unidentified ?? '', source: system._source?.unidentified?.description ?? '' },
+      (item.isOwner || system.description?.chat) && { key: 'chat', label: game.i18n.localize('DND5E.DescriptionChat'), name: 'system.description.chat',
+         enriched: context.enriched?.chat ?? '', source: system._source?.description?.chat ?? '' }
+   ].filter(Boolean);
    const spell = item.type === 'spell' ? {
       level: labels.level ?? '', school: labels.school ?? '', components: labels.components?.vsm ?? '',
       concentration: !!system.properties?.has?.('concentration'), ritual: !!system.properties?.has?.('ritual'),
@@ -852,6 +881,8 @@ export function itemSheetFacts(sheet, context)
       editing: sheet.isEditMode,
       concealed,
       subtitles: (context.subtitles ?? []).filter((s) => s.label && !(s.requiresIdentification && concealed)).map((s) => game.i18n.localize(s.label)),
+      headerFields,
+      descriptions,
       typeLabel: game.i18n.localize(CONFIG.Item.typeLabels?.[item.type] ?? item.type),
       toggles: itemToggles(item),
       physical,

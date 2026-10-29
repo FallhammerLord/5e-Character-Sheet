@@ -962,6 +962,37 @@ export function registerQuenchTests(quench)
             }
          });
 
+         it('keeps dnd5e\'s item fields and adds: rarity, units and the other descriptions; the add button on Advancement', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 8);
+            const [blade] = await createItems([{ name: 'FHCS test rare blade', type: 'weapon', flags: { core: { sheetClass: `${MODULE_ID}.FHCSItemSheet` } } }]);
+            // A world item, not the actor's: a class on the actor would level it.
+            const klass = await Item.implementation.create({ name: 'FHCS test class', type: 'class', flags: { core: { sheetClass: `${MODULE_ID}.FHCSItemSheet` } } });
+            const sheets = [blade.sheet, klass.sheet];
+            const inside = (s, selector) => s.element?.querySelector(selector);
+            try
+            {
+               const [bladeSheet, classSheet] = sheets;
+               await bladeSheet.render({ force: true });
+               // dnd5e edits these only in its header, which ours replaces (user, 2026-10-29).
+               const wanted = ['[name="system.rarities"]', '[name="system.weight.units"]', '[name="system.price.denomination"]', '[data-fhcs-description="chat"] prose-mirror'];
+               await until(() => wanted.every((q) => inside(bladeSheet, q)),
+                  () => `the Description tab holds dnd5e's header fields and the chat description; missing ${wanted.filter((q) => !inside(bladeSheet, q)).join(', ')}`);
+               await classSheet.render({ force: true });
+               await until(() => inside(classSheet, '.fhcs-tabs [data-tab="advancement"]'), () => `a class has an Advancement tab; tabs ${[...(classSheet.element?.querySelectorAll('.fhcs-tabs [data-tab]') ?? [])].map((t) => t.dataset.tab)}`);
+               classSheet.changeTab('advancement', 'primary');
+               const add = () => inside(classSheet, '.create-child');
+               await until(() => add() && getComputedStyle(add()).display !== 'none',
+                  () => `dnd5e's add button shows on Advancement; button ${!!add()}, display ${add() ? getComputedStyle(add()).display : '-'}, window ${classSheet.element?.className}`);
+            }
+            finally
+            {
+               for (const s of sheets) { await s.close(); }
+               await blade.delete();
+               await klass.delete();
+            }
+         });
+
          it('moves the Traits panel below the Resources with its arrow on Attributes', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 6);

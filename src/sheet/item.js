@@ -38,14 +38,18 @@ export function itemSheetView(facts, { localize, format })
 
    // The properties column: a field in edit mode, the value in play; rows with nothing to say are left out in play.
    const props = [];
-   const row = (key, value, field = '', unit = '') => props.push({ key, label: localize(`FHCS.Item.Prop.${key}`), value: String(value ?? ''), field, unit,
+   // `unitInput` and `input` are dnd5e's own inputs as HTML (compat draws them); a row with `input` is that field.
+   const row = (key, value, field = '', unit = '', { label, unitInput = '', input = '' } = {}) => props.push({ key,
+      label: label ?? localize(`FHCS.Item.Prop.${key}`), value: String(value ?? ''), field, unit, unitInput, input,
       number: ['quantity', 'weight', 'price'].includes(key) });
    if (facts.physical)
    {
       row('quantity', facts.physical.quantity, 'system.quantity');
-      row('weight', facts.physical.weight, 'system.weight.value', facts.physical.weightUnit);
-      if (facts.physical.price) { row('price', facts.physical.price.value, 'system.price.value', facts.physical.price.unit); }
+      row('weight', facts.physical.weight, 'system.weight.value', facts.physical.weightUnit, { unitInput: facts.physical.weightUnitInput });
+      if (facts.physical.price) { row('price', facts.physical.price.value, 'system.price.value', facts.physical.price.unit, { unitInput: facts.physical.price.unitInput }); }
    }
+   // Fields dnd5e keeps in its header (rarity, a feature's requirements), which ours doesn't draw.
+   for (const f of facts.headerFields ?? []) { row(f.key, f.value, '', '', { label: f.label, input: f.input }); }
    if (facts.uses)
    {
       row('uses', format('FHCS.Item.UsesOf', { value: facts.uses.value, max: facts.uses.max }));
@@ -73,7 +77,9 @@ export function itemSheetView(facts, { localize, format })
       props: shown.map((p) => ({ ...p, value: !facts.editing && p.key === 'category' && !p.value ? '—' : p.value,
          unitText: p.unit ? ` ${p.unit}` : '', placeholder: p.key === 'category' ? localize('FHCS.Item.CategoryNone') : '' })),
       tags: facts.tags ?? [],
-      description: { ...facts.description, empty: !String(facts.description?.enriched ?? '').replace(/<[^>]*>/g, '').trim() },
+      // The description first, then the others dnd5e shows (unidentified for the GM, chat), each its own panel.
+      descriptions: [{ key: 'description', label: localize('FHCS.Item.Description'), ...facts.description }, ...(facts.descriptions ?? [])]
+         .map((d) => ({ ...d, empty: !String(d.enriched ?? '').replace(/<[^>]*>/g, '').trim() })),
       uuid: facts.uuid,
       text: {
          icon: format('FHCS.Item.Icon', { name: facts.name }),

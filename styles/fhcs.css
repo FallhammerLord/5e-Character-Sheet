@@ -954,7 +954,9 @@
    color: var(--fhcs-die-on-ink);
 }
 
-.fhcs-sheet:is(.tab-inventory, .tab-features, .tab-spells, .tab-effects) .create-child { display: block; }
+/* dnd5e's list of tabs that add something (sheets.less), the item sheet's Activities and Advancement among them (user,
+   2026-10-29: Advancement had no way to add one). */
+.fhcs-sheet:is(.tab-inventory, .tab-features, .tab-spells, .tab-effects, .tab-advancement, .tab-activities) .create-child { display: block; }
 
 /* ---------- Tab row (SCOPE §4.2) ---------- */
 
@@ -3465,8 +3467,19 @@
 /* A value, or edit mode's field with its unit, one line of the control's height in both modes (rule 6). */
 .fhcs-item-sheet .fhcs-item-prop > dd { display: flex; align-items: center; gap: var(--fhcs-s1); min-width: 0; min-height: var(--fhcs-control); overflow-wrap: anywhere; }
 .fhcs-item-sheet .fhcs-item-prop .fhcs-input { flex: 1; min-width: 0; height: var(--fhcs-control); text-align: left; }
+/* dnd5e's own inputs beside ours (a unit, a currency, rarity, requirements): our size and type. */
+.fhcs-item-sheet .fhcs-item-prop > dd > :is(select, input:not(.fhcs-input), multi-select)
+{
+   flex: 1;
+   min-width: 0;
+   height: var(--fhcs-control);
+   font: inherit;
+}
+.fhcs-item-sheet .fhcs-item-prop > dd > .fhcs-input + select { flex: none; width: 56px; }
+.fhcs-item-sheet .fhcs-item-prop > dd > multi-select { height: auto; min-height: var(--fhcs-control); }
 .fhcs-item-sheet .fhcs-item-tags { display: flex; flex-wrap: wrap; gap: var(--fhcs-s1); margin: 0; padding: var(--fhcs-s2) 0 var(--fhcs-s1); list-style: none; }
 .fhcs-item-sheet .fhcs-item-tags > li { display: flex; align-items: center; min-height: 24px; padding: 0 var(--fhcs-s1); border: 1px solid var(--fhcs-line); border-radius: var(--fhcs-radius); }
+.fhcs-item-sheet .fhcs-item-texts { display: flex; flex-direction: column; gap: var(--fhcs-s2); min-width: 0; }
 .fhcs-item-sheet .fhcs-item-text { display: flex; flex-direction: column; overflow: hidden; }
 .fhcs-item-sheet .fhcs-item-text > :not(.fhcs-panel-head) { margin: 0; padding: var(--fhcs-s2); }
 .fhcs-item-sheet .fhcs-item-text :is(p, li, ul, ol, h1, h2, h3, h4, blockquote) { margin: 0 0 var(--fhcs-s2); font-size: var(--fhcs-body-size); line-height: var(--fhcs-body-line); }

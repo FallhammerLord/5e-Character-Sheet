@@ -805,11 +805,17 @@ for (const c of CASES.filter((x) => x.sameRowsAs && !x.look))
 // a long name at 500px.
 const ITEM_TABS = Object.fromEntries(['description', 'details', 'activities', 'effects']
    .map((id, i) => [id, { id, label: ['Description', 'Details', 'Activities', 'Effects'][i], active: id === 'description' }]));
+// dnd5e's own inputs, as Foundry draws a field's choices (compat's `fieldInput`).
+const SELECT = (name, values) => `<select name="${name}">${values.map((v) => `<option value="${v}">${v}</option>`).join('')}</select>`;
 const ITEMS = {
    weapon: { type: 'weapon', name: 'Sun Blade', nameField: 'name', img: ICON('#c9a227'), editable: true, concealed: false,
       subtitles: ['Martial Melee', 'Rare', 'DMG 2024'], typeLabel: 'Weapon',
       toggles: [{ key: 'equipped', on: true }, { key: 'attuned', on: true }, { key: 'identified', on: true }],
-      physical: { quantity: 1, weight: 3, weightUnit: 'lb', price: { value: 12000, unit: 'gp' } }, uses: null, spell: null,
+      physical: { quantity: 1, weight: 3, weightUnit: 'lb', weightUnitInput: SELECT('system.weight.units', ['lb', 'kg']),
+         price: { value: 12000, unit: 'gp', unitInput: SELECT('system.price.denomination', ['gp', 'sp', 'cp']) } }, uses: null, spell: null,
+      headerFields: [{ key: 'rarities', label: 'Rarity', value: 'Rare', input: SELECT('system.rarities', ['Common', 'Uncommon', 'Rare']) }],
+      descriptions: [{ key: 'unidentified', label: 'Unidentified Description', name: 'system.unidentified.description', source: '', enriched: '<p>A sword hilt with no blade.</p>' },
+         { key: 'chat', label: 'Chat Description', name: 'system.description.chat', source: '', enriched: '' }],
       tags: ['Finesse', 'Versatile', 'Magical'], category: 'Sun relics', categoryField: 'flags.fhcs.section',
       description: { name: 'system.description.value', source: '', enriched: '<p>This item appears to be a longsword hilt. While grasping the hilt, you can take a Bonus Action to cause a blade of pure radiance to spring into existence.</p><p>You gain a +2 bonus to attack rolls and damage rolls made with this weapon.</p>' },
       uuid: 'Actor.a.Item.sun' },
@@ -837,7 +843,9 @@ const itemSheet = (kind, { editing = false, ...over } = {}) =>
 for (const kind of Object.keys(ITEMS))
 {
    CASES.push({ name: `item-${kind}`, frame: 'item', html: itemSheet(kind), rows: '.fhcs-item-header, .fhcs-tabs, .fhcs-item-prop' });
-   CASES.push({ name: `item-${kind}-editing`, frame: 'item', html: itemSheet(kind, { editing: true }), rows: '.fhcs-item-header, .fhcs-tabs, .fhcs-item-prop', sameRowsAs: `item-${kind}` });
+   // No lock, so no play-and-edit pair (SCOPE §5.4 rule 3): an owner's sheet holds fields a viewer's doesn't.
+   CASES.push({ name: `item-${kind}-editing`, frame: 'item', html: itemSheet(kind, { editing: true }) });
+   CASES.push({ name: `theme-forge-item-${kind}-editing`, frame: 'item', look: 'forge', html: itemSheet(kind, { editing: true }) });
    CASES.push({ name: `theme-forge-item-${kind}`, frame: 'item', look: 'forge', html: itemSheet(kind) });
 }
 CASES.push({ name: 'item-long-name', frame: 'item', html: itemSheet('weapon', { name: 'Sun Blade of the Dawnwarden, Twice-Forged in the Ember Halls' }) });
