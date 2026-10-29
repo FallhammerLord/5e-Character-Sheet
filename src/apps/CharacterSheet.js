@@ -430,6 +430,27 @@ function toggleMoment(sheet)
    }
 }
 
+/** How long the portrait's light catch takes to cross the art (the styles' animation, 500ms) and a little over. */
+const CATCH_MS = 550;
+
+/**
+ * The portrait catches the light once each time the pointer comes onto it (SCOPE §5.3 rule 6): the sheet marks it
+ * `fhcs-catching` for one pass, so the catch runs to its end, clears on its own while the pointer stays, and a quick
+ * out and in never restarts it (user, 2026-10-29: on :hover it lingered and replayed). Bound once per window.
+ */
+function catchLight(element)
+{
+   if (element.dataset.fhcsCatch) { return; }
+   element.dataset.fhcsCatch = 'on';
+   element.addEventListener('pointerover', (event) =>
+   {
+      const portrait = event.target.closest?.('.fhcs-portrait');
+      if (!portrait || portrait.contains(event.relatedTarget) || portrait.classList.contains('fhcs-catching')) { return; }
+      portrait.classList.add('fhcs-catching');
+      setTimeout(() => portrait.classList.remove('fhcs-catching'), CATCH_MS);
+   });
+}
+
 /**
  * A frame's gleam follows the pointer (user, 2026-10-28; SCOPE §5.3): the pointer's place across the frame under it,
  * as `--fhcs-gleam-x`, for a theme to draw its sheen at. Bound once per window; one write a frame at most; nothing
@@ -858,6 +879,7 @@ export function makeCharacterSheet(Base)
          fadeTrays(this);
          toggleMoment(this);
          followPointer(this.element);
+         catchLight(this.element);
          middleClickOpens(this.element, this.actor);
          // Special Traits is a settings page: locking the sheet leaves it for Attributes.
          if (!this.isEditMode && this.tabGroups.primary === 'specialTraits') { this.changeTab('details', 'primary'); }

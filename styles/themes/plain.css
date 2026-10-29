@@ -20,8 +20,8 @@
    /* The portrait's light catch: a gold band, crossing from the upper left. */
    --fhcs-plain-catch: color-mix(in srgb, #ffd98a 45%, transparent);
    --fhcs-plain-catch-angle: 115deg;
-   --fhcs-plain-catch-from: 120%;
-   --fhcs-plain-catch-to: -20%;
+   --fhcs-plain-catch-from: 185%;
+   --fhcs-plain-catch-to: -85%;
    --fhcs-plain-moon: none;
    /* The emblem at the inspiration bar's left: the sun rising. Inspiration's marks: a sun, rayed; banked, its disc
       filled, giving off gold sunlight. */
@@ -42,8 +42,8 @@
    --fhcs-plain-glint: color-mix(in srgb, #dfe8ff 45%, transparent);
    --fhcs-plain-catch: color-mix(in srgb, #dfe8ff 35%, transparent);
    --fhcs-plain-catch-angle: 245deg;
-   --fhcs-plain-catch-from: -20%;
-   --fhcs-plain-catch-to: 120%;
+   --fhcs-plain-catch-from: -85%;
+   --fhcs-plain-catch-to: 185%;
    /* Moonlight only (user, 2026-10-29: "not stars or falling sparks"): the moon rising. Inspiration's marks wax and
       wane across the row (user, 2026-10-29): crescent, gibbous, new, gibbous, crescent, each a thin disc with its lit
       part filled; banked, any of them a full moon with a pale halo that breathes slower than the sun's. A lone mark
@@ -218,13 +218,14 @@
 }
 
 /* ---------- The portrait catches the light (Phase 6.55) ----------
-   On hover a band of light crosses the art once, from the light's side: Day's sunlight from the upper left, Night's
-   moonlight from the upper right (about 500ms). Inside the clip, so a round portrait keeps its circle; not while
+   When the pointer comes onto the portrait a band of light crosses the art once, from the light's side: Day's
+   sunlight from the upper left, Night's moonlight from the upper right (about 500ms). The sheet marks it
+   (`fhcs-catching`) for one pass, so it clears on its own and a quick out and in never restarts it (user, 2026-10-29). Inside the clip, so a round portrait keeps its circle; not while
    framing, whose dashed edge uses this layer. */
 
 @media (prefers-reduced-motion: no-preference)
 {
-   .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"]) .fhcs-portrait:not(.fhcs-framing):hover > .fhcs-portrait-clip::after
+   .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"]) .fhcs-portrait.fhcs-catching:not(.fhcs-framing) > .fhcs-portrait-clip::after
    {
       content: '';
       position: absolute;
@@ -233,11 +234,12 @@
       pointer-events: none;
       background: linear-gradient(var(--fhcs-plain-catch-angle), transparent 38%, var(--fhcs-plain-catch) 50%, transparent 62%) var(--fhcs-plain-catch-from) 0 / 200% 100% no-repeat;
       mix-blend-mode: screen;
-      animation: fhcs-plain-catch 0.5s ease-out forwards;
+      animation: fhcs-plain-catch 0.5s ease-out;
    }
 }
 
-/* The band sits mid-image on a layer twice the art's width: 120% puts it off the left, -20% off the right. */
+/* The band sits mid-image on a layer twice the art's width, slanted: 185% puts it wholly off the left, -85% off the
+   right (at 120% and -20% a strip of it stayed in, user 2026-10-29). */
 @keyframes fhcs-plain-catch
 {
    from { background-position: var(--fhcs-plain-catch-from) 0; }

@@ -500,16 +500,16 @@
    {
       box-shadow: 0 -2px 14px -2px var(--fhcs-theme-fire), 0 0 6px var(--fhcs-theme-glow), inset 0 0 0 1px var(--fhcs-theme-edge);
    }
-   .fhcs-sheet[data-fhcs-theme="forge"]:not([data-fhcs-motion="off"]) .fhcs-portrait:not(.fhcs-framing):hover > .fhcs-portrait-clip::after
+   .fhcs-sheet[data-fhcs-theme="forge"]:not([data-fhcs-motion="off"]) .fhcs-portrait.fhcs-catching:not(.fhcs-framing) > .fhcs-portrait-clip::after
    {
       content: '';
       position: absolute;
       inset: 0;
       z-index: 1;
       pointer-events: none;
-      background: linear-gradient(105deg, transparent 38%, color-mix(in srgb, #e2c278 40%, transparent) 50%, transparent 62%) 120% 0 / 200% 100% no-repeat;
+      background: linear-gradient(105deg, transparent 38%, color-mix(in srgb, #e2c278 40%, transparent) 50%, transparent 62%) 185% 0 / 200% 100% no-repeat;
       mix-blend-mode: screen;
-      animation: fhcs-forge-sheen 0.5s ease-out forwards;
+      animation: fhcs-forge-sheen 0.5s ease-out;
    }
    /* A press lands like a hammer: a 1px dip and a spark ring, once. */
    .fhcs-sheet[data-fhcs-theme="forge"]:not([data-fhcs-motion="off"]) :is(.fhcs-button, .fhcs-toggle, .fhcs-chip, .fhcs-tab):active
@@ -563,9 +563,10 @@
 
 @keyframes fhcs-forge-sheen
 {
-   /* The band sits mid-image on a layer twice the art's width: 120% puts it off the left, -20% off the right. */
-   from { background-position: 120% 0; }
-   to { background-position: -20% 0; }
+   /* The band sits mid-image on a layer twice the art's width: 185% puts it wholly off the left, -85% off the right (at
+      120% and -20% a strip of it stayed in). One pass, marked by the sheet (`fhcs-catching`). */
+   from { background-position: 185% 0; }
+   to { background-position: -85% 0; }
 }
 
 
