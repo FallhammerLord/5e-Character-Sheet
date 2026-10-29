@@ -7,7 +7,7 @@
  *   time"): a burst fans up and out from the mark, each spark with its own speed, angle, size and life, falling under
  *   gravity and cooling from white-gold to red; fewer and dimmer as HP falls (the hearth's heat).
  * - Day (Plain in light mode, Phase 6.55): sun motes, dust in a sunbeam, drifting up from the mark and swaying as they
- *   rise, catching the light as they turn.
+ *   rise, catching the light as they turn. Spent, the sun goes nova: a flash, and a ring of light bursting outward.
  * - Night (Plain in dark mode): a moonbeam, moonlight only (user, 2026-10-29: "not stars or falling sparks"), slanting
  *   down from the upper right onto the mark, brightening, then fading, with a pool of light where it lands; it burns
  *   the mark into a full moon (styles/themes/plain.css). Spent, a cloud drifts across the mark and wipes it away.
@@ -27,6 +27,9 @@ const LIFE_S = [1.0, 2.2];
 const MOTE_LIFE_S = [1.3, 2.3];
 const BEAM_S = 1.1;
 const CLOUD_S = 0.6;
+/** Day's nova: when its flash peaks (the styles' nova empties the mark then, at 30% of 600ms), and how long the ring runs. */
+const NOVA_PEAK_S = 0.18;
+const NOVA_S = 0.6;
 
 /** A theme's answer to inspiration gained, from the mark that was struck. */
 export function inspirationGained(element, mark)
@@ -36,10 +39,12 @@ export function inspirationGained(element, mark)
    else if (!theme) { if (darkMode(element)) { moonbeam(element, mark); } else { sunMotes(element, mark); } }
 }
 
-/** A theme's answer to inspiration spent, at the mark spent: Night's cloud wipes the full moon away. */
+/** A theme's answer to inspiration spent, at the mark spent: Night's cloud wipes the full moon away; Day's sun goes nova. */
 export function inspirationSpent(element, mark)
 {
-   if (!element.dataset.fhcsTheme && darkMode(element)) { cloudWipe(element, mark); }
+   if (element.dataset.fhcsTheme) { return; }
+   if (darkMode(element)) { cloudWipe(element, mark); }
+   else { sunNova(element, mark); }
 }
 
 /** Whether the sheet may move now. */
@@ -345,6 +350,50 @@ export function cloudWipe(element, mark = null)
          ctx.beginPath();
          ctx.arc(cx, cy, puff.r * 1.6, 0, Math.PI * 2);
          ctx.fill();
+      }
+      return 1;
+   });
+}
+
+/**
+ * Day's nova: as the spent sun swells and flares, a flash of white-gold at its centre, then a ring of light bursting
+ * outward from it, thinning and fading as it spreads (the styles empty the mark at the flash's height).
+ * @param {HTMLElement} element  The sheet's window element.
+ * @param {HTMLElement} [mark]   The mark spent.
+ */
+export function sunNova(element, mark = null)
+{
+   if (!mayMove(element)) { return; }
+   const surface = particleCanvas(element);
+   if (!surface) { return; }
+   const at = originOf(mark, surface.box);
+   if (!at) { surface.done(); return; }
+   run(surface, element, (ctx, age) =>
+   {
+      if (age >= NOVA_S) { return 0; }
+      // The flash: up to its peak, then gone quickly.
+      const flash = age < NOVA_PEAK_S ? age / NOVA_PEAK_S : Math.max(0, 1 - (age - NOVA_PEAK_S) / 0.12);
+      if (flash > 0)
+      {
+         const glow = ctx.createRadialGradient(at.x, at.y, 0, at.x, at.y, 18);
+         glow.addColorStop(0, `rgba(255, 244, 214, ${0.9 * flash})`);
+         glow.addColorStop(0.4, `rgba(255, 168, 80, ${0.45 * flash})`);
+         glow.addColorStop(1, 'rgba(232, 98, 42, 0)');
+         ctx.fillStyle = glow;
+         ctx.beginPath();
+         ctx.arc(at.x, at.y, 18, 0, Math.PI * 2);
+         ctx.fill();
+      }
+      // The ring, from the flash's height outward: fast at first, slowing, thinning and fading.
+      const t = (age - NOVA_PEAK_S) / (NOVA_S - NOVA_PEAK_S);
+      if (t > 0)
+      {
+         const spread = 1 - (1 - t) ** 2.2;
+         ctx.strokeStyle = `rgba(232, 98, 42, ${0.85 * (1 - t)})`;
+         ctx.lineWidth = 3 * (1 - t) + 0.5;
+         ctx.beginPath();
+         ctx.arc(at.x, at.y, 8 + 30 * spread, 0, Math.PI * 2);
+         ctx.stroke();
       }
       return 1;
    });
