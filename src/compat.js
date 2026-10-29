@@ -1369,6 +1369,40 @@ export function canApplyDamage()
 export function openTrays(element)
 {
    for (const tray of element.querySelectorAll('damage-application, effect-application')) { tray.open = true; }
+   watchTrays(element);
+}
+
+/** dnd5e's chat elements that follow selected and targeted tokens only while marked on screen (`visible`). */
+const TRAY_WATCHED = 'damage-application, effect-application, recorded-targets';
+
+/** One watcher for every card: marks its trays on or off screen as it scrolls; and the cards it has seen in the log. */
+let trayWatcher = null;
+const shown = new WeakSet();
+
+/**
+ * Marks a card's trays and target lists `visible` while the card is on screen, as dnd5e's chat log does
+ * (chat-log.mjs #onCardIntersects). dnd5e looks once, when the message enters the log; a card whose trays our
+ * render draws after that look kept them unmarked, so they never followed the selected or targeted tokens and the
+ * mode switch did nothing (user, 2026-10-29: "apply doesn't update ... the toggle seems nonfunctional").
+ *
+ * @param {HTMLElement} element  The rendered message.
+ */
+function watchTrays(element)
+{
+   if (typeof IntersectionObserver === 'undefined' || !element.querySelector(TRAY_WATCHED)) { return; }
+   trayWatcher ??= new IntersectionObserver((entries) =>
+   {
+      for (const { isIntersecting, target } of entries)
+      {
+         // A card not yet in the log is kept until it arrives; one that has left the log is let go.
+         if (!target.isConnected) { if (shown.has(target)) { trayWatcher.unobserve(target); } continue; }
+         shown.add(target);
+         for (const tray of target.querySelectorAll(TRAY_WATCHED)) { if ('visible' in tray) { tray.visible = isIntersecting; } }
+      }
+   });
+   // Each render draws new trays: look again, so the new ones are marked from the start.
+   trayWatcher.unobserve(element);
+   trayWatcher.observe(element);
 }
 
 /**

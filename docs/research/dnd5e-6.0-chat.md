@@ -66,3 +66,12 @@ So SCOPE §6.4's "saves on the same card" exists already; our work there is word
 - **Apply damage:** the tray calls `actor.applyDamage(damages, { ...options, isDelta: true, origin: this.chatMessage })` per selected or targeted token it owns (damage-application.mjs:601). `applyDamage` hands the same options to `calculateDamage`, which fires `dnd5e.calculateDamage(actor, damages, options)` with each type's value after resistances (`damages.temp` and `.tempMax` beside them); then `dnd5e.preApplyDamage` and, after the update, `dnd5e.applyDamage(actor, amount, options)`.
 - **Apply effects:** `_onApplyEffects` prepares each checked effect for each target with `_prepareEffectData(effect, actor)`, then creates or updates them in one `foundry.documents.modifyBatch`. No hook; we wrap the two methods on `customElements.get('effect-application')`.
 - **Attack targets** are a `TargetsField` on the attack message, recorded at the roll; `evaluatedTargets` compares them with the roll.
+
+## Trays follow tokens only while marked on screen (found 2026-10-29)
+
+`damage-application`, `effect-application` and `recorded-targets` rebuild their token lists only while `visible`
+(an attribute) and not `suspended` (`recorded-targets.mjs` `shouldBuildTargetList`; suspended while the tray isn't
+`open`). The chat log marks `visible` with an IntersectionObserver it attaches to each message's element as it enters
+the log (`chat-log.mjs` `#onLogMutated`, `#onCardIntersects`), so a tray drawn into a message after that first look
+stays unmarked: its list never follows selected or targeted tokens, and the Selected/Targeted switch (which only asks
+for a rebuild) looks dead. Ours: `compat.openTrays` also watches each card and marks its trays (`watchTrays`).
