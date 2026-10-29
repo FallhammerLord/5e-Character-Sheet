@@ -40,6 +40,24 @@ Learned over Phases 1–5; follow it unless the user says otherwise.
 6. **Play check:** the user opens a real character. Expect one styling pass after first play: size and comfort show only in Foundry (pips too big, details too tight).
 7. Tick ROADMAP, write the BUILT entry, update STATUS's "Next session", ask before pushing to `main`.
 
+## How a polish round goes
+
+Play notes come as one message with many asks (seven to twelve). Learned 2026-10-28:
+
+1. **Number the asks first** in ROADMAP's current phase, before any code; answer by number at the end. Ask one line about an unclear ask and carry on with the rest.
+2. **Find the existing answer before designing one:** Foundry's or dnd5e's behaviour first (who may edit, their icons, resizable windows, middle-click), then our nearest pattern on another tab. "Foundry should have icons for this" and "the same styling as the other categories" both meant this (SCOPE §5.0).
+3. **One ask, one slice, one commit** with its docs. Look at the screenshots of what changed.
+4. **A rule said in passing is a rule:** record it in SCOPE, dated, in the same commit ("big effects answer events, never timers").
+5. **One handover at the end:** which Quench tests are new, what to look at in play.
+
+## How a theme goes
+
+Learned building Fire and Forge (2026-10-28):
+
+1. **Look up the real thing before drawing it** (forging heat, temper colours, Damascus patterns) and write it into the theme's research note. Drawn from memory, the first Damascus came out as wood grain.
+2. **Preview a texture alone,** at 4× and on its bar, before the layout check: the check can judge contrast, not whether it reads as steel.
+3. **Keep to SCOPE §5.3:** one look in both of Foundry's modes, no texture inside panels, effects that answer events where they happen, one CSS file plus its texture script.
+
 ## Commands
 
 ```sh
@@ -77,17 +95,21 @@ Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies insta
 
 - **Templates use only core Handlebars helpers;** compute display values in the view functions. dnd5e's helpers don't exist in the layout check.
 - **A partial included by a tab loads with its part** (`PART_OPTIONS` templates in `src/apps/CharacterSheet.js`); the load check fails otherwise.
-- **Three text styles, two spacing steps** (user, 2026-10-24): display (large bold), body (regular), label (small bold capitals), set once at the top of `styles/fhcs.css`; spacing only `--fhcs-s1` and `--fhcs-s2` (the layout check fails on any other gap, padding or margin; the named exceptions are SCOPE §5.2 rules 3 and 21); controls `--fhcs-control` tall. Emphasis comes from color or placement, not a fourth style. The layout check fails on a fourth style.
-- **Colors only through tokens, and contrast in both themes** (user, 2026-10-24): every token has a light value and a dark one (the token blocks at the top of `styles/fhcs.css`); text meets WCAG 4.5:1 (3:1 large) against what it sits on. Don't fade text that carries information; mark it another way.
-- **One meaning per icon and color, across the sheet** (SCOPE §5.1). Check the table before choosing a mark; add new ones to it. Never color alone: every tint has an icon, mark or word beside it.
-- **Targets at least 24px**, even when the drawn mark is smaller (a 12px pip in a 24px button).
-- **Text in a button reads from the left;** Foundry centers button content, so set `justify-content: flex-start` on text buttons.
-- **Tooltips use `data-fhcs-tip`** (shown after a 1.5 s rest, above the button, cleared by a click), never `data-tooltip`, which shows at once and covered dice a click had just added (user, 2026-10-24). Two to four words.
-- **At the 644px minimum with every column on,** lesser columns give way (`flex-shrink` with a `min-width`) before names do (96px floor).
-- **Themes follow SCOPE §5.3:** art never under text without a plate, never reshapes (same heights as Plain), vectors only, moments about 600ms, each theme its own on/off moments through the toggle's hooks, everything still under Motion off and reduced motion. A theme is one CSS file in `styles/themes/`; textures that are generated come from a script in `tools/`.
+- **The design rules live in SCOPE §5,** one copy, so they can't drift: §5.0 principles, §5.1 marks, §5.2 styling, §5.3 themes, §5.4 other sheets. Read the part you're touching. The ones most often broken:
+  - three text styles (display, body, label) and spacing 4 or 8 only (`--fhcs-s1`, `--fhcs-s2`); the layout check fails a fourth style or any other gap;
+  - colours only through tokens, each with its light and dark value; text 4.5:1 (3:1 large); don't fade text that carries information;
+  - check §5.1 before choosing a mark, and look at the marks sharing its bar; add the new one;
+  - targets 24px (§5.2 rule 20 for the exception);
+  - text buttons `justify-content: flex-start` (Foundry centres them);
+  - tooltips `data-fhcs-tip`, two to four words, never `data-tooltip` (user, 2026-10-24: it showed at once and covered dice);
+  - at 644px lesser columns give way (`flex-shrink`, `min-width`); names keep 96px.
 - **Code style:** Allman braces, 3-space indent, single quotes (matches the quest log).
 
 ### Traps we've hit (check here before debugging layout)
+
+- **A subgrid's padding narrows its edge tracks** (a 24px gear column became 20px): inset the first cell, not the row.
+- **The layout check takes over two minutes:** run it in the background with its output to a log, then read the log.
+- **Playwright scripts of our own** need `chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })` here; the bare launch looks for another version.
 
 - **Foundry drags the window from any press in the title bar except on a button,** and keeps the pointer, so a `summary` there never opens: title-bar controls are buttons, and their trays hang from the window, outside the bar.
 - **dnd5e's item sheet disables every button and field in play mode** except those with `always-interactive` (application-v2-mixin.mjs:301): our lock, tabs and toggles carry it, or the sheet can never be unlocked.

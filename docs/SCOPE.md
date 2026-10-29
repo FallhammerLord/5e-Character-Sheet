@@ -195,6 +195,18 @@ From the quest log and Initiative: three text sizes; targets at least 24px; tool
 
 Don't say a thing twice: a mark that shows its own state needs no count beside it (user, 2026-10-26: the slot pips lost their "3 / 4").
 
+### 5.0 Principles (Claude, 2026-10-29, drawn from the user's decisions through Phase 6.5 and Forge)
+
+The rules below, in seven lines. When a case isn't covered, decide by these, in this order.
+
+1. **Readability first.** Text and marks win over art, texture and motion (§5.3 rules 1, 5).
+2. **Nothing moves.** Heights and places hold across modes, folds, themes and widths (§5.2 rule 6, §5.3 rule 3).
+3. **One meaning per mark, one mark per meaning** (§5.1). Check the table, and look at the marks that share a bar: a fold caret and a move arrow both drew ⌄ on one heading (2026-10-28).
+4. **Like things alike.** A new part copies the nearest existing pattern (Traits took the favorites groups' rows, user 2026-10-28); a feature for one tab goes on every tab it fits (categories and their order, user 2026-10-28).
+5. **Foundry and dnd5e first.** Their behaviour, icons and permissions before ours: an item sheet is editable whenever Foundry says so, no lock; dnd5e's halved shield for equipped; windows resize; a middle-click opens a sheet (user, 2026-10-28).
+6. **Effects answer the player.** A moment starts where its event shows, when it happens; never on a timer (§5.3 rule 6).
+7. **What a check can hold, a check holds,** seen failing once; the rest is listed as unchecked in §5.2.
+
 ### 5.1 Icons and colors on the sheet (one meaning each)
 
 Check here before choosing a mark, and add new ones. Every tint has an icon, mark or word beside it; never color alone. Colors are tokens with light and dark values (`styles/fhcs.css`).
@@ -245,7 +257,7 @@ Chat cards keep their own scheme (§6.6): the primary d20 black (white in dark t
 
 ### 5.2 Sheet styling rules (user, 2026-10-27)
 
-One set of rules for every tab and both modes (user, 2026-10-27: "apply as uniformly as we can, now that everything is where it should be"). The layout check enforces what it can (marked *check*).
+One set of rules for every tab and both modes (user, 2026-10-27: "apply as uniformly as we can, now that everything is where it should be"). The layout check enforces what it can (marked *check*). Not checked yet: rules 5, 7, 8, 10 (focus), 12 and 13, and rule 9 for icons and control edges; read those by eye on the screenshots.
 
 **Layout and alignment**
 1. **Edges that meet line up.** A region is a grid; neighbouring parts share its lines. Every heading is one fixed height whatever it holds, so headings side by side share their line (user's screenshot, 2026-10-28: Traits' heading, holding its fold button, sat lower than Skills'). The header: the portrait card spans two rows; the HP band and the cards share the second, so both their tops and bottoms align (the user's screenshot, 2026-10-27). *check*
@@ -266,7 +278,7 @@ One set of rules for every tab and both modes (user, 2026-10-27: "apply as unifo
 8. **Colours told apart differ in lightness, not hue alone;** no pair that only red against green separates (death saves keep tick and cross).
 9. **Contrast:** text 4.5:1, large text 3:1 (WCAG 1.4.3) *check*; a control's edge and an icon 3:1 against what they sit on (WCAG 1.4.11).
 10. **Focus shows** on every control, in both themes (WCAG 2.4.7).
-11. **Motion is brief, rare or slow:** answers under 300ms, moments to about 600ms, ambient motion only sparse or slow; all of it still under the player's Motion switch and reduced motion (§5.3 rule 6).
+11. **Motion:** §5.3 rule 6 (one copy).
 12. **Same thing, same place, same look** across tabs: search bar, pins, Columns menu, row layout, empty lines.
 13. **Empty states** are one short line in body, muted (a new sheet's empty favorites is normal, user 2026-10-27).
 
@@ -290,12 +302,19 @@ Every theme, and Plain where it applies. The look of each theme is §4.11.
 2. **What a theme may change** (Claude, 2026-10-28): the ground, panel surfaces and frames, corners, decals, heading bands, the tab row, its own marks (inspiration's) and motion. Never a meaning colour's hue (§5.1); it may shift lightness to keep contrast. Accent colours decorate, never mark.
 3. **A theme never reshapes:** every size, padding and height stays Plain's, so play and edit mode match in every theme; fields look as in Plain (only the edge heats on focus); the open tab never glows (user, 2026-10-28). *check (play and edit pairs per theme)*
 4. **Vectors and CSS only** (user, 2026-10-28): decals SVG, frames CSS, textures vector lines and gradients, never pixels or filter noise (`feTurbulence`); generated textures come from a script (Forge: `tools/forge-textures.mjs`). **No texture inside a panel** (user, 2026-10-28: Forge's grain read as rocks behind item entries, then traits and resources): a theme's texture lives in the ground, the bars and the window's frame, never behind a panel's text. One OFL display font per theme may take the display style and headings (Forge: Grenze). Custom images later, not now.
-5. **One look per theme** (user, 2026-10-28: "no difference between F&F light and dark ... default them to dark ... only worry about 1 style per style"): a theme draws the same in Foundry's light and dark modes (Forge is dark in both); contrast as §5.2 rule 9; texture under text 16% at most. Plain keeps Foundry's light and dark. *check (every theme in both of Foundry's modes, every width)*
+5. **One look per theme** (user, 2026-10-28: "no difference between F&F light and dark ... default them to dark ... only worry about 1 style per style"): a theme draws the same in Foundry's light and dark modes (Forge is dark in both); contrast as §5.2 rule 9, and text over a texture holds 4.5:1 against its brightest and its darkest stroke, not only its ground (Claude, 2026-10-29, replacing "texture under text 16% at most": the Damascus redraw passed that unchecked; the check is still to come, STATUS). Plain keeps Foundry's light and dark. *check (every theme in both of Foundry's modes, every width)*
 6. **Motion** (user, 2026-10-28): answers to the player under 300ms; moments (a hit, a heal, inspiration gained or spent) about 600ms, once; ambient motion only slow (a banked mark's breathing glow); never more than three flashes a second; all still under the player's Motion switch and reduced motion. **A hover gleam follows the pointer** across a frame (user, 2026-10-28, replacing a gleam that ran across once; the sheet sets `--fhcs-gleam-x`), the portrait keeping its own. **A theme's effect starts where its event shows** (user, 2026-10-28: Forge's sparks fan from the inspiration mark struck). **A theme's big effects answer an event, never a timer** (user, 2026-10-28: Forge's sparks now spray only when inspiration is gained, replacing a burst every 70 to 120 seconds). **Every theme brings its own on and off moments for a toggle**, through the toggle's hooks (inspiration: `--fhcs-inspire-on`, `-off`, `-on-glow`, `-off-glow`).
 7. **State art** (user, 2026-10-28): a theme's art follows the character's state, beside the marks that say it, never in their place: `--fhcs-hp` (0–1), `data-fhcs-hp` (full, bloodied, down), and a moment class when HP falls or rises.
 8. **Layers:** a translucent plate with a blur is its own layer, so a plate holding an open tray rises above its neighbours; a tray sets its own ink, not the bar's it opens from.
 9. **Self-contained:** one CSS file per theme (with its font and generated textures), so a theme can travel to the quest log later; not shared yet.
 10. **Chat cards follow the world theme,** not the speaker's; a world setting keeps them plain.
+
+### 5.4 Other sheets (Claude, 2026-10-29, from SCOPE §4.13 and the item sheet)
+
+1. **Our own parts follow §5.0 to §5.3** (the item sheet's header and Description tab).
+2. **dnd5e's forms get a skin, not a rebuild:** our tokens, type and spacing over their markup (Details, Activities, Effects, Advancement, the config windows). Their markup may mix more than three text styles; we don't promise otherwise.
+3. **A sheet without a lock has no play mode,** so §5.2 rule 6 applies only where there is a lock. A sheet locks only where dnd5e's own character or NPC sheet does.
+4. **Every window resizes,** with a least width (dnd5e's own) and a starting height.
 
 ## 6. Rolls and chat cards
 
