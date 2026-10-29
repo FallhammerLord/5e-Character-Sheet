@@ -74,4 +74,8 @@ So SCOPE §6.4's "saves on the same card" exists already; our work there is word
 `open`). The chat log marks `visible` with an IntersectionObserver it attaches to each message's element as it enters
 the log (`chat-log.mjs` `#onLogMutated`, `#onCardIntersects`), so a tray drawn into a message after that first look
 stays unmarked: its list never follows selected or targeted tokens, and the Selected/Targeted switch (which only asks
-for a rebuild) looks dead. Ours: `compat.openTrays` also watches each card and marks its trays (`watchTrays`).
+for a rebuild) looks dead. Ours: `compat.openTrays` also watches each card and marks its trays (`watchTrays`), a guard:
+it was written for a report whose real cause was the next point.
+
+**Selected mode lists only tokens with an actor** (`buildTargetsList`: `if ( t.actor )`): a token with no actor has
+no HP to apply to and no save to roll, so it never shows in a tray (user, 2026-10-29, testing with such tokens).

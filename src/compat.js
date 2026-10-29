@@ -1381,9 +1381,9 @@ const shown = new WeakSet();
 
 /**
  * Marks a card's trays and target lists `visible` while the card is on screen, as dnd5e's chat log does
- * (chat-log.mjs #onCardIntersects). dnd5e looks once, when the message enters the log; a card whose trays our
- * render draws after that look kept them unmarked, so they never followed the selected or targeted tokens and the
- * mode switch did nothing (user, 2026-10-29: "apply doesn't update ... the toggle seems nonfunctional").
+ * (chat-log.mjs #onCardIntersects). dnd5e looks once, when the message enters the log, so a tray drawn after that
+ * look would stay unmarked and never follow the tokens. A guard: written for a report (2026-10-29) whose real cause
+ * was tokens with no actor, which dnd5e never lists.
  *
  * @param {HTMLElement} element  The rendered message.
  */
