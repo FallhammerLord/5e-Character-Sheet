@@ -129,6 +129,7 @@ Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies insta
 - **Custom properties inherit:** a check keyed on one (`--fhcs-art`) must count only the element where it starts.
 - **Sideways moves pass the parity check** by design (rule 6 lets columns slide left); only heights and vertical places fail it.
 - **The layout check's last line counts layouts; it doesn't say they passed.** Read its whole output (failures print above it), or grep for lines that start with a case name.
+- **Anything a theme's script adds to the window outlives the theme** (`.window-content` persists across redraws): it places itself with its own inline styles and removes itself when done. Forge's leftover sparks canvas, unstyled in Plain, pushed the tabs out of sight.
 - **Foundry puts the interface's mode on the page and each window's own on the window** (`.themed.theme-light` inside `body.theme-dark`): a bare `.theme-dark .fhcs-sheet` reads the page's. Dark selectors add `:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))`, as dnd5e's `@scope (.theme-dark) to (.themed)` (not `@scope` itself: its proximity rule would let base tokens beat a theme's). The layout check puts every window in an interface of the other mode.
 - **A theme's light token block reaches dark mode too** unless its dark block sets the same token (Forge's darker success green showed on dark iron).
 - **Headless Chromium has no hyphenation dictionary:** "Dragonbo / rn" in a screenshot is the harness, not the sheet.

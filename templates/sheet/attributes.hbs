@@ -49,7 +49,9 @@
             {{/if}}
             {{#if move}}{{> "modules/fhcs/templates/sheet/section-move.hbs" }}{{/if}}
          </div>
-         <ul class="fhcs-favorites"{{#unless open}} hidden{{/unless}}>
+         {{!-- `favorites`: dnd5e gives `.favorites [data-item-id]` its item menu and takes drops there as favorites
+               (character-sheet.mjs:902, 1152; user, 2026-10-29: "should maintain relevant item right-click menus"). --}}
+         <ul class="fhcs-favorites favorites"{{#unless open}} hidden{{/unless}}>
             {{#each rows}}
             {{!-- dnd5e's useFavorite reads these ids from the row and the button. --}}
             <li class="fhcs-favorite{{#if equipped}} fhcs-equipped{{/if}}{{#if prepared}} fhcs-prepared{{/if}}{{#if kind}} fhcs-kind-{{ kind }}{{/if}}{{#if expanded}} fhcs-open{{/if}}"

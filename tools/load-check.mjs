@@ -187,6 +187,11 @@ else
    if (parts.features?.scrollable?.join() !== '.fhcs-items') { problems.push('the features part does not keep its list\'s scroll'); }
    if (!parts.effects?.template.startsWith('modules/fhcs/')) { problems.push('the effects part is still dnd5e\'s'); }
    if (!parts.effects?.templates?.some((p) => p.endsWith('/list-bar.hbs'))) { problems.push('the effects part does not load list-bar.hbs'); }
+   // dnd5e's item menu and favorite drops find favorites by `.favorites [data-item-id]` (character-sheet.mjs:902).
+   if (!/class="fhcs-favorites favorites"[\s\S]*?data-item-id=/.test(readFileSync(new URL('../templates/sheet/attributes.hbs', import.meta.url), 'utf8')))
+   {
+      problems.push('the favorites list lost dnd5e\'s .favorites class, so its rows have no item menu');
+   }
    if (!parts.biography?.template.startsWith('modules/fhcs/')) { problems.push('the biography part is still dnd5e\'s'); }
    if (!parts.biography?.templates?.some((p) => p.endsWith('/bio-box.hbs'))) { problems.push('the biography part does not load bio-box.hbs'); }
    if (parts.biography?.scrollable?.join() !== '') { problems.push('the biography tab lost dnd5e\'s scrolling'); }

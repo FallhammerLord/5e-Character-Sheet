@@ -57,6 +57,9 @@ export function sparkBurst(element, mark = null)
       canvas = document.createElement('canvas');
       canvas.className = 'fhcs-sparks';
       canvas.setAttribute('aria-hidden', 'true');
+      // Placed by itself, not by a theme's styles: left behind when the theme changed, it stood in the window's
+      // column and pushed the tabs out of sight (user, 2026-10-29).
+      Object.assign(canvas.style, { position: 'absolute', inset: '0', zIndex: '3', width: '100%', height: '100%', pointerEvents: 'none' });
       content.append(canvas);
    }
    const scale = globalThis.devicePixelRatio || 1;
@@ -65,7 +68,8 @@ export function sparkBurst(element, mark = null)
    canvas.width = Math.round(width * scale);
    canvas.height = Math.round(height * scale);
    const ctx = canvas.getContext('2d');
-   if (!ctx) { return; }
+   if (!ctx) { if (!canvas.fhcsBursts) { canvas.remove(); } return; }
+   canvas.fhcsBursts = (canvas.fhcsBursts ?? 0) + 1;
    ctx.setTransform(scale, 0, 0, scale, 0, 0);
 
    // The hearth's heat sets how many sparks and how bright: a full forge throws a spray, a cooling one a few.
@@ -127,7 +131,8 @@ export function sparkBurst(element, mark = null)
          ctx.fill();
       }
       if (alive && element.isConnected) { requestAnimationFrame(frame); }
-      else { ctx.clearRect(0, 0, width, height); }
+      // The last burst is over: the canvas goes with it, so nothing of a theme stays in the window.
+      else if (--canvas.fhcsBursts <= 0) { canvas.remove(); }
    };
    requestAnimationFrame(frame);
 }
