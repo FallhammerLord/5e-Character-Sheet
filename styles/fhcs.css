@@ -2032,21 +2032,26 @@
 /* Traits (user, 2026-10-27): a panel at the main column's top, its heading on the Skills heading's line, on the fill
    underlay the stats panels use. One line per trait: label, values, then a gear column (empty in play), every row
    24px at least in both modes. */
-.fhcs-sheet .fhcs-traits-panel { border-radius: var(--fhcs-radius); background: var(--fhcs-fill); }
-.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head { gap: var(--fhcs-s2); }
+.fhcs-sheet .fhcs-traits-panel > .fhcs-group-head { gap: var(--fhcs-s2); }
 .fhcs-sheet .fhcs-traits-panel .fhcs-group-toggle { flex: none; }
 /* The whole bar is the fold button (user, 2026-10-28: the focus box covered only the word): the button's target
    stretches over the bar, the folded summary beside it too, and its focus box is drawn on the bar. The summary stays
    outside the button, so one control holds one text size (rule 17). */
-.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head { position: relative; }
-.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head > .fhcs-group-toggle::after { content: ''; position: absolute; inset: 0; }
-.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head > .fhcs-group-toggle:is(:hover, :focus, :focus-visible) { outline: none; box-shadow: none; background: none; }
-.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head:has(> .fhcs-group-toggle:focus-visible) { outline: 2px solid var(--fhcs-ink); outline-offset: -2px; }
-.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head > .fhcs-traits-summary { pointer-events: none; }
+.fhcs-sheet .fhcs-traits-panel > .fhcs-group-head { position: relative; }
+.fhcs-sheet .fhcs-traits-panel > .fhcs-group-head > .fhcs-group-toggle::after { content: ''; position: absolute; inset: 0; }
+.fhcs-sheet .fhcs-traits-panel > .fhcs-group-head > .fhcs-group-toggle:is(:hover, :focus, :focus-visible) { outline: none; box-shadow: none; background: none; }
+.fhcs-sheet .fhcs-traits-panel > .fhcs-group-head:has(> .fhcs-group-toggle:focus-visible) { outline: 2px solid var(--fhcs-ink); outline-offset: -2px; }
+.fhcs-sheet .fhcs-traits-panel > .fhcs-group-head > .fhcs-traits-summary { pointer-events: none; }
 /* The Special Traits gear and the panel's arrows sit above the fold button's stretched target. */
-.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head { justify-content: space-between; }
-.fhcs-sheet .fhcs-traits-panel > .fhcs-panel-head > :is(.fhcs-special-traits, .fhcs-section-move) { position: relative; z-index: 1; flex: none; }
+.fhcs-sheet .fhcs-traits-panel > .fhcs-group-head { justify-content: space-between; }
+.fhcs-sheet .fhcs-traits-panel > .fhcs-group-head > :is(.fhcs-special-traits, .fhcs-section-move) { position: relative; z-index: 1; flex: none; }
 .fhcs-sheet .fhcs-traits-summary { flex: 1; }
+
+/* Every category on Attributes (Traits, Resources, the favorites groups) one look (user, 2026-10-29: "traits need to
+   match the styling of other categories"): its heading and rows inset by s2 inside the frame, so the frame shows down
+   both sides (in Forge its riveted edge). Once a stray rule for the Features tab's grouping button, which shared the
+   class; now on purpose. */
+.fhcs-sheet .fhcs-attributes-main > .fhcs-group { padding: 0 var(--fhcs-s2); }
 
 /* `.fhcs-traits-panel >` outweighs the tab's reset of every `dl` (user, 2026-10-28: the labels sat on the edge). */
 .fhcs-sheet .fhcs-traits-panel > .fhcs-traits
@@ -3204,7 +3209,7 @@
 
 /* The grouping in words, beside the pins; dnd5e's own icon button for it is hidden. */
 .fhcs-sheet .fhcs-list-bar .filter-control[data-action="group"] { display: none; }
-.fhcs-sheet .fhcs-group { justify-content: flex-start; width: auto; padding: 0 var(--fhcs-s2); }
+.fhcs-sheet .fhcs-group-cycle { justify-content: flex-start; width: auto; padding: 0 var(--fhcs-s2); }
 
 /* Recovery gives way like usage, before the name does. */
 .fhcs-sheet .fhcs-col-recovery { flex: 0 1 104px; min-width: 64px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -3453,6 +3458,40 @@
 .fhcs-item-sheet .fhcs-item-toggle:disabled { cursor: default; }
 
 .fhcs-item-sheet .fhcs-item-body { display: grid; grid-template-columns: 160px minmax(0, 1fr); align-items: start; gap: var(--fhcs-s2); }
+/* A class, species or background: the properties as a row above a full-width description (SCOPE §4.13). */
+.fhcs-item-sheet .fhcs-item-body.fhcs-item-wide { grid-template-columns: minmax(0, 1fr); }
+.fhcs-item-sheet .fhcs-item-wide .fhcs-item-prop-list { display: flex; flex-wrap: wrap; column-gap: var(--fhcs-s2); }
+.fhcs-item-sheet .fhcs-item-wide .fhcs-item-prop { flex: 1 1 160px; border-bottom: 0; }
+
+/* dnd5e's info row: a cell for each fact, the label with its gear, the value under it. */
+.fhcs-item-sheet .fhcs-item-info
+{
+   display: grid;
+   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+   gap: var(--fhcs-s2);
+   margin: 0 0 var(--fhcs-s2);
+   padding: var(--fhcs-s1) var(--fhcs-s2);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-surface);
+}
+.fhcs-item-sheet .fhcs-item-info-cell { display: flex; flex-direction: column; min-width: 0; }
+.fhcs-item-sheet .fhcs-item-info-cell > dt { display: flex; align-items: center; gap: var(--fhcs-s1); min-height: 24px; margin: 0; }
+.fhcs-item-sheet .fhcs-item-info-cell > dd { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--fhcs-s1); margin: 0; overflow-wrap: anywhere; }
+.fhcs-item-sheet .fhcs-item-info-cell dnd5e-icon { width: 16px; height: 16px; }
+
+/* A class's level: a ring, as on the class cards (§5.1), sized to the header. */
+.fhcs-item-sheet .fhcs-item-level
+{
+   display: grid;
+   flex: none;
+   place-items: center;
+   box-sizing: border-box;
+   width: 48px;
+   height: 48px;
+   border: 2px solid var(--fhcs-line);
+   border-radius: 50%;
+}
 .fhcs-item-sheet :is(.fhcs-item-props, .fhcs-item-text)
 {
    min-width: 0;
@@ -3482,10 +3521,23 @@
 .fhcs-item-sheet .fhcs-item-texts { display: flex; flex-direction: column; gap: var(--fhcs-s2); min-width: 0; }
 .fhcs-item-sheet .fhcs-item-text { display: flex; flex-direction: column; overflow: hidden; }
 .fhcs-item-sheet .fhcs-item-text > :not(.fhcs-panel-head) { margin: 0; padding: var(--fhcs-s2); }
-.fhcs-item-sheet .fhcs-item-text :is(p, li, ul, ol, h1, h2, h3, h4, blockquote) { margin: 0 0 var(--fhcs-s2); font-size: var(--fhcs-body-size); line-height: var(--fhcs-body-line); }
-.fhcs-item-sheet .fhcs-item-text :is(p, li, ul, ol, h1, h2, h3, h4, blockquote):last-child { margin-bottom: 0; }
-/* Headings inside a description keep the body size, bold: emphasis by weight within body text, not a fourth style. */
-.fhcs-item-sheet .fhcs-item-text :is(h1, h2, h3, h4) { font-weight: bold; border: 0; }
+.fhcs-item-sheet .fhcs-item-text :is(p, li, ul, ol, h1, h2, h3, h4, h5, h6, blockquote, table) { margin: 0 0 var(--fhcs-s2); font-size: var(--fhcs-body-size); line-height: var(--fhcs-body-line); }
+.fhcs-item-sheet .fhcs-item-text :is(p, li, ul, ol, h1, h2, h3, h4, h5, h6, blockquote, table):last-child { margin-bottom: 0; }
+/* A description's own structure in our three styles (user, 2026-10-29: the Cleric's traits table and headings): a
+   section heading in display, a lesser one and a table's heads in label, everything else body. */
+.fhcs-item-sheet .fhcs-item-text :is(h1, h2, h3) { padding: 0; border: 0; font-size: var(--fhcs-display-size); font-weight: bold; line-height: 1.2; text-transform: none; }
+.fhcs-item-sheet .fhcs-item-text :is(h4, h5, h6, th) { padding: 0; border: 0; font-size: var(--fhcs-label-size); font-weight: bold; letter-spacing: 0.04em; text-transform: uppercase; }
+/* Tables as our ledgers: a line under each row, every other one filled, the heads in label style. */
+.fhcs-item-sheet .fhcs-item-text table { width: 100%; border: 0; border-collapse: collapse; background: none; }
+.fhcs-item-sheet .fhcs-item-text :is(tr, thead, tbody) { border: 0; background: none; }
+.fhcs-item-sheet .fhcs-item-text tr { border-bottom: 1px solid var(--fhcs-line-soft); }
+.fhcs-item-sheet .fhcs-item-text tbody tr:nth-child(even) { background: var(--fhcs-fill); }
+.fhcs-item-sheet .fhcs-item-text :is(th, td) { padding: var(--fhcs-s1); border: 0; text-align: left; vertical-align: top; color: var(--fhcs-ink); }
+.fhcs-item-sheet .fhcs-item-text td { font-size: var(--fhcs-body-size); font-weight: normal; }
+/* A quote or aside: a line down its left, its words body. */
+.fhcs-item-sheet .fhcs-item-text blockquote { padding: 0 0 0 var(--fhcs-s2); border: 0; border-left: 2px solid var(--fhcs-line); background: none; }
+/* A bold lead-in ("Darkvision.", "Feat:") takes the label style: our emphasis, not a fourth style. */
+.fhcs-item-sheet .fhcs-item-text :is(strong, b) { font-size: var(--fhcs-label-size); font-weight: bold; letter-spacing: 0.04em; text-transform: uppercase; }
 /* Foundry's Font Awesome marks in the item header's toggles, at our icons' size. */
 .fhcs-item-sheet .fhcs-item-toggle > .fhcs-fa { font-size: 14px; line-height: 1; }
 /* Breathing room inside the item window (user, 2026-10-28), at the sides and foot; the header keeps its top. */

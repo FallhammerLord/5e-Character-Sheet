@@ -14,7 +14,8 @@ export const ITEM_PARTS = {
 /** Partials our parts include, loaded with them. */
 const ITEM_PART_OPTIONS = {
    header: { templates: [`${MODULE_PATH}/templates/sheet/conc-c.hbs`] },
-   tabs: { templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`] }
+   tabs: { templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`] },
+   description: { templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`] }
 };
 
 /** The narrowest an item sheet may be (SCOPE §4.13: dnd5e's own width). */
@@ -82,6 +83,12 @@ export function makeItemSheet(Base)
       }
 
       static PARTS = itemParts(Base.PARTS);
+
+      /** No lock, so none of dnd5e's edit-mode slider in the title bar either (it was only hidden). */
+      _renderModeToggle()
+      {
+         this.element?.querySelector('.window-header .mode-slider')?.remove();
+      }
 
       /** dnd5e's ⋮ menu, with every other title-bar button added (SCOPE §5.2 rule 14). */
       * _getHeaderControlContextEntries()

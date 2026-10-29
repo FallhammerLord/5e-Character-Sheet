@@ -61,11 +61,24 @@ export function itemSheetView(facts, { localize, format })
    }
    // The category of the player's own (SCOPE §4.13), the same name the character's tabs file it by.
    row('category', facts.category, facts.categoryField);
-   // The category shows in both modes, "—" when unset, so the column keeps its rows on the lock (rule 6).
-   const shown = props.filter((p) => facts.editing || p.value !== '' || p.key === 'quantity' || p.key === 'category');
+   // A reader sees only what's set (no lock, so no rows to hold in place: SCOPE §5.4 rule 3); quantity always.
+   const shown = props.filter((p) => facts.editing || p.value !== '' || p.key === 'quantity');
+
+   // Classes, species and backgrounds hold long texts and nothing for the column but the category: their properties
+   // run as a row above the description, which takes the full width (user, 2026-10-29: the Cleric's table).
+   const wide = !facts.physical && !facts.uses && !spell && !(facts.headerFields ?? []).length;
+   const levelLabel = facts.levels ? format('FHCS.Item.Level', { level: facts.levels }) : '';
+
+   const hasProps = shown.length > 0 || (facts.tags ?? []).length > 0;
 
    return {
       name: facts.name,
+      // Nothing for the column, or only the category of a long-text item: the description takes the full width.
+      wide: wide || !hasProps,
+      hasProps,
+      level: facts.levels || 0,
+      levelLabel,
+      info: (facts.info ?? []).map((i) => ({ ...i, canConfigure: !!(i.config && facts.editable && facts.editing) })),
       nameField: facts.nameField,
       img: facts.img,
       editable: !!facts.editable,
@@ -74,7 +87,7 @@ export function itemSheetView(facts, { localize, format })
       subtitle,
       marks,
       toggles,
-      props: shown.map((p) => ({ ...p, value: !facts.editing && p.key === 'category' && !p.value ? '—' : p.value,
+      props: shown.map((p) => ({ ...p,
          unitText: p.unit ? ` ${p.unit}` : '', placeholder: p.key === 'category' ? localize('FHCS.Item.CategoryNone') : '' })),
       tags: facts.tags ?? [],
       // The description first, then the others dnd5e shows (unidentified for the GM, chat), each its own panel.

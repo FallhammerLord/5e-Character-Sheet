@@ -597,10 +597,10 @@ export const CASES = [
    { name: 'effects-folded', template: 'sheet/effects', context: effects({ folded: ['effects:temporary'] }) },
    { name: 'inventory-empty', template: 'sheet/inventory', context: inventory({ sections: [], attunement: { value: 0, max: 0 }, encumbrance: null }) },
    { name: 'attributes', template: 'sheet/attributes', context: attributes(), rows: '.fhcs-skills > li, .fhcs-trait-row', marks: '.fhcs-skill-name, .fhcs-skill-mod',
-      align: [['.fhcs-attributes-side .fhcs-panel-head', 'top', '.fhcs-traits-panel .fhcs-panel-head', 'top'], ['.fhcs-attributes-side .fhcs-panel-head', 'bottom', '.fhcs-traits-panel .fhcs-panel-head', 'bottom']] },
+      align: [['.fhcs-attributes-side .fhcs-panel-head', 'top', '.fhcs-traits-panel .fhcs-group-head', 'top'], ['.fhcs-attributes-side .fhcs-panel-head', 'bottom', '.fhcs-traits-panel .fhcs-group-head', 'bottom']] },
    { name: 'attributes-folded', template: 'sheet/attributes', context: attributes({ folded: ['inventory', 'spell-1', 'traits'] }),
       // The traits heading sits on the Skills heading's line, folded or open (user, 2026-10-27).
-      align: [['.fhcs-attributes-side .fhcs-panel-head', 'top', '.fhcs-traits-panel .fhcs-panel-head', 'top'], ['.fhcs-attributes-side .fhcs-panel-head', 'bottom', '.fhcs-traits-panel .fhcs-panel-head', 'bottom']] },
+      align: [['.fhcs-attributes-side .fhcs-panel-head', 'top', '.fhcs-traits-panel .fhcs-group-head', 'top'], ['.fhcs-attributes-side .fhcs-panel-head', 'bottom', '.fhcs-traits-panel .fhcs-group-head', 'bottom']] },
    { name: 'attributes-editing', template: 'sheet/attributes', context: attributes({ editing: true }), rows: '.fhcs-skills > li, .fhcs-trait-row', marks: '.fhcs-skill-name, .fhcs-skill-mod', sameRowsAs: 'attributes' },
    { name: 'attributes-resource-tray', template: 'sheet/attributes', open: ['resource-primary'], context: attributes({ editing: true }) },
    { name: 'attributes-ability-tray', template: 'sheet/attributes', open: ['skill-ability-ath'], context: attributes({ editing: true }) },
@@ -831,6 +831,25 @@ const ITEMS = {
       uses: { value: 2, max: 3, recovery: 'Short Rest, Long Rest' }, spell: null, tags: [], category: '', categoryField: 'flags.fhcs.section',
       description: { name: 'system.description.value', source: '', enriched: '' }, uuid: 'Actor.a.Item.sw' }
 };
+// A class, a species and a background, as dnd5e's SRD writes them (user's screenshots, 2026-10-29): a traits table and
+// headings; the species' info row; bold lead-ins.
+const LONG = { nameField: 'name', editable: true, concealed: false, toggles: [], physical: null, uses: null, spell: null, tags: [], category: '',
+   categoryField: 'flags.fhcs.section', headerFields: [], descriptions: [] };
+ITEMS.class = { ...LONG, type: 'class', name: 'Cleric', img: ICON('#5b8fd6'), subtitles: ['Class'], typeLabel: 'Class', levels: 1, uuid: 'Item.cleric',
+   description: { name: 'system.description.value', source: '', enriched: '<h3>Core Cleric Traits</h3><table><tbody>'
+      + '<tr><th>Primary Ability</th><td>Wisdom</td></tr><tr><th>Hit Point Die</th><td>D8 per Cleric level</td></tr>'
+      + '<tr><th>Saving Throw Proficiencies</th><td>Wisdom and Charisma</td></tr><tr><th>Skill Proficiencies</th><td><em>Choose 2:</em> History, Insight, Medicine, Persuasion, or Religion</td></tr>'
+      + '<tr><th>Starting Equipment</th><td><em>Choose A or B:</em> (A) <a class="content-link">Chain Shirt</a>, <a class="content-link">Shield</a>, <a class="content-link">Mace</a>; or (B) 110 GP</td></tr></tbody></table>'
+      + '<blockquote><p><em>A Miraculous Priest of Divine Power</em></p></blockquote><p>Clerics draw power from the realms of the gods and harness it to work miracles.</p>' } };
+ITEMS.species = { ...LONG, type: 'race', name: 'Dwarf', img: ICON('#a0703a'), subtitles: ['Species'], typeLabel: 'Species', uuid: 'Item.dwarf',
+   info: [{ label: 'Creature Type', value: 'Humanoid (Dwarf)', config: 'type', tip: 'Configure creature type' },
+      { label: 'Movement', value: '<span class="key">Speed</span> <span class="value">30</span>', config: 'movement', tip: 'Configure movement' },
+      { label: 'Senses', value: '<span class="key">Darkvision</span> <span class="value">120</span>', config: 'senses', tip: 'Configure senses' }],
+   description: { name: 'system.description.value', source: '', enriched: '<h3>Dwarf Traits</h3><p><strong>Creature Type:</strong> Humanoid</p><p><strong>Size:</strong> Medium (about 4–5 feet tall)</p>'
+      + '<p><strong>Darkvision.</strong> You have Darkvision with a range of 120 feet.</p>' } };
+ITEMS.background = { ...LONG, type: 'background', name: 'Criminal', img: ICON('#8a5a3c'), subtitles: ['Background'], typeLabel: 'Background', uuid: 'Item.criminal',
+   description: { name: 'system.description.value', source: '', enriched: '<p><strong>Ability Scores:</strong> Dexterity, Constitution, Intelligence</p><p><strong>Feat:</strong> <a class="content-link">Alert</a></p>'
+      + '<p>You eked out a living in dark alleyways, cutting purses or burgling shops.</p>' } };
 const itemSheet = (kind, { editing = false, ...over } = {}) =>
 {
    // No lock (SCOPE §4.13): an owner always edits, a viewer only reads; "editing" here is the owner's sheet.

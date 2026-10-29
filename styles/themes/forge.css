@@ -207,7 +207,7 @@
 
 /* ---------- Type: Grenze for the display style and headings ---------- */
 
-.fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-display, .fhcs-panel-head .fhcs-label, .fhcs-group-head .fhcs-label, .fhcs-section-toggle > .fhcs-label)
+.fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-display, .fhcs-item-text :is(h1, h2, h3), .fhcs-panel-head .fhcs-label, .fhcs-group-head .fhcs-label, .fhcs-section-toggle > .fhcs-label)
 {
    font-family: 'FHCS Grenze', var(--font-body, serif);
 }

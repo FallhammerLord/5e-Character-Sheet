@@ -860,7 +860,7 @@ export function itemSheetFacts(sheet, context)
    }));
    // The other descriptions, as dnd5e shows them: the unidentified one for the GM, the chat one for its owner (or when set).
    const identifiable = 'identified' in system;
-   const descriptions = concealed ? [] : [
+   const descriptions = concealed || context.singleDescription ? [] : [
       identifiable && game.user.isGM && { key: 'unidentified', label: game.i18n.localize('DND5E.DescriptionUnidentified'), name: 'system.unidentified.description',
          enriched: context.enriched?.unidentified ?? '', source: system._source?.unidentified?.description ?? '' },
       (item.isOwner || system.description?.chat) && { key: 'chat', label: game.i18n.localize('DND5E.DescriptionChat'), name: 'system.description.chat',
@@ -883,6 +883,11 @@ export function itemSheetFacts(sheet, context)
       subtitles: (context.subtitles ?? []).filter((s) => s.label && !(s.requiresIdentification && concealed)).map((s) => game.i18n.localize(s.label)),
       headerFields,
       descriptions,
+      // dnd5e's info row above the description: a species' creature type, movement and senses (each with its settings
+      // window), a weapon's to-hit and damage, armour's AC. Its values are dnd5e's own HTML.
+      info: concealed ? [] : (context.info ?? []).map((i) => ({ label: i.label ? game.i18n.localize(i.label) : '', value: i.value ?? '', config: i.config ?? '',
+         tip: i.tooltip ? game.i18n.localize(i.tooltip) : '' })),
+      levels: item.type === 'class' ? Number(system.levels ?? 0) : 0,
       typeLabel: game.i18n.localize(CONFIG.Item.typeLabels?.[item.type] ?? item.type),
       toggles: itemToggles(item),
       physical,

@@ -968,7 +968,8 @@ export function registerQuenchTests(quench)
             const [blade] = await createItems([{ name: 'FHCS test rare blade', type: 'weapon', flags: { core: { sheetClass: `${MODULE_ID}.FHCSItemSheet` } } }]);
             // A world item, not the actor's: a class on the actor would level it.
             const klass = await Item.implementation.create({ name: 'FHCS test class', type: 'class', flags: { core: { sheetClass: `${MODULE_ID}.FHCSItemSheet` } } });
-            const sheets = [blade.sheet, klass.sheet];
+            const species = await Item.implementation.create({ name: 'FHCS test species', type: 'race', flags: { core: { sheetClass: `${MODULE_ID}.FHCSItemSheet` } } });
+            const sheets = [blade.sheet, klass.sheet, species.sheet];
             const inside = (s, selector) => s.element?.querySelector(selector);
             try
             {
@@ -984,12 +985,18 @@ export function registerQuenchTests(quench)
                const add = () => inside(classSheet, '.create-child');
                await until(() => add() && getComputedStyle(add()).display !== 'none',
                   () => `dnd5e's add button shows on Advancement; button ${!!add()}, display ${add() ? getComputedStyle(add()).display : '-'}, window ${classSheet.element?.className}`);
+               await until(() => inside(classSheet, '.fhcs-item-level'), () => 'a class shows its level in the header');
+               // dnd5e's info row, with a gear for each of a species' settings windows (user, 2026-10-29).
+               await species.sheet.render({ force: true });
+               const gears = () => [...(species.sheet.element?.querySelectorAll('.fhcs-item-info [data-action="showConfiguration"]') ?? [])].map((g) => g.dataset.config);
+               await until(() => ['type', 'movement', 'senses'].every((c) => gears().includes(c)), () => `a species' info row has its gears; it has ${gears().join(', ') || 'none'}`);
             }
             finally
             {
                for (const s of sheets) { await s.close(); }
                await blade.delete();
                await klass.delete();
+               await species.delete();
             }
          });
 
@@ -1182,7 +1189,7 @@ export function registerQuenchTests(quench)
             await click('.fhcs-features [data-action="fhcsCycleGroup"]');
             await until(() => home(rage, 'activation') === 'active' && home(tough, 'activation') === 'passive',
                () => `the switch moves them to Active and Passive; found ${home(rage, 'activation')} and ${home(tough, 'activation')} (rows say ${row(rage)?.dataset.groupActivation}, ${row(tough)?.dataset.groupActivation})`);
-            assert.include(sheet.element.querySelector('.fhcs-features .fhcs-group')?.textContent ?? '', game.i18n.localize('FHCS.Features.Group.activation'),
+            assert.include(sheet.element.querySelector('.fhcs-features .fhcs-group-cycle')?.textContent ?? '', game.i18n.localize('FHCS.Features.Group.activation'),
                'the button names the grouping now in force');
             const [activity] = await clickReaches(`.fhcs-features [data-item-id="${rage.id}"] [data-action="use"]`, 'dnd5e.preUseActivity');
             assert.strictEqual(activity.item.id, rage.id, 'the picture uses the feature');

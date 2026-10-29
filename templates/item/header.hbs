@@ -18,6 +18,8 @@
          {{/each}}
       </div>
    </div>
+   {{!-- A class's level in its ring (§5.1: the class's level), as dnd5e's badge. --}}
+   {{#if level}}<span class="fhcs-display fhcs-item-level" role="img" aria-label="{{ levelLabel }}" data-fhcs-tip="{{ levelLabel }}">{{ level }}</span>{{/if}}
    {{#if toggles.length}}
    <div class="fhcs-item-toggles">
       {{#each toggles}}

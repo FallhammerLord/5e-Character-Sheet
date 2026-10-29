@@ -261,7 +261,7 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const props = spell.props.map((p) => `${p.key}=${p.value}`).join(' ');
    if (spell.subtitle !== '3rd Level · Conjuration · V, S, M' || spell.marks.length !== 1 || !spell.marks[0].concentration) { problems.push(`item sheet, a spell's line: ${spell.subtitle}, marks ${JSON.stringify(spell.marks)}`); }
    if (spell.toggles[0].can) { problems.push('item sheet: an always-prepared spell can be switched'); }
-   if (props !== 'time=1 Action category=—') { problems.push(`item sheet, a spell's properties in play: ${props}`); }
+   if (props !== 'time=1 Action') { problems.push(`item sheet, a spell's properties in play: ${props}`); }
    const editing = itemSheetView({ ...base, type: 'weapon', editing: true, subtitles: ['Martial Melee', 'Rare'], toggles: [{ key: 'equipped', on: false }],
       physical: { quantity: 1, weight: 3, weightUnit: 'lb', price: null } }, { localize, format });
    const fields = editing.props.map((p) => `${p.key}:${p.field || '-'}`).join(' ');

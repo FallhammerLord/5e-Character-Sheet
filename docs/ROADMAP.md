@@ -134,6 +134,7 @@ Third pass, from the user's play (2026-10-28):
 - [x] 24. Traits as ledger rows, as the other categories; Damascus redrawn as folded steel (three steels, ladder rungs, raindrops), middle-click opens a row's sheet
 - [x] 25. Design audit (2026-10-29): stemmed move arrows, the halved shield for equipped everywhere, one focus ring; the layout check holds focus, icon contrast and text over a texture (`ONLY=` for a quick run)
 - [x] 26. Item sheet keeps all of dnd5e's: rarity, weight unit, currency and requirements with dnd5e's inputs; the unidentified and chat descriptions; the add button on Activities and Advancement
+- [x] 27. From the Quench run and dnd5e's own item sheets (2026-10-29): Traits wears the groups' frame; no edit slider on the item sheet; dnd5e's info row with its gears; a class's level; full-width descriptions for classes, species and backgrounds; tables and headings in our styles
 - [x] 22. From the Quench run and play (2026-10-28): item sheet unlocks (always-interactive), Special Traits gear opens, HD rolls in play, Forge one look (dark), Traits and Resources reorderable, Traits' left padding (and a check for text on a panel's edge)
 
 ## Phase 6.6: Themes (user, 2026-10-28; SCOPE §4.11)

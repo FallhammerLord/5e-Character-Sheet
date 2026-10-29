@@ -198,6 +198,7 @@
       "Concentration": "Concentration",
       "Ritual": "Ritual",
       "SheetLabel": "Fallhammer item sheet",
+      "Level": "Level {level}",
       "Toggle": {
         "equipped": "Equipped",
         "attuned": "Attuned",

@@ -3,7 +3,21 @@
       mode; the description is a prose-mirror that shows its text until the player chooses to edit (quest log rule). --}}
 <section class="tab fhcs-item-description {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
    {{#with fhcsItem}}
-   <div class="fhcs-item-body">
+   {{#if info.length}}
+   {{!-- dnd5e's info row (a species' type, movement and senses; a weapon's to-hit and damage): its values are dnd5e's
+         HTML; a gear opens dnd5e's settings window for it. --}}
+   <dl class="fhcs-frame fhcs-item-info">
+      {{#each info}}
+      <div class="fhcs-item-info-cell">
+         <dt class="fhcs-label fhcs-muted">{{ label }}{{#if canConfigure}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration"
+                 data-config="{{ config }}" aria-label="{{ tip }}" data-fhcs-tip="{{ tip }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</dt>
+         <dd class="fhcs-body">{{{ value }}}</dd>
+      </div>
+      {{/each}}
+   </dl>
+   {{/if}}
+   <div class="fhcs-item-body{{#if wide}} fhcs-item-wide{{/if}}">
+      {{#if hasProps}}
       <div class="fhcs-frame fhcs-item-props" role="group" aria-label="{{ text.properties }}">
          <dl class="fhcs-item-prop-list">
             {{#each props}}
@@ -24,6 +38,7 @@
          </ul>
          {{/if}}
       </div>
+      {{/if}}
       <div class="fhcs-item-texts">
          {{#each descriptions}}
          <div class="fhcs-frame fhcs-item-text" data-fhcs-description="{{ key }}">
