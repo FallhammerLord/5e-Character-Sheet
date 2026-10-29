@@ -156,9 +156,9 @@ Third pass, from the user's play (2026-10-28):
 - [x] 3. (built 2026-10-29; conditions too, and every theme uses Plain's until it brings its own; a Quench test added) Toggle moments for every toggle Plain lacks (slot pips, death saves, equip, attune, prepared, favorite, effect switch): inked in, erased
 - [x] 4. (built 2026-10-29; and in every theme the fill drains or fills from where it stood) Hit and heal at the HP line (the hooks exist for every theme)
 - [x] 5. (built 2026-10-29: the slide in Day and Night; tray fades and unfolds in every theme, on the player's own click only; folds don't redraw, so all unfold) Tab line slides to the new tab; trays and tips fade in with a 2px drop; section folds animate if folding doesn't redraw
-- [ ] 6. Hover: the frame's top edge catches the light where the pointer is (`--fhcs-gleam-x`); a press dips 1px
+- [x] 6. (built 2026-10-29: Day's glint gold, Night's silver; frames with their own art keep it) Hover: the frame's top edge catches the light where the pointer is (`--fhcs-gleam-x`); a press dips 1px
 - [ ] 7. Particles as scripts (`src/apps/sparks.js` grows into one engine with an emitter per theme): Day sun motes drifting up, Night a moonbeam falling on the mark struck, on inspiration gained
-- [ ] 8. State art (stretch): Night's moon wanes with HP (full, bloodied, down); Day's light lowers toward dusk
+- [x] 8. (built with slice 1, 2026-10-29) State art: Night's moon wanes with HP (full, bloodied, down); Day's light lowers toward dusk
 - [ ] 9. Emblems and marks: a sun for Day, a moon for Night on the tab row; Night's inspiration mark a moon, not a star; Sand's emblem a sanctuary arch
 - [ ] 10. "Theme motion" becomes "Sheet motion"; the load check fails an animation outside the reduced-motion and Motion-off gates
 - [x] Mockups: canvas row "Phase 6.55 · Plain as Day and Night" (Day, Night, 644px bloodied and edit mode, down; the marks, pips, shields, tabs and HP tray click through to their moments); waits on the user's review (2026-10-29)
