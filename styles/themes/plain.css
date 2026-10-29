@@ -17,6 +17,11 @@
    --fhcs-plain-cast: 1px 1px 2px color-mix(in srgb, #50370a 14%, transparent);
    /* The glint where the pointer crosses a frame's top edge: sunlight on the page. */
    --fhcs-plain-glint: color-mix(in srgb, #c98a1c 85%, transparent);
+   /* The portrait's light catch: a gold band, crossing from the upper left. */
+   --fhcs-plain-catch: color-mix(in srgb, #ffd98a 45%, transparent);
+   --fhcs-plain-catch-angle: 115deg;
+   --fhcs-plain-catch-from: 120%;
+   --fhcs-plain-catch-to: -20%;
    --fhcs-plain-moon: none;
    /* The emblem at the inspiration bar's left: the sun rising. Inspiration's marks: a sun, rayed; banked, its disc
       filled, giving off gold sunlight. */
@@ -35,6 +40,10 @@
    --fhcs-plain-lit: color-mix(in srgb, #cddafa 16%, transparent);
    --fhcs-plain-cast: -1px 1px 2px color-mix(in srgb, #000 45%, transparent);
    --fhcs-plain-glint: color-mix(in srgb, #dfe8ff 45%, transparent);
+   --fhcs-plain-catch: color-mix(in srgb, #dfe8ff 35%, transparent);
+   --fhcs-plain-catch-angle: 245deg;
+   --fhcs-plain-catch-from: -20%;
+   --fhcs-plain-catch-to: 120%;
    /* Moonlight only (user, 2026-10-29: "not stars or falling sparks"): the moon rising; marks a crescent, banked a
       full moon with a pale halo that breathes slower than the sun's. */
    --fhcs-plain-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 19h18M13.5 4a6.5 6.5 0 1 0 4.5 11.2 5 5 0 0 1-4.5-11.2z' fill='none' stroke='%23c5d2f0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
@@ -199,4 +208,31 @@
 @container fhcs-tabs (width < 720px)
 {
    .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet) .fhcs-tabs:has(.fhcs-lock[aria-pressed="true"]) .fhcs-inspiration::before { display: none; }
+}
+
+/* ---------- The portrait catches the light (Phase 6.55) ----------
+   On hover a band of light crosses the art once, from the light's side: Day's sunlight from the upper left, Night's
+   moonlight from the upper right (about 500ms). Inside the clip, so a round portrait keeps its circle; not while
+   framing, whose dashed edge uses this layer. */
+
+@media (prefers-reduced-motion: no-preference)
+{
+   .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"]) .fhcs-portrait:not(.fhcs-framing):hover > .fhcs-portrait-clip::after
+   {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: linear-gradient(var(--fhcs-plain-catch-angle), transparent 38%, var(--fhcs-plain-catch) 50%, transparent 62%) var(--fhcs-plain-catch-from) 0 / 200% 100% no-repeat;
+      mix-blend-mode: screen;
+      animation: fhcs-plain-catch 0.5s ease-out forwards;
+   }
+}
+
+/* The band sits mid-image on a layer twice the art's width: 120% puts it off the left, -20% off the right. */
+@keyframes fhcs-plain-catch
+{
+   from { background-position: var(--fhcs-plain-catch-from) 0; }
+   to { background-position: var(--fhcs-plain-catch-to) 0; }
 }
