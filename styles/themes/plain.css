@@ -167,12 +167,13 @@
 }
 
 /* ---------- Hover and press (Phase 6.55) ----------
-   The light catches a frame's top edge where the pointer crosses it (`--fhcs-gleam-x`, set by the sheet). Kept weak
-   (:where), so a frame that carries its own art (an origin card's) keeps it. A press dips 1px. */
+   The light catches a frame's top edge where the pointer crosses it (`--fhcs-gleam-x`, set by the sheet). It outweighs
+   each frame's own `background` (user, 2026-10-29: kept weak, it showed on two frames of eleven), taking only the image:
+   no Plain frame draws one (an origin card's art is a child), and each keeps its colour. A press dips 1px. */
 
 @media (prefers-reduced-motion: no-preference)
 {
-   :where(.fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"])) :where(.fhcs-frame:not(.fhcs-portrait)):hover
+   .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"]) .fhcs-frame:not(.fhcs-portrait):hover
    {
       background-image: radial-gradient(72px 4px at var(--fhcs-gleam-x, 50%) 0, var(--fhcs-plain-glint), transparent);
       background-repeat: no-repeat;
