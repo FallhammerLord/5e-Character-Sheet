@@ -152,6 +152,7 @@ Third pass, from the user's play (2026-10-28):
 
 - [x] 1. (built 2026-10-29, `styles/themes/plain.css`, character sheet only; the item sheet and chat cards follow) Ground: ledger ruling in the window's gutters; Day lit warm from the upper left, Night cool from the upper right
 - [x] 2. (built 2026-10-29) Heading bars: a double hairline (the ledger's totals rule); frames a 1px top highlight (sun or moon catching the edge)
+- [x] Play notes (user, 2026-10-29): (a) the sheet stayed dark with windows set to light: fixed, the window's own mode decides, every stylesheet; (b) switching Plain to Forge sometimes leaves the sheet empty: not yet known, waits on the console
 - [ ] 3. Toggle moments for every toggle Plain lacks (slot pips, death saves, equip, attune, prepared, favorite, effect switch): inked in, erased
 - [ ] 4. Hit and heal at the HP line (the hooks exist for every theme)
 - [ ] 5. Tab line slides to the new tab; trays and tips fade in with a 2px drop; section folds animate if folding doesn't redraw

@@ -68,9 +68,9 @@
 
 /* Dark; and a theme with one look, dark whatever Foundry's mode (Forge, user 2026-10-28: "no difference between F&F
    light and dark ... default them to dark ... only worry about 1 style per style"). */
-.theme-dark .fhcs-sheet,
+.theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *)),
 .fhcs-sheet.theme-dark,
-.theme-dark .fhcs-chat,
+.theme-dark .fhcs-chat:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *)),
 .fhcs-chat.theme-dark,
 .fhcs-sheet[data-fhcs-theme="forge"],
 .fhcs-chat[data-fhcs-theme="forge"]

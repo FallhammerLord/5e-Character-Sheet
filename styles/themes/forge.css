@@ -83,9 +83,9 @@
 
 /* Forge has one look, dark, in either Foundry mode (user, 2026-10-28): these values win over the light ones above, at
    the same weight, by coming after them. The light block stays only as the base the dark one finishes. */
-.theme-dark .fhcs-sheet[data-fhcs-theme="forge"],
+.theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="forge"],
 .fhcs-sheet.theme-dark[data-fhcs-theme="forge"],
-.theme-dark .fhcs-chat[data-fhcs-theme="forge"],
+.theme-dark .fhcs-chat:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="forge"],
 .fhcs-chat.theme-dark[data-fhcs-theme="forge"],
 .fhcs-sheet[data-fhcs-theme="forge"],
 .fhcs-chat[data-fhcs-theme="forge"]

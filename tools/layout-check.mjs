@@ -47,14 +47,16 @@ const FRAMES = {
 const THEMES = { light: 'background:#f4f1ea;color:#191813', dark: 'background:#26252b;color:#e8e6e3' };
 
 /** A window like Foundry's, with the classes dnd5e, Foundry's theme and our code put on it. */
-const frame = (kind, width, theme, body, { look = '', hp = null, titleBar = '', titleTray = '' } = {}) => `<section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"${look ? ` data-fhcs-theme="${look}"` : ''}${hp === null ? '' : ` data-fhcs-hp="${hp <= 0 ? 'down' : hp <= 0.5 ? 'bloodied' : 'full'}"`}
+// The window sits in an interface of the other mode: Foundry sets the interface's mode on the page and each window's own
+// on the window (user, 2026-10-29: the sheet kept the dark interface's colours with windows set to light).
+const frame = (kind, width, theme, body, { look = '', hp = null, titleBar = '', titleTray = '' } = {}) => `<div class="theme-${theme === 'light' ? 'dark' : 'light'}"><section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"${look ? ` data-fhcs-theme="${look}"` : ''}${hp === null ? '' : ` data-fhcs-hp="${hp <= 0 ? 'down' : hp <= 0.5 ? 'bloodied' : 'full'}"`}
    style="${hp === null ? '' : `--fhcs-hp:${hp};`}position:relative;width:${width}px;height:${HEIGHT}px;display:flex;flex-direction:column;border:1px solid #000;margin:8px;
    ${THEMES[theme]}">
    ${kind !== 'chat'
       // Foundry's title bar as it draws one, with a module's extra button that must wait in the ⋮ menu (rule 14).
       ? `<header class="window-header"><h1 class="window-title">${width}px</h1>${titleBar}<button type="button" class="header-control icon fa-solid fa-ellipsis-vertical" data-action="toggleControls" aria-label="Controls"></button><button type="button" class="header-control icon fa-solid fa-id-badge" data-action="moduleExtra" aria-label="A module's button"></button><button type="button" class="header-control icon fa-solid fa-xmark" data-action="close" aria-label="Close"></button></header>`
       : `<header style="background:#111;color:#eee;padding:4px 8px;font:13px sans-serif">${width}px</header>`}
-   <div class="window-content" style="flex:1;min-height:0;overflow:auto">${FRAMES[kind].wrap(body, look)}</div>${titleTray}</section>`;
+   <div class="window-content" style="flex:1;min-height:0;overflow:auto">${FRAMES[kind].wrap(body, look)}</div>${titleTray}</section></div>`;
 
 const page = (html) => `<!doctype html><html lang="en"><head><meta charset="utf-8">
    <style>body{margin:0;background:#444;font-family:sans-serif}*{box-sizing:border-box}button,input,select{font:inherit}
@@ -78,6 +80,14 @@ function findProblems()
    const WHOLE = '.fhcs-condition-name, .fhcs-origin-text > .fhcs-label, .fhcs-origin-head > .fhcs-label, .fhcs-class-card .fhcs-origin-line:not(.fhcs-origin-sub) > .fhcs-origin-name';
    const app = document.querySelector('.application');
    const edge = app.getBoundingClientRect().right;
+   // The window's own mode decides its colours, not the interface's around it: Plain's ink follows the window.
+   const mode = app.className.match(/(?:^|\s)theme-(light|dark)/)?.[1];
+   const inked = app.matches('.fhcs-sheet') ? app.querySelector(':scope > .window-content') : app.querySelector('.fhcs-chat:not([data-fhcs-theme])');
+   const wanted = { light: 'rgb(25, 24, 19)', dark: 'rgb(232, 230, 227)' }[mode];
+   if (inked && wanted && !app.matches('[data-fhcs-theme]') && getComputedStyle(inked).color !== wanted)
+   {
+      issues.push(`the ${mode} window draws in ${getComputedStyle(inked).color}, not its mode's ink ${wanted}: the interface's mode reached it`);
+   }
    for (const el of app.querySelectorAll('.window-content *'))
    {
       const cs = getComputedStyle(el);

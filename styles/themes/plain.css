@@ -18,7 +18,7 @@
    --fhcs-plain-moon: none;
 }
 
-.theme-dark .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet),
+.theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *)):not([data-fhcs-theme], .fhcs-item-sheet),
 .fhcs-sheet.theme-dark:not([data-fhcs-theme], .fhcs-item-sheet)
 {
    --fhcs-plain-ground: #1c1e25;
@@ -32,14 +32,14 @@
 }
 
 /* Bloodied: the moon wanes, its halo half gone. */
-.theme-dark .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet)[data-fhcs-hp="bloodied"],
+.theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *)):not([data-fhcs-theme], .fhcs-item-sheet)[data-fhcs-hp="bloodied"],
 .fhcs-sheet.theme-dark:not([data-fhcs-theme], .fhcs-item-sheet)[data-fhcs-hp="bloodied"]
 {
    --fhcs-plain-moon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3CradialGradient id='h'%3E%3Cstop offset='.4' stop-color='%23cfdcff' stop-opacity='.35'/%3E%3Cstop offset='1' stop-color='%23cfdcff' stop-opacity='0'/%3E%3C/radialGradient%3E%3Cmask id='p'%3E%3Ccircle cx='60' cy='60' r='36' fill='%23fff'/%3E%3Ccircle cx='98' cy='60' r='36' fill='%23000'/%3E%3C/mask%3E%3C/defs%3E%3Cg opacity='.15'%3E%3Ccircle cx='60' cy='60' r='58' fill='url(%23h)' opacity='.5'/%3E%3Ccircle cx='60' cy='60' r='36' fill='none' stroke='%23cfdcff' stroke-opacity='.35'/%3E%3Cg mask='url(%23p)'%3E%3Ccircle cx='60' cy='60' r='36' fill='%23dfe6f5'/%3E%3Ccircle cx='50' cy='52' r='9' fill='%23b9c3d8'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
 
 /* Down: a new moon, its outline only, no halo. */
-.theme-dark .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet)[data-fhcs-hp="down"],
+.theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *)):not([data-fhcs-theme], .fhcs-item-sheet)[data-fhcs-hp="down"],
 .fhcs-sheet.theme-dark:not([data-fhcs-theme], .fhcs-item-sheet)[data-fhcs-hp="down"]
 {
    --fhcs-plain-moon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Ccircle cx='60' cy='60' r='36' fill='none' stroke='%23cfdcff' stroke-opacity='.2'/%3E%3C/svg%3E");

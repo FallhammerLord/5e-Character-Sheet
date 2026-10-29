@@ -14,7 +14,7 @@
    --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%238a2533' d='M4 2h2v20H4z'/%3E%3Cpath fill='%238a2533' d='M6 3h14l-4 4.5L20 12H6z'/%3E%3C/svg%3E");
 }
 
-.theme-dark .fhcs-sheet[data-fhcs-theme="valley"],
+.theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="valley"],
 .fhcs-sheet.theme-dark[data-fhcs-theme="valley"]
 {
    --fhcs-surface: #1a211b;
