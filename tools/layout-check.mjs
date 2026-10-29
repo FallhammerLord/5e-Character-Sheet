@@ -634,7 +634,9 @@ const boxes = new Map();
 const problems = [];
 for (const t of SELF_TEST)
 {
-   const caught = (await check(t.id, frame('sheet', WIDTHS.sheet[0], 'light', t.body), false, { focus: true })).length > 0;
+   // On a bare sheet: Plain's ground is art (styles/themes/plain.css), and these bodies sit on no plate. A look no theme
+   // draws keeps the window plain.
+   const caught = (await check(t.id, frame('sheet', WIDTHS.sheet[0], 'light', t.body, { look: 'none' }), false, { focus: true })).length > 0;
    if (caught !== t.expect) { problems.push(`self-test ${t.id}: expected ${t.expect ? 'a problem' : 'none'}, got ${caught ? 'a problem' : 'none'}`); }
 }
 
