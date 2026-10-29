@@ -22,6 +22,10 @@ const r1 = (n) => Math.round(n * 10) / 10;
  * period divides the tile's width, so the tile repeats with no seam. The edges are traced by marching squares and
  * chained into paths, one per steel.
  */
+/** The three steels: colour, opacity, stroke width. The brightest and darkest go to the layout check (`-hi`, `-lo`). */
+const DAMASCUS_STEELS = [['#f4efe6', 0.2, 1.3], ['#9aa3ad', 0.22, 1.1], ['#000', 0.4, 1.6]];
+const stroke = ([colour, alpha], ground) => `color-mix(in srgb, ${colour} ${Math.round(alpha * 100)}%, var(--fhcs-theme-${ground}))`;
+
 function damascus()
 {
    const W = 320;
@@ -80,7 +84,7 @@ function damascus()
       }
       steels[((n % 3) + 3) % 3].push(...chain(segments));
    }
-   const look = [['#f4efe6', 0.2, 1.3], ['#9aa3ad', 0.22, 1.1], ['#000', 0.4, 1.6]];
+   const look = DAMASCUS_STEELS;
    const paths = steels.map((lines, k) => `<path d='${lines.join('')}' stroke='${look[k][0]}' stroke-opacity='${look[k][1]}' stroke-width='${look[k][2]}'/>`);
    return `<svg xmlns='http://www.w3.org/2000/svg' width='${W}' height='${H}'><g fill='none' stroke-linejoin='round'>${paths.join('')}</g></svg>`;
 }
@@ -140,6 +144,13 @@ for (const [name, svg] of [['damascus', damascus()], ...runes])
    const line = new RegExp(`(--fhcs-theme-${name}: )url\\("data:image/svg\\+xml,[^"]*"\\);`);
    if (!line.test(css)) { throw new Error(`forge.css has no --fhcs-theme-${name} token to replace`); }
    css = css.replace(line, `$1${uri(svg)};`);
+}
+// The bar's gradient runs from bar-top to bar: the bright stroke is worst on the lighter end, the dark on the darker.
+for (const [name, value] of [['damascus-hi', stroke(DAMASCUS_STEELS[0], 'bar-top')], ['damascus-lo', stroke(DAMASCUS_STEELS[2], 'bar')]])
+{
+   const line = new RegExp(`(--fhcs-theme-${name}: )[^;]*;`);
+   if (!line.test(css)) { throw new Error(`forge.css has no --fhcs-theme-${name} token to replace`); }
+   css = css.replace(line, `$1${value};`);
 }
 writeFileSync(CSS, css);
 console.log('Wrote the Damascus and rune marks into styles/themes/forge.css.');

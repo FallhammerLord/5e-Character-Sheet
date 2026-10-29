@@ -374,13 +374,6 @@
    border-color: var(--fhcs-crit);
 }
 
-.fhcs-chat :is(.fhcs-card-title, .fhcs-band, .fhcs-band-button, .fhcs-band-summary, .fhcs-button, .fhcs-slot,
-   .fhcs-row-summary, .fhcs-card-details > summary, .fhcs-apply-summary, .fhcs-history, .fhcs-rows):focus-visible
-{
-   outline: 2px solid currentColor;
-   outline-offset: -2px;
-}
-
 /* ---------- Bands ---------- */
 
 .fhcs-chat .fhcs-band
@@ -872,6 +865,14 @@
    line-height: inherit;
 }
 
+/* Focus shows on every control, one way, in every theme (SCOPE §5.2 rule 10; 2026-10-29, replacing a rule per part):
+   a ring in the control's own ink, inside its edge so it never grows the row. */
+:is(.fhcs-sheet, .fhcs-chat) :is(button, input, select, summary, a[href], [tabindex]):focus-visible
+{
+   outline: 2px solid currentColor;
+   outline-offset: -2px;
+}
+
 /* The window itself: our surface and a thin line, so frame and sheet read as one (user, 2026-10-24). */
 .fhcs-sheet
 {
@@ -1043,7 +1044,6 @@
    cursor: pointer;
 }
 .fhcs-sheet .fhcs-star:disabled { cursor: default; }
-.fhcs-sheet .fhcs-star:focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
 .fhcs-sheet .fhcs-mark
 {
    display: block;
@@ -2714,7 +2714,10 @@
 }
 
 .fhcs-sheet .fhcs-toggle-equip[aria-pressed="true"] { border-color: var(--fhcs-success); color: var(--fhcs-success); }
-.fhcs-sheet .fhcs-toggle-equip[aria-pressed="true"] .fhcs-icon { stroke-width: 2.8; }
+/* Equipped: dnd5e's halved shield (SCOPE §5.1, 2026-10-29), its left half filled when on; the line down its middle
+   tells it from the save button's whole shield. */
+.fhcs-sheet .fhcs-icon .fhcs-half { stroke: none; }
+.fhcs-sheet :is(.fhcs-toggle-equip[aria-pressed="true"], .fhcs-equipped) .fhcs-half { fill: currentColor; }
 .fhcs-sheet .fhcs-toggle-attune[aria-pressed="true"] { border-color: var(--fhcs-adv); color: var(--fhcs-adv); }
 .fhcs-sheet .fhcs-toggle-attune[aria-pressed="true"] .fhcs-icon { fill: currentColor; }
 .fhcs-sheet .fhcs-toggle[aria-disabled="true"] { cursor: default; }

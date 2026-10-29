@@ -205,7 +205,7 @@ The rules below, in seven lines. When a case isn't covered, decide by these, in 
 4. **Like things alike.** A new part copies the nearest existing pattern (Traits took the favorites groups' rows, user 2026-10-28); a feature for one tab goes on every tab it fits (categories and their order, user 2026-10-28).
 5. **Foundry and dnd5e first.** Their behaviour, icons and permissions before ours: an item sheet is editable whenever Foundry says so, no lock; dnd5e's halved shield for equipped; windows resize; a middle-click opens a sheet (user, 2026-10-28).
 6. **Effects answer the player.** A moment starts where its event shows, when it happens; never on a timer (§5.3 rule 6).
-7. **What a check can hold, a check holds,** seen failing once; the rest is listed as unchecked in §5.2.
+7. **What a check can hold, a check holds,** seen failing once; §5.2 lists what is still read by eye.
 
 ### 5.1 Icons and colors on the sheet (one meaning each)
 
@@ -216,7 +216,7 @@ Check here before choosing a mark, and add new ones. Every tint has an icon, mar
 | Bookmark; filled rose when on | Favorite | Toggle column on Inventory and Spellbook rows, and dnd5e's right-click menu. Favorited rows glow faintly rose, keeping their own left edge (user, 2026-10-26). |
 | Book: filled, outline, filled with a lock | Prepared, not prepared, always prepared | Spellbook rows (a toggle); Attributes favorites (filled only) |
 | Tint and left edge by kind: blue, teal, violet, orange-brown, grey | Prepared, always prepared, Pact Magic prepared, innate, at will | Spellbook rows, Attributes favorites. Unprepared rows plain. |
-| Check in a green toggle; green tint and left edge | Equipped | Inventory rows, Attributes favorites |
+| Halved shield (dnd5e's), its left half filled when on, in a green toggle; green tint and left edge | Equipped | Inventory rows, Attributes favorites, the item sheet's header (2026-10-29, replacing a check: one mark per meaning). The line down its middle tells it from the save button's whole shield. |
 | Star: filled, outline, none | Attuned, needs attuning (click to attune), no attunement | Inventory rows |
 | Star on the tab row (a theme's own mark: Forge's runes, a struck tile when banked): filled, outline | Inspiration: on or banked, an empty place in the bank | Tab row, before the lock (2026-10-28; on the portrait before, so the star has carried both meanings, told apart by place, since Phase 1) |
 | Head in profile with a turning arrow (dnd5e's concentrating icon, drawn simpler); filled gold | Concentration spell; held now | Spellbook rows and their column heading, the concentration bar, the Effects tab's On column (user, 2026-10-28: replaced a C in a ring, which read as ©). The concentration bar takes a gold edge and tint while concentrating. |
@@ -248,8 +248,8 @@ Check here before choosing a mark, and add new ones. Every tint has an icon, mar
 | Radio dot: filled, ring | The one chosen; another | Edit mode: each casting card on the Spellbook, the main spellcasting ability (user, 2026-10-27); a resource panel's cog tray, the item shown (2026-10-28) |
 | Circular arrow | Restore: uses back to most | Each resource panel's foot (user, 2026-10-28) |
 | Palette | The sheet's theme | The title bar, before ⋮, both modes (user, 2026-10-28) |
-| Chevron up, chevron down | Move this section up or down (each off at its end) | Edit mode: section headings on Inventory, Spellbook, Features and Effects; favorites groups on Attributes (user, 2026-10-28) |
-| Halved shield (dnd5e's); wand with sparkles (dnd5e's) | Equipped; identified | The item sheet's header toggles, filled when on (user, 2026-10-28). The halved shield is dnd5e's own equip mark; the save button's whole shield means proficient. |
+| Arrow up, arrow down (with a stem) | Move this section up or down (each off at its end; 2026-10-29, replacing chevrons, which matched the open caret on the same bar) | Edit mode: section headings on Inventory, Spellbook, Features and Effects; favorites groups on Attributes (user, 2026-10-28) |
+| Wand with sparkles (dnd5e's) | Identified | The item sheet's header toggle, filled when on (user, 2026-10-28) |
 | Down arrow | Level down | Edit mode, the level tray (user, 2026-10-27) |
 
 Chat cards keep their own scheme (§6.6): the primary d20 black (white in dark themes), disadvantage dice red, advantage dice blue.
@@ -257,7 +257,7 @@ Chat cards keep their own scheme (§6.6): the primary d20 black (white in dark t
 
 ### 5.2 Sheet styling rules (user, 2026-10-27)
 
-One set of rules for every tab and both modes (user, 2026-10-27: "apply as uniformly as we can, now that everything is where it should be"). The layout check enforces what it can (marked *check*). Not checked yet: rules 5, 7, 8, 10 (focus), 12 and 13, and rule 9 for icons and control edges; read those by eye on the screenshots.
+One set of rules for every tab and both modes (user, 2026-10-27: "apply as uniformly as we can, now that everything is where it should be"). The layout check enforces what it can (marked *check*). Not checked yet: rules 5, 7, 8, 12 and 13, and rule 9 for control edges; read those by eye on the screenshots.
 
 **Layout and alignment**
 1. **Edges that meet line up.** A region is a grid; neighbouring parts share its lines. Every heading is one fixed height whatever it holds, so headings side by side share their line (user's screenshot, 2026-10-28: Traits' heading, holding its fold button, sat lower than Skills'). The header: the portrait card spans two rows; the HP band and the cards share the second, so both their tops and bottoms align (the user's screenshot, 2026-10-27). *check*
@@ -276,8 +276,8 @@ One set of rules for every tab and both modes (user, 2026-10-27: "apply as unifo
 **Colour, focus and attention** (WCAG 2.2; ADHD rules, §5)
 7. **Never colour alone** (WCAG 1.4.1): every tint has an icon, mark or word (§5.1).
 8. **Colours told apart differ in lightness, not hue alone;** no pair that only red against green separates (death saves keep tick and cross).
-9. **Contrast:** text 4.5:1, large text 3:1 (WCAG 1.4.3) *check*; a control's edge and an icon 3:1 against what they sit on (WCAG 1.4.11).
-10. **Focus shows** on every control, in both themes (WCAG 2.4.7).
+9. **Contrast:** text 4.5:1, large text 3:1 (WCAG 1.4.3) *check*; a control's edge and an icon 3:1 against what they sit on (WCAG 1.4.11). *check (icons)*
+10. **Focus shows** on every control, in every theme (WCAG 2.4.7): one ring for all, 2px in the control's own ink, inside its edge (2026-10-29). *check*
 11. **Motion:** §5.3 rule 6 (one copy).
 12. **Same thing, same place, same look** across tabs: search bar, pins, Columns menu, row layout, empty lines.
 13. **Empty states** are one short line in body, muted (a new sheet's empty favorites is normal, user 2026-10-27).
@@ -302,7 +302,7 @@ Every theme, and Plain where it applies. The look of each theme is §4.11.
 2. **What a theme may change** (Claude, 2026-10-28): the ground, panel surfaces and frames, corners, decals, heading bands, the tab row, its own marks (inspiration's) and motion. Never a meaning colour's hue (§5.1); it may shift lightness to keep contrast. Accent colours decorate, never mark.
 3. **A theme never reshapes:** every size, padding and height stays Plain's, so play and edit mode match in every theme; fields look as in Plain (only the edge heats on focus); the open tab never glows (user, 2026-10-28). *check (play and edit pairs per theme)*
 4. **Vectors and CSS only** (user, 2026-10-28): decals SVG, frames CSS, textures vector lines and gradients, never pixels or filter noise (`feTurbulence`); generated textures come from a script (Forge: `tools/forge-textures.mjs`). **No texture inside a panel** (user, 2026-10-28: Forge's grain read as rocks behind item entries, then traits and resources): a theme's texture lives in the ground, the bars and the window's frame, never behind a panel's text. One OFL display font per theme may take the display style and headings (Forge: Grenze). Custom images later, not now.
-5. **One look per theme** (user, 2026-10-28: "no difference between F&F light and dark ... default them to dark ... only worry about 1 style per style"): a theme draws the same in Foundry's light and dark modes (Forge is dark in both); contrast as §5.2 rule 9, and text over a texture holds 4.5:1 against its brightest and its darkest stroke, not only its ground (Claude, 2026-10-29, replacing "texture under text 16% at most": the Damascus redraw passed that unchecked; the check is still to come, STATUS). Plain keeps Foundry's light and dark. *check (every theme in both of Foundry's modes, every width)*
+5. **One look per theme** (user, 2026-10-28: "no difference between F&F light and dark ... default them to dark ... only worry about 1 style per style"): a theme draws the same in Foundry's light and dark modes (Forge is dark in both); contrast as §5.2 rule 9, and text over a texture holds 4.5:1 against its brightest and its darkest stroke, not only its ground (Claude, 2026-10-29, replacing "texture under text 16% at most": the Damascus redraw passed that unchecked). A theme sets `--fhcs-texture-hi` and `-lo` on the textured element, written by its texture script. *check* Plain keeps Foundry's light and dark. *check (every theme in both of Foundry's modes, every width)*
 6. **Motion** (user, 2026-10-28): answers to the player under 300ms; moments (a hit, a heal, inspiration gained or spent) about 600ms, once; ambient motion only slow (a banked mark's breathing glow); never more than three flashes a second; all still under the player's Motion switch and reduced motion. **A hover gleam follows the pointer** across a frame (user, 2026-10-28, replacing a gleam that ran across once; the sheet sets `--fhcs-gleam-x`), the portrait keeping its own. **A theme's effect starts where its event shows** (user, 2026-10-28: Forge's sparks fan from the inspiration mark struck). **A theme's big effects answer an event, never a timer** (user, 2026-10-28: Forge's sparks now spray only when inspiration is gained, replacing a burst every 70 to 120 seconds). **Every theme brings its own on and off moments for a toggle**, through the toggle's hooks (inspiration: `--fhcs-inspire-on`, `-off`, `-on-glow`, `-off-glow`).
 7. **State art** (user, 2026-10-28): a theme's art follows the character's state, beside the marks that say it, never in their place: `--fhcs-hp` (0–1), `data-fhcs-hp` (full, bloodied, down), and a moment class when HP falls or rises.
 8. **Layers:** a translucent plate with a blur is its own layer, so a plate holding an open tray rises above its neighbours; a tray sets its own ink, not the bar's it opens from.

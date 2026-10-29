@@ -17,7 +17,7 @@
                {{#if ../columns.uses}}<span class="fhcs-label fhcs-muted fhcs-col-uses">{{ ../text.head.uses }}</span>{{/if}}
                {{#if ../columns.usage}}<span class="fhcs-label fhcs-muted fhcs-col-usage">{{ ../text.head.usage }}</span>{{/if}}
                {{#if ../columns.quantity}}<span class="fhcs-label fhcs-muted fhcs-col-quantity">{{ ../text.head.quantity }}</span>{{/if}}
-               {{#if ../columns.equipped}}<span class="fhcs-muted fhcs-col-toggle" role="img" aria-label="{{ ../text.head.equipped }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg></span>{{/if}}
+               {{#if ../columns.equipped}}<span class="fhcs-muted fhcs-col-toggle" role="img" aria-label="{{ ../text.head.equipped }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6zM12 3v18"/><path class="fhcs-half" d="M12 3L5 6v6c0 4.5 3 7.5 7 9z"/></svg></span>{{/if}}
                {{#if ../columns.attuned}}<span class="fhcs-muted fhcs-col-toggle" role="img" aria-label="{{ ../text.head.attuned }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.4 6.1L21 12l-6.6 2.9L12 21l-2.4-6.1L3 12l6.6-2.9z"/></svg></span>{{/if}}
                {{#if ../columns.favorite}}<span class="fhcs-muted fhcs-col-toggle" role="img" aria-label="{{ ../text.head.favorite }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>{{/if}}
                {{#if ../editing}}<span class="fhcs-col-edit">{{#if move}}{{> "modules/fhcs/templates/sheet/section-move.hbs" }}{{/if}}</span>{{/if}}

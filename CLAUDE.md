@@ -108,7 +108,7 @@ Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies insta
 ### Traps we've hit (check here before debugging layout)
 
 - **A subgrid's padding narrows its edge tracks** (a 24px gear column became 20px): inset the first cell, not the row.
-- **The layout check takes over two minutes:** run it in the background with its output to a log, then read the log.
+- **The layout check takes over two minutes:** run it in the background with its output to a log, then read the log. `ONLY='<regex>'` checks just the matching cases (plus the self-test) while working.
 - **Playwright scripts of our own** need `chromium.launch({ executablePath: '/opt/pw-browsers/chromium' })` here; the bare launch looks for another version.
 
 - **Foundry drags the window from any press in the title bar except on a button,** and keeps the pointer, so a `summary` there never opens: title-bar controls are buttons, and their trays hang from the window, outside the bar.

@@ -325,13 +325,32 @@ function findProblems()
    // Custom properties inherit, so the art is where the mark starts, not every element under it.
    const marked = (n) => !!n && getComputedStyle(n).getPropertyValue('--fhcs-art').trim() === '1';
    const isArt = (n) => marked(n) && !marked(n.parentElement);
+   // A texture (SCOPE §5.3 rule 5): an element whose theme sets `--fhcs-texture-hi` and `-lo` (its brightest and darkest
+   // stroke over its ground) carries lines the check reads as those two colours in its place.
+   const textureOf = (n) => getComputedStyle(n).getPropertyValue('--fhcs-texture-hi').trim();
+   const isTexture = (n) => !!textureOf(n) && textureOf(n) !== (n.parentElement ? textureOf(n.parentElement) : '');
+   const resolve = (n, name) =>
+   {
+      const probe = document.createElement('i');
+      probe.style.color = `var(${name})`;
+      n.append(probe);
+      const colour = parse(getComputedStyle(probe).color);
+      probe.remove();
+      return colour;
+   };
    const backdrops = (el) =>
    {
       const list = chain(el);
-      const at = list.findLastIndex(isArt);
-      if (at < 0 && !isArt(app)) { return [backdrop(el)]; }
+      const art = list.findLastIndex(isArt);
+      const texture = list.findLastIndex(isTexture);
+      if (texture > art)
+      {
+         return ['--fhcs-texture-hi', '--fhcs-texture-lo'].map((name) => list.slice(texture + 1)
+            .reduce((bg, n) => over(parse(getComputedStyle(n).backgroundColor), bg), resolve(list[texture], name)));
+      }
+      if (art < 0 && !isArt(app)) { return [backdrop(el)]; }
       return [{ r: 0, g: 0, b: 0, a: 1 }, { r: 255, g: 255, b: 255, a: 1 }]
-         .map((base) => list.slice(at + 1).reduce((bg, n) => over(parse(getComputedStyle(n).backgroundColor), bg), base));
+         .map((base) => list.slice(art + 1).reduce((bg, n) => over(parse(getComputedStyle(n).backgroundColor), bg), base));
    };
    const opacity = (el) => [app, ...chain(el)].reduce((o, n) => o * Number(getComputedStyle(n).opacity), 1);
    const luminance = ({ r, g, b }) =>
@@ -360,6 +379,18 @@ function findProblems()
          return ratio(over({ ...fg, a: fg.a * opacity(el) }, bg), bg);
       }));
       if (got < needed) { issues.push(`contrast ${got.toFixed(2)}:1 below ${needed}:1: ${el.tagName.toLowerCase()}.${[...el.classList].join('.')} "${text.slice(0, 30)}"`); }
+   }
+
+   // Icons and marks 3:1 against what they sit on (WCAG 1.4.11, SCOPE §5.2 rule 9); a disabled control's are exempt.
+   for (const svg of app.querySelectorAll('.window-content svg.fhcs-icon'))
+   {
+      if (svg.closest('[hidden], details:not([open]) > :not(summary), :disabled, [aria-disabled="true"]') || !svg.getClientRects().length) { continue; }
+      const cs = getComputedStyle(svg);
+      if (cs.visibility === 'hidden') { continue; }
+      const ink = parse(cs.stroke !== 'none' ? cs.stroke : cs.fill);
+      if (!ink.a) { continue; }
+      const got = Math.min(...backdrops(svg.parentElement).map((bg) => ratio(over({ ...ink, a: ink.a * opacity(svg) }, bg), bg)));
+      if (got < 3) { issues.push(`icon contrast ${got.toFixed(2)}:1 below 3:1: svg in ${svg.parentElement.tagName.toLowerCase()}.${[...svg.parentElement.classList].join('.')}`); }
    }
 
    // Three text styles, no more (user, 2026-10-24): size, weight and capitals of every piece of text in our parts.
@@ -485,6 +516,10 @@ const SELF_TEST = [
    { id: 'self-capitals', expect: true, body: '<button style="text-transform:uppercase;width:120px">Columns</button>' },
    { id: 'self-gear', expect: true, body: '<span style="display:flex;align-items:center;font-size:12px">Str<button style="display:grid;place-items:center;width:24px;height:24px;min-height:0;padding:0"><svg class="fhcs-gear" style="width:16px;height:16px"><path d="M0 0h16v16H0z"/></svg></button></span>' },
    { id: 'self-spacing', expect: true, body: '<div class="fhcs-self" style="display:flex;gap:3px"><span>a</span><span>b</span></div>' },
+   { id: 'self-texture', expect: true, body: '<div style="--fhcs-texture-hi:#ccc;--fhcs-texture-lo:#222;background:#222"><p style="color:#eee">Text on a bright stroke</p></div>' },
+   { id: 'self-icon-faint', expect: true, body: '<span style="color:#ddd"><svg class="fhcs-icon" width="16" height="16" style="stroke:currentColor;fill:none"><path d="M0 0h16v16"/></svg></span>' },
+   { id: 'self-no-focus', expect: true, body: '<div class="fhcs-sheet"><button type="button" style="outline:none;box-shadow:none;width:80px">Go</button></div>' },
+   { id: 'self-focus', expect: false, body: '<div class="fhcs-sheet"><button type="button" style="width:80px">Go</button></div>' },
    { id: 'self-overlap', expect: true, body: '<div style="display:grid;grid-template-columns:40px 1fr"><span style="justify-self:start;white-space:nowrap">Runs into the next</span><span>x</span></div>' }
 ];
 
@@ -495,6 +530,28 @@ const tab = await browser.newPage({ viewport: { width: 1100, height: HEIGHT + 40
  * Runs in the page: edges a case says must line up (SCOPE §5.2 rule 1): [selector, edge, selector, edge], each the
  * first match's top, bottom, left or right.
  */
+/**
+ * Focus shows (WCAG 2.4.7, SCOPE §5.2 rule 10): every enabled control in our parts, focused from the keyboard, changes
+ * its own outline, shadow or background, or its parent's (a heading bar ringed for the fold button in it).
+ */
+function focusShows()
+{
+   const issues = [];
+   const look = (n) => { const cs = getComputedStyle(n); return `${cs.outlineStyle} ${cs.outlineWidth} ${cs.outlineColor}|${cs.boxShadow}|${cs.backgroundColor}`; };
+   const controls = document.querySelectorAll(':is(.fhcs-sheet, .fhcs-chat) :is(button, input, select, summary, a[href], [tabindex="0"])');
+   for (const el of controls)
+   {
+      if (el.disabled || el.closest('[hidden], details:not([open]) > :not(summary)') || !el.getClientRects().length) { continue; }
+      if (getComputedStyle(el).visibility === 'hidden') { continue; }
+      const before = [look(el), look(el.parentElement)].join('/');
+      el.focus({ focusVisible: true, preventScroll: true });
+      const shown = document.activeElement !== el || [look(el), look(el.parentElement)].join('/') !== before;
+      el.blur();
+      if (!shown) { issues.push(`no focus shown: ${el.tagName.toLowerCase()}.${[...el.classList].join('.')} [${el.dataset.action ?? el.name ?? ''}]`); }
+   }
+   return issues;
+}
+
 function misaligned(pairs)
 {
    const issues = [];
@@ -561,6 +618,7 @@ async function check(id, html, screenshot, c = {})
    writeFileSync(`${out}/${id}.html`, page(html));
    await tab.goto(`file://${out}/${id}.html`);
    const found = await tab.evaluate(findProblems);
+   if (c.focus) { found.push(...await tab.evaluate(focusShows)); }
    if (c.align) { found.push(...await tab.evaluate(misaligned, c.align)); }
    if (c.rows) { measured.set(`${c.name}|${id.slice(c.name.length)}`, await tab.evaluate(heights, { rows: c.rows, marks: c.marks })); }
    if (c.rows) { boxes.set(`${c.name}|${id.slice(c.name.length)}`, await tab.evaluate(everyBox)); }
@@ -576,12 +634,14 @@ const boxes = new Map();
 const problems = [];
 for (const t of SELF_TEST)
 {
-   const caught = (await check(t.id, frame('sheet', WIDTHS.sheet[0], 'light', t.body), false)).length > 0;
+   const caught = (await check(t.id, frame('sheet', WIDTHS.sheet[0], 'light', t.body), false, { focus: true })).length > 0;
    if (caught !== t.expect) { problems.push(`self-test ${t.id}: expected ${t.expect ? 'a problem' : 'none'}, got ${caught ? 'a problem' : 'none'}`); }
 }
 
 let checked = 0;
-for (const c of CASES)
+// `ONLY=<regex>` checks just the cases whose names match (the self-test always runs); a full run takes minutes.
+const only = process.env.ONLY ? new RegExp(process.env.ONLY) : null;
+for (const c of CASES.filter((k) => !only || only.test(k.name)))
 {
    // `open` lists folded panels to draw open, by their data-fold-key.
    // A case gives a template and its context, or `html`: markup Foundry draws for dnd5e (its form helpers aren't here).
@@ -595,7 +655,9 @@ for (const c of CASES)
       for (const width of WIDTHS[kind])
       {
          const id = `${c.name}-${theme}-${width}`;
-         for (const issue of await check(id, frame(kind, width, theme, body, c), true, c)) { problems.push(`${id}: ${issue}`); }
+         // Focus is checked at each case's first width only: focusing every control is slow, and width doesn't change it.
+         const options = { ...c, focus: width === WIDTHS[kind][0] };
+         for (const issue of await check(id, frame(kind, width, theme, body, c), true, options)) { problems.push(`${id}: ${issue}`); }
          // `sameRowsAs` names the play-mode case this edit-mode one must match row for row (rule 6).
          if (c.sameRowsAs)
          {

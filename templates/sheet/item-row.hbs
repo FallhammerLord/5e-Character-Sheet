@@ -51,7 +51,7 @@
          <button type="button" class="item-action fhcs-toggle fhcs-toggle-equip" data-action="equip"
                  aria-pressed="{{#if equip.pressed}}true{{else}}false{{/if}}" aria-label="{{ equip.label }}"
                  data-fhcs-tip="{{ equip.label }}"{{#if equip.disabled}} aria-disabled="true"{{/if}}>
-            <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true">{{#if equip.pressed}}<path d="M5 12l5 5 9-10"/>{{else}}<path d="M8 12h8"/>{{/if}}</svg>
+            <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6zM12 3v18"/><path class="fhcs-half" d="M12 3L5 6v6c0 4.5 3 7.5 7 9z"/></svg>
          </button>
          {{/if}}
       </span>
