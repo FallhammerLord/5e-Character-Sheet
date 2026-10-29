@@ -857,7 +857,8 @@ const itemSheet = (kind, { editing = false, ...over } = {}) =>
    const tab = { id: 'description', group: 'primary', cssClass: 'active' };
    return template('item/header')({ fhcsItem: view })
       + template('sheet/tabs')({ fhcsTabs: tabRow(ITEM_TABS, { canEdit: false, editing }, localize, {}, []) })
-      + `<div class="tab-body">${template('item/description')({ fhcsItem: view, tab })}</div>`;
+      // No tab body: dnd5e's item tabs sit straight in the window's content, as Foundry draws them.
+      + template('item/description')({ fhcsItem: view, tab });
 };
 for (const kind of Object.keys(ITEMS))
 {

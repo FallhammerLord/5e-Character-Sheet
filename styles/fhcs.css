@@ -3542,3 +3542,23 @@
 .fhcs-item-sheet .fhcs-item-toggle > .fhcs-fa { font-size: 14px; line-height: 1; }
 /* Breathing room inside the item window (user, 2026-10-28), at the sides and foot; the header keeps its top. */
 .fhcs-item-sheet > .window-content { padding: 0 var(--fhcs-s2) var(--fhcs-s2); }
+/* Every tab fills the window below the header and tab row, scrolling within it (dnd5e caps a tab at a height of its
+   own); the description panel grows into the room, so its editor follows the window's height (user, 2026-10-29). */
+.fhcs-sheet.fhcs-item-sheet > .window-content > .tab.active
+{
+   flex: 1;
+   min-height: 0;
+   max-height: none;
+   overflow-y: auto;
+   scrollbar-gutter: stable;
+   scrollbar-width: thin;
+}
+.fhcs-item-sheet .fhcs-item-description.active { display: flex; flex-direction: column; }
+.fhcs-item-sheet .fhcs-item-body { flex: 1 0 auto; }
+.fhcs-item-sheet .fhcs-item-body:not(.fhcs-item-wide) > .fhcs-item-props { align-self: start; }
+.fhcs-item-sheet .fhcs-item-body > .fhcs-item-texts { align-self: stretch; }
+.fhcs-item-sheet .fhcs-item-body.fhcs-item-wide { display: flex; flex-direction: column; align-items: stretch; }
+.fhcs-item-sheet .fhcs-item-wide > .fhcs-item-texts { flex: 1 0 auto; }
+.fhcs-item-sheet .fhcs-item-texts > .fhcs-item-text:first-child { flex: 1 0 auto; }
+.fhcs-item-sheet .fhcs-item-text > :is(prose-mirror, .fhcs-item-prose) { display: flex; flex: 1 0 auto; flex-direction: column; }
+.fhcs-item-sheet .fhcs-item-text > prose-mirror > .editor-content { flex: 1 0 auto; }
