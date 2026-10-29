@@ -187,6 +187,32 @@ else
    if (parts.features?.scrollable?.join() !== '.fhcs-items') { problems.push('the features part does not keep its list\'s scroll'); }
    if (!parts.effects?.template.startsWith('modules/fhcs/')) { problems.push('the effects part is still dnd5e\'s'); }
    if (!parts.effects?.templates?.some((p) => p.endsWith('/list-bar.hbs'))) { problems.push('the effects part does not load list-bar.hbs'); }
+   // Every animation keeps still for the player who asks (SCOPE §5.3 rule 6): inside a reduced-motion query, and on the
+   // sheet behind the Motion switch (`:not([data-fhcs-motion="off"])`). Chat cards have no Motion switch, only the query.
+   for (const path of JSON.parse(readFileSync(new URL('../module.json', import.meta.url), 'utf8')).styles)
+   {
+      const text = readFileSync(new URL(`../${path}`, import.meta.url), 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+      const stack = [];
+      let start = 0;
+      for (let i = 0; i < text.length; i++)
+      {
+         if (text[i] === '{') { stack.push(text.slice(start, i).trim()); start = i + 1; }
+         else if (text[i] === '}') { stack.pop(); start = i + 1; }
+         else if (text[i] === ';' && /^\s*animation\s*:/.test(text.slice(start, i)) && !stack.some((p) => p.startsWith('@keyframes')))
+         {
+            const selector = stack.at(-1) ?? '';
+            const value = text.slice(start, i).split(':').slice(1).join(':').trim();
+            const queried = stack.some((p) => /@media[^{]*prefers-reduced-motion:\s*no-preference/.test(p));
+            const switched = /\.fhcs-chat|\.fhcs-tip-/.test(selector) || /:not\(\[data-fhcs-motion="off"\]|data-fhcs-motion="off"\]\)/.test(selector);
+            if (value !== 'none' && (!queried || !switched))
+            {
+               problems.push(`${path}: an animation outside ${queried ? 'the Motion switch' : 'the reduced-motion query'}: ${selector.replace(/\s+/g, ' ').slice(0, 90)}`);
+            }
+            start = i + 1;
+         }
+         else if (text[i] === ';') { start = i + 1; }
+      }
+   }
    // dnd5e's item menu and favorite drops find favorites by `.favorites [data-item-id]` (character-sheet.mjs:902).
    if (!/class="fhcs-favorites favorites"[\s\S]*?data-item-id=/.test(readFileSync(new URL('../templates/sheet/attributes.hbs', import.meta.url), 'utf8')))
    {

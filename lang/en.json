@@ -40,8 +40,8 @@
         "Hint": "Chat cards wear the sheet theme above. Off: cards stay plain."
       },
       "Motion": {
-        "Name": "Theme motion",
-        "Hint": "Off: themed sheets keep still (no sparks, gleams or moments). Your own choice; your system's reduced-motion setting also turns it off."
+        "Name": "Sheet motion",
+        "Hint": "Off: the sheet keeps still in every theme, Plain's Day and Night too (no particles, glints or moments). Your own choice; your system's reduced-motion setting also turns it off."
       }
     },
     "Chat": {

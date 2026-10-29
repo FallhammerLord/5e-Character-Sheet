@@ -45,7 +45,8 @@ export function registerSettings()
       onChange: () => rethemeCards()
    });
 
-   // A theme's motion, each player's own (SCOPE §4.11): off, the sheet keeps still, as under reduced motion.
+   // The sheet's motion in every theme, Plain's too, each player's own (SCOPE §4.11): off, the sheet keeps still, as under
+   // reduced motion.
    game.settings.register(MODULE_ID, 'motion', {
       name: 'FHCS.Settings.Motion.Name',
       hint: 'FHCS.Settings.Motion.Hint',
