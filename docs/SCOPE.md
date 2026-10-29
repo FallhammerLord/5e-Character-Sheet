@@ -165,6 +165,7 @@ Four themes for players who want them, ahead of the rest of Phase 7: **Fire and 
     - **Night is moonlight and moonbeams only** (user, 2026-10-29: "not stars or falling sparks"): its inspiration mark, glow and particles are moonlight (a moon mark, a pale halo, a moonbeam falling on the mark struck), replacing today's starlight in dark mode. Day: a rayed sun mark, a gold glow, sun motes drifting up from the mark struck.
     - **Particles are one script engine** (`src/apps/sparks.js` grown), an emitter per theme.
     - **State art:** Night's moon wanes with HP (full, waning when bloodied, new when down); Day's light lowers toward dusk.
+    - **Marks in ink** (Claude, 2026-10-29, for the user to reverse): inspiration's suns and moons draw in the sheet's ink and only their glow is gold or silver, since gold marks concentration (§5.1).
     - **Emblems:** a sun for Day, a moon for Night; Sand and Sanctuary takes a sanctuary arch for its emblem in place of the sun.
     - **"Theme motion" becomes "Sheet motion";** the load check fails an animation outside the reduced-motion and Motion-off gates.
   - *Wind and Wrath:* storm slate and overcast; square frames with a cut top-right corner and a storm-light left edge; faint wind lines in the ground; a bolt. Hover sends a gust across a heading; a press is shoved sideways.

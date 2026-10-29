@@ -159,7 +159,7 @@ Third pass, from the user's play (2026-10-28):
 - [x] 6. (built 2026-10-29: Day's glint gold, Night's silver; frames with their own art keep it) Hover: the frame's top edge catches the light where the pointer is (`--fhcs-gleam-x`); a press dips 1px
 - [ ] 7. Particles as scripts (`src/apps/sparks.js` grows into one engine with an emitter per theme): Day sun motes drifting up, Night a moonbeam falling on the mark struck, on inspiration gained
 - [x] 8. (built with slice 1, 2026-10-29) State art: Night's moon wanes with HP (full, bloodied, down); Day's light lowers toward dusk
-- [ ] 9. Emblems and marks: a sun for Day, a moon for Night on the tab row; Night's inspiration mark a moon, not a star; Sand's emblem a sanctuary arch
+- [x] 9. (built 2026-10-29; marks in the sheet's ink, the glow gold or silver; the emblem leaves a narrow edit row, as Forge's anvil) Emblems and marks: a sun for Day, a moon for Night on the tab row; Night's inspiration mark a moon, not a star; Sand's emblem a sanctuary arch
 - [ ] 10. "Theme motion" becomes "Sheet motion"; the load check fails an animation outside the reduced-motion and Motion-off gates
 - [x] Mockups: canvas row "Phase 6.55 · Plain as Day and Night" (Day, Night, 644px bloodied and edit mode, down; the marks, pips, shields, tabs and HP tray click through to their moments); waits on the user's review (2026-10-29)
 - [ ] Quench and play
