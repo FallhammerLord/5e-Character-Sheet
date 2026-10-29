@@ -9,7 +9,8 @@
  * - Day (Plain in light mode, Phase 6.55): sun motes, dust in a sunbeam, drifting up from the mark and swaying as they
  *   rise, catching the light as they turn.
  * - Night (Plain in dark mode): a moonbeam, moonlight only (user, 2026-10-29: "not stars or falling sparks"), slanting
- *   down from the upper right onto the mark, brightening, then fading, with a pool of light where it lands.
+ *   down from the upper right onto the mark, brightening, then fading, with a pool of light where it lands; it burns
+ *   the mark into a full moon (styles/themes/plain.css). Spent, a cloud drifts across the mark and wipes it away.
  *
  * Nothing moves while the player's Motion setting or the system's reduced motion says keep still, or at 0 HP. The
  * canvas places itself and leaves when its last effect ends (user, 2026-10-29: left behind after a theme change, it
@@ -22,9 +23,10 @@
 const EMIT_S = 0.35;
 const LIFE_S = [1.0, 2.2];
 
-/** How long sun motes rise, and how long the moonbeam shines. */
+/** How long sun motes rise, how long the moonbeam shines, and how long a cloud takes to cross a mark. */
 const MOTE_LIFE_S = [1.3, 2.3];
 const BEAM_S = 1.1;
+const CLOUD_S = 0.6;
 
 /** A theme's answer to inspiration gained, from the mark that was struck. */
 export function inspirationGained(element, mark)
@@ -32,6 +34,12 @@ export function inspirationGained(element, mark)
    const theme = element.dataset.fhcsTheme;
    if (theme === 'forge') { sparkBurst(element, mark); }
    else if (!theme) { if (darkMode(element)) { moonbeam(element, mark); } else { sunMotes(element, mark); } }
+}
+
+/** A theme's answer to inspiration spent, at the mark spent: Night's cloud wipes the full moon away. */
+export function inspirationSpent(element, mark)
+{
+   if (!element.dataset.fhcsTheme && darkMode(element)) { cloudWipe(element, mark); }
 }
 
 /** Whether the sheet may move now. */
@@ -107,11 +115,12 @@ function run(surface, element, draw)
    let last = start;
    const frame = (now) =>
    {
-      const dt = Math.min(0.05, (now - last) / 1000);
+      const dt = Math.min(0.05, Math.max(0, now - last) / 1000);
       last = now;
       const { canvas, ctx, width, height } = surface;
       if (canvas.fhcsCleared !== now) { ctx.clearRect(0, 0, width, height); canvas.fhcsCleared = now; }
-      const alive = draw(ctx, (now - start) / 1000, dt);
+      // The first frame's time can fall a hair before `start`; an effect's age never goes below 0.
+      const alive = draw(ctx, Math.max(0, now - start) / 1000, dt);
       if (alive && element.isConnected) { requestAnimationFrame(frame); }
       else { surface.done(); }
    };
@@ -296,6 +305,47 @@ export function moonbeam(element, mark = null)
       ctx.arc(to.x, to.y, 16, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
+      return 1;
+   });
+}
+
+/**
+ * Night's cloud: a soft bank of cloud drifting left to right across the mark spent, thick enough at its middle to hide
+ * it, so the full moon can give way to its phase unseen (at half its crossing, as the styles' wipe does). A few
+ * overlapping puffs, each its own soft disc, moving as one with a little lift.
+ * @param {HTMLElement} element  The sheet's window element.
+ * @param {HTMLElement} [mark]   The mark spent.
+ */
+export function cloudWipe(element, mark = null)
+{
+   if (!mayMove(element)) { return; }
+   const surface = particleCanvas(element);
+   if (!surface) { return; }
+   const at = originOf(mark, surface.box);
+   if (!at) { surface.done(); return; }
+   const puffs = [[-9, 2, 8], [-2, -2, 10], [7, 1, 9], [13, 3, 6], [-14, 4, 5]].map(([dx, dy, r]) => ({ dx, dy, r: r * random(0.9, 1.1) }));
+   const TRAVEL = 44;
+   run(surface, element, (ctx, age) =>
+   {
+      const t = age / CLOUD_S;
+      if (t >= 1) { return 0; }
+      // Across at an even pace, thickest in the middle of its crossing.
+      const x = at.x - TRAVEL / 2 + TRAVEL * t;
+      const y = at.y - 2 * Math.sin(t * Math.PI);
+      const alpha = Math.sin(t * Math.PI) ** 0.6;
+      for (const puff of puffs)
+      {
+         const cx = x + puff.dx;
+         const cy = y + puff.dy;
+         const body = ctx.createRadialGradient(cx, cy, 0, cx, cy, puff.r * 1.6);
+         body.addColorStop(0, `rgba(118, 126, 150, ${0.95 * alpha})`);
+         body.addColorStop(0.6, `rgba(104, 112, 136, ${0.7 * alpha})`);
+         body.addColorStop(1, 'rgba(96, 104, 128, 0)');
+         ctx.fillStyle = body;
+         ctx.beginPath();
+         ctx.arc(cx, cy, puff.r * 1.6, 0, Math.PI * 2);
+         ctx.fill();
+      }
       return 1;
    });
 }

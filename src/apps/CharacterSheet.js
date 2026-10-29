@@ -9,7 +9,7 @@ import { effectsView } from '../sheet/effects.js';
 import { biographyView } from '../sheet/biography.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
 import { comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, tabRow, themePicker } from '../sheet/header.js';
-import { inspirationGained } from './sparks.js';
+import { inspirationGained, inspirationSpent } from './sparks.js';
 import { delayTips, keepFolds } from '../chat/card.js';
 import { startFraming } from './framing.js';
 
@@ -307,8 +307,10 @@ function inspirationMoment(element)
    element.classList.remove('fhcs-moment-inspire', 'fhcs-moment-uninspire');
    element.classList.add(moment);
    setTimeout(() => element.classList.remove(moment), MOMENT_MS);
-   // A theme's answer to a gain starts at the mark that shows it (user, 2026-10-28).
-   if (gained) { inspirationGained(element, stars.find((star) => star.getClientRects().length) ?? bar); }
+   // A theme's answer to a gain or a spend starts at the mark that shows it (user, 2026-10-28).
+   const shown = stars.find((star) => star.getClientRects().length) ?? bar;
+   if (gained) { inspirationGained(element, shown); }
+   else { inspirationSpent(element, shown); }
 }
 
 /** How long a tray takes to fade in, and a fold to open (SCOPE §5.3 rule 6: an answer, under 300ms). */

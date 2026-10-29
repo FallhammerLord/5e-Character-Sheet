@@ -44,11 +44,18 @@
    --fhcs-plain-catch-angle: 245deg;
    --fhcs-plain-catch-from: -20%;
    --fhcs-plain-catch-to: 120%;
-   /* Moonlight only (user, 2026-10-29: "not stars or falling sparks"): the moon rising; marks a crescent, banked a
-      full moon with a pale halo that breathes slower than the sun's. */
+   /* Moonlight only (user, 2026-10-29: "not stars or falling sparks"): the moon rising. Inspiration's marks wax and
+      wane across the row (user, 2026-10-29): crescent, gibbous, new, gibbous, crescent, each a thin disc with its lit
+      part filled; banked, any of them a full moon with a pale halo that breathes slower than the sun's. A lone mark
+      (no bank) is the waxing crescent. */
    --fhcs-plain-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 19h18M13.5 4a6.5 6.5 0 1 0 4.5 11.2 5 5 0 0 1-4.5-11.2z' fill='none' stroke='%23c5d2f0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-   --fhcs-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M14.5 4.5a7.5 7.5 0 1 0 5 12 6 6 0 0 1-5-12z' fill='none' stroke='%23000' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");
-   --fhcs-mark-on: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8'/%3E%3C/svg%3E");
+   --fhcs-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3Cpath d='M12 4a8 8 0 0 1 0 16a3.5 8 0 0 0 0-16z'/%3E%3C/svg%3E");
+   --fhcs-mark-on: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8.75'/%3E%3C/svg%3E");
+   --fhcs-plain-moon-1: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3Cpath d='M12 4a8 8 0 0 1 0 16a3.5 8 0 0 0 0-16z'/%3E%3C/svg%3E");
+   --fhcs-plain-moon-2: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3Cpath d='M12 4a8 8 0 0 1 0 16a4.5 8 0 0 1 0-16z'/%3E%3C/svg%3E");
+   --fhcs-plain-moon-3: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E");
+   --fhcs-plain-moon-4: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3Cpath d='M12 4a8 8 0 0 0 0 16a4.5 8 0 0 0 0-16z'/%3E%3C/svg%3E");
+   --fhcs-plain-moon-5: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3Cpath d='M12 4a8 8 0 0 0 0 16a3.5 8 0 0 1 0-16z'/%3E%3C/svg%3E");
    --fhcs-inspire-glow: #d8e2ff;
    --fhcs-inspire-breath: fhcs-starlight 4.4s ease-in-out infinite;
    /* The full moon: a pale disc with its seas, faint. */
@@ -235,4 +242,74 @@
 {
    from { background-position: var(--fhcs-plain-catch-from) 0; }
    to { background-position: var(--fhcs-plain-catch-to) 0; }
+}
+
+/* ---------- Night's inspiration: the moon's phases, burned full by a moonbeam, wiped by a cloud (user, 2026-10-29) ----------
+   Each place in the row keeps its phase. Gaining doesn't grow or turn the mark: the moonbeam (src/apps/sparks.js)
+   lands, and at its brightest the mark burns into a full moon, its halo flaring. Spending: a cloud drifts across, and
+   once it covers the mark the full moon gives way to the place's phase, its light gone. */
+
+.theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *)):not([data-fhcs-theme], .fhcs-item-sheet) :is(.fhcs-inspiration-stars, .fhcs-tray-stars) > :nth-child(5n+1),
+.fhcs-sheet.theme-dark:not([data-fhcs-theme], .fhcs-item-sheet) :is(.fhcs-inspiration-stars, .fhcs-tray-stars) > :nth-child(5n+1)
+{
+   --fhcs-mark: var(--fhcs-plain-moon-1);
+}
+
+.theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *)):not([data-fhcs-theme], .fhcs-item-sheet) :is(.fhcs-inspiration-stars, .fhcs-tray-stars) > :nth-child(5n+2),
+.fhcs-sheet.theme-dark:not([data-fhcs-theme], .fhcs-item-sheet) :is(.fhcs-inspiration-stars, .fhcs-tray-stars) > :nth-child(5n+2)
+{
+   --fhcs-mark: var(--fhcs-plain-moon-2);
+}
+
+.theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *)):not([data-fhcs-theme], .fhcs-item-sheet) :is(.fhcs-inspiration-stars, .fhcs-tray-stars) > :nth-child(5n+3),
+.fhcs-sheet.theme-dark:not([data-fhcs-theme], .fhcs-item-sheet) :is(.fhcs-inspiration-stars, .fhcs-tray-stars) > :nth-child(5n+3)
+{
+   --fhcs-mark: var(--fhcs-plain-moon-3);
+}
+
+.theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *)):not([data-fhcs-theme], .fhcs-item-sheet) :is(.fhcs-inspiration-stars, .fhcs-tray-stars) > :nth-child(5n+4),
+.fhcs-sheet.theme-dark:not([data-fhcs-theme], .fhcs-item-sheet) :is(.fhcs-inspiration-stars, .fhcs-tray-stars) > :nth-child(5n+4)
+{
+   --fhcs-mark: var(--fhcs-plain-moon-4);
+}
+
+.theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *)):not([data-fhcs-theme], .fhcs-item-sheet) :is(.fhcs-inspiration-stars, .fhcs-tray-stars) > :nth-child(5n+0),
+.fhcs-sheet.theme-dark:not([data-fhcs-theme], .fhcs-item-sheet) :is(.fhcs-inspiration-stars, .fhcs-tray-stars) > :nth-child(5n+0)
+{
+   --fhcs-mark: var(--fhcs-plain-moon-5);
+}
+
+.theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *)):not([data-fhcs-theme], .fhcs-item-sheet) .fhcs-inspiration,
+.fhcs-sheet.theme-dark:not([data-fhcs-theme], .fhcs-item-sheet) .fhcs-inspiration
+{
+   --fhcs-inspire-on: fhcs-plain-moon-burn 600ms linear;
+   --fhcs-inspire-on-glow: fhcs-plain-moon-flare 600ms ease-out;
+   --fhcs-inspire-off: fhcs-plain-moon-wipe 600ms linear;
+   --fhcs-inspire-off-glow: fhcs-plain-moon-dim 600ms ease-in;
+}
+
+/* The mask flips with the beam's peak (a quarter of its second in), and under the cloud's middle. */
+@keyframes fhcs-plain-moon-burn
+{
+   0%, 44% { -webkit-mask-image: var(--fhcs-mark); mask-image: var(--fhcs-mark); }
+   45%, 100% { -webkit-mask-image: var(--fhcs-mark-on); mask-image: var(--fhcs-mark-on); }
+}
+
+@keyframes fhcs-plain-moon-flare
+{
+   0% { filter: drop-shadow(0 0 0 var(--fhcs-inspire-glow)); }
+   45% { filter: drop-shadow(0 0 10px var(--fhcs-inspire-glow)); }
+   100% { filter: drop-shadow(0 0 2px var(--fhcs-inspire-glow)); }
+}
+
+@keyframes fhcs-plain-moon-wipe
+{
+   0%, 49% { -webkit-mask-image: var(--fhcs-mark-on); mask-image: var(--fhcs-mark-on); }
+   50%, 100% { -webkit-mask-image: var(--fhcs-mark); mask-image: var(--fhcs-mark); }
+}
+
+@keyframes fhcs-plain-moon-dim
+{
+   0% { filter: drop-shadow(0 0 4px var(--fhcs-inspire-glow)); }
+   50%, 100% { filter: drop-shadow(0 0 0 transparent); }
 }
