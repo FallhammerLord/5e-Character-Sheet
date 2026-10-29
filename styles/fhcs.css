@@ -1168,6 +1168,25 @@
 @keyframes fhcs-switch-on { from { cx: 6px; } }
 @keyframes fhcs-switch-off { from { cx: 14px; } }
 
+/* Opening (Phase 6.55): a tray the player opens fades in, dropping 2px; a fold the player opens lets its rows fade down
+   4px. Under 300ms, an answer; nothing on closing, which is at once. Every theme. `fhcs-opening` is set by the sheet,
+   only on the player's own click, so a tray kept open across a redraw stays put. */
+@media (prefers-reduced-motion: no-preference)
+{
+   .fhcs-sheet:not([data-fhcs-motion="off"]) :is(details.fhcs-opening > .fhcs-tray, .fhcs-tray.fhcs-opening) { animation: fhcs-tray-in 150ms ease-out; }
+   .fhcs-sheet:not([data-fhcs-motion="off"]) :is(.fhcs-section.fhcs-opening > .fhcs-item-list, .fhcs-favorites.fhcs-opening, .fhcs-traits.fhcs-opening, .fhcs-contents.fhcs-opening) { animation: fhcs-unfold 200ms ease-out; }
+}
+
+@keyframes fhcs-tray-in
+{
+   from { opacity: 0; transform: translateY(-2px); }
+}
+
+@keyframes fhcs-unfold
+{
+   from { opacity: 0; transform: translateY(-4px); }
+}
+
 /* The theme picker on the title bar, beside ⋮ (SCOPE §4.11, user 2026-10-28): a title-bar control, its tray under it. */
 .fhcs-sheet > .window-header > .fhcs-theme-chip { display: grid; flex: none; place-items: center; cursor: pointer; }
 .fhcs-sheet > .window-header > .fhcs-theme-chip .fhcs-icon { width: 16px; height: 16px; }

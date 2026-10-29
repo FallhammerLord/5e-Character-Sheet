@@ -121,3 +121,32 @@
 {
    to { background-position: 200% 0; }
 }
+
+/* ---------- The open tab's line slides to the tab opened (Phase 6.55, 250ms) ----------
+   The sheet sets where the last line was (`--fhcs-tab-from-x`, `-w`); while it slides, the tab's own line waits. */
+
+@media (prefers-reduced-motion: no-preference)
+{
+   .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"]) .fhcs-tab.active.fhcs-tab-slid
+   {
+      position: relative;
+      border-bottom-color: transparent;
+   }
+   .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"]) .fhcs-tab.active.fhcs-tab-slid::after
+   {
+      content: '';
+      position: absolute;
+      right: 0;
+      bottom: -2px;
+      left: 0;
+      height: 2px;
+      background: currentColor;
+      transform-origin: left;
+      animation: fhcs-plain-tab-slide 250ms ease-out;
+   }
+}
+
+@keyframes fhcs-plain-tab-slide
+{
+   from { transform: translateX(var(--fhcs-tab-from-x, 0)) scaleX(var(--fhcs-tab-from-w, 1)); }
+}

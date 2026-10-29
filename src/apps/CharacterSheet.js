@@ -65,6 +65,7 @@ async function toggleGroup(event, target)
    if (!list) { return; }
    list.hidden = !list.hidden;
    target.setAttribute('aria-expanded', String(!list.hidden));
+   if (!list.hidden) { opening(list); }
    // What shows only while folded (the traits' one-line summary).
    for (const el of group.querySelectorAll('[data-fhcs-folded]')) { el.hidden = !list.hidden; }
    const folded = new Set(game.user.getFlag(MODULE_ID, PREFS.folded) ?? []);
@@ -162,6 +163,7 @@ function openSpecialTraits()
 function themeTray()
 {
    const tray = this.element.querySelector(':scope > .fhcs-theme-tray');
+   if (tray?.hidden) { opening(tray); }
    showThemeTray(this.element, !!tray?.hidden);
 }
 
@@ -172,6 +174,7 @@ async function toggleSection(event, target)
    if (!section) { return; }
    const open = !section.classList.toggle('fhcs-folded');
    target.setAttribute('aria-expanded', String(open));
+   if (open) { opening(section); }
    const folded = new Set(game.user.getFlag(MODULE_ID, PREFS.folded) ?? []);
    if (open) { folded.delete(section.dataset.fhcsFold); }
    else { folded.add(section.dataset.fhcsFold); }
@@ -197,6 +200,7 @@ async function toggleContainer(event, target)
    if (!list) { return; }
    list.hidden = !list.hidden;
    target.setAttribute('aria-expanded', String(!list.hidden));
+   if (!list.hidden) { opening(list); }
    const open = new Set(game.user.getFlag(MODULE_ID, PREFS.openContainers) ?? []);
    if (list.hidden) { open.delete(row.dataset.itemId); }
    else { open.add(row.dataset.itemId); }
@@ -305,6 +309,56 @@ function inspirationMoment(element)
    setTimeout(() => element.classList.remove(moment), MOMENT_MS);
    // A theme's answer to a gain starts at the mark that shows it (user, 2026-10-28).
    if (gained) { inspirationGained(element, stars.find((star) => star.getClientRects().length) ?? bar); }
+}
+
+/** How long a tray takes to fade in, and a fold to open (SCOPE §5.3 rule 6: an answer, under 300ms). */
+const OPEN_MS = 200;
+
+/** Marks an element as just opened by the player (`fhcs-opening`) for its fade; styles keep it still under Motion off. */
+function opening(element)
+{
+   if (!element) { return; }
+   element.classList.remove('fhcs-opening');
+   void element.offsetWidth;
+   element.classList.add('fhcs-opening');
+   setTimeout(() => element.classList.remove('fhcs-opening'), OPEN_MS + 50);
+}
+
+/**
+ * A tray fades in when the player opens it, and only then: one reopened after a redraw (keepFolds) stays put. Bound
+ * once per window, on the summary's click, before the tray shows.
+ */
+function fadeTrays(sheet)
+{
+   if (!sheet.element || sheet.element.dataset.fhcsTrays) { return; }
+   sheet.element.dataset.fhcsTrays = 'true';
+   sheet.element.addEventListener('click', (event) =>
+   {
+      const summary = event.target.closest?.('details > summary');
+      const details = summary?.parentElement;
+      if (details && !details.open && details.querySelector(':scope > .fhcs-tray')) { opening(details); }
+   }, { capture: true });
+}
+
+/** How long the tab line takes to slide: an answer to the player, under 300ms (SCOPE §5.3 rule 6). */
+const TAB_SLIDE_MS = 250;
+
+/**
+ * Slides the open tab's line from where the last one was (`from`, its box): the new tab's line starts at that place
+ * and width (`--fhcs-tab-from-x`, `-w`) and settles under the new tab. Styles keep it still under Motion off.
+ */
+function slideTabLine(row, from)
+{
+   const tab = row?.querySelector('.fhcs-tab.active');
+   if (!tab || !from) { return; }
+   const to = tab.getBoundingClientRect();
+   if (!to.width || Math.abs(to.left - from.left) < 1) { return; }
+   tab.style.setProperty('--fhcs-tab-from-x', `${Math.round(from.left - to.left)}px`);
+   tab.style.setProperty('--fhcs-tab-from-w', (from.width / to.width).toFixed(3));
+   tab.classList.remove('fhcs-tab-slid');
+   void tab.offsetWidth;
+   tab.classList.add('fhcs-tab-slid');
+   setTimeout(() => tab.classList.remove('fhcs-tab-slid'), TAB_SLIDE_MS + 50);
 }
 
 /** The toggles that get an on and an off moment (SCOPE §5.3 rule 6; Phase 6.55): pips, marks and switches. */
@@ -677,6 +731,15 @@ export function makeCharacterSheet(Base)
          yield* extraHeaderControls(this.element);
       }
 
+      /** The open tab's line slides from the tab left to the one opened (Phase 6.55). */
+      changeTab(tab, group, options)
+      {
+         const row = this.element?.querySelector('.fhcs-tabs');
+         const from = row?.querySelector('.fhcs-tab.active')?.getBoundingClientRect();
+         super.changeTab(tab, group, options);
+         slideTabLine(row, from);
+      }
+
       /** Foundry joins every parent's classes; drop dnd5e's look from the list. */
       _initializeApplicationOptions(options)
       {
@@ -790,6 +853,7 @@ export function makeCharacterSheet(Base)
          themeState(this.element, this.actor);
          inspirationMoment(this.element);
          rememberToggles(this);
+         fadeTrays(this);
          toggleMoment(this);
          followPointer(this.element);
          middleClickOpens(this.element, this.actor);
