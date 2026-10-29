@@ -148,7 +148,7 @@ Third pass, from the user's play (2026-10-28):
 
 ## Phase 6.55: Themes round 2, Plain as Day and Night (user, 2026-10-29; SCOPE §4.11)
 
-"Bringing plain light & dark in line with subdued textures and animations." Plain becomes Day (sunlight) and Night (moonlight) with a ledger subtheme; particles are scripts. Brainstorm from 2026-10-29, for the user's picks:
+"Bringing plain light & dark in line with subdued textures and animations." Plain becomes Day (sunlight) and Night (moonlight) with a ledger subtheme; particles are scripts. All ten agreed (user, 2026-10-29); Night is moonlight and moonbeams, never stars or sparks (SCOPE §4.11).
 
 - [ ] 1. Ground: ledger ruling in the window's gutters; Day lit warm from the upper left, Night cool from the upper right
 - [ ] 2. Heading bars: a double hairline (the ledger's totals rule); frames a 1px top highlight (sun or moon catching the edge)
@@ -156,9 +156,9 @@ Third pass, from the user's play (2026-10-28):
 - [ ] 4. Hit and heal at the HP line (the hooks exist for every theme)
 - [ ] 5. Tab line slides to the new tab; trays and tips fade in with a 2px drop; section folds animate if folding doesn't redraw
 - [ ] 6. Hover: the frame's top edge catches the light where the pointer is (`--fhcs-gleam-x`); a press dips 1px
-- [ ] 7. Particles as scripts (`src/apps/sparks.js` grows into one engine with an emitter per theme): Day sun motes, Night silver glints or a falling star, from the mark struck, on inspiration gained
+- [ ] 7. Particles as scripts (`src/apps/sparks.js` grows into one engine with an emitter per theme): Day sun motes drifting up, Night a moonbeam falling on the mark struck, on inspiration gained
 - [ ] 8. State art (stretch): Night's moon wanes with HP (full, bloodied, down); Day's light lowers toward dusk
-- [ ] 9. Emblems and marks: a sun for Day, a moon for Night on the tab row; Sand's sun emblem then changes
+- [ ] 9. Emblems and marks: a sun for Day, a moon for Night on the tab row; Night's inspiration mark a moon, not a star; Sand's emblem a sanctuary arch
 - [ ] 10. "Theme motion" becomes "Sheet motion"; the load check fails an animation outside the reduced-motion and Motion-off gates
 - [ ] Mockups (Day, Night, 644px), Quench and play
 
