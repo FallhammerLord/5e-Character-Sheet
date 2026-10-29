@@ -1570,6 +1570,12 @@
 }
 
 .fhcs-sheet .fhcs-hp-fill { position: absolute; inset: 0 auto 0 0; background: var(--fhcs-hp-fill); }
+/* On a hit or a heal the fill drains or fills from where it stood (`--fhcs-hp-was`), every theme. */
+@media (prefers-reduced-motion: no-preference)
+{
+   .fhcs-sheet:is(.fhcs-moment-hit, .fhcs-moment-heal):not([data-fhcs-motion="off"]) .fhcs-hp-fill { animation: fhcs-hp-fill 400ms ease-out; }
+}
+@keyframes fhcs-hp-fill { from { width: calc(var(--fhcs-hp-was, 1) * 100%); } }
 
 .fhcs-sheet .fhcs-hp-line
 {

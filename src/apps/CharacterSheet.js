@@ -96,6 +96,8 @@ function themeState(element, actor)
    const before = element.dataset.fhcsHpValue;
    element.dataset.fhcsHpValue = String(value);
    if (before === undefined || Number(before) === value) { return; }
+   // Where the bar stood before, so its fill drains or fills from there.
+   element.style.setProperty('--fhcs-hp-was', (hp.max > 0 ? Math.clamp(Number(before) / hp.max, 0, 1) : 1).toFixed(2));
    const moment = value < Number(before) ? 'fhcs-moment-hit' : 'fhcs-moment-heal';
    element.classList.remove('fhcs-moment-hit', 'fhcs-moment-heal');
    element.classList.add(moment);

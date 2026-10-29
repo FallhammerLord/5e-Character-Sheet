@@ -85,3 +85,39 @@
    background-size: 100% 1px;
    background-repeat: no-repeat;
 }
+
+/* ---------- Hit and heal, at the HP line (Phase 6.55, about 600ms, once) ---------- */
+
+@media (prefers-reduced-motion: no-preference)
+{
+   /* A hit: the number jolts and a red underline is cut away under it. */
+   .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"]).fhcs-moment-hit .fhcs-hp-line > :last-child
+   {
+      background: linear-gradient(var(--fhcs-failure), var(--fhcs-failure)) left bottom / 100% 2px no-repeat;
+      animation: fhcs-plain-hit 600ms ease-out forwards;
+   }
+   /* A heal: a band of green light sweeps the bar, under the numbers. */
+   .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"]).fhcs-moment-heal .fhcs-hp-line { z-index: 1; }
+   .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"]).fhcs-moment-heal .fhcs-hp-meter::after
+   {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--fhcs-success) 30%, transparent), transparent) -100% 0 / 50% 100% no-repeat;
+      animation: fhcs-plain-heal 600ms ease-in-out forwards;
+   }
+}
+
+@keyframes fhcs-plain-hit
+{
+   15% { transform: translateX(-2px); }
+   35% { transform: translateX(2px); }
+   55% { transform: translateX(-1px); }
+   to { transform: none; background-size: 0 2px; }
+}
+
+@keyframes fhcs-plain-heal
+{
+   to { background-position: 200% 0; }
+}
