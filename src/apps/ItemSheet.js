@@ -48,6 +48,16 @@ function itemTheme(element, item)
    else { element.dataset.fhcsMotion = 'off'; }
 }
 
+/**
+ * The icon's button in edit mode: dnd5e's image picker, given the image itself, which carries `data-edit` (its callback
+ * sets that image's src, and the form saves it, as in dnd5e's own header).
+ */
+function editIcon(event, target)
+{
+   const image = target.querySelector('img[data-edit]');
+   return image ? this.constructor._onEditImage?.call(this, event, image) : null;
+}
+
 /** A header toggle: equipped, attuned, identified or prepared. */
 function itemToggle(event, target)
 {
@@ -68,7 +78,7 @@ export function makeItemSheet(Base)
          classes: ['fhcs-sheet', 'fhcs-item-sheet'],
          position: { width: 560, height: 640 },
          window: { resizable: true },
-         actions: { fhcsItemToggle: itemToggle }
+         actions: { fhcsItemToggle: itemToggle, fhcsEditIcon: editIcon }
       };
 
       /**

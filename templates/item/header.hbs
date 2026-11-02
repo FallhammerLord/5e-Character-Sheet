@@ -1,10 +1,12 @@
 {{!-- The item sheet's header (SCOPE §4.13, user 2026-10-28): the icon, the name in display, one line of what it is (a
       spell: level · school · components, with the concentration and ritual marks of §5.1), and the toggles in our
-      marks. dnd5e's `editImage` changes the icon in edit mode; `showIcon` shows it in play. --}}
+      marks. The icon's button opens dnd5e's picker in edit mode (`fhcsEditIcon`, handing it the image) and shows the icon
+      in play (`showIcon`). `data-edit` sits on the image, as in dnd5e's header: Foundry saves each `img[data-edit]`'s
+      src with the form, and on the button it sent no path, so every save failed (user, 2026-10-29). --}}
 <header class="fhcs-item-header fhcs-frame">
    {{#with fhcsItem}}
-   <button type="button" class="fhcs-item-icon always-interactive" {{#if fields}}data-action="editImage" data-edit="img"{{else}}data-action="showIcon"{{/if}}
-           aria-label="{{ text.icon }}"><img src="{{ img }}" alt=""></button>
+   <button type="button" class="fhcs-item-icon always-interactive" {{#if fields}}data-action="fhcsEditIcon"{{else}}data-action="showIcon"{{/if}}
+           aria-label="{{ text.icon }}"><img src="{{ img }}" alt=""{{#if fields}} data-edit="img"{{/if}}></button>
    <div class="fhcs-item-titles">
       {{#if fields}}
       <input type="text" class="fhcs-input fhcs-display fhcs-item-name" name="{{ nameField }}" value="{{ name }}" aria-label="{{ text.name }}">

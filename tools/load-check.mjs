@@ -5,7 +5,7 @@
  * doesn't check that imports exist.
  * Usage: npm run load
  */
-const { readFileSync, existsSync } = await import('node:fs');
+const { readFileSync, existsSync, readdirSync } = await import('node:fs');
 
 const hooks = {};
 const registered = [];
@@ -211,6 +211,16 @@ else
             start = i + 1;
          }
          else if (text[i] === ';') { start = i + 1; }
+      }
+   }
+   // Foundry saves each image's or video's `data-edit` path with the form, from its src: on any other element it sends
+   // no path and the whole save fails (user, 2026-10-29: the item's Category never saved).
+   for (const file of readdirSync(new URL('../templates/', import.meta.url), { recursive: true }).filter((f) => f.endsWith('.hbs')))
+   {
+      const text = readFileSync(new URL(`../templates/${file}`, import.meta.url), 'utf8');
+      for (const [, tag] of text.matchAll(/<([a-z][\w-]*)\b[^>]*\bdata-edit=/g))
+      {
+         if (!['img', 'video'].includes(tag)) { problems.push(`templates/${file}: data-edit on a <${tag}>; Foundry saves it from an <img> or <video>'s src`); }
       }
    }
    // dnd5e's item menu and favorite drops find favorites by `.favorites [data-item-id]` (character-sheet.mjs:902).
