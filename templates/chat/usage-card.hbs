@@ -16,7 +16,7 @@
    {{#each fhcs.bands}}
    {{#if isSave}}
    <div class="fhcs-band fhcs-band-{{ kind }} fhcs-band-group">
-      <button type="button" class="fhcs-band-button" data-action="{{ action }}" data-index="{{ index }}">
+      <button type="button" class="fhcs-band-button" data-action="{{ action }}" data-index="{{ index }}"{{#if locked}} disabled{{/if}}>
          <span class="fhcs-band-top"><span class="fhcs-band-heading">{{ heading }}</span><span class="fhcs-band-end"></span></span>
          <span class="fhcs-band-text">{{ text }}</span>
          <span class="fhcs-band-prompt">{{ prompt }}</span>

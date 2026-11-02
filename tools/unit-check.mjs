@@ -68,9 +68,10 @@ const PART_CASES = [
       { bands: ['save:Save:DC 15 Dexterity Saving Throw:0', 'damage:Damage:Roll damage:1'], others: ['placeTemplate:2'] }
    ],
    [
-      'hidden buttons are left out',
+      // dnd5e hides attack and damage from other players; their band stays, locked, to show the roll once made.
+      'a hidden roll button stays as a locked band; a hidden action is left out',
       [{ action: 'rollAttack', index: 0, label: 'DND5E.Attack', hidden: true }, { action: 'consumeResource', index: 1, label: 'x', hidden: true }],
-      { bands: [], others: [] }
+      { bands: ['attack:Attack:Roll attack:0:locked'], others: [] }
    ],
    [
       'healing is a damage band',
@@ -82,7 +83,7 @@ for (const [name, buttons, expected] of PART_CASES)
 {
    const { bands, others } = cardParts(buttons, localize);
    const got = {
-      bands: bands.map((b) => `${b.kind}:${b.heading}:${b.text}:${b.index}`),
+      bands: bands.map((b) => `${b.kind}:${b.heading}:${b.text}:${b.index}${b.locked ? ':locked' : ''}`),
       others: others.map((o) => `${o.action}:${o.index}`)
    };
    try { deepStrictEqual(got, expected); }

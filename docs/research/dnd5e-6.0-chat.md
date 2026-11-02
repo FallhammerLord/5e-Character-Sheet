@@ -79,3 +79,11 @@ it was written for a report whose real cause was the next point.
 
 **Selected mode lists only tokens with an actor** (`buildTargetsList`: `if ( t.actor )`): a token with no actor has
 no HP to apply to and no save to roll, so it never shows in a tray (user, 2026-10-29, testing with such tokens).
+
+## Who sees a card's buttons (found 2026-11-02)
+
+`UsageMessageData#_prepareButtons` hides every button whose `visibility` isn't `all` from anyone but the GM, the
+actor's owners and the message's author (`isCreator`); attack and damage buttons default to `creator`. It prepares no
+buttons at all when the client can't find the message's activity (`getAssociatedActivity()` is null). Ours: a hidden
+roll button keeps its band, `locked`, drawn only once rolled, since the roll's own message is hidden once drawn in the
+card (src/chat/rolls.js); with no activity, the bands come from the message's stored `buttons`, all locked.

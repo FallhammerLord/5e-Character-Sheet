@@ -37,6 +37,17 @@ export const CARD_PARTS = ['header', 'rolled-band', 'd20-row', 'd20-tray', 'die'
    .map((name) => `modules/${MODULE_ID}/templates/chat/parts/${name}.hbs`);
 // (roll-card.hbs and request-card.hbs include the same parts.)
 
+/**
+ * The message's own stored buttons, for a client that can't find the activity (dnd5e then prepares none): every one
+ * locked, since dnd5e can't act on them without it, so the bands show what was rolled and nothing to press.
+ */
+function storedButtons(data)
+{
+   return (data.buttons ?? []).map((button, index) => ({
+      ...button, index, hidden: true, label: button.label?.hidden || button.label?.value || ''
+   }));
+}
+
 /** dnd5e's chat button actions that become bands, and the kind of band each is. */
 const BAND_KINDS = {
    rollAttack: 'attack',
@@ -60,9 +71,10 @@ export function cardParts(buttons, localize)
    const others = [];
    for (const button of buttons)
    {
-      if (button.hidden) { continue; }
       const label = localize(button.label ?? '');
       const kind = BAND_KINDS[button.action];
+      // A button this viewer can't press: no action of its own, but a roll band still shows what was rolled.
+      if (button.hidden && !kind) { continue; }
       if (!kind) { others.push({ action: button.action, index: button.index, label }); continue; }
       const rollText = localize(`FHCS.Card.Roll.${button.action}`);
       bands.push({
@@ -72,6 +84,9 @@ export function cardParts(buttons, localize)
          match: button.dataset?.skill ?? button.dataset?.tool ?? button.dataset?.ability ?? null,
          action: button.action,
          index: button.index,
+         // dnd5e hides attack and damage buttons from everyone but the roller and the GM (visibility "creator"); the
+         // band stays for them, drawn only once rolled (user, 2026-11-02: other players saw no rolls at all).
+         locked: !!button.hidden,
          heading: localize(`FHCS.Card.Band.${button.action}`),
          // A save or check carries its own words ("DC 15 Dexterity Saving Throw"); the rest say what clicking does.
          text: (kind === 'save') || (kind === 'roll') ? label : rollText
@@ -420,9 +435,9 @@ export function makeUsageMessageData(Base)
          const actor = this.parent.getAssociatedActor();
          const item = context.item ?? {};
          const format = (key, data) => game.i18n.format(key, data);
-         const { bands, others } = cardParts(context.buttons ?? [], localize);
-         const canCrit = bands.some((b) => b.kind === 'attack');
-         for (const band of bands.filter((b) => b.isSave))
+         const { bands: drawn, others } = cardParts(context.buttons ?? storedButtons(this), localize);
+         const canCrit = drawn.some((b) => b.kind === 'attack');
+         for (const band of drawn.filter((b) => b.isSave))
          {
             band.prompt = localize('FHCS.Card.RollForSelected');
             band.rows = rollsFrom(this.parent, ['save', 'check']).filter((m) => answersButton(m, band.match))
@@ -430,7 +445,7 @@ export function makeUsageMessageData(Base)
          }
          // Saves and checks are drawn as rows in their bands; dnd5e's own summaries of them would repeat them.
          context.summaries = (context.summaries ?? []).filter((s) => !['save', 'check'].includes(game.messages.get(s.id)?.type));
-         for (const band of bands)
+         for (const band of drawn)
          {
             const source = BAND_ROLLS[band.kind];
             if (!source) { continue; }
@@ -441,6 +456,8 @@ export function makeUsageMessageData(Base)
             else if (rolls.length) { band.text = localize('FHCS.Card.HiddenRoll'); }
             if (facts && (band.kind === 'damage')) { band.damageId = facts.messageId; }
          }
+         // A band the viewer can't press shows only what was rolled (a save band, its rows).
+         const bands = drawn.filter((band) => !band.locked || band.rolled || band.rows?.length);
          // Apply: dnd5e's damage tray for the latest damage roll, and its effects tray (SCOPE §6.5).
          const damageId = canApplyDamage() ? bands.find((b) => b.damageId)?.damageId : null;
          const tags = Object.values(context.rows ?? {}).flatMap((row) => row.entries ?? []).map((e) => e.label);

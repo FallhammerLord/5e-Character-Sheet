@@ -693,6 +693,17 @@ export const CASES = [
    { name: 'card-request', template: 'chat/request-card', frame: 'chat', context: request() },
    { name: 'card-fireball-saves', template: 'chat/usage-card', frame: 'chat', context: fireball() },
    { name: 'card-attack-crit', template: 'chat/usage-card', frame: 'chat', context: rolledAttack(attack(), ['6 + 5 + 3 = 14', '1 + 5 + 3 = 9'], damage()) },
+   // Another player's view (user, 2026-11-02): dnd5e hides the roll buttons from them; the attack shows once rolled,
+   // the unrolled damage band is left out, and nothing can be pressed.
+   {
+      name: 'card-attack-viewer', template: 'chat/usage-card', frame: 'chat', context: (() =>
+      {
+         const context = card({ canAct: false }, ATTACK.map((b) => ({ ...b, hidden: true })));
+         context.fhcs.bands[0].rolled = { ...d20Band(attack({ canEdit: false }), [], format), open: true };
+         context.fhcs.bands = context.fhcs.bands.filter((band) => band.rolled);
+         return context;
+      })()
+   },
    // What Apply did, kept on the card (user, 2026-10-28): split damage, one type, none, an effect, a long name.
    { name: 'card-applied', template: 'chat/usage-card', frame: 'chat', context: (() =>
    {
