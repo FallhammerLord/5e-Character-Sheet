@@ -1,4 +1,5 @@
 import { MODULE_ID, SHEET_ID, SYSTEM_ACTIONS } from '../constants.js';
+import { isStale } from '../chat/card.js';
 import { addBonus, addD20, damageFacts, systemCharacterSheet } from '../compat.js';
 
 /** How long a click may take to reach dnd5e's hook before a test fails. */
@@ -1442,6 +1443,39 @@ export function registerQuenchTests(quench)
                assert.ok(band, 'rolled attack band');
                assert.strictEqual(Number(band.querySelector('.fhcs-band-total').textContent), attack.rolls[0].total);
                assert.ok(band.querySelector('.fhcs-die-primary'), 'primary d20 shown');
+            }
+            finally
+            {
+               await attack?.delete();
+               await usage.delete();
+            }
+         });
+
+         it('notices a card drawn without its roll, and one redraw brings it current', async function ()
+         {
+            // Players saw cards without their rolls (user, 2026-11-06): the card's draw raced the roll's arrival.
+            const results = await activity.use({ subsequentActions: false, consume: false }, { configure: false },
+               { rollMode: 'selfroll' });
+            const usage = results?.message;
+            assert.ok(usage?.id, 'usage card posted');
+            let attack = null;
+            const card = () => ui.chat.element?.querySelector(`[data-message-id="${usage.id}"] .fhcs-card[data-fhcs-drawn]`);
+            try
+            {
+               const [roll] = await activity.rollAttack({}, { configure: false },
+                  { rollMode: 'selfroll', data: { system: { origin: usage.id } } }) ?? [];
+               attack = roll?.parent ?? usage.getAssociatedRolls('attack').at(-1);
+               assert.ok(attack, 'attack message posted');
+               await waitFor(() => card()?.querySelector('.fhcs-band-rolled.fhcs-band-attack'));
+               assert.ok(card()?.querySelector('.fhcs-band-rolled.fhcs-band-attack'),
+                  `the card in the log draws the attack; it holds "${card()?.dataset.fhcsDrawn ?? 'no card'}"`);
+               assert.isFalse(isStale(usage), `a card drawn with its roll is current; it holds "${card()?.dataset.fhcsDrawn}"`);
+               // As if drawn before the attack arrived: an empty record, and Foundry's redraw done.
+               card().dataset.fhcsDrawn = '';
+               assert.isTrue(isStale(usage), 'a card drawn without its roll is stale');
+               await ui.chat.updateMessage(usage);
+               await waitFor(() => !isStale(usage));
+               assert.isFalse(isStale(usage), `the stale card is drawn again; it holds "${card()?.dataset.fhcsDrawn}"`);
             }
             finally
             {

@@ -8,10 +8,11 @@
  * `effect-application`) work inside our markup. Slices 2–8 fill the bands with results.
  */
 import { MODULE_ID } from '../constants.js';
-import { actorArtwork, addBonus, addD20, answersButton, appliedFacts, canApplyDamage, damageFacts, hideTooltip, openTrays,
+import { actorArtwork, addBonus, addD20, answersButton, appliedFacts, canApplyDamage, damageFacts, drawnRolls, hideTooltip, openTrays,
    preferSelected, rollCardDamage, rollFacts, rollsFrom, showTooltip } from '../compat.js';
 import { describeRoll } from './outcome.js';
 import { d20Row, dieClasses, MAX_PER_SIDE } from './d20.js';
+import { FOLDED_TYPES } from './rolls.js';
 
 /**
  * A card wears the world's theme, not the speaker's (SCOPE §5.3 rule 10), unless the world keeps cards plain
@@ -396,6 +397,20 @@ async function onCardAction(event, button, usage)
 const useCard = (system) => game.settings.get(MODULE_ID, 'cards') && !system.parent.content;
 
 /**
+ * Whether a usage card shown in the page missed a roll: drawn before the roll arrived or last changed (compat.quietPosts
+ * draws it again).
+ *
+ * @param {ChatMessage} message
+ */
+export function isStale(message)
+{
+   if ((message?.type !== 'usage') || !message.id || message.content || !game.settings.get(MODULE_ID, 'cards')) { return false; }
+   const now = drawnRolls(message, [...FOLDED_TYPES]);
+   return [...(globalThis.document?.querySelectorAll(`[data-message-id="${message.id}"] .fhcs-card[data-fhcs-drawn]`) ?? [])]
+      .some((card) => card.dataset.fhcsDrawn !== now);
+}
+
+/**
  * Our usage-message data model, built from dnd5e's at init (a module can't import the system by path).
  *
  * @param {typeof foundry.abstract.TypeDataModel} Base  dnd5e's UsageMessageData.
@@ -464,7 +479,8 @@ export function makeUsageMessageData(Base)
                ? { damageId, heading: localize('FHCS.Card.Apply'), note: localize('FHCS.Card.ApplyNote') }
                : null,
             applied: appliedLines(appliedFacts(this.parent), format),
-            appliedHeading: localize('FHCS.Card.Applied')
+            appliedHeading: localize('FHCS.Card.Applied'),
+            drawn: drawnRolls(this.parent, [...FOLDED_TYPES])
          };
          return context;
       }

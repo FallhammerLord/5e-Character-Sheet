@@ -620,6 +620,18 @@ export function makeCharacterSheet(Base)
       async _preparePartContext(partId, context, options)
       {
          context = await super._preparePartContext(partId, context, options);
+         try { return await this.fhcsPartContext(partId, context); }
+         catch (error)
+         {
+            // Foundry logs the failed render; this names the part and who saw it (user, 2026-11-06: players only).
+            console.error(`fhcs | The ${partId} part failed to draw (${game.user.isGM ? 'GM' : 'player'} ${game.user.name}, ${this.actor?.name}).`, error);
+            throw error;
+         }
+      }
+
+      /** Our display values for one part, beside dnd5e's context. */
+      async fhcsPartContext(partId, context)
+      {
          const i18n = { localize: (key) => game.i18n.localize(key), format: (key, data) => game.i18n.format(key, data) };
          // The player's folded favorites groups and list sections.
          const folded = () => game.user.getFlag(MODULE_ID, PREFS.folded) ?? [];
@@ -713,6 +725,18 @@ export function makeCharacterSheet(Base)
       async _onRender(context, options)
       {
          await super._onRender(context, options);
+         // Our extras run after dnd5e's: one that throws must not leave the sheet half-wired (user, 2026-11-06: players'
+         // sheets sometimes stop taking edits until reopened). It says so in the console, naming who and which step.
+         try { await this.fhcsAfterRender(); }
+         catch (error)
+         {
+            console.error(`fhcs | The sheet's extras failed after a render (${game.user.isGM ? 'GM' : 'player'} ${game.user.name}, ${this.actor?.name}).`, error);
+         }
+      }
+
+      /** What our sheet adds after each render: listeners, theme state, the title bar's picker, pinned filters. */
+      async fhcsAfterRender()
+      {
          // The header's trays stay open across re-renders; its chips' tooltips wait like the cards' do.
          keepFolds(this.element, `sheet-${this.id}`);
          closeTraysOnClickOff();

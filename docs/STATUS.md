@@ -12,6 +12,8 @@ The current state: what the next session does, what waits on the user, what's ve
 6. **Design audit follow-ups** (2026-10-29): built, offline checks pass, not yet seen in Foundry. Section moves are stemmed arrows; equipped is the halved shield on rows too; one focus ring for every control; the layout check now holds focus, icon contrast and text over a texture. Waits on the user: a look in play (the equip toggle, focus by Tab key).
 7. **Item sheet completeness** (2026-10-29): built, offline checks pass, not yet seen in Foundry. dnd5e's add button on Advancement and Activities; its header-only fields; the unidentified and chat descriptions; its info row with gears (species type, movement, senses); a class's level; full-width descriptions with tables and headings in our styles; no edit slider. Quench's lock failure was a test bug (dnd5e's slider was hidden, not gone; now gone). Tabs fill the window; the description editor follows its height. Traits wears the groups' frame. Waits on the user: Quench core, and a look at the Cleric, Dwarf and Criminal in our sheet.
 
+8. **Player-side bugs** (ROADMAP "Player-side bugs", 2026-11-06): cards that missed a roll draw again (built, offline checks pass; waits on Quench chat cards' new test and play). The sheet lock-up has no known cause; diagnostics are in. Waits on the user: console output (F12) the next time a player's sheet locks, and what "locked" looks like.
+
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
 
 ## Waiting on the user

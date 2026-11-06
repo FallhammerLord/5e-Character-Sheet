@@ -1459,6 +1459,18 @@ export function rollsFrom(usage, types)
 }
 
 /**
+ * What a usage card draws from its rolls, as one string: each roll it may show, and when that roll last changed. A card
+ * drawn with an older string missed a roll (chat log stale check, `quietPosts`).
+ *
+ * @param {ChatMessage} usage
+ * @param {string[]} types
+ */
+export function drawnRolls(usage, types)
+{
+   return rollsFrom(usage, types).map((m) => `${m.id}:${m._stats?.modifiedTime ?? 0}`).join(' ');
+}
+
+/**
  * Rolls a card's damage the way dnd5e's Damage button does (last attack's ability, ammunition and mode; the card's
  * scaling and targets), as a critical or not, without the damage dialog, linked to the card (`system.origin`).
  *
@@ -1624,7 +1636,7 @@ const FOLLOW_MS = 8000;
  * @param {Function} isQuiet   (message) => true for a folded roll.
  * @returns {boolean} Whether the chat log was wrapped.
  */
-export function quietPosts(isQuiet)
+export function quietPosts(isQuiet, isStale = () => false)
 {
    const proto = ui.chat?.constructor?.prototype;
    if (!proto || !['postOne', 'scrollBottom', 'updateMessage'].every((m) => typeof proto[m] === 'function'))
@@ -1648,14 +1660,41 @@ export function quietPosts(isQuiet)
       follow.observer.observe(card);
    };
 
+   // A card drawn while its roll arrived shows without it (user, 2026-11-06: "chat cards populate but do not show
+   // rolls", players only). A card's first draw is async; a roll created meanwhile asks for a redraw that finds no card
+   // yet in the log, or two redraws race and the older finishes first. After each draw, a card that missed a roll is
+   // drawn again, a few times at most.
+   const redraws = new Map();
+   const settle = async (log, message) =>
+   {
+      const id = message?.id;
+      if (!id || !isStale(message)) { redraws.delete(id); return; }
+      const count = (redraws.get(id) ?? 0) + 1;
+      if (count > MAX_REDRAWS)
+      {
+         redraws.delete(id);
+         console.warn(`fhcs | Card ${id} still misses a roll after ${MAX_REDRAWS} redraws.`);
+         return;
+      }
+      redraws.set(id, count);
+      console.info(`fhcs | Card ${id} was drawn before its latest roll arrived; drawing it again.`);
+      await log.updateMessage(message);
+   };
+
    proto.postOne = async function (message, options = {})
    {
       if (isQuiet(message)) { return postOne.call(this, message, { ...options, notify: false, scroll: false }); }
-      if (!message.isAuthor) { return postOne.call(this, message, options); }
+      if (!message.isAuthor)
+      {
+         const shown = await postOne.call(this, message, options);
+         await settle(this, message);
+         return shown;
+      }
       watchForPlayer(this, stopFollowing);
       Object.assign(follow, { id: message.id, until: Date.now() + FOLLOW_MS });
       const result = await postOne.call(this, message, { ...options, scroll: true });
       watchCard(this, message.id);
+      await settle(this, message);
       return result;
    };
    proto.postOne.fhcsQuiet = true;
@@ -1668,10 +1707,14 @@ export function quietPosts(isQuiet)
          watchCard(this, message.id);
          await this.scrollBottom({ waitImages: true });
       }
+      await settle(this, message);
       return result;
    };
    return true;
 }
+
+/** How many times one card is drawn again for a roll it missed, before giving up (and saying so in the console). */
+const MAX_REDRAWS = 3;
 
 /** Ends a follow the moment the player scrolls, clicks or types in the chat log themselves. */
 function watchForPlayer(log, stop)

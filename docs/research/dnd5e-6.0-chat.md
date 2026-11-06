@@ -27,7 +27,7 @@ The roll's label ("Intelligence Saving Throw") is `message.flavor`, shown in the
 
 ## Summaries: results on the card that asked
 
-With the client setting `dnd5e.chatCardSummary` (on by default), a usage card renders each descendent roll (its saves and checks) as a `.card-summary[data-message-id]` row inside itself (`save-summary.hbs`, `check-summary.hbs`), and hides the descendent's own card (`html.hidden = true`). Rolls made from a card's button link back through `system.origin`; `#refreshOrigin` re-renders the origin when a descendent is created, updated or deleted.
+With the client setting `dnd5e.chatCardSummary` (on by default), a usage card renders each descendent roll (its saves and checks) as a `.card-summary[data-message-id]` row inside itself (`save-summary.hbs`, `check-summary.hbs`), and hides the descendent's own card (`html.hidden = true`). Rolls made from a card's button link back through `system.origin`; `#refreshOrigin` re-renders the origin when a descendent is created, updated or deleted. That re-render is `ui.chat.updateMessage(origin)`, fired from the roll's `_onCreate`; it races the card's own draw (a card still drawing on first post is not in the log yet, and of two redraws the first to finish lands). We redraw a card that missed a roll (`compat.quietPosts`, user 2026-11-06).
 
 So SCOPE §6.4's "saves on the same card" exists already; our work there is wording (success or failure, DC) on those summary rows.
 
