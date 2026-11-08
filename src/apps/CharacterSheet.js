@@ -12,6 +12,7 @@ import { TEMP_TOP_FLAG, comfortWidth, headerMinWidth, headerView, hpPreview, ins
 import { inspirationGained, inspirationSpent } from './sparks.js';
 import { delayTips, keepFolds } from '../chat/card.js';
 import { startFraming } from './framing.js';
+import { animateFold, closeTrayFold, trayIn, trayOut } from './folds.js';
 
 /** Our template parts, by dnd5e part ID. */
 export const SHEET_PARTS = {
@@ -63,13 +64,16 @@ async function toggleGroup(event, target)
    const group = target.closest('[data-fhcs-group]');
    const list = group?.querySelector('.fhcs-favorites, .fhcs-traits');
    if (!list) { return; }
-   list.hidden = !list.hidden;
-   target.setAttribute('aria-expanded', String(!list.hidden));
-   if (!list.hidden) { opening(list); }
-   // What shows only while folded (the traits' one-line summary).
-   for (const el of group.querySelectorAll('[data-fhcs-folded]')) { el.hidden = !list.hidden; }
+   const open = target.getAttribute('aria-expanded') !== 'true';
+   target.setAttribute('aria-expanded', String(open));
+   // What shows only while folded (the traits' one-line summary) swaps as the rows show and once they're gone.
+   animateFold(list, open, (shown) =>
+   {
+      list.hidden = !shown;
+      for (const el of group.querySelectorAll('[data-fhcs-folded]')) { el.hidden = shown; }
+   });
    const folded = new Set(game.user.getFlag(MODULE_ID, PREFS.folded) ?? []);
-   if (list.hidden) { folded.add(group.dataset.fhcsGroup); }
+   if (!open) { folded.add(group.dataset.fhcsGroup); }
    else { folded.delete(group.dataset.fhcsGroup); }
    await game.user.setFlag(MODULE_ID, PREFS.folded, [...folded]);
 }
@@ -205,8 +209,9 @@ async function drawSettingsHead(sheet)
 function themeTray()
 {
    const tray = this.element.querySelector(':scope > .fhcs-theme-tray');
-   if (tray?.hidden) { opening(tray); }
-   showThemeTray(this.element, !!tray?.hidden);
+   if (!tray) { return; }
+   if (tray.hidden) { showThemeTray(this.element, true); trayIn(tray); }
+   else { trayOut(tray, () => showThemeTray(this.element, false)); }
 }
 
 /** Folds or opens a section on a list tab (user, 2026-10-28), and remembers it with the favorites groups. */
@@ -214,9 +219,9 @@ async function toggleSection(event, target)
 {
    const section = target.closest('[data-fhcs-fold]');
    if (!section) { return; }
-   const open = !section.classList.toggle('fhcs-folded');
+   const open = target.getAttribute('aria-expanded') !== 'true';
    target.setAttribute('aria-expanded', String(open));
-   if (open) { opening(section); }
+   animateFold(section.querySelector(':scope > .fhcs-item-list'), open, (shown) => section.classList.toggle('fhcs-folded', !shown));
    const folded = new Set(game.user.getFlag(MODULE_ID, PREFS.folded) ?? []);
    if (open) { folded.delete(section.dataset.fhcsFold); }
    else { folded.add(section.dataset.fhcsFold); }
@@ -240,11 +245,11 @@ async function toggleContainer(event, target)
    const row = target.closest('[data-item-id]');
    const list = row?.querySelector(':scope > .fhcs-contents');
    if (!list) { return; }
-   list.hidden = !list.hidden;
-   target.setAttribute('aria-expanded', String(!list.hidden));
-   if (!list.hidden) { opening(list); }
+   const shown = list.hidden;
+   target.setAttribute('aria-expanded', String(shown));
+   animateFold(list, shown, (show) => { list.hidden = !show; });
    const open = new Set(game.user.getFlag(MODULE_ID, PREFS.openContainers) ?? []);
-   if (list.hidden) { open.delete(row.dataset.itemId); }
+   if (!shown) { open.delete(row.dataset.itemId); }
    else { open.add(row.dataset.itemId); }
    await game.user.setFlag(MODULE_ID, PREFS.openContainers, [...open]);
 }
@@ -355,22 +360,10 @@ function inspirationMoment(element)
    else { inspirationSpent(element, shown); }
 }
 
-/** How long a tray takes to fade in, and a fold to open (SCOPE §5.3 rule 6: an answer, under 300ms). */
-const OPEN_MS = 200;
-
-/** Marks an element as just opened by the player (`fhcs-opening`) for its fade; styles keep it still under Motion off. */
-function opening(element)
-{
-   if (!element) { return; }
-   element.classList.remove('fhcs-opening');
-   void element.offsetWidth;
-   element.classList.add('fhcs-opening');
-   setTimeout(() => element.classList.remove('fhcs-opening'), OPEN_MS + 50);
-}
-
 /**
- * A tray fades in when the player opens it, and only then: one reopened after a redraw (keepFolds) stays put. Bound
- * once per window, on the summary's click, before the tray shows.
+ * Trays open and close smoothly (ask 3): a summary's press on a tray's `details` fades the tray in once it shows, or
+ * fades it out before the `details` closes. Only the player's own press: one reopened after a redraw (keepFolds) stays
+ * put. Bound once per window.
  */
 function fadeTrays(sheet)
 {
@@ -380,7 +373,21 @@ function fadeTrays(sheet)
    {
       const summary = event.target.closest?.('details > summary');
       const details = summary?.parentElement;
-      if (details && !details.open && details.querySelector(':scope > .fhcs-tray')) { opening(details); }
+      if (!details?.querySelector(':scope > .fhcs-tray')) { return; }
+      if (details.open)
+      {
+         event.preventDefault();
+         closeTrayFold(details);
+      }
+      else { details.dataset.fhcsTrayIn = 'true'; }
+   }, { capture: true });
+   // `toggle` doesn't bubble; caught on its way down.
+   sheet.element.addEventListener('toggle', (event) =>
+   {
+      const details = event.target;
+      if (!details.open || !details.dataset?.fhcsTrayIn) { return; }
+      delete details.dataset.fhcsTrayIn;
+      trayIn(details.querySelector(':scope > .fhcs-tray'));
    }, { capture: true });
 }
 
@@ -695,13 +702,13 @@ function closeTraysOnClickOff()
    {
       for (const fold of document.querySelectorAll('.fhcs-sheet details.fhcs-fold[open]'))
       {
-         if (!fold.contains(event.target)) { fold.open = false; }
+         if (!fold.contains(event.target)) { closeTrayFold(fold); }
       }
       // The title bar's theme tray, outside the content: its chip opens and closes it itself.
       for (const tray of document.querySelectorAll('.fhcs-sheet > .fhcs-theme-tray:not([hidden])'))
       {
          const sheet = tray.parentElement;
-         if (!tray.contains(event.target) && !event.target.closest?.('.fhcs-theme-chip')) { showThemeTray(sheet, false); }
+         if (!tray.contains(event.target) && !event.target.closest?.('.fhcs-theme-chip')) { trayOut(tray, () => showThemeTray(sheet, false)); }
       }
    }, { capture: true });
 }
