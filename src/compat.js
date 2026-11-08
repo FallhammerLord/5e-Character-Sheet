@@ -6,6 +6,7 @@
 import { countingDie, MAX_PER_SIDE, modeForSides } from './chat/d20.js';
 import { diceMath } from './chat/math.js';
 import { canCast, spellKind } from './sheet/spellbook.js';
+import { TEMP_TOP_FLAG, tempTopAfter } from './sheet/header.js';
 import { categoryId } from './sheet/lists.js';
 import { APPLIED_FLAG, CATEGORY_FLAG, INSPIRATION_FLAG, SECTION_ORDER_FLAG, INSPIRATION_SLOTS_FLAG, MODULE_ID, PORTRAIT_FLAG, RESOURCES_FLAG, SHAPE_FLAG } from './constants.js';
 
@@ -129,6 +130,8 @@ export async function headerFacts(sheet, context, moduleId)
       ac: attributes.ac?.value,
       init: attributes.init?.total ?? attributes.init?.mod ?? 0,
       hp: { value: attributes.hp.value ?? 0, max: attributes.hp.effectiveMax ?? attributes.hp.max ?? 0,
+         // Max HP before Max ± (dnd5e's `max`; `effectiveMax` adds `tempmax`), and Temp's top (header.js hpBars).
+         base: attributes.hp.max ?? 0, tempTop: actor.flags?.[MODULE_ID]?.[TEMP_TOP_FLAG] ?? 0,
          temp: attributes.hp.temp ?? 0, tempmax: actor.system._source.attributes?.hp?.tempmax ?? 0 },
       inspiration: attributes.inspiration,
       death: { success: attributes.death?.success ?? 0, failure: attributes.death?.failure ?? 0 },
@@ -1275,6 +1278,19 @@ export function extraHeaderControls(element)
       icon: [...button.classList, ...(button.querySelector('i')?.classList ?? [])].filter((c) => /^fa[srlbd-]|^fa$/.test(c)).join(' ') || 'fa-solid fa-circle',
       onClick: () => button.click()
    }));
+}
+
+/**
+ * Keeps Temp's top (header.js TEMP_TOP_FLAG): a change that raises a character's Temp carries the new top in the same
+ * update, so one write draws once. A `preUpdateActor` hook.
+ */
+export function recordTempTop(actor, change)
+{
+   if (actor.type !== 'character') { return; }
+   const temp = foundry.utils.getProperty(change, 'system.attributes.hp.temp');
+   if (temp === undefined) { return; }
+   const top = tempTopAfter(actor.system.attributes?.hp?.temp, temp);
+   if (top !== null) { foundry.utils.setProperty(change, `flags.${MODULE_ID}.${TEMP_TOP_FLAG}`, top); }
 }
 
 export function rerenderSheets(className)

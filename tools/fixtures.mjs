@@ -657,6 +657,11 @@ export const CASES = [
    { name: 'header-framing', template: 'sheet/header', context: { ...header({ portrait: { src: TALL, isVideo: false, framing: true } }), editable: true } },
    { name: 'header-framed', template: 'sheet/header', context: header({ portrait: { src: TALL, isVideo: false }, frame: { src: TALL, x: 50, y: 60, zoom: 2 } }) },
    // The HP tray open from the bar, Aid on (user, 2026-10-27); and a viewer's bar, which opens nothing.
+   // HP's bars (user, 2026-11-08): Temp part spent with Max ± raised (a break at the base max), and Max ± lowered (the
+   // HP it took shaded past the break), in play and edit mode.
+   { name: 'header-hp-raised', template: 'sheet/header', context: header({ hp: { value: 92, max: 97, base: 87, temp: 5, tempTop: 12, tempmax: 10 } }) },
+   { name: 'header-hp-lowered', template: 'sheet/header', context: header({ hp: { value: 60, max: 67, base: 87, temp: 9, tempTop: 9, tempmax: -20 } }) },
+   { name: 'header-hp-lowered-editing', template: 'sheet/header', context: { ...header({ hp: { value: 105, max: 105, base: 125, temp: 12, tempTop: 20, tempmax: -20 }, originCards: originFacts({ editing: true }) }), editable: true }, oneLine: '.fhcs-hp-line' },
    { name: 'header-hp-tray', template: 'sheet/header', open: ['hp'], context: header({ hp: { value: 82, max: 92, temp: 5, tempmax: 5 } }) },
    // Four classes: two cards, "+2" opens the class tray (user, 2026-10-27).
    // Every card's first line sits level, the "+N" card's too (user's screenshot, 2026-10-27).

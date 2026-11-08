@@ -1,3 +1,6 @@
+{{!-- HP's fill, and a Max ± change's dashed break where the smaller max HP falls; a negative change shades the HP it
+      took away (user, 2026-11-08). --}}
+{{#*inline "fhcs-hp-fill"}}<span class="fhcs-hp-fill" style="width: {{ hp.pct }}%"></span>{{#if hp.cut}}<span class="fhcs-hp-cut{{#if hp.lost}} fhcs-hp-lost{{/if}}" style="left: {{ hp.cut }}%" aria-hidden="true"></span>{{/if}}{{/inline}}
 {{!-- "+N" (user, 2026-10-27): more classes than the two cards, in a tray. It ends the card's last line (user,
       2026-10-28: in the label line it cut "Class" at 644px), where a subclass gives way first. --}}
 {{#*inline "fhcs-more"}}
@@ -118,7 +121,7 @@
             <div class="fhcs-hp meter">
                <div class="fhcs-hp-meter" role="meter" aria-valuemin="0" aria-valuenow="{{ hp.value }}" aria-valuemax="{{ hp.max }}"
                     aria-label="{{ hp.label }}">
-                  <span class="fhcs-hp-fill" style="width: {{ hp.pct }}%"></span>
+                  {{> fhcs-hp-fill }}
                   <span class="label fhcs-hp-line"><span class="fhcs-display">{{ text.hp }}</span><span class="fhcs-display">{{ hp.text }}</span></span>
                   <input type="text" class="fhcs-input fhcs-display" name="system.attributes.hp.value" data-dtype="Number"
                          data-max="{{ hp.max }}" value="{{ hp.value }}" placeholder="0" hidden>
@@ -130,7 +133,7 @@
                   stays out of the way. --}}
             <details class="fhcs-fold fhcs-hp-fold" data-fold-key="hp">
                <summary class="fhcs-hp-meter" aria-label="{{ hp.changeLabel }}">
-                  <span class="fhcs-hp-fill" style="width: {{ hp.pct }}%"></span>
+                  {{> fhcs-hp-fill }}
                   <span class="fhcs-hp-line"><span class="fhcs-display">{{ text.hp }}</span><span class="fhcs-display">{{ hp.text }}</span></span>
                </summary>
                <div class="fhcs-tray fhcs-hp-tray" data-hp="{{ hp.current }}" data-temp="{{ hp.tempValue }}">
@@ -156,13 +159,14 @@
             {{else}}
             <div class="fhcs-hp-meter" role="meter" aria-valuemin="0" aria-valuenow="{{ hp.value }}" aria-valuemax="{{ hp.max }}"
                  aria-label="{{ hp.label }}">
-               <span class="fhcs-hp-fill" style="width: {{ hp.pct }}%"></span>
+               {{> fhcs-hp-fill }}
                <span class="fhcs-hp-line"><span class="fhcs-display">{{ text.hp }}</span><span class="fhcs-display">{{ hp.text }}</span></span>
             </div>
             {{/if}}
             {{!-- Temp and Max ±: each a bar like HP, its word and its field inside (user, 2026-10-27). --}}
             <div class="fhcs-hp-fields">
-               <label class="fhcs-hp-bar" for="{{ @root.document.id }}-fhcs-temp"><span class="fhcs-label fhcs-muted">{{ text.temp }}</span>
+               {{!-- Temp fills blue as Temp over the Temp last gained, and drains on a hit before HP (user, 2026-11-08). --}}
+               <label class="fhcs-hp-bar fhcs-temp-bar" for="{{ @root.document.id }}-fhcs-temp"><span class="fhcs-temp-fill" style="width: {{ hp.tempPct }}%" aria-hidden="true"></span><span class="fhcs-label fhcs-muted">{{ text.temp }}</span>
                   <input type="text" id="{{ @root.document.id }}-fhcs-temp" class="fhcs-input fhcs-body" name="system.attributes.hp.temp"
                          data-dtype="Number" inputmode="numeric" value="{{ hp.temp }}" placeholder="0"></label>
                <label class="fhcs-hp-bar" for="{{ @root.document.id }}-fhcs-tempmax" data-fhcs-tip="{{ text.maxModLabel }}"><span class="fhcs-label fhcs-muted">{{ text.maxMod }}</span>

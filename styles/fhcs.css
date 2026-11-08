@@ -59,6 +59,10 @@
    /* The HP bar's fill: a light tint of success, so ink on it keeps 4.5:1 in both themes (the dark block's success and
       surface feed it there). */
    --fhcs-hp-fill: color-mix(in srgb, var(--fhcs-success) 28%, var(--fhcs-surface));
+   /* Temp's fill: a light blue tint (user, 2026-11-08), ink keeping 4.5:1 on it like HP's green. */
+   --fhcs-temp-fill: color-mix(in srgb, var(--fhcs-adv) 24%, var(--fhcs-surface));
+   /* HP a negative Max ± took away: a flat shade of the bar. */
+   --fhcs-hp-lost: color-mix(in srgb, var(--fhcs-ink) 12%, var(--fhcs-fill));
    /* The portrait's bars over the art (user, 2026-10-28): the surface at 85% with a blur behind. Worst case, ink on it
       over pure black art (light) or pure white (dark): 10:1 and 6.9:1; muted text 5.3:1 and 4.9:1, above 4.5:1. */
    --fhcs-scrim: color-mix(in srgb, var(--fhcs-surface) 85%, transparent);
@@ -1566,9 +1570,30 @@
 /* On a hit or a heal the fill drains or fills from where it stood (`--fhcs-hp-was`), every theme. */
 @media (prefers-reduced-motion: no-preference)
 {
-   .fhcs-sheet:is(.fhcs-moment-hit, .fhcs-moment-heal):not([data-fhcs-motion="off"]) .fhcs-hp-fill { animation: fhcs-hp-fill 400ms ease-out; }
+   /* On a hit that takes Temp too, HP's waits for Temp's bar to drain (`--fhcs-hp-delay`), holding where it stood. */
+   .fhcs-sheet:is(.fhcs-moment-hit, .fhcs-moment-heal):not([data-fhcs-motion="off"]) .fhcs-hp-fill { animation: fhcs-hp-fill 400ms ease-out var(--fhcs-hp-delay, 0ms) both; }
+   .fhcs-sheet:is(.fhcs-moment-temp-hit, .fhcs-moment-temp-heal):not([data-fhcs-motion="off"]) .fhcs-temp-fill { animation: fhcs-temp-fill 400ms ease-out; }
 }
 @keyframes fhcs-hp-fill { from { width: calc(var(--fhcs-hp-was, 1) * 100%); } }
+@keyframes fhcs-temp-fill { from { width: calc(var(--fhcs-temp-was, 0) * 100%); } }
+
+/* Max ± on HP's bar (user, 2026-11-08): a dashed break where the smaller max HP falls; a negative change shades the
+   HP it took away, a flat tint the numbers keep their contrast on. The break shows as a mark above and below the
+   numbers, never through them (a line through "97" broke the reading). */
+.fhcs-sheet .fhcs-hp-cut { position: absolute; inset: 0 0 0 auto; pointer-events: none; }
+.fhcs-sheet .fhcs-hp-cut:not(.fhcs-hp-lost) { width: 0; }
+.fhcs-sheet .fhcs-hp-lost { background: var(--fhcs-hp-lost); }
+.fhcs-sheet .fhcs-hp-cut::before,
+.fhcs-sheet .fhcs-hp-cut::after
+{
+   content: '';
+   position: absolute;
+   left: -1px;
+   height: 6px;
+   border-left: 2px dashed var(--fhcs-muted);
+}
+.fhcs-sheet .fhcs-hp-cut::before { top: 0; }
+.fhcs-sheet .fhcs-hp-cut::after { bottom: 0; }
 
 .fhcs-sheet .fhcs-hp-line
 {
@@ -1626,21 +1651,27 @@
 }
 
 .fhcs-sheet .fhcs-hp-bar > span { white-space: nowrap; }
+/* Temp's fill (user, 2026-11-08): blue, Temp over its top, under the word and the field. */
+.fhcs-sheet .fhcs-temp-bar { position: relative; overflow: hidden; }
+.fhcs-sheet .fhcs-temp-bar > :not(.fhcs-temp-fill) { position: relative; }
+.fhcs-sheet .fhcs-temp-fill { position: absolute; inset: 0 auto 0 0; background: var(--fhcs-temp-fill); }
 
 .fhcs-sheet .fhcs-hp-bar > .fhcs-input
 {
-   flex: 0 1 28px;
+   flex: 1 1 28px;
    width: 28px;
    min-width: 0;
    height: 22px;
    min-height: 0;
-   padding: 0 var(--fhcs-s1);
-   border-color: transparent;
+   padding: 0;
+   border: 0;
    background: transparent;
    text-align: right;
 }
 
-.fhcs-sheet .fhcs-hp-bar > .fhcs-input:focus { border-color: var(--fhcs-ink); background: var(--fhcs-surface); }
+/* The value takes the field's whole width (2026-11-08: "-20" showed as "-2" in the layout check); focus draws the edge
+   as a ring, so nothing moves. */
+.fhcs-sheet .fhcs-hp-bar > .fhcs-input:focus { box-shadow: inset 0 0 0 1px var(--fhcs-ink); background: var(--fhcs-surface); text-align: center; }
 
 /* The XP bar. */
 .fhcs-sheet .fhcs-bar

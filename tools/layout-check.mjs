@@ -98,6 +98,11 @@ function findProblems()
       if (!r.width) { continue; }
       const label = `${el.tagName.toLowerCase()}.${[...el.classList].join('.')} "${(el.textContent || el.value || '').trim().slice(0, 30)}"`;
       if (r.right > edge + 1) { issues.push(`past window edge by ${Math.round(r.right - edge)}px: ${label}`); continue; }
+      // A number wider than its field shows cut (2026-11-08: Max ± showed "-20" as "-2"). Free text scrolls in its field.
+      if (el.matches('input:is([type="number"], [data-dtype="Number"], [inputmode="numeric"])') && el.value && el.scrollWidth > el.clientWidth + 1)
+      {
+         issues.push(`field text cut, ${el.scrollWidth}px in ${el.clientWidth}px: ${label}`);
+      }
       // Siblings drawn on top of each other (a grid item wider than its track runs into the next one).
       if (cs.position !== 'absolute' && cs.position !== 'fixed')
       {
@@ -530,6 +535,7 @@ const SELF_TEST = [
    { id: 'self-icon-faint', expect: true, body: '<span style="color:#ddd"><svg class="fhcs-icon" width="16" height="16" style="stroke:currentColor;fill:none"><path d="M0 0h16v16"/></svg></span>' },
    { id: 'self-no-focus', expect: true, body: '<div class="fhcs-sheet"><button type="button" style="outline:none;box-shadow:none;width:80px">Go</button></div>' },
    { id: 'self-focus', expect: false, body: '<div class="fhcs-sheet"><button type="button" style="width:80px">Go</button></div>' },
+   { id: 'self-field-cut', expect: true, body: '<input type="text" data-dtype="Number" style="width:16px;padding:0" value="-120">' },
    { id: 'self-overlap', expect: true, body: '<div style="display:grid;grid-template-columns:40px 1fr"><span style="justify-self:start;white-space:nowrap">Runs into the next</span><span>x</span></div>' }
 ];
 

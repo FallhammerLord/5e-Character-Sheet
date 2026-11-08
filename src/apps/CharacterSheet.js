@@ -8,7 +8,7 @@ import { featureColumnChoice, featuresView } from '../sheet/features.js';
 import { effectsView } from '../sheet/effects.js';
 import { biographyView } from '../sheet/biography.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
-import { comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, tabRow, themePicker } from '../sheet/header.js';
+import { TEMP_TOP_FLAG, comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, tabRow, themePicker } from '../sheet/header.js';
 import { inspirationGained, inspirationSpent } from './sparks.js';
 import { delayTips, keepFolds } from '../chat/card.js';
 import { startFraming } from './framing.js';
@@ -94,15 +94,36 @@ function themeState(element, actor)
    const ratio = hp.max > 0 ? Math.clamp(value / hp.max, 0, 1) : 1;
    element.style.setProperty('--fhcs-hp', ratio.toFixed(2));
    element.dataset.fhcsHp = value <= 0 ? 'down' : ratio <= 0.5 ? 'bloodied' : 'full';
-   const before = element.dataset.fhcsHpValue;
-   element.dataset.fhcsHpValue = String(value);
-   if (before === undefined || Number(before) === value) { return; }
-   // Where the bar stood before, so its fill drains or fills from there.
-   element.style.setProperty('--fhcs-hp-was', (hp.max > 0 ? Math.clamp(Number(before) / hp.max, 0, 1) : 1).toFixed(2));
-   const moment = value < Number(before) ? 'fhcs-moment-hit' : 'fhcs-moment-heal';
-   element.classList.remove('fhcs-moment-hit', 'fhcs-moment-heal');
+   // Temp first: damage takes it first, so on a hit that takes both, HP's bar drains after Temp's (user, 2026-11-08).
+   const temp = Math.max(0, Number(hp.temp) || 0);
+   const tempTop = Math.max(Number(actor.flags?.[MODULE_ID]?.[TEMP_TOP_FLAG]) || 0, temp);
+   const tempFell = barMoment(element, 'Temp', temp, tempTop, 'fhcs-moment-temp');
+   // HP's bar spans max HP with or without Max ±, whichever is larger (header.js hpBars).
+   element.style.setProperty('--fhcs-hp-delay', tempFell ? `${TEMP_DRAIN_MS}ms` : '0ms');
+   barMoment(element, 'Hp', value, Math.max(Number(hp.effectiveMax ?? hp.max) || 0, Number(hp.max) || 0), 'fhcs-moment');
+}
+
+/** How long Temp's bar drains before HP's starts, on a hit that takes both. */
+const TEMP_DRAIN_MS = 250;
+
+/**
+ * A hit or heal moment on one of the HP bars, when its value moved between two draws: where its fill stood
+ * (`--fhcs-hp-was`, `--fhcs-temp-was`) and `<prefix>-hit` or `-heal` on the sheet for one moment.
+ * @returns {boolean} Whether the value fell.
+ */
+function barMoment(element, name, value, top, prefix)
+{
+   const key = `fhcs${name}Value`;
+   const before = element.dataset[key];
+   element.dataset[key] = String(value);
+   if (before === undefined || Number(before) === value) { return false; }
+   element.style.setProperty(`--fhcs-${name.toLowerCase()}-was`, (top > 0 ? Math.clamp(Number(before) / top, 0, 1) : 0).toFixed(2));
+   const fell = value < Number(before);
+   const moment = `${prefix}-${fell ? 'hit' : 'heal'}`;
+   element.classList.remove(`${prefix}-hit`, `${prefix}-heal`);
    element.classList.add(moment);
    setTimeout(() => element.classList.remove(moment), MOMENT_MS);
+   return fell;
 }
 
 /** The theme tray (edit mode): a theme of the character's own, or back to the world default (no value). */

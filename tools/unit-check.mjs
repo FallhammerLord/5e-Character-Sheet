@@ -17,7 +17,7 @@ import { effectsView } from '../src/sheet/effects.js';
 import { biographyView, paragraphs } from '../src/sheet/biography.js';
 import { arrangeSections, categoryId, pinView } from '../src/sheet/lists.js';
 import { itemSheetView } from '../src/sheet/item.js';
-import { comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, levelOrder, levelTrack, portraitFrame, signed, tabRow, themePicker } from '../src/sheet/header.js';
+import { comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, levelOrder, levelTrack, portraitFrame, signed, tabRow, themePicker, hpBars, tempTopAfter } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 
 const facts = (over) => ({
@@ -424,7 +424,14 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const up = headerView({ ...base, hp: { value: 5, max: 10, temp: 0 } }, { format, localize });
    const down = headerView({ ...base, hp: { value: 0, max: 10, temp: 0 } }, { format, localize });
    if (up.death) { problems.push('death saves show above 0 HP'); }
-   // The portrait card: exhaustion 0 hides behind its dot; Max ± is tempmax as a plain number (dnd5e reads a typed
+   // The HP bars (user, 2026-11-08): a positive Max ± breaks at the base max, a negative one at the max left, shading
+   // the rest; Temp fills over its top, or full past it; a rise in Temp is a new top, a fall keeps it.
+   const bars = [hpBars({ value: 87, max: 97, base: 87, temp: 0 }), hpBars({ value: 40, max: 80, base: 100, temp: 6, tempTop: 12 }),
+      hpBars({ value: 50, max: 100, temp: 15, tempTop: 10 })].map((b) => [b.pct, b.cut, b.lost, b.tempPct]);
+   const tops = [tempTopAfter(0, 8), tempTopAfter(8, 3), tempTopAfter(5, 5), tempTopAfter('', 4)];
+   try { deepStrictEqual([bars, tops], [[[90, 90, false, 0], [40, 80, true, 50], [50, null, false, 100]], [8, null, null, 4]]); }
+   catch { problems.push(`HP bars: ${JSON.stringify([bars, tops])}`); }
+   // The portrait card: exhaustion 0 shows its face alone; Max ± is tempmax as a plain number (dnd5e reads a typed
    // sign as a delta); a token shows whole, other art fills the frame; one chip per rest.
    const card = headerView({ ...base, portrait: { token: true }, showRests: true, hp: { value: 5, max: 15, temp: 2, tempmax: 5 },
       restTypes: [{ key: 'short', label: 'Short' }, { key: 'long', label: 'Long' }] }, { format, localize });

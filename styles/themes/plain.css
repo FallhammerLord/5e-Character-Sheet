@@ -125,19 +125,21 @@
    background-repeat: no-repeat;
 }
 
-/* ---------- Hit and heal, at the HP line (Phase 6.55, about 600ms, once) ---------- */
+/* ---------- Hit and heal, at the HP line (Phase 6.55, about 600ms, once); Temp's bar the same (user, 2026-11-08) ---------- */
 
 @media (prefers-reduced-motion: no-preference)
 {
    /* A hit: the number jolts and a red underline is cut away under it. */
-   .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"]).fhcs-moment-hit .fhcs-hp-line > :last-child
+   .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"]).fhcs-moment-hit .fhcs-hp-line > :last-child,
+   .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"]).fhcs-moment-temp-hit .fhcs-temp-bar > .fhcs-input
    {
       background: linear-gradient(var(--fhcs-failure), var(--fhcs-failure)) left bottom / 100% 2px no-repeat;
       animation: fhcs-plain-hit 600ms ease-out forwards;
    }
    /* A heal: a band of green light sweeps the bar, under the numbers. */
    .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"]).fhcs-moment-heal .fhcs-hp-line { z-index: 1; }
-   .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"]).fhcs-moment-heal .fhcs-hp-meter::after
+   .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"]).fhcs-moment-heal .fhcs-hp-meter::after,
+   .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet, [data-fhcs-motion="off"]).fhcs-moment-temp-heal .fhcs-temp-bar::after
    {
       content: '';
       position: absolute;

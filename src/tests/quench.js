@@ -377,11 +377,11 @@ export function registerQuenchTests(quench)
             assert.strictEqual(config.type, 'short');
          });
 
-         it('takes damage (temp first), heals and gives temp HP from the HP tray', async function ()
+         it('takes damage (temp first), heals and gives temp HP from the HP tray; draws Temp over its top and Max ± as a break', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 6);
             const hp = () => actor.system.attributes.hp;
-            const before = { value: hp().value, temp: hp().temp, max: actor.system._source.attributes.hp.max };
+            const before = { value: hp().value, temp: hp().temp, max: actor.system._source.attributes.hp.max, tempmax: actor.system._source.attributes.hp.tempmax };
             // A test character has no class; a max override gives it 20 HP to work with.
             await actor.update({ 'system.attributes.hp.max': 20, 'system.attributes.hp.value': 20, 'system.attributes.hp.temp': 2 });
             // Type, then press, with no redraw between: click() waits for one, and a redraw replaces the tray, dropping
@@ -403,7 +403,23 @@ export function registerQuenchTests(quench)
             await until(() => hp().temp === 4, () => `Temp sets temporary HP to 4; temp ${hp().temp}`);
             const fold = sheet.element.querySelector('.fhcs-header details.fhcs-hp-fold');
             assert.isFalse(!!fold?.open, 'the tray closes after a change');
-            await actor.update({ 'system.attributes.hp.max': before.max, 'system.attributes.hp.value': before.value, 'system.attributes.hp.temp': before.temp });
+            // Temp's bar (user, 2026-11-08): the gain is its top, kept on the character; a hit drains it to 3 of 4.
+            const tempFill = () => sheet.element.querySelector('.fhcs-header .fhcs-temp-fill')?.style.width ?? 'no Temp fill';
+            await until(() => actor.getFlag('fhcs', 'tempTop') === 4 && tempFill() === '100%',
+               () => `gaining 4 Temp makes 4 its top and fills its bar; top ${actor.getFlag('fhcs', 'tempTop')}, fill ${tempFill()}`);
+            await change('damage', 1);
+            await until(() => hp().temp === 3 && tempFill() === '75%', () => `1 damage drains Temp's bar to 3 of 4; temp ${hp().temp}, fill ${tempFill()}`);
+            // Max ±: a raise draws a dashed break at the max without it; a cut shades the HP it took away.
+            const cut = () => sheet.element.querySelector('.fhcs-header .fhcs-hp-cut');
+            const cutText = () => cut()?.outerHTML ?? 'no break';
+            await actor.update({ 'system.attributes.hp.tempmax': 5 });
+            await settled();
+            await until(() => cut() && !cut().classList.contains('fhcs-hp-lost') && cut().style.left === '80%', () => `Max +5 breaks the bar at 20 of 25; ${cutText()}`);
+            await actor.update({ 'system.attributes.hp.tempmax': -5 });
+            await settled();
+            await until(() => cut()?.classList.contains('fhcs-hp-lost') && cut().style.left === '75%', () => `Max −5 shades the last 5 of 20; ${cutText()}`);
+            await actor.update({ 'system.attributes.hp.max': before.max, 'system.attributes.hp.value': before.value, 'system.attributes.hp.temp': before.temp,
+               'system.attributes.hp.tempmax': before.tempmax ?? 0 });
          });
 
          it('edits XP in play, and name, scores, AC, hit dice and the token switch in edit mode', async function ()

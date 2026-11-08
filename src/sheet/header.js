@@ -113,6 +113,40 @@ function framedPortrait(facts)
 
 const percent = (value, max) => (max > 0 ? Math.max(0, Math.min(100, Math.round(100 * value / max))) : 0);
 
+/** Temp's top (user, 2026-11-08): the Temp last gained, kept on the character, so Temp's bar drains as it's spent. */
+export const TEMP_TOP_FLAG = 'tempTop';
+
+/**
+ * The Temp top a change to Temp leaves: a rise sets it to the new Temp (dnd5e's Temp never stacks, so a rise is a new
+ * gain); a fall keeps it.
+ * @returns {number|null} The new top, or null to leave it as it is.
+ */
+export function tempTopAfter(oldTemp, newTemp)
+{
+   const was = Number(oldTemp) || 0, now = Number(newTemp) || 0;
+   return now > was ? now : null;
+}
+
+/**
+ * The HP bars' geometry (user, 2026-11-08). HP's bar spans the larger of max HP with and without Max ± (`base`, dnd5e's
+ * `hp.max`; `max`, its `effectiveMax`); a Max ± change draws a dashed break where the smaller falls, and a negative one
+ * shades the HP it took away. Temp's bar fills as Temp over its top.
+ * @param {{value: number, max: number, base?: number, temp?: number, tempTop?: number}} hp
+ * @returns {{pct: number, cut: number|null, lost: boolean, tempPct: number}}
+ */
+export function hpBars(hp)
+{
+   const base = Number(hp.base ?? hp.max) || 0;
+   const scale = Math.max(hp.max, base);
+   const temp = Math.max(0, Number(hp.temp) || 0);
+   return {
+      pct: percent(hp.value, scale),
+      cut: base !== hp.max && scale > 0 ? percent(Math.min(hp.max, base), scale) : null,
+      lost: base > hp.max,
+      tempPct: percent(temp, Math.max(Number(hp.tempTop) || 0, temp))
+   };
+}
+
 /** Framing limits: the focus point in percent of the art, the zoom from whole (1) to three times. */
 export const FRAME_ZOOM = { min: 1, max: 3, step: 0.1 };
 export const FRAME_DEFAULT = { x: 50, y: 0, zoom: 1 };
@@ -195,7 +229,7 @@ export function headerView(facts, { format, localize })
          label: format('FHCS.Header.ShowMilestones', { level })
       } : null,
       hp: {
-         value: hp.value, max: hp.max, temp: hp.temp || '', pct: percent(hp.value, hp.max),
+         value: hp.value, max: hp.max, temp: hp.temp || '', ...hpBars(hp),
          // Max ± is dnd5e's temporary change to max HP (`tempmax`: Aid, drains), not the max override (user, 2026-10-27).
          // A plain number: dnd5e reads a typed leading + or − as add or subtract (`_onChangeInputDelta`).
          maxMod: hp.tempmax ? String(hp.tempmax) : '',

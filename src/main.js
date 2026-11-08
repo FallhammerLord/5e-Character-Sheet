@@ -1,5 +1,5 @@
 import { MODULE_ID } from './constants.js';
-import { extendChatModel, preloadTemplates, quietPosts, recordLevelOrder, registerCharacterSheet, registerItemSheet, systemItemSheet,
+import { extendChatModel, preloadTemplates, quietPosts, recordLevelOrder, recordTempTop, registerCharacterSheet, registerItemSheet, systemItemSheet,
    systemCharacterSheet, watchApplications, watchItemCategories } from './compat.js';
 import { levelOrder } from './sheet/header.js';
 import { keepStable } from './sheet/death.js';
@@ -55,6 +55,9 @@ Hooks.on('dnd5e.preUseActivity', rollOnUse);
 Hooks.on('dnd5e.postUseActivity', damageAfterUse);
 Hooks.on('dnd5e.postRollAttack', damageAfterAttack);
 Hooks.on('dnd5e.preRoll', skipRollDialog);
+
+// Temp's top, for its bar: a change that raises Temp carries it (user, 2026-11-08).
+Hooks.on('preUpdateActor', recordTempTop);
 
 // The milestone track: record the order class levels are gained, once dnd5e's advancement finishes.
 Hooks.on('dnd5e.advancementManagerComplete', (manager) => recordLevelOrder(manager, MODULE_ID, levelOrder));

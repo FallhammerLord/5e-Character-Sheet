@@ -519,13 +519,13 @@
    }
 
 
-   /* A hit: the portrait jolts and flares, sparks fly from the header (about 600ms). */
-   .fhcs-sheet[data-fhcs-theme="forge"].fhcs-moment-hit:not([data-fhcs-motion="off"]) .fhcs-portrait { animation: fhcs-forge-jolt 0.4s ease-out; }
-   .fhcs-sheet[data-fhcs-theme="forge"].fhcs-moment-hit:not([data-fhcs-motion="off"]) .fhcs-portrait-clip::before { animation: fhcs-forge-flare 0.6s ease-out; }
+   /* A hit: the portrait jolts and flares, sparks fly from the header (about 600ms); one Temp takes alone too (user, 2026-11-08). */
+   .fhcs-sheet[data-fhcs-theme="forge"]:is(.fhcs-moment-hit, .fhcs-moment-temp-hit):not([data-fhcs-motion="off"]) .fhcs-portrait { animation: fhcs-forge-jolt 0.4s ease-out; }
+   .fhcs-sheet[data-fhcs-theme="forge"]:is(.fhcs-moment-hit, .fhcs-moment-temp-hit):not([data-fhcs-motion="off"]) .fhcs-portrait-clip::before { animation: fhcs-forge-flare 0.6s ease-out; }
    /* A hit also flares an ember glow round the whole window, once. */
-   .fhcs-sheet[data-fhcs-theme="forge"].fhcs-moment-hit:not([data-fhcs-motion="off"]) .window-content::after { animation: fhcs-forge-vignette 0.6s ease-out; }
+   .fhcs-sheet[data-fhcs-theme="forge"]:is(.fhcs-moment-hit, .fhcs-moment-temp-hit):not([data-fhcs-motion="off"]) .window-content::after { animation: fhcs-forge-vignette 0.6s ease-out; }
    /* A heal: the hearth's light swells on the portrait. */
-   .fhcs-sheet[data-fhcs-theme="forge"].fhcs-moment-heal:not([data-fhcs-motion="off"]) .fhcs-portrait-clip::before { animation: fhcs-forge-swell 0.6s ease-in-out; }
+   .fhcs-sheet[data-fhcs-theme="forge"]:is(.fhcs-moment-heal, .fhcs-moment-temp-heal):not([data-fhcs-motion="off"]) .fhcs-portrait-clip::before { animation: fhcs-forge-swell 0.6s ease-in-out; }
 }
 
 @keyframes fhcs-forge-strike
