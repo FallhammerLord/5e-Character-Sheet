@@ -208,6 +208,13 @@ Done and verified in play (2026-10-24). Runs alongside the sheet phases; works w
 - [x] Standalone rolls (sheet checks, saves, death saves, GM requests) in the same frame (verified 2026-10-24)
 - ~~Compatibility: step aside when RSReforged is active~~ dropped (user, 2026-10-24): this replaces Ready Set Roll at the table; no RSR alongside it
 
+## Player-side bugs (user, 2026-11-06)
+
+"Sometimes the chat cards populate but do not show rolls; sometimes the sheet locks up and cannot be edited until close, reopen or F5. Not repeatable by the GM."
+
+1. [x] Cards without their rolls: a card's draw is async, and a roll created meanwhile asks for a redraw that finds no card in the log yet, or two redraws race and the older one lands. Each card now records the rolls it drew (`data-fhcs-drawn`); after every draw the chat log draws a card again when it missed one, three times at most, saying so in the console (`fhcs | Card … was drawn before its latest roll arrived`). Cause found by reading dnd5e's source, not seen happen. Quench chat cards: new test. Waits on play.
+2. [ ] Sheet locks up: no cause found in our code yet. Our after-render steps now can't leave the sheet half-wired (a failure logs `fhcs | The sheet's extras failed…`), and a part that fails to draw names itself and the user (`fhcs | The <part> part failed to draw…`). Waits on the user: the next time it happens, F12 console output, and whether fields look greyed, clicks do nothing, or the window won't drag.
+
 ## Mechanical parity checklist
 
 What the default sheet and Tidy both do; ours must too before release. Tick when verified in a world.

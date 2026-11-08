@@ -7,7 +7,7 @@ import { makeCharacterSheet } from './apps/CharacterSheet.js';
 import { makeItemSheet } from './apps/ItemSheet.js';
 import { registerQuenchTests } from './tests/quench.js';
 import { registerSettings } from './settings.js';
-import { CARD_PARTS, makeUsageMessageData } from './chat/card.js';
+import { CARD_PARTS, isStale, makeUsageMessageData } from './chat/card.js';
 import { makeRequestMessageData, makeRollMessageData } from './chat/roll-card.js';
 import { damageAfterAttack, damageAfterUse, foldIntoCard, isFolded, refreshOnRollChange, rollOnUse,
    skipRollDialog } from './chat/rolls.js';
@@ -44,7 +44,7 @@ Hooks.on('dnd5e.renderChatMessage', foldIntoCard);
 // ...and keep a record on each card of what its Apply did.
 Hooks.once('ready', () =>
 {
-   quietPosts(isFolded);
+   quietPosts(isFolded, isStale);
    watchApplications();
    // "Category…" on dnd5e's item context menu (SCOPE §4.13).
    watchItemCategories();
