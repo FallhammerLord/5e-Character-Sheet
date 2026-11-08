@@ -394,6 +394,17 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    catch { problems.push(`attributes edit mode: ${JSON.stringify(got)}`); }
 }
 
+// Tools roll from the Traits panel (user, 2026-11-08): one button per tool with its bonus; other traits stay text.
+{
+   const facts = { skills: [], abilities: [], favorites: [], resources: [], slots: {}, folded: [],
+      traits: [{ key: 'languages', title: 'Languages', values: ['Common'] },
+         { key: 'tool', title: 'Tools', values: ['Herbalism Kit', 'Lute'], rolls: [{ key: 'herb', label: 'Herbalism Kit', total: 4 }, { key: 'lute', label: 'Lute', total: -1 }] }] };
+   const view = attributesView(facts, { format, localize });
+   const got = view.traits.map((t) => `${t.key}:${t.rolls.map((r) => `${r.key} ${r.mod}${r.last ? '.' : ''}`).join()}`);
+   try { deepStrictEqual(got, ['languages:', 'tool:herb +4,lute \u22121.']); }
+   catch { problems.push(`tool rolls: ${JSON.stringify(got)}`); }
+}
+
 // The HP tray's preview: damage takes temp first and stops at 0; nothing typed asks for an amount.
 {
    const hp = { value: 20, temp: 5 };

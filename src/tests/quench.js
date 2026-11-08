@@ -324,6 +324,15 @@ export function registerQuenchTests(quench)
             assert.strictEqual(skill.skill, 'prc');
          });
 
+         it('rolls a tool from the Traits panel (parity, 2026-11-08)', async function ()
+         {
+            await actor.update({ 'system.tools.thief': { value: 1, ability: 'dex' } });
+            await until(() => sheet.element.querySelector('.fhcs-trait-roll[data-key="thief"]'),
+               () => `no tool button; the tool row holds: ${sheet.element.querySelector('.fhcs-trait-rolls, .fhcs-trait-row:last-child')?.textContent?.trim() ?? 'nothing'}`);
+            const [config] = await clickReaches('.fhcs-trait-roll[data-key="thief"]', 'dnd5e.preRollTool');
+            assert.strictEqual(config.tool, 'thief', `the roll asked for tool "${config.tool}"`);
+         });
+
          it('folds the traits panel for this player, and opens it again', async function ()
          {
             const before = game.user.getFlag(MODULE_ID, 'foldedFavorites') ?? [];
@@ -667,6 +676,42 @@ export function registerQuenchTests(quench)
             await click(equip);
             await until(() => sheet.element.querySelector(`${equip}.fhcs-toggled-off`), held('unequipping marks it off'));
             await item.delete();
+         });
+
+         it('saves coins typed into the Inventory footer, a delta included, and carries dnd5e\'s weight (parity, 2026-11-08)', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 5);
+            await actor.update({ 'system.currency.gp': 0 });
+            await click('.fhcs-tabs [data-tab="inventory"]');
+            const gp = '.tab[data-tab="inventory"] input[name="system.currency.gp"]';
+            await enter(gp, '25');
+            await until(() => actor.system.currency.gp === 25, () => `gp holds ${actor.system.currency.gp} after typing 25`);
+            // dnd5e reads a leading + or - as a change to the value (parseInputDelta, utils.mjs:457).
+            await enter(gp, '+5');
+            await until(() => actor.system.currency.gp === 30, () => `gp holds ${actor.system.currency.gp} after typing +5 on 25`);
+            await settled();
+            assert.strictEqual(find(gp).value, '30', `the gp field shows "${find(gp).value}"`);
+
+            if (game.settings.get('dnd5e', 'encumbrance') === 'none')
+            {
+               assert.notOk(sheet.element.querySelector('.fhcs-carried'), 'the carried bar shows with encumbrance off');
+               return;
+            }
+            const before = actor.system.attributes.encumbrance.value;
+            const [anvil] = await createItems([{ name: 'FHCS test anvil', type: 'loot', system: { quantity: 2, weight: { value: 10, units: 'lb' } } }]);
+            try
+            {
+               await until(() => actor.system.attributes.encumbrance.value > before, 'dnd5e never counted the anvils\' weight');
+               await settled();
+               const enc = actor.system.attributes.encumbrance;
+               const bar = find('.fhcs-carried-bar');
+               const text = find('.fhcs-carried-text').textContent.trim();
+               const value = (Math.round(enc.value * 10) / 10).toLocaleString(game.i18n.lang);
+               assert.isTrue(text.startsWith(`${value} /`), `the carried text reads "${text}"; dnd5e holds ${enc.value} of ${enc.max}`);
+               assert.strictEqual(Number(bar.getAttribute('aria-valuenow')), Math.max(0, Math.min(100, enc.pct)),
+                  `the bar stands at ${bar.getAttribute('aria-valuenow')}; dnd5e's pct is ${enc.pct}`);
+            }
+            finally { await anvil?.delete(); }
          });
 
          it('lists a container\'s contents under it, folds them, and takes items dropped on it', async function ()

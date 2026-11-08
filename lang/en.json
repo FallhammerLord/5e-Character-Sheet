@@ -264,6 +264,7 @@
       "SkillProf": "{skill}: proficiency (click to change)",
       "SkillConfig": "{skill} settings",
       "TraitConfig": "{trait} settings",
+      "ToolRoll": "Roll {tool} {mod}",
       "SkillLabel": "{skill} check {mod}, passive {passive}, {prof}",
       "Prof": {
         "none": "not proficient",

@@ -2166,6 +2166,28 @@
 .fhcs-sheet .fhcs-trait-row > .fhcs-trait-gear { justify-content: center; }
 /* The inset sits on the name, not the row: a subgrid's padding narrows its edge tracks, and the gear's 24px with them. */
 .fhcs-sheet .fhcs-trait-row > dt { padding-left: var(--fhcs-s1); }
+/* Tools roll (user, 2026-11-08): each a text button like a skill's name, the list wrapping as the plain text does. */
+.fhcs-sheet .fhcs-trait-row > .fhcs-trait-rolls { flex-wrap: wrap; }
+.fhcs-sheet .fhcs-trait-rolls > span { white-space: pre; }
+.fhcs-sheet .fhcs-trait-roll
+{
+   display: inline-flex;
+   align-items: center;
+   justify-content: flex-start;
+   gap: var(--fhcs-s1);
+   width: auto;
+   height: 24px;
+   min-height: 0;
+   margin: 0;
+   padding: 0;
+   border: 0;
+   background: none;
+   color: inherit;
+   font: inherit;
+   white-space: nowrap;
+   cursor: pointer;
+}
+.fhcs-sheet .fhcs-trait-roll:hover > .fhcs-trait-roll-name { text-decoration: underline; }
 
 /* ---------- Attributes in edit mode (SCOPE §4.9, user, 2026-10-27) ---------- */
 

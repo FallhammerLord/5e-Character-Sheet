@@ -255,8 +255,8 @@ What the default sheet and Tidy both do; ours must too before release. Tick when
 Slices:
 
 - [x] A. The map (2026-11-08)
-- [ ] B. Tools roll from the Traits panel: each tool pill carries dnd5e's `roll` action (`rollable`, `data-type="tool"`, the tool's `data-key`), so dnd5e's `rollToolCheck` runs. Fixture case, Quench click test
-- [ ] C. Encumbrance and currency: Quench test that edits a coin and checks the carried bar against dnd5e's `attributes.encumbrance`; then play
+- [x] B. Tools roll from the Traits panel (built 2026-11-08; Quench core "rolls a tool from the Traits panel"): each tool pill carries dnd5e's `roll` action (`rollable`, `data-type="tool"`, the tool's `data-key`), so dnd5e's `rollToolCheck` runs. Fixture case, Quench click test
+- [x] C. Encumbrance and currency (test written 2026-11-08, Quench core "saves coins typed…"): Quench test that edits a coin and checks the carried bar against dnd5e's `attributes.encumbrance`; then play
 - [ ] D. Limited view in our frame (SCOPE §4.15): mockup board, build, fixture, Quench with the actor read as Limited
 - [ ] E. Observer view: nothing editable, no edit controls; Quench with the actor read as Observer
 - [ ] F. Quench, then play as a player account (Limited and Observer need a real non-owner; Quench runs as GM)

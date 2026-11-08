@@ -244,7 +244,8 @@ const attributesFacts = (over = {}) => ({
       { key: 'ci', title: 'Condition Immunities', values: [] },
       { key: 'weapon', title: 'Weapon Proficiencies', values: ['Simple Weapons'] },
       { key: 'armor', title: 'Armor Proficiencies', values: ['Light Armor', 'Medium Armor', 'Heavy Armor', 'Shields'] },
-      { key: 'tool', title: 'Tool Proficiencies', values: ['Herbalism Kit'] }
+      { key: 'tool', title: 'Tool Proficiencies', values: ['Herbalism Kit', "Thieves' Tools"],
+         rolls: [{ key: 'herb', label: 'Herbalism Kit', total: 4 }, { key: 'thief', label: "Thieves' Tools", total: 7 }] }
    ],
    favorites: [
       fav('Light Crossbow', 'inventory', { subtitle: 'Ranged Weapon Attack', state: 'equipped', expandable: true, expanded: true,

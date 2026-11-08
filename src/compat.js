@@ -181,7 +181,9 @@ export async function attributesFacts(sheet, context, { folded, open = new Set()
       ...['languages', 'di', 'dr', 'dv', 'dm', 'ci', 'weapon', 'armor'].map((key) => ({
          key, title: title(key), values: (prepared[key] ?? []).map((v) => [v.label, v.value].filter(Boolean).join(' '))
       })),
-      { key: 'tool', title: title('tool'), values: sheet._prepareSkillsTools(context, 'tools').map((t) => t.label) }
+      // Each tool rolls through dnd5e's `roll` action (user, 2026-11-08: "should be clickable in traits").
+      ...[sheet._prepareSkillsTools(context, 'tools')].map((tools) => ({ key: 'tool', title: title('tool'), values: tools.map((t) => t.label),
+         rolls: tools.map((t) => ({ key: t.key, label: t.label, total: t.total ?? 0 })) }))
    ];
 
    // dnd5e's three legacy resources, read from the actor (dnd5e lists one as a favorite only once it has a label and a

@@ -62,7 +62,10 @@ export function attributesView(facts, { format, localize })
          key: t.key, title: localize(`FHCS.Attributes.TraitShort.${t.key}`), text: t.values.length ? t.values.join(', ') : '—', empty: !t.values.length,
          // Each trait's gear opens dnd5e's window for it; senses have their own (`data-config`), the rest go by trait.
          config: t.key === 'senses' ? 'senses' : '', trait: t.key === 'senses' ? '' : t.key,
-         configLabel: format('FHCS.Attributes.TraitConfig', { trait: t.title })
+         configLabel: format('FHCS.Attributes.TraitConfig', { trait: t.title }),
+         // Tools roll (user, 2026-11-08): each a button for dnd5e's `roll` action, its bonus beside its name.
+         rolls: (t.rolls ?? []).map((r, i, all) => ({ key: r.key, label: r.label, mod: signed(r.total), last: i === all.length - 1,
+            rollLabel: format('FHCS.Attributes.ToolRoll', { tool: r.label, mod: signed(r.total) }) }))
       }));
 
    const groups = new Map();

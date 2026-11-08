@@ -23,7 +23,13 @@
                   categories"); the rows share the list's columns. --}}
             <div class="fhcs-trait-row">
                <dt class="fhcs-label fhcs-muted">{{ title }}</dt>
+               {{#if rolls.length}}
+               {{!-- Tools roll (user, 2026-11-08): dnd5e's `roll` action finds the tool by the button's own data-key. --}}
+               <dd class="fhcs-body fhcs-trait-rolls">{{#each rolls}}<button type="button" class="fhcs-trait-roll {{ @root.rollableClass }}" data-action="roll" data-type="tool" data-key="{{ key }}"
+                       aria-label="{{ rollLabel }}" data-fhcs-tip="{{ rollLabel }}"><span class="fhcs-trait-roll-name">{{ label }}</span> {{ mod }}</button>{{#unless last}}<span aria-hidden="true">, </span>{{/unless}}{{/each}}</dd>
+               {{else}}
                <dd class="fhcs-body{{#if empty}} fhcs-muted{{/if}}">{{ text }}</dd>
+               {{/if}}
                <dd class="fhcs-trait-gear">{{#if ../editing}}<button type="button" class="fhcs-toggle fhcs-gear-button fhcs-muted" data-action="showConfiguration"
                        {{#if config}}data-config="{{ config }}"{{else}}data-trait="{{ trait }}"{{/if}} aria-label="{{ configLabel }}" data-fhcs-tip="{{ configLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</dd>
             </div>
