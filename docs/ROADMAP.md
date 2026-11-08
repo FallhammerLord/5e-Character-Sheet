@@ -171,14 +171,14 @@ Third pass, from the user's play (2026-10-28):
 
 From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.md's polish round; answer by number at the end.
 
-- [ ] 1. Toggle moments ease in: today the icon lights and its outline pops on at once. Effective, not smooth. Keep under 300ms (SCOPE §5.3 rule 6), every theme's toggle hooks.
+- [x] 1. Toggle moments ease in: today the icon lights and its outline pops on at once. Effective, not smooth. Keep under 300ms (SCOPE §5.3 rule 6), every theme's toggle hooks. Built: the toggle's box (edge and ink) eases with its mark, one curve, 260ms; frames checked offline.
 - [ ] 2. Temp HP is a bar of its own: blue, filling as Temp over its own top, with the same hit and heal moments as HP. Today the Temp field sits empty. Damage takes Temp first, so a hit drains Temp's bar before HP's.
 - [ ] 3. Trays and folds open and close smoothly: today they jump on fold and unfold. Covers trays, section folds and favorites groups, in every theme; closing animates as well as opening.
 - [ ] 4. Night brighter: moonbeams and lit moons stronger; lit moons breathe (SCOPE §4.12's banked glows, slow, still under Motion off and reduced motion). The dim outlines of unlit moons stay as they are. Day unchanged.
-- [ ] 5. Exhaustion at 0 shows its face icon (the chip's icon at 1 and up), not the empty dot.
-- [ ] 6. Special Traits' gear sits at the right of its bar.
-- [ ] 7. Special Traits opened in edit mode can't be closed without locking the sheet (a real bug: `CharacterSheet.js` returns to Attributes only on leaving edit mode). The gear closes it again, back to Attributes.
-- [ ] 8. Edit-mode HP band: the HP gear takes width from the number, so a large total wraps ("HP 105 / 105" on two lines; user's screenshot). HP and its total hold one line at every width; a layout case with a three-digit HP in edit mode at 644px, so it can't return.
+- [x] 5. Exhaustion at 0 shows its face icon (the chip's icon at 1 and up), not the empty dot.
+- [x] 6. Special Traits' gear sits at the right of its bar (after the arrows).
+- [x] 7. Special Traits opened in edit mode can't be closed without locking the sheet (a real bug: `CharacterSheet.js` returns to Attributes only on leaving edit mode). The gear closes it again, back to Attributes. Built: the page opens with a bar of its name and the gear, pressed; Quench's Special Traits test clicks it.
+- [x] 8. Edit-mode HP band: the HP gear takes width from the number, so a large total wraps ("HP 105 / 105" on two lines; user's screenshot). HP and its total hold one line at every width; a layout case with a three-digit HP in edit mode at 644px, so it can't return. Built: the gear hangs over the art at the bar's top left, a solid chip like the portrait's; the layout check's new `oneLine` option fails wrapped text (seen failing on the old layout).
 - [ ] Quench and play
 
 ## Phase 6.7: Every sheet (user, 2026-10-28)

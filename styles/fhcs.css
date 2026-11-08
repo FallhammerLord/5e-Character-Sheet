@@ -1124,11 +1124,22 @@
    `--fhcs-toggle-on`, `-off` (the mark) and `-off-fill` (a filled pip's fill, from `--fhcs-erase-ink`). */
 .fhcs-sheet
 {
-   --fhcs-toggle-on: fhcs-ink-in 240ms ease-out;
-   --fhcs-toggle-off: fhcs-erase 260ms ease-out;
-   --fhcs-toggle-off-fill: fhcs-erase-fill 260ms ease-out;
+   --fhcs-toggle-on: fhcs-ink-in 260ms var(--fhcs-toggle-ease);
+   --fhcs-toggle-off: fhcs-erase 260ms var(--fhcs-toggle-ease);
+   --fhcs-toggle-off-fill: fhcs-erase-fill 260ms var(--fhcs-toggle-ease);
+   /* The box round the mark eases with it (user, 2026-11-08: the icon lit and its outline popped on at once): from its
+      off look (an edge line, muted ink) to its on ink, and back. */
+   --fhcs-toggle-box-on: fhcs-box-on 260ms var(--fhcs-toggle-ease);
+   --fhcs-toggle-box-off: fhcs-box-off 260ms var(--fhcs-toggle-ease);
+   --fhcs-toggle-ease: cubic-bezier(0.3, 0, 0.2, 1);
    --fhcs-erase-ink: currentColor;
 }
+/* Each toggle's on ink, for its box's moment (the same inks its pressed rules use). */
+.fhcs-sheet .fhcs-toggle-equip { --fhcs-on-ink: var(--fhcs-success); }
+.fhcs-sheet .fhcs-toggle-attune { --fhcs-on-ink: var(--fhcs-adv); }
+.fhcs-sheet .fhcs-toggle-fav { --fhcs-on-ink: var(--fhcs-fav); }
+.fhcs-sheet .fhcs-toggle-prep { --fhcs-on-ink: var(--fhcs-kind, var(--fhcs-kind-prepared)); }
+.fhcs-sheet :is(.fhcs-switch, .fhcs-condition) { --fhcs-on-ink: var(--fhcs-ink); }
 .fhcs-sheet .fhcs-slot { --fhcs-erase-ink: var(--fhcs-slot); }
 .fhcs-sheet .fhcs-death-success .fhcs-death-pip { --fhcs-erase-ink: var(--fhcs-success); }
 .fhcs-sheet .fhcs-death-failure .fhcs-death-pip { --fhcs-erase-ink: var(--fhcs-failure); }
@@ -1141,16 +1152,21 @@
    .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-toggled-off:not(.fhcs-switch, .fhcs-condition) > svg { animation: var(--fhcs-toggle-off); animation-delay: var(--fhcs-toggle-at, 0ms); }
    .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-slot.fhcs-toggled-off::before,
    .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-death-pip.fhcs-toggled-off { animation: var(--fhcs-toggle-off-fill); animation-delay: var(--fhcs-toggle-at, 0ms); }
+   .fhcs-sheet:not([data-fhcs-motion="off"]) :is(.fhcs-toggle-equip, .fhcs-toggle-attune, .fhcs-toggle-fav, .fhcs-toggle-prep, .fhcs-switch, .fhcs-condition).fhcs-toggled-on { animation: var(--fhcs-toggle-box-on); animation-delay: var(--fhcs-toggle-at, 0ms); }
+   .fhcs-sheet:not([data-fhcs-motion="off"]) :is(.fhcs-toggle-equip, .fhcs-toggle-attune, .fhcs-toggle-fav, .fhcs-toggle-prep, .fhcs-switch, .fhcs-condition).fhcs-toggled-off { animation: var(--fhcs-toggle-box-off); animation-delay: var(--fhcs-toggle-at, 0ms); }
    /* A switch's knob slides across. */
-   .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-toggled-on .fhcs-switch-mark circle { animation: fhcs-switch-on 200ms ease-out; animation-delay: var(--fhcs-toggle-at, 0ms); }
-   .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-toggled-off .fhcs-switch-mark circle { animation: fhcs-switch-off 200ms ease-out; animation-delay: var(--fhcs-toggle-at, 0ms); }
+   .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-toggled-on .fhcs-switch-mark circle { animation: fhcs-switch-on 260ms var(--fhcs-toggle-ease); animation-delay: var(--fhcs-toggle-at, 0ms); }
+   .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-toggled-off .fhcs-switch-mark circle { animation: fhcs-switch-off 260ms var(--fhcs-toggle-ease); animation-delay: var(--fhcs-toggle-at, 0ms); }
 }
 
 @keyframes fhcs-ink-in
 {
-   from { transform: scale(0.4); opacity: 0.3; }
+   from { transform: scale(0.6); opacity: 0.2; }
    to { transform: none; opacity: 1; }
 }
+
+@keyframes fhcs-box-on { from { border-color: var(--fhcs-line); background-color: transparent; color: var(--fhcs-muted); } }
+@keyframes fhcs-box-off { from { border-color: var(--fhcs-on-ink); color: var(--fhcs-on-ink); } }
 
 @keyframes fhcs-erase
 {
@@ -1423,7 +1439,7 @@
 .fhcs-sheet .fhcs-status > :last-child { border-radius: 0 var(--fhcs-radius) var(--fhcs-radius) 0; }
 .fhcs-sheet .fhcs-status .fhcs-tray { left: auto; right: 0; }
 /* Exhaustion, Short rest and Long rest: one width each, their marks centred, so the bar's icons sit evenly (user,
-   2026-10-28); the width is exhaustion's chip's ("0" and its face), so showing it moves nothing. */
+   2026-10-28); the width is exhaustion's chip's (its face and a level), so a level's coming moves nothing. */
 .fhcs-sheet :is(.fhcs-status > details > summary, .fhcs-status > .fhcs-chip[data-action="rest"])
 {
    box-sizing: border-box;
@@ -1432,48 +1448,6 @@
    justify-content: center;
    justify-items: center;
 }
-.fhcs-sheet .fhcs-status .fhcs-exhaustion-dot::before { justify-self: center; margin-left: 0; }
-/* Exhaustion 0 in the bar: an ink ring on the bar's fill. */
-.fhcs-sheet .fhcs-status .fhcs-exhaustion-dot { background: var(--fhcs-fill); color: var(--fhcs-ink); }
-.fhcs-sheet .fhcs-status .fhcs-exhaustion-dot::before { justify-self: center; margin-left: 0; border-color: currentColor; background: transparent; }
-
-/* Exhaustion 0: a small dot; resting on it 1.5 s (like tips), focusing it or opening it shows the chip. Dot and chip
-   share one grid cell, so the target is the chip's size and nothing hangs outside it. */
-.fhcs-sheet .fhcs-exhaustion-dot
-{
-   display: inline-grid;
-   align-items: center;
-   min-width: var(--fhcs-control);
-   height: var(--fhcs-control);
-   list-style: none;
-   cursor: pointer;
-}
-
-.fhcs-sheet .fhcs-exhaustion-dot::-webkit-details-marker { display: none; }
-.fhcs-sheet .fhcs-exhaustion-dot > * { grid-area: 1 / 1; }
-
-/* The dot, drawn by the summary itself in the chip's cell. */
-.fhcs-sheet .fhcs-exhaustion-dot::before
-{
-   content: '';
-   grid-area: 1 / 1;
-   justify-self: start;
-   width: 12px;
-   height: 12px;
-   margin-left: var(--fhcs-s1);
-   box-sizing: border-box;
-   border: 2px solid var(--fhcs-die-ink);
-   border-radius: 50%;
-   background: var(--fhcs-surface);
-}
-
-.fhcs-sheet .fhcs-dot-chip { visibility: hidden; }
-.fhcs-sheet .fhcs-exhaustion-dot:hover .fhcs-dot-chip { visibility: visible; transition: visibility 0s linear 1.5s; }
-.fhcs-sheet :is(.fhcs-exhaustion-dot:focus-visible, details[open] > .fhcs-exhaustion-dot) .fhcs-dot-chip { visibility: visible; }
-/* The chip takes the dot's place, never shown over it (user, 2026-10-28: the two overlapped on rest). */
-.fhcs-sheet .fhcs-exhaustion-dot:hover::before { visibility: hidden; transition: visibility 0s linear 1.5s; }
-.fhcs-sheet :is(.fhcs-exhaustion-dot:focus-visible, details[open] > .fhcs-exhaustion-dot)::before { visibility: hidden; }
-
 /* Chips, the size of a control, on the panels' underlay: the fill, an edge, ink marks (user, 2026-10-28: one look for
    every chip, the status bar's, not solid ink on the art). On is a filled mark. */
 .fhcs-sheet .fhcs-chip
@@ -1724,8 +1698,20 @@
 
 .fhcs-sheet .fhcs-origin-speed { display: flex; flex: 1; align-items: center; min-width: 0; }
 .fhcs-sheet .fhcs-origin-speed > .fhcs-line { flex: 0 1 auto; }
-.fhcs-sheet .fhcs-hp-edit { display: flex; align-items: center; gap: var(--fhcs-s1); }
+/* Edit mode's HP bar keeps play mode's full width; its gear hangs above its top left, on the art, a solid chip like
+   the portrait's (user, 2026-11-08: beside the bar it wrapped "HP 105 / 105"). */
+.fhcs-sheet .fhcs-hp-edit { position: relative; display: flex; align-items: center; }
 .fhcs-sheet .fhcs-hp-edit > .meter { flex: 1; min-width: 0; }
+.fhcs-sheet .fhcs-hp-edit > .fhcs-hp-gear
+{
+   position: absolute;
+   bottom: calc(100% + var(--fhcs-s1));
+   left: 0;
+   border-color: var(--fhcs-die-ink);
+   background: var(--fhcs-die-ink);
+   color: var(--fhcs-die-on-ink);
+}
+.fhcs-sheet .fhcs-hp-edit > .fhcs-hp-gear > .fhcs-gear { width: 16px; height: 16px; }
 
 /* Edit mode's portrait options, top centre: one gear chip, its tray of the token switch (a ring when on), round and
    Frame opening below it, centred. */
@@ -2120,6 +2106,9 @@
 /* The Special Traits gear and the panel's arrows sit above the fold button's stretched target. */
 .fhcs-sheet .fhcs-traits-panel > .fhcs-group-head { justify-content: space-between; }
 .fhcs-sheet .fhcs-traits-panel > .fhcs-group-head > :is(.fhcs-special-traits, .fhcs-section-move) { position: relative; z-index: 1; flex: none; }
+/* The arrows, then the gear at the bar's right end (user, 2026-11-08: the gear sat mid-bar once the panel opened):
+   the arrows' group takes the free room and keeps them at its right. */
+.fhcs-sheet .fhcs-traits-panel > .fhcs-group-head > .fhcs-section-move { flex: 1 0 auto; }
 .fhcs-sheet .fhcs-traits-summary { flex: 1; }
 
 /* Every category on Attributes (Traits, Resources, the favorites groups) one look (user, 2026-10-29: "traits need to
@@ -3439,6 +3428,17 @@
 }
 
 .fhcs-sheet .tab[data-tab="specialTraits"] legend { padding: 0 var(--fhcs-s1); }
+
+/* Its bar (edit mode): the page's name, and the pressed gear that closes it back to Attributes (user, 2026-11-08). */
+.fhcs-sheet .tab[data-tab="specialTraits"] > .fhcs-settings-head
+{
+   flex: none;
+   padding: 0 var(--fhcs-s1) 0 var(--fhcs-s2);
+   border: 1px solid var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   background: var(--fhcs-surface);
+}
+.fhcs-sheet .fhcs-settings-head > .fhcs-gear-button[aria-pressed="true"] { border-radius: var(--fhcs-radius); background: var(--fhcs-die-ink); color: var(--fhcs-die-on-ink); }
 
 .fhcs-sheet .tab[data-tab="specialTraits"] .form-group
 {

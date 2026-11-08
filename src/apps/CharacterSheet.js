@@ -153,10 +153,31 @@ function showThemeTray(element, open)
    if (open && bar) { tray.style.top = `${bar.offsetTop + bar.offsetHeight}px`; }
 }
 
-/** The Traits panel's gear (edit mode): dnd5e's Special Traits page, which the tab row no longer draws. */
+/**
+ * The Traits panel's gear (edit mode): dnd5e's Special Traits page, which the tab row no longer draws. The page's own
+ * gear closes it, back to Attributes (user, 2026-11-08).
+ */
 function openSpecialTraits()
 {
-   this.changeTab('specialTraits', 'primary', { force: true });
+   const open = this.tabGroups.primary === 'specialTraits';
+   this.changeTab(open ? 'details' : 'specialTraits', 'primary', { force: true });
+}
+
+const SETTINGS_HEAD = `${MODULE_PATH}/templates/sheet/settings-head.hbs`;
+
+/** Special Traits' bar, drawn into dnd5e's page: its name and the gear that closes it. Edit mode only. */
+async function drawSettingsHead(sheet)
+{
+   const page = sheet.element.querySelector('.tab[data-tab="specialTraits"]');
+   const old = page?.querySelector(':scope > .fhcs-settings-head');
+   if (!page || !sheet.isEditMode) { old?.remove(); return; }
+   if (old) { return; }
+   const holder = document.createElement('div');
+   holder.innerHTML = await renderTemplate(SETTINGS_HEAD, {
+      title: game.i18n.localize('FHCS.Attributes.SpecialTraits'), close: game.i18n.localize('FHCS.Attributes.SpecialTraitsClose')
+   });
+   page.prepend(holder.firstElementChild);
+   delayTips(page);
 }
 
 /** The title bar's palette: opens or closes its tray. */
@@ -907,6 +928,7 @@ export function makeCharacterSheet(Base)
          middleClickOpens(this.element, this.actor);
          // Special Traits is a settings page: locking the sheet leaves it for Attributes.
          if (!this.isEditMode && this.tabGroups.primary === 'specialTraits') { this.changeTab('details', 'primary'); }
+         await drawSettingsHead(this);
          await drawThemePicker(this);
          const items = this.element.querySelector('.fhcs-inventory .fhcs-items');
          if (items && !items.dataset.fhcsWatched)

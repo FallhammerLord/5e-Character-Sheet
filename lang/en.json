@@ -146,7 +146,6 @@
       "MaxModLabel": "Change to max hit points",
       "MoreClasses": "{n} more classes: show them",
       "MoreClassesTitle": "More classes",
-      "ExhaustionShow": "Exhaustion 0: show",
       "AC": "AC",
       "Init": "Init",
       "Prof": "Prof",
@@ -243,6 +242,7 @@
       "Skills": "Skills",
       "Traits": "Traits",
       "SpecialTraits": "Special traits",
+      "SpecialTraitsClose": "Back to attributes",
       "TraitShort": {
         "senses": "Senses",
         "languages": "Languages",

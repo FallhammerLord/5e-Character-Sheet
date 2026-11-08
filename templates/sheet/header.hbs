@@ -111,7 +111,9 @@
             {{!-- Edit mode: dnd5e's meter markup; a click on it shows the field to set HP exactly (base-actor-sheet.mjs
                   #toggleMeter). --}}
             <div class="fhcs-hp-edit">
-            <button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="hitPoints"
+            {{!-- HP's gear, a solid chip hung over the art at the bar's top left like the portrait's own (user, 2026-11-08:
+                  beside the bar it took the room "HP 105 / 105" needs). --}}
+            <button type="button" class="fhcs-chip fhcs-hp-gear" data-action="showConfiguration" data-config="hitPoints"
                     aria-label="{{ text.hpConfig }}" data-fhcs-tip="{{ text.hpConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>
             <div class="fhcs-hp meter">
                <div class="fhcs-hp-meter" role="meter" aria-valuemin="0" aria-valuenow="{{ hp.value }}" aria-valuemax="{{ hp.max }}"
@@ -183,19 +185,14 @@
          <span class="fhcs-display fhcs-name" data-fhcs-tip="{{ name }}" data-fhcs-tip-cut>{{ name }}</span>
          {{/if}}
          {{!-- One joined group at the name row's right (user, 2026-10-28, moved off the portrait so the art shows):
-               exhaustion (a dot at 0, shown on rest), Short and Long rest (one click each into dnd5e's rest dialog), and
+               exhaustion (its face; from 1 its level beside it), Short and Long rest (one click each into dnd5e's rest dialog), and
                hit dice ("HD 12"; in edit mode a gear and dnd5e's hit dice window). --}}
          <div class="fhcs-status fhcs-frame">
             <details class="fhcs-fold fhcs-status-exhaustion" data-fold-key="exhaustion">
-               {{#if exhaustion.none}}
-               <summary class="fhcs-exhaustion-dot" aria-label="{{ text.exhaustionShow }}">
-                  <span class="fhcs-chip fhcs-label fhcs-dot-chip" aria-hidden="true"><svg class="fhcs-icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 15h8M8.5 9.5h2M13.5 9.5h2"/></svg>0</span>
-               </summary>
-               {{else}}
+               {{!-- At 0 the face alone, the chip's own icon (user, 2026-11-08: it replaced the dot); from 1 the face and its level. --}}
                <summary class="fhcs-chip fhcs-label" aria-label="{{ exhaustion.label }}" data-fhcs-tip="{{ exhaustion.label }}">
-                  <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 15h8M8.5 9.5h2M13.5 9.5h2"/></svg>{{ exhaustion.value }}
+                  <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M8 15h8M8.5 9.5h2M13.5 9.5h2"/></svg>{{#unless exhaustion.none}}{{ exhaustion.value }}{{/unless}}
                </summary>
-               {{/if}}
                <div class="fhcs-tray fhcs-tray-row" data-prop="system.attributes.exhaustion">
                   {{#each exhaustion.pips}}
                   <button type="button" class="fhcs-chip fhcs-label{{#if filled}} fhcs-on{{/if}}" data-action="togglePip" data-n="{{ n }}"

@@ -247,8 +247,8 @@ function findProblems()
       {
          const el = parts[n];
          if (Math.abs(r.height - boxes[0].height) > 1) { issues.push(`status segment ${Math.round(r.height)}px tall, the first ${Math.round(boxes[0].height)}px: ${named(el)}`); }
-         const icons = boxes.filter((b, k) => !(parts[k].textContent || '').trim() || parts[k].matches('.fhcs-exhaustion-dot'));
-         const iconOnly = !(el.textContent || '').trim() || el.matches('.fhcs-exhaustion-dot');
+         const icons = boxes.filter((b, k) => !(parts[k].textContent || '').trim());
+         const iconOnly = !(el.textContent || '').trim();
          if (iconOnly && Math.abs(r.width - icons[0].width) > 1) { issues.push(`status icon segment ${Math.round(r.width)}px wide, the first ${Math.round(icons[0].width)}px: ${named(el)}`); }
          if (n && r.left - boxes[n - 1].right > 1.5) { issues.push(`status segments ${Math.round(r.left - boxes[n - 1].right)}px apart: ${named(el)}`); }
       }
@@ -575,6 +575,28 @@ function misaligned(pairs)
    return issues;
 }
 
+/** Runs in the page: text under `selector` that wraps onto a second line (user, 2026-11-08: "HP 105 / 105" on two). */
+function wrapped(selector)
+{
+   const issues = [];
+   for (const el of document.querySelectorAll(`.window-content ${selector}`))
+   {
+      const tops = [];
+      const walk = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      for (let t = walk.nextNode(); t; t = walk.nextNode())
+      {
+         if (!t.textContent.trim()) { continue; }
+         const range = document.createRange();
+         range.selectNodeContents(t);
+         for (const r of range.getClientRects()) { if (r.width) { tops.push(r.top); } }
+      }
+      // A line starts where a top lies 6px or more below the last (texts side by side differ by a pixel or two).
+      const lines = tops.sort((a, b) => a - b).filter((t, i, all) => !i || t - all[i - 1] >= 6).length;
+      if (lines > 1) { issues.push(`wraps onto ${lines} lines: ${el.className} "${el.textContent.trim().replace(/\s+/g, ' ')}"`); }
+   }
+   return issues;
+}
+
 /**
  * Runs in the page: every element of ours in normal flow, keyed by its last fhcs class and its index among those, with
  * its height, its top within the window, and how many elements it holds. Edit mode must keep every one that both modes draw (SCOPE §5.2 rule 6).
@@ -630,6 +652,7 @@ async function check(id, html, screenshot, c = {})
    const found = await tab.evaluate(findProblems);
    if (c.focus) { found.push(...await tab.evaluate(focusShows)); }
    if (c.align) { found.push(...await tab.evaluate(misaligned, c.align)); }
+   if (c.oneLine) { found.push(...await tab.evaluate(wrapped, c.oneLine)); }
    if (c.rows) { measured.set(`${c.name}|${id.slice(c.name.length)}`, await tab.evaluate(heights, { rows: c.rows, marks: c.marks })); }
    if (c.rows) { boxes.set(`${c.name}|${id.slice(c.name.length)}`, await tab.evaluate(everyBox)); }
    if (screenshot) { await tab.screenshot({ path: `${out}/${id}.png`, fullPage: true }); }

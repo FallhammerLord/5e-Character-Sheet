@@ -926,7 +926,7 @@ export function registerQuenchTests(quench)
             }
          });
 
-         it('opens Special Traits from the Traits gear in edit mode, and leaves it on locking', async function ()
+         it('opens Special Traits from the Traits gear in edit mode, closes it from its own gear, and leaves it on locking', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 6);
             if (!sheet.isEditMode)
@@ -936,6 +936,14 @@ export function registerQuenchTests(quench)
             }
             await click('.fhcs-traits-panel [data-action="fhcsSpecialTraits"]');
             await until(() => sheet.tabGroups.primary === 'specialTraits', () => `the gear opens Special Traits; the open tab is ${sheet.tabGroups.primary}`);
+            // The page's own gear closes it, back to Attributes, still in edit mode (user, 2026-11-08).
+            await until(() => sheet.element.querySelector('.tab[data-tab="specialTraits"] > .fhcs-settings-head [data-action="fhcsSpecialTraits"]'),
+               'Special Traits draws its bar with the closing gear');
+            await click('.tab[data-tab="specialTraits"] > .fhcs-settings-head [data-action="fhcsSpecialTraits"]');
+            await until(() => sheet.tabGroups.primary === 'details' && sheet.isEditMode,
+               () => `the page's gear returns to Attributes in edit mode; the open tab is ${sheet.tabGroups.primary}, edit mode ${sheet.isEditMode}`);
+            await click('.fhcs-traits-panel [data-action="fhcsSpecialTraits"]');
+            await until(() => sheet.tabGroups.primary === 'specialTraits', () => `the gear opens Special Traits again; the open tab is ${sheet.tabGroups.primary}`);
             await leaveEditMode();
             await until(() => sheet.tabGroups.primary === 'details', () => `locking leaves it for Attributes; the open tab is ${sheet.tabGroups.primary}`);
          });

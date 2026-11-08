@@ -2,7 +2,8 @@
  * Layout cases: each renders one of our templates with sample data. The layout check draws every case at every
  * width of its frame and fails on overflow. Each phase adds its parts here (Phase 1: the header).
  *
- * A case: { name, template: 'path/without-hbs', context: {...}, frame?: 'sheet' | 'chat', theme?: 'light' }
+ * A case: { name, template: 'path/without-hbs', context: {...}, frame?: 'sheet' | 'chat', theme?: 'light', oneLine?: selector whose text
+ * must not wrap }
  */
 import { appliedLines, cardParts, d20Band, damageBand, saveRow } from '../src/chat/card.js';
 import { headerView, inspirationBar, tabRow, themePicker } from '../src/sheet/header.js';
@@ -184,7 +185,10 @@ const FOUR_CLASSES = (over = {}) => originFacts({
  * label, the control in .form-fields and a hint), for the layout check: our styles must hold it without dnd5e's.
  */
 const field = (label, control, hint) => `<div class="form-group"><label>${label}</label><div class="form-fields">${control}</div>${hint ? `<p class="hint">${hint}</p>` : ''}</div>`;
+// Its bar, as CharacterSheet draws it in edit mode: the name and the pressed gear that closes the page.
+const settingsHead = template('sheet/settings-head')({ title: localize('FHCS.Attributes.SpecialTraits'), close: localize('FHCS.Attributes.SpecialTraitsClose') });
 const SPECIAL_TRAITS = `<section class="tab active" data-tab="specialTraits" data-group="primary">
+   ${settingsHead}
    <fieldset class="card"><legend>Class</legend>
       ${field('Original Class', '<select name="system.details.originalClass"><option>Ranger</option><option>Rogue</option></select>', 'First class taken by character used to determine certain class traits when multiclassing.')}
    </fieldset>
@@ -640,6 +644,8 @@ export const CASES = [
    },
    // Edit mode (SCOPE §4.9): name and scores as fields, gears, the AC window, the Token switch.
    { name: 'header-editing', template: 'sheet/header', context: { ...header({ originCards: originFacts({ editing: true }) }), editable: true }, align: HEADER_ALIGN, rows: '.fhcs-header, .fhcs-ability', sameRowsAs: 'header' },
+   // Three-digit HP in edit mode (user, 2026-11-08: "HP 105 / 105" wrapped beside the gear): one line at every width.
+   { name: 'header-editing-hp-105', template: 'sheet/header', context: { ...header({ hp: { value: 105, max: 105, temp: 0 }, originCards: originFacts({ editing: true }) }), editable: true }, oneLine: '.fhcs-hp-line' },
    { name: 'header-editing-tall', template: 'sheet/header', context: { ...header({ portrait: { src: TALL, isVideo: false }, originCards: FOUR_CLASSES({ editing: true }) }), editable: true } },
    {
       name: 'header-editing-multiclass', template: 'sheet/header', open: ['level-up'],

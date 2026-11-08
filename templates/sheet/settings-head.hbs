@@ -1,0 +1,7 @@
+{{!-- A settings page's bar (Special Traits), drawn into dnd5e's page after render: its name, and the gear that opened
+      it, pressed, which closes it back to Attributes (user, 2026-11-08: the page could be left only by locking). --}}
+<div class="fhcs-panel-head fhcs-settings-head">
+   <span class="fhcs-label">{{ title }}</span>
+   <button type="button" class="fhcs-toggle fhcs-gear-button always-interactive" data-action="fhcsSpecialTraits" aria-pressed="true"
+           aria-label="{{ close }}" data-fhcs-tip="{{ close }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>
+</div>

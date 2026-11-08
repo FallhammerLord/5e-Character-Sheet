@@ -217,7 +217,7 @@ export function headerView(facts, { format, localize })
       } : null,
       exhaustion: {
          value: facts.exhaustion.value,
-         // At 0 the chip hides behind a small dot; resting on the dot shows it (user, 2026-10-27).
+         // At 0 the chip shows its face alone (user, 2026-11-08: replacing the dot).
          none: !facts.exhaustion.value,
          label: format('FHCS.Header.Exhaustion', { n: facts.exhaustion.value }),
          pips: Array.from({ length: facts.exhaustion.max }, (_, i) => ({
@@ -250,7 +250,7 @@ export function headerView(facts, { format, localize })
       })),
       text: {
          hp: localize('FHCS.Header.HP'), temp: localize('FHCS.Header.Temp'), maxMod: localize('FHCS.Header.MaxMod'),
-         maxModLabel: localize('FHCS.Header.MaxModLabel'), exhaustionShow: localize('FHCS.Header.ExhaustionShow'),
+         maxModLabel: localize('FHCS.Header.MaxModLabel'),
          name: localize('FHCS.Header.Name'), xpLabel: localize('FHCS.Header.XPLabel'),
          speedConfig: localize('FHCS.Header.SpeedConfig'), acConfig: format('FHCS.Header.ACConfig', { ac: facts.ac ?? '—' }),
          initConfig: localize('FHCS.Header.InitConfig'), hdConfig: localize('FHCS.Header.HDConfig'),
