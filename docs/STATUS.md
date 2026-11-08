@@ -4,14 +4,14 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Play round 2026-11-08, asks 4 and 14** (ROADMAP, "Play round, 2026-11-08"): Night brighter (SCOPE §4.12's banked glows reaching Night's moons; no new rule needed), and inspiration's moments in step for every connected player (research first: when each client's redraw lands). Ask 12 waits on a session of play; the rest of the round is verified.
-2. **Mechanical parity** (ROADMAP, "Mechanical parity checklist"; Phase 1's three open items): the next phase after the play round (user, 2026-11-08). Recommended: a Quench batch that exercises each parity item, so one run verifies most of the list.
-3. **Favorites trap** (on the branch): the effect test fails some runs at moving steps and passes others (latest pass 2026-11-08). Not yet known. On a failure, read its text (it reports the row, tab, favorites and logged writes) and the console's `fhcs | test favorites write` warnings. The `#postNotification` TypeError seen in the chat card runs is in Foundry's own code, cause not yet known. Our code never writes `system.favorites`.
+1. **Mechanical parity** (ROADMAP, "Mechanical parity checklist"; Phase 1's three open items): the next phase (user, 2026-11-08). Recommended: a Quench batch that exercises each parity item, so one run verifies most of the list. The play round's asks are all built; 4, 12 and 14 wait on the user.
+2. **Favorites trap** (on the branch): the effect test fails some runs at moving steps and passes others (latest pass 2026-11-08). Not yet known. On a failure, read its text (it reports the row, tab, favorites and logged writes) and the console's `fhcs | test favorites write` warnings. The `#postNotification` TypeError seen in the chat card runs is in Foundry's own code, cause not yet known. Our code never writes `system.favorites`.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
 
 ## Waiting on the user
 
+- **Play round asks 4 and 14** (built 2026-11-08): Night in play, the full moons brighter and breathing, the moonbeam stronger, the unlit outlines as before. Inspiration from two clients: a star banked or spent by one player plays on that same star for the others, smoothly; each client's F12 console shows `fhcs | Inspiration … drawn for <user> <n>ms after the save`, to compare. Quench: the bank test now also spends a star from outside the sheet.
 - **Chat cards in play** (from a player's client): another player's attack and damage show once rolled; an effect applied from a card leaves a line; the hit line holds when targets change; each damage type its own total; a new card scrolls fully into view, down to Apply.
 - **Quench rerun:** the click-off tray test now waits for the tray's fade-out (it checked at once; a test bug, 2026-11-08). The rest passed that run, the effect favorite test included.
 - **Token sizes on Wildcard swaps** (ROADMAP play round ask 12; after a session of play, user 2026-11-08): swap a resized token's image to an untagged file (size stays), then to a tagged one like `_scale1.5` (scale applies). Not testable offline beyond the unit cases; no Quench test (it needs a scene token).

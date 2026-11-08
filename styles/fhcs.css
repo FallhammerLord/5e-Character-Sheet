@@ -1111,10 +1111,10 @@
    .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-star.fhcs-on { animation: var(--fhcs-inspire-breath, fhcs-starlight 3.6s ease-in-out infinite); }
    .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-inspiration-stars > .fhcs-star:nth-child(2n) { animation-delay: -1.2s; }
    .fhcs-sheet:not([data-fhcs-motion="off"]) .fhcs-inspiration-stars > .fhcs-star:nth-child(3n) { animation-delay: -2.3s; }
-   .fhcs-sheet.fhcs-moment-inspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-moment { animation: var(--fhcs-inspire-on-glow); }
-   .fhcs-sheet.fhcs-moment-inspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-moment > .fhcs-mark { animation: var(--fhcs-inspire-on); }
-   .fhcs-sheet.fhcs-moment-uninspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-moment { animation: var(--fhcs-inspire-off-glow); }
-   .fhcs-sheet.fhcs-moment-uninspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-moment > .fhcs-mark { animation: var(--fhcs-inspire-off); }
+   .fhcs-sheet.fhcs-moment-inspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-moment { animation: var(--fhcs-inspire-on-glow); animation-delay: var(--fhcs-inspire-at, 0ms); }
+   .fhcs-sheet.fhcs-moment-inspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-moment > .fhcs-mark { animation: var(--fhcs-inspire-on); animation-delay: var(--fhcs-inspire-at, 0ms); }
+   .fhcs-sheet.fhcs-moment-uninspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-moment { animation: var(--fhcs-inspire-off-glow); animation-delay: var(--fhcs-inspire-at, 0ms); }
+   .fhcs-sheet.fhcs-moment-uninspire:not([data-fhcs-motion="off"]) .fhcs-inspiration .fhcs-star-moment > .fhcs-mark { animation: var(--fhcs-inspire-off); animation-delay: var(--fhcs-inspire-at, 0ms); }
 }
 @keyframes fhcs-starlight
 {

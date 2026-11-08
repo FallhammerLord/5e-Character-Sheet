@@ -262,7 +262,7 @@ export function sunMotes(element, mark = null)
 /**
  * Night's moonbeam: a shaft of moonlight slanting down from the upper right onto the mark struck, soft at its edges
  * and brightest where it lands, with a pool of light round the mark. It brightens quickly, holds, then fades (about
- * a second, once). Fainter as HP falls (the moon waning).
+ * a second, once). Fainter as HP falls (the moon waning). Brightened for ask 4 (user, 2026-11-08: "Night brighter").
  * @param {HTMLElement} element  The sheet's window element.
  * @param {HTMLElement} [mark]   Where the event shows.
  */
@@ -280,7 +280,7 @@ export function moonbeam(element, mark = null)
    // Across the shaft, for its edges: narrow far off, wider where it lands.
    const across = { x: Math.cos(ANGLE), y: Math.sin(ANGLE) };
    const FAR = 8;
-   const NEAR = 14;
+   const NEAR = 17;
    run(surface, element, (ctx, age) =>
    {
       const t = age / BEAM_S;
@@ -292,8 +292,8 @@ export function moonbeam(element, mark = null)
       ctx.filter = 'blur(3px)';
       const shaft = ctx.createLinearGradient(from.x, from.y, to.x, to.y);
       shaft.addColorStop(0, 'rgba(215, 228, 255, 0)');
-      shaft.addColorStop(0.5, `rgba(215, 228, 255, ${0.2 * alpha})`);
-      shaft.addColorStop(1, `rgba(228, 236, 255, ${0.4 * alpha})`);
+      shaft.addColorStop(0.5, `rgba(215, 228, 255, ${0.38 * alpha})`);
+      shaft.addColorStop(1, `rgba(236, 242, 255, ${0.72 * alpha})`);
       ctx.fillStyle = shaft;
       ctx.beginPath();
       ctx.moveTo(from.x - across.x * FAR, from.y - across.y * FAR);
@@ -302,12 +302,12 @@ export function moonbeam(element, mark = null)
       ctx.lineTo(to.x - across.x * NEAR, to.y - across.y * NEAR);
       ctx.closePath();
       ctx.fill();
-      const pool = ctx.createRadialGradient(to.x, to.y, 0, to.x, to.y, 16);
-      pool.addColorStop(0, `rgba(228, 236, 255, ${0.3 * alpha})`);
+      const pool = ctx.createRadialGradient(to.x, to.y, 0, to.x, to.y, 22);
+      pool.addColorStop(0, `rgba(236, 242, 255, ${0.6 * alpha})`);
       pool.addColorStop(1, 'rgba(228, 236, 255, 0)');
       ctx.fillStyle = pool;
       ctx.beginPath();
-      ctx.arc(to.x, to.y, 16, 0, Math.PI * 2);
+      ctx.arc(to.x, to.y, 22, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
       return 1;

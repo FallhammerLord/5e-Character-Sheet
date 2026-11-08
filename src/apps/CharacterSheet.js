@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES } from '../constants.js';
-import { attributesFacts, biographyFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, renderTemplate, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
@@ -313,15 +313,10 @@ function linkResourceAction(event, target)
    return linkResource(this.actor, target.dataset.key, target.dataset.itemId);
 }
 
-/**
- * The inspiration bar (SCOPE §4.12): the star clicked is spent if filled, banked if empty (user, 2026-10-28: any
- * order). The sheet remembers which, so the redraw's moment lands on that star.
- */
+/** The inspiration bar (SCOPE §4.12): the star clicked is spent if filled, banked if empty (user, 2026-10-28: any order). */
 function inspirationAction(event, target)
 {
-   const slot = Number(target.dataset.slot);
-   this.element.dataset.fhcsInspireSlot = String(slot);
-   return setInspirationSlot(this.actor, slot);
+   return setInspirationSlot(this.actor, Number(target.dataset.slot));
 }
 
 /** The inspiration gear's tray: bank inspiration in an item's uses, or back to dnd5e's on or off. */
@@ -331,33 +326,68 @@ function linkInspirationAction(event, target)
    return linkInspiration(this.actor, target.dataset.itemId);
 }
 
+/** The bank's places as drawn, one letter each (filled or empty), read from the row or the count's tray. */
+function drawnPlaces(bar)
+{
+   const places = [];
+   for (const star of bar.querySelectorAll('.fhcs-star[data-slot]')) { places[Number(star.dataset.slot)] = star.classList.contains('fhcs-on') ? 'x' : '-'; }
+   return Array.from(places, (place) => place ?? '-').join('');
+}
+
 /**
- * Inspiration gained or spent between two draws: a moment on the newest star, or on the one just spent (SCOPE §4.12);
- * each theme draws its own (Forge: stamped hot, cooling off). Styles keep it still under Motion off and reduced motion.
+ * Inspiration gained or spent between two draws: a moment on the star that changed (SCOPE §4.12); each theme draws its
+ * own (Forge: stamped hot, cooling off). Every client finds that star the same way, by the places drawn before and now
+ * (ask 14, 2026-11-08: only the clicking client knew the star, so other players saw the moment land on another), and
+ * a further redraw while the moment runs carries it on from where it was (`--fhcs-inspire-at`), as toggles do. Styles
+ * keep it still under Motion off and reduced motion.
  */
-function inspirationMoment(element)
+function inspirationMoment(element, actor)
 {
    const bar = element.querySelector('.fhcs-tabs .fhcs-inspiration');
    if (!bar) { return; }
    const count = Number(bar.dataset.fhcsCount) || 0;
-   const before = element.dataset.fhcsInspired;
-   const slot = element.dataset.fhcsInspireSlot;
-   element.dataset.fhcsInspired = String(count);
-   if (before === undefined || count === Number(before)) { return; }
-   delete element.dataset.fhcsInspireSlot;
-   const gained = count > Number(before);
-   // The star clicked, in the row and in the count's tray; else where a gain or spend from elsewhere shows.
-   const stars = [...(slot !== undefined ? bar.querySelectorAll(`.fhcs-star[data-slot="${slot}"]`)
-      : bar.querySelectorAll(gained ? '.fhcs-star-last' : '.fhcs-star-cooled'))];
-   for (const star of stars) { star.classList.add('fhcs-star-moment'); }
-   const moment = gained ? 'fhcs-moment-inspire' : 'fhcs-moment-uninspire';
-   element.classList.remove('fhcs-moment-inspire', 'fhcs-moment-uninspire');
-   element.classList.add(moment);
-   setTimeout(() => element.classList.remove(moment), MOMENT_MS);
-   // A theme's answer to a gain or a spend starts at the mark that shows it (user, 2026-10-28).
+   const places = drawnPlaces(bar);
+   const before = element.fhcsInspired;
+   element.fhcsInspired = { count, places };
+   let moment = element.fhcsInspireMoment;
+   if (before && count !== before.count)
+   {
+      const gained = count > before.count;
+      // The places that turned the way the count went; else (no bank, or a bank just linked) where the view shows it.
+      const slots = [...places].flatMap((place, slot) => (place !== (before.places[slot] ?? '-') && (place === 'x') === gained ? [slot] : []));
+      moment = element.fhcsInspireMoment = { gained, slots, start: Date.now() };
+      element.classList.remove('fhcs-moment-inspire', 'fhcs-moment-uninspire');
+      element.classList.add(gained ? 'fhcs-moment-inspire' : 'fhcs-moment-uninspire');
+      clearTimeout(element.fhcsInspireTimer);
+      element.fhcsInspireTimer = setTimeout(() => element.classList.remove('fhcs-moment-inspire', 'fhcs-moment-uninspire'), MOMENT_MS);
+      savedAgo(actor, gained);
+   }
+   if (!moment) { return; }
+   const elapsed = Date.now() - moment.start;
+   if (elapsed >= MOMENT_MS) { element.fhcsInspireMoment = null; return; }
+   const stars = [...(moment.slots.length ? bar.querySelectorAll(moment.slots.map((slot) => `.fhcs-star[data-slot="${slot}"]`).join(', '))
+      : bar.querySelectorAll(moment.gained ? '.fhcs-star-last' : '.fhcs-star-cooled'))];
+   for (const star of stars)
+   {
+      star.style.setProperty('--fhcs-inspire-at', `-${elapsed}ms`);
+      star.classList.add('fhcs-star-moment');
+   }
+   // A theme's answer starts at the mark that shows it (user, 2026-10-28), once: its canvas outlives redraws.
+   if (moment.shown) { return; }
+   moment.shown = true;
    const shown = stars.find((star) => star.getClientRects().length) ?? bar;
-   if (gained) { inspirationGained(element, shown); }
+   if (moment.gained) { inspirationGained(element, shown); }
    else { inspirationSpent(element, shown); }
+}
+
+/**
+ * Says in the console how long after the save this client drew inspiration's moment (ask 14): the save's server time
+ * against this client's, so players' consoles can be compared.
+ */
+function savedAgo(actor, gained)
+{
+   const ago = lastSavedAgo(actor);
+   if (ago !== null) { console.info(`fhcs | Inspiration ${gained ? 'gained' : 'spent'}: drawn for ${game.user?.name} ${ago}ms after the save.`); }
 }
 
 /**
@@ -947,7 +977,7 @@ export function makeCharacterSheet(Base)
          wireHpTray(this.element);
          wireResourceUses(this.element, this.actor);
          themeState(this.element, this.actor);
-         inspirationMoment(this.element);
+         inspirationMoment(this.element, this.actor);
          rememberToggles(this);
          fadeTrays(this);
          toggleMoment(this);

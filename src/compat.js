@@ -761,6 +761,18 @@ export async function setInspirationSlot(actor, slot)
    return item.update({ 'system.uses.spent': item.system.uses.max - value });
 }
 
+/**
+ * How long ago, in ms, the character or its inspiration item was last saved, by the server's clock (Foundry keeps
+ * `game.time.serverTime` in step with it), so clients can be compared (ask 14); null when unknown.
+ */
+export function lastSavedAgo(actor)
+{
+   if (!actor) { return null; }
+   const saved = Math.max(actor._stats?.modifiedTime ?? 0, inspirationItem(actor)?._stats?.modifiedTime ?? 0);
+   const now = game.time?.serverTime;
+   return saved && Number.isFinite(now) ? Math.round(now - saved) : null;
+}
+
 /** Keeps dnd5e's on-or-off inspiration in step with the bank: on while it holds any, so whatever reads dnd5e's works. */
 function syncInspiration(actor, banked)
 {

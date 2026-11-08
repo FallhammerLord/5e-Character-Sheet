@@ -999,8 +999,13 @@ export function registerQuenchTests(quench)
                   () => `the leftmost empty star banks itself and turns dnd5e's on; it holds ${uses()}, places ${places()}`);
                await click('.fhcs-inspiration-stars [data-slot="2"]');
                await until(() => feat.system.uses.value === 2 && places() === '[0,2]', () => `the rightmost banks too; it holds ${uses()}, places ${places()}`);
-               await click('.fhcs-inspiration-stars [data-slot="0"]');
-               await until(() => feat.system.uses.value === 1 && places() === '[2]', () => `the leftmost filled star spends itself; it holds ${uses()}, places ${places()}`);
+               // Spent from elsewhere, as another player's click arrives here (ask 14): the moment lands on the star
+               // that changed, the leftmost, where the old guess (the rightmost empty) would have put it on the middle.
+               await actor.update({ 'flags.fhcs.inspirationSlots': { item: feat.id, filled: [2] } }, { render: false });
+               await feat.update({ 'system.uses.spent': 2 });
+               const moments = () => [...sheet.element.querySelectorAll('.fhcs-inspiration-stars .fhcs-star-moment')].map((star) => star.dataset.slot).join(', ') || 'none';
+               await until(() => feat.system.uses.value === 1 && places() === '[2]' && moments() === '0',
+                  () => `a spend from elsewhere marks the star spent; it holds ${uses()}, places ${places()}, moment on ${moments()}`);
                await click('.fhcs-inspiration-bank-tray [data-slot="2"]');
                await until(() => feat.system.uses.value === 0 && actor.system.attributes.inspiration === false,
                   () => `the count's tray spends the last, and an empty bank turns dnd5e's off; it holds ${uses()}, places ${places()}`);

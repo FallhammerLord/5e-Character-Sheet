@@ -60,12 +60,12 @@
    --fhcs-plain-moon-3: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3C/svg%3E");
    --fhcs-plain-moon-4: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3Cpath d='M12 4a8 8 0 0 0 0 16a4.5 8 0 0 0 0-16z'/%3E%3C/svg%3E");
    --fhcs-plain-moon-5: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3Cpath d='M12 4a8 8 0 0 0 0 16a3.5 8 0 0 1 0-16z'/%3E%3C/svg%3E");
-   /* A step down from the ink (user, 2026-10-29: "a little too bright on their own"): the phases at 72%, the full moon
-      a soft silver, its halo fainter. */
+   /* The unlit phases a step down from the ink (user, 2026-10-29: "a little too bright on their own"), at 72%. The
+      full moon bright silver, its halo strong and breathing deep and slow (ask 4, user 2026-11-08: "Night brighter"). */
    --fhcs-plain-mark-ink: color-mix(in srgb, var(--fhcs-ink) 72%, transparent);
-   --fhcs-plain-banked: #cfd6e6;
-   --fhcs-inspire-glow: color-mix(in srgb, #d8e2ff 55%, transparent);
-   --fhcs-inspire-breath: fhcs-starlight 4.4s ease-in-out infinite;
+   --fhcs-plain-banked: #eef2fb;
+   --fhcs-inspire-glow: color-mix(in srgb, #e2eaff 90%, transparent);
+   --fhcs-inspire-breath: fhcs-plain-moon-breath 5s ease-in-out infinite;
    /* The full moon: a pale disc with its seas, faint. */
    --fhcs-plain-moon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Cdefs%3E%3CradialGradient id='h'%3E%3Cstop offset='.4' stop-color='%23cfdcff' stop-opacity='.35'/%3E%3Cstop offset='1' stop-color='%23cfdcff' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Cg opacity='.16'%3E%3Ccircle cx='60' cy='60' r='58' fill='url(%23h)'/%3E%3Ccircle cx='60' cy='60' r='36' fill='%23dfe6f5'/%3E%3Ccircle cx='50' cy='52' r='9' fill='%23b9c3d8'/%3E%3Ccircle cx='68' cy='70' r='6' fill='%23c3ccdf'/%3E%3Ccircle cx='70' cy='48' r='4' fill='%23c3ccdf'/%3E%3C/g%3E%3C/svg%3E");
 }
@@ -310,8 +310,15 @@
 @keyframes fhcs-plain-moon-flare
 {
    0% { filter: drop-shadow(0 0 0 var(--fhcs-inspire-glow)); }
-   45% { filter: drop-shadow(0 0 10px var(--fhcs-inspire-glow)); }
-   100% { filter: drop-shadow(0 0 2px var(--fhcs-inspire-glow)); }
+   45% { filter: drop-shadow(0 0 14px var(--fhcs-inspire-glow)) drop-shadow(0 0 3px var(--fhcs-inspire-glow)); }
+   100% { filter: drop-shadow(0 0 3px var(--fhcs-inspire-glow)); }
+}
+
+/* A full moon's breath (ask 4): its halo swells and settles, slower than the sun's, deep enough to see at a glance. */
+@keyframes fhcs-plain-moon-breath
+{
+   0%, 100% { filter: drop-shadow(0 0 3px var(--fhcs-inspire-glow)); }
+   50% { filter: drop-shadow(0 0 9px var(--fhcs-inspire-glow)) drop-shadow(0 0 3px var(--fhcs-inspire-glow)); }
 }
 
 @keyframes fhcs-plain-moon-wipe
@@ -322,7 +329,7 @@
 
 @keyframes fhcs-plain-moon-dim
 {
-   0% { filter: drop-shadow(0 0 4px var(--fhcs-inspire-glow)); }
+   0% { filter: drop-shadow(0 0 6px var(--fhcs-inspire-glow)); }
    50%, 100% { filter: drop-shadow(0 0 0 transparent); }
 }
 
