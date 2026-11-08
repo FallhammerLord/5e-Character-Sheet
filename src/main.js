@@ -1,5 +1,5 @@
 import { MODULE_ID } from './constants.js';
-import { extendChatModel, preloadTemplates, quietPosts, recordLevelOrder, recordTempTop, registerCharacterSheet, registerItemSheet, systemItemSheet,
+import { extendChatModel, keepTokenSizes, preloadTemplates, quietPosts, recordLevelOrder, recordTempTop, registerCharacterSheet, registerItemSheet, systemItemSheet,
    systemCharacterSheet, watchApplications, watchItemCategories } from './compat.js';
 import { levelOrder } from './sheet/header.js';
 import { keepStable } from './sheet/death.js';
@@ -58,6 +58,9 @@ Hooks.on('dnd5e.preRoll', skipRollDialog);
 
 // Temp's top, for its bar: a change that raises Temp carries it (user, 2026-11-08).
 Hooks.on('preUpdateActor', recordTempTop);
+
+// Token sizes kept through Token HUD Wildcard's image swaps (user, 2026-11-08; world setting).
+Hooks.on('preUpdateToken', keepTokenSizes);
 
 // The milestone track: record the order class levels are gained, once dnd5e's advancement finishes.
 Hooks.on('dnd5e.advancementManagerComplete', (manager) => recordLevelOrder(manager, MODULE_ID, levelOrder));

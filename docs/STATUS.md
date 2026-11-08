@@ -13,6 +13,7 @@ Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a p
 ## Waiting on the user
 
 - **Chat cards in play** (from a player's client): another player's attack and damage show once rolled; an effect applied from a card leaves a line; the hit line holds when targets change; each damage type its own total; a new card scrolls fully into view, down to Apply.
+- **Token sizes on Wildcard swaps** (ROADMAP play round ask 12): swap a resized token's image to an untagged file (size stays), then to a tagged one like `_scale1.5` (scale applies). Not testable offline beyond the unit cases; no Quench test (it needs a scene token).
 - **Player sheet lock-up** (ROADMAP "Player-side bugs" 2): the F12 console output the next time it happens, and what "locked" looks like.
 - **Not yet tried:** choosing a class, species or background in edit mode; Special Traits checkboxes at 20px.
 

@@ -7,6 +7,7 @@ import { countingDie, MAX_PER_SIDE, modeForSides } from './chat/d20.js';
 import { diceMath } from './chat/math.js';
 import { canCast, spellKind } from './sheet/spellbook.js';
 import { TEMP_TOP_FLAG, tempTopAfter } from './sheet/header.js';
+import { sizesToKeep } from './tokens/sizes.js';
 import { categoryId } from './sheet/lists.js';
 import { APPLIED_FLAG, CATEGORY_FLAG, INSPIRATION_FLAG, SECTION_ORDER_FLAG, INSPIRATION_SLOTS_FLAG, MODULE_ID, PORTRAIT_FLAG, RESOURCES_FLAG, SHAPE_FLAG } from './constants.js';
 
@@ -1291,6 +1292,19 @@ export function recordTempTop(actor, change)
    if (temp === undefined) { return; }
    const top = tempTopAfter(actor.system.attributes?.hp?.temp, temp);
    if (top !== null) { foundry.utils.setProperty(change, `flags.${MODULE_ID}.${TEMP_TOP_FLAG}`, top); }
+}
+
+/**
+ * Keeps a token's size through an image swap (tokens/sizes.js): the size keys Wildcard fills from the prototype are set
+ * back to the token's own. A `preUpdateToken` hook, on while the world setting `keepTokenSizes` is.
+ */
+export function keepTokenSizes(token, change)
+{
+   if (!game.settings.get(MODULE_ID, 'keepTokenSizes')) { return; }
+   const { flattenObject, getProperty, setProperty } = foundry.utils;
+   const prototype = token.actor?._source?.prototypeToken;
+   const keys = sizesToKeep(token._source.texture?.src, flattenObject(change), (key) => (prototype ? getProperty(prototype, key) : undefined));
+   for (const key of keys) { setProperty(change, key, getProperty(token._source, key)); }
 }
 
 export function rerenderSheets(className)

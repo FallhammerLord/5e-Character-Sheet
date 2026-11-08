@@ -42,6 +42,10 @@
       "Motion": {
         "Name": "Sheet motion",
         "Hint": "Off: the sheet keeps still in every theme, Plain's Day and Night too (no particles, glints or moments). Your own choice; your system's reduced-motion setting also turns it off."
+      },
+      "KeepTokenSizes": {
+        "Name": "Keep token sizes on image swaps",
+        "Hint": "When Token HUD Wildcard swaps a token's image, keep the token's own size, scale, opacity and anchor unless the new file's name sets them (_width2, _scale1.5). Off: Wildcard resets them to the prototype token's."
       }
     },
     "Chat": {

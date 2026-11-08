@@ -19,6 +19,7 @@ import { arrangeSections, categoryId, pinView } from '../src/sheet/lists.js';
 import { itemSheetView } from '../src/sheet/item.js';
 import { comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, levelOrder, levelTrack, portraitFrame, signed, tabRow, themePicker, hpBars, tempTopAfter } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
+import { sizesToKeep } from '../src/tokens/sizes.js';
 
 const facts = (over) => ({
    kind: 'save', who: 'Kira', what: 'Wisdom Saving Throw', total: 14, natural: 11, target: 15,
@@ -699,6 +700,27 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
 
 // Each extra ability (honor, sanity) widens the minimum by one column and its gap.
 if (headerMinWidth(7) - headerMinWidth(6) !== 51) { problems.push('the sheet minimum does not grow by one ability column'); }
+
+// Token sizes through image swaps (src/tokens/sizes.js): untagged keys written at the prototype's value are kept; a tag,
+// a hand-typed size, an unchanged image or a token without an actor leaves the update alone.
+{
+   const proto = { width: 1, height: 1, alpha: 1, 'texture.scaleX': 1, 'texture.scaleY': 1 };
+   const swap = (src, over = {}) => ({ 'texture.src': src, width: 1, height: 1, alpha: 1, 'texture.scaleX': 1, 'texture.scaleY': 1, ...over });
+   const got = [
+      sizesToKeep('a.webp', swap('b.webp'), (k) => proto[k]),
+      sizesToKeep('a.webp', swap('b_width2_scale1.5.webp', { width: 2, 'texture.scaleX': 1.5, 'texture.scaleY': 1.5 }), (k) => proto[k]),
+      sizesToKeep('a.webp', swap('b_scaleX2.webp', { 'texture.scaleX': 2 }), (k) => proto[k]),
+      sizesToKeep('a.webp', swap('b.webp', { width: 3 }), (k) => proto[k]),
+      sizesToKeep('a.webp', swap('a.webp'), (k) => proto[k]),
+      sizesToKeep('a.webp', swap('b.webp'), () => undefined)
+   ];
+   try
+   {
+      deepStrictEqual(got, [['width', 'height', 'alpha', 'texture.scaleX', 'texture.scaleY'], ['height', 'alpha'],
+         ['width', 'height', 'alpha', 'texture.scaleY'], ['height', 'alpha', 'texture.scaleX', 'texture.scaleY'], [], []]);
+   }
+   catch { problems.push(`Token sizes: ${JSON.stringify(got)}`); }
+}
 
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
 console.log(`${CASES.length} outcome lines, ${PART_CASES.length} card layouts, ${ROW_CASES.length} d20 rows, `

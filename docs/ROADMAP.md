@@ -182,7 +182,8 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
 - [x] 9. Max HP overrides on the HP bar (user, 2026-11-08): a positive or negative Max HP change shows on the main bar, as a dashed break line where the unmodified maximum falls. Built: the bar spans the larger max; the dashed mark sits at the bar's top and bottom edges, off the numbers (a line through "97" broke the reading); a negative change shades the lost HP. Also: the Max ± and Temp fields cut "-20" to "-2"; they now use their whole width, and the layout check fails a number field whose value is cut (free text scrolls by design).
 - [x] 10. The Traits bar's gear stands over the row gears (user, 2026-11-08: 4px left of them). Built: the bar runs to the panel's edge like its rows; the edit-mode Attributes case checks the two right edges.
 - [x] 11. Quench: the effect test's favorite switch, seen on, was gone at its click (2026-11-08). Not yet known; the click now reports the row, the actor's favorites and the trap's logged writes, which also show in the console as warnings. The next run passed (user, 2026-11-08); the cause is still not known, and the trap stays.
-- [ ] Quench and play (asks 1, 2, 5–10 passed and played, 2026-11-08; 3 and 4 to come)
+- [x] 12. Token sizes kept through Token HUD Wildcard's image swaps: the user's guard, taken in (SCOPE §4.14). Built: `src/tokens/sizes.js`, a `preUpdateToken` hook, a world setting; unit cases. Waits on play.
+- [ ] Quench and play (asks 1, 2, 5–10 passed and played, 2026-11-08; 3, 4 and 12 to come)
 
 ## Phase 6.7: Every sheet (user, 2026-10-28)
 

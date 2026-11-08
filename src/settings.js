@@ -57,6 +57,16 @@ export function registerSettings()
       onChange: () => rerenderSheets(SHEET_CLASS_NAME)
    });
 
+   // Token sizes kept through image swaps (user, 2026-11-08): Token HUD Wildcard falls back to the prototype's size.
+   game.settings.register(MODULE_ID, 'keepTokenSizes', {
+      name: 'FHCS.Settings.KeepTokenSizes.Name',
+      hint: 'FHCS.Settings.KeepTokenSizes.Hint',
+      scope: 'world',
+      config: true,
+      type: Boolean,
+      default: true
+   });
+
    // Which Inventory columns show (user, 2026-10-26: each player's choice, made from the tab in edit mode).
    game.settings.register(MODULE_ID, 'inventoryColumns', {
       name: 'FHCS.Settings.InventoryColumns.Name',
