@@ -6,14 +6,15 @@ The current state: what the next session does, what waits on the user, what's ve
 
 1. **Play round 2026-11-08, ask 4** (ROADMAP, "Play round, 2026-11-08"): Night brighter (SCOPE §4.12's banked glows reaching Night's moons; no new rule needed). Asks 3 and 12 are built and wait on play; the rest of the round is verified.
 2. **Mechanical parity** (ROADMAP, "Mechanical parity checklist"; Phase 1's three open items): the next phase after the play round (user, 2026-11-08). Recommended: a Quench batch that exercises each parity item, so one run verifies most of the list.
-3. **Favorites trap** (on `main`): the core batch logs every write to the test character's favorites with its caller; the effect test's failures report them. It failed three runs out of several, at moving steps, then passed (user, 2026-11-08); not yet known which writer. Look at it only if it fails again, from the failure text and the console's `fhcs | test favorites write` warnings. Our code never writes `system.favorites`.
+3. **Favorites trap** (on the branch): the effect test failed again (user, 2026-11-08), a step earlier: the bookmark made the effect a favorite, but the Attributes tab never drew its row. That wait now reports the data, the tab and the logged writes too. Not yet known. Next failure: read its text and the console's `fhcs | test favorites write` warnings. A second Quench failure that run was cut off in the screenshot; ask for its text. The run's `#postNotification` TypeError is in Foundry's own code, cause not yet known. Our code never writes `system.favorites`.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
 
 ## Waiting on the user
 
 - **Chat cards in play** (from a player's client): another player's attack and damage show once rolled; an effect applied from a card leaves a line; the hit line holds when targets change; each damage type its own total; a new card scrolls fully into view, down to Apply.
-- **Smooth folds and trays** (ask 3): fold and unfold a list section, a favorites group, Traits and a container; open and close a tray (HP, rest, levels) by its summary and by a click elsewhere, and the theme tray. In Plain and Forge, then with Sheet motion off (instant). No Quench test: its redraw-waiting clicks outlast the 220ms; the existing fold tests still cover the state.
+- **Portrait rest** (ask 13): after a catch, the portrait doesn't catch again for 10–16 seconds.
+- **Smooth folds and trays** (ask 3, trays reworked after "jittery"): fold and unfold a list section, a favorites group, Traits and a container; open and close a tray (HP, rest, levels) by its summary and by a click elsewhere, and the theme tray. In Plain and Forge, then with Sheet motion off (instant). No Quench test: its redraw-waiting clicks outlast the 220ms; the existing fold tests still cover the state.
 - **Token sizes on Wildcard swaps** (ROADMAP play round ask 12): swap a resized token's image to an untagged file (size stays), then to a tagged one like `_scale1.5` (scale applies). Not testable offline beyond the unit cases; no Quench test (it needs a scene token).
 - **Player sheet lock-up** (ROADMAP "Player-side bugs" 2): the F12 console output the next time it happens, and what "locked" looks like.
 - **Not yet tried:** choosing a class, species or background in edit mode; Special Traits checkboxes at 20px.

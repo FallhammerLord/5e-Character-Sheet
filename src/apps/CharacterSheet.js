@@ -12,7 +12,7 @@ import { TEMP_TOP_FLAG, comfortWidth, headerMinWidth, headerView, hpPreview, ins
 import { inspirationGained, inspirationSpent } from './sparks.js';
 import { delayTips, keepFolds } from '../chat/card.js';
 import { startFraming } from './framing.js';
-import { animateFold, closeTrayFold, trayIn, trayOut } from './folds.js';
+import { animateFold, closeTrayFold, openTrayFold, trayIn, trayOut } from './folds.js';
 
 /** Our template parts, by dnd5e part ID. */
 export const SHEET_PARTS = {
@@ -361,9 +361,9 @@ function inspirationMoment(element)
 }
 
 /**
- * Trays open and close smoothly (ask 3): a summary's press on a tray's `details` fades the tray in once it shows, or
- * fades it out before the `details` closes. Only the player's own press: one reopened after a redraw (keepFolds) stays
- * put. Bound once per window.
+ * Trays open and close smoothly (ask 3): a summary's press on a tray's `details` opens it with the tray's fade begun
+ * in the same frame, or fades the tray out before the `details` closes. Only the player's own press: one reopened after
+ * a redraw (keepFolds) stays put. Bound once per window.
  */
 function fadeTrays(sheet)
 {
@@ -374,20 +374,9 @@ function fadeTrays(sheet)
       const summary = event.target.closest?.('details > summary');
       const details = summary?.parentElement;
       if (!details?.querySelector(':scope > .fhcs-tray')) { return; }
-      if (details.open)
-      {
-         event.preventDefault();
-         closeTrayFold(details);
-      }
-      else { details.dataset.fhcsTrayIn = 'true'; }
-   }, { capture: true });
-   // `toggle` doesn't bubble; caught on its way down.
-   sheet.element.addEventListener('toggle', (event) =>
-   {
-      const details = event.target;
-      if (!details.open || !details.dataset?.fhcsTrayIn) { return; }
-      delete details.dataset.fhcsTrayIn;
-      trayIn(details.querySelector(':scope > .fhcs-tray'));
+      event.preventDefault();
+      if (details.open) { closeTrayFold(details); }
+      else { openTrayFold(details); }
    }, { capture: true });
 }
 
@@ -482,10 +471,17 @@ function toggleMoment(sheet)
 /** How long the portrait's light catch takes to cross the art (the styles' animation, 500ms) and a little over. */
 const CATCH_MS = 550;
 
+/** When each window's portrait may catch the light again. */
+const catchRests = new WeakMap();
+
+/** The portrait's rest after a catch, from its start: the catch itself, then 10 + 1d6 seconds. */
+const catchRest = () => CATCH_MS + (10 + Math.ceil(Math.random() * 6)) * 1000;
+
 /**
  * The portrait catches the light once each time the pointer comes onto it (SCOPE §5.3 rule 6): the sheet marks it
  * `fhcs-catching` for one pass, so the catch runs to its end, clears on its own while the pointer stays, and a quick
- * out and in never restarts it (user, 2026-10-29: on :hover it lingered and replayed). Bound once per window.
+ * out and in never restarts it (user, 2026-10-29: on :hover it lingered and replayed); then it rests 10 + 1d6 seconds
+ * (user, 2026-11-08). Bound once per window.
  */
 function catchLight(element)
 {
@@ -495,6 +491,10 @@ function catchLight(element)
    {
       const portrait = event.target.closest?.('.fhcs-portrait');
       if (!portrait || portrait.contains(event.relatedTarget) || portrait.classList.contains('fhcs-catching')) { return; }
+      // A rest after each catch (user, 2026-11-08: replaying at once was distracting): 10 + 1d6 seconds. Kept on the
+      // window, so a redraw's new portrait waits too.
+      if (Date.now() < (catchRests.get(element) ?? 0)) { return; }
+      catchRests.set(element, Date.now() + catchRest());
       portrait.classList.add('fhcs-catching');
       setTimeout(() => portrait.classList.remove('fhcs-catching'), CATCH_MS);
    });

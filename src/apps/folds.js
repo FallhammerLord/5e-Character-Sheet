@@ -90,6 +90,17 @@ export function trayOut(tray, apply)
    play(tray, [TRAY_SHOWN, TRAY_SHUT], TRAY_MS, apply);
 }
 
+/**
+ * Opens a `details` whose child is a tray, its fade starting in the same frame: left to the browser's own toggle, the
+ * tray painted whole for a frame before its fade began at nothing (a flicker, user 2026-11-08: "jittery").
+ */
+export function openTrayFold(details)
+{
+   if (!details || details.open) { return; }
+   details.open = true;
+   trayIn(details.querySelector(':scope > .fhcs-tray'));
+}
+
 /** Closes a `details` whose child is a tray, the tray fading out first. A second close while it fades does nothing. */
 export function closeTrayFold(details)
 {

@@ -1337,12 +1337,12 @@ export function registerQuenchTests(quench)
             // The favorite brings its switch to the Attributes tab, and the switch flips it there (user, 2026-10-28).
             await click('.fhcs-tabs [data-tab="details"]');
             const favSwitch = `.fhcs-attributes [data-favorite-id="${relative}"] .fhcs-switch`;
-            await until(() => sheet.element.querySelector(favSwitch)?.getAttribute('aria-pressed') === 'true',
-               () => `the favorited effect shows its switch on; the row holds ${sheet.element.querySelector(`.fhcs-attributes [data-favorite-id="${relative}"]`)?.innerText ?? 'nothing'}`);
-            // 2026-11-08: the switch, just seen on, was gone at this click; report what the row and the data hold.
+            // 2026-11-08: the switch, just seen on, was gone at this click, then missing at the wait before it; report what the row and the data hold.
             const favState = () => `the favorite's row holds ${sheet.element.querySelector(`.fhcs-attributes [data-favorite-id="${relative}"]`)?.outerHTML.slice(0, 300) ?? 'nothing'}; `
                + `the tab is ${sheet.tabGroups?.primary}; favorite ${actor.system.hasFavorite(relative)}; favorites ${favoriteIds(actor.system.favorites)}; `
                + `favorites writes since the bookmark: ${favoriteWritesSince(writesMark)}`;
+            await until(() => sheet.element.querySelector(favSwitch)?.getAttribute('aria-pressed') === 'true',
+               () => `the favorited effect shows its switch on; ${favState()}`);
             await click(favSwitch, favState);
             await until(() => effect.disabled, () => `the favorite's switch turns the effect off; ${favState()}`);
             await click(favSwitch, favState);
