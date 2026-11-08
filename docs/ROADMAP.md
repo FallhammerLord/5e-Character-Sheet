@@ -21,9 +21,9 @@ Portrait, name, class and level, HP and temp HP, AC, initiative, speed, proficie
 
 - [x] Mockup approved (2026-10-24): https://claude.ai/artifact/PfrTrdDsbn3Wx7DCa2HDEf
 - [x] Header part: portrait 160 × up to 240 with corner chips (exhaustion, inspiration, rest, hit dice); HP with dnd5e's click-to-edit meter, Temp; name, XP or the milestone track, level; class, origin, speed, proficiency; AC, Init and abilities in one row (verified 2026-10-24)
-- [ ] Ability emphasis, a client setting: modifier large (default) or score large (in code 2026-10-24)
-- [ ] Milestone track (dnd5e's leveling mode "no XP"): 20 pips filled with class images in the order gained, recorded after advancement (in code 2026-10-24)
-- [ ] Pinned strip on scroll (SCOPE §4.5)
+- ~~Ability emphasis, a client setting~~ retired (user, 2026-10-27; SCOPE §4.1): score and modifier share one style
+- [x] Milestone track (dnd5e's leveling mode "no XP"): 20 pips filled with class images in the order gained, recorded after advancement (played 2026-11-08)
+- Pinned strip on scroll: moved to Phase 7 (user, 2026-11-08)
 
 ## Phase 2: Attributes tab
 
@@ -205,7 +205,7 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
 
 ## Phase 7: The ADHD layer
 
-Skills column on every tab (user, 2026-10-26): the Attributes skills column stays beside every tab, as in Tidy's current sheet (its sidebar; Classic showed skills on Attributes only, checked in Tidy v13.0.0 source). Tab bodies then lose about 240px; recheck Inventory and Spellbook rows at 644px. Optional "Now" strip: action, bonus action, reaction and movement, with spent ones dimmed until the next turn. Favorites capped at five. Panels fold; HP, AC and conditions stay pinned. An effect that turns all incoming damage into one type (user, 2026-10-28; SCOPE §6.7).
+Skills column on every tab (user, 2026-10-26): the Attributes skills column stays beside every tab, as in Tidy's current sheet (its sidebar; Classic showed skills on Attributes only, checked in Tidy v13.0.0 source). Tab bodies then lose about 240px; recheck Inventory and Spellbook rows at 644px. Optional "Now" strip: action, bonus action, reaction and movement, with spent ones dimmed until the next turn. Favorites capped at five. Panels fold; HP, AC and conditions stay pinned: the pinned strip on scroll (SCOPE §4.1, §4.5; moved here from Phase 1, user 2026-11-08). An effect that turns all incoming damage into one type (user, 2026-10-28; SCOPE §6.7).
 
 ## Phase 8: Themes, compatibility, release
 
@@ -235,19 +235,27 @@ Done and verified in play (2026-10-24). Runs alongside the sheet phases; works w
 1. [x] Cards without their rolls: a card's draw is async, and a roll created meanwhile asks for a redraw that finds no card in the log yet, or two redraws race and the older one lands. Each card now records the rolls it drew (`data-fhcs-drawn`); after every draw the chat log draws a card again when it missed one, three times at most, saying so in the console (`fhcs | Card … was drawn before its latest roll arrived`). Cause found by reading dnd5e's source, not seen happen. Quench chat cards: new test. Waits on play.
 2. [ ] Sheet locks up: no cause found in our code yet. Our after-render steps now can't leave the sheet half-wired (a failure logs `fhcs | The sheet's extras failed…`), and a part that fails to draw names itself and the user (`fhcs | The <part> part failed to draw…`). Waits on the user: the next time it happens, F12 console output, and whether fields look greyed, clicks do nothing, or the window won't drag.
 
-## Mechanical parity checklist
+## Mechanical parity (user, 2026-11-08; SCOPE §4.15)
 
-What the default sheet and Tidy both do; ours must too before release. Tick when verified in a world.
+What the default sheet and Tidy both do; ours must too before release. Tick when verified in a world. Each line names the Quench tests that already cover it and what's missing.
 
-- [ ] Every roll: abilities, saves, skills, tools, initiative, death saves, hit dice
-- [ ] Item use through activities, with consumption and chat cards
-- [ ] Drag and drop: items in, items out, reorder, containers, onto the hotbar
-- [ ] Context menus on items and effects
-- [ ] Spell slots, pact slots, prepared spells, concentration
-- [ ] Temp HP, max HP override, hit dice
-- [ ] Conditions and exhaustion
-- [ ] Encumbrance and currency
-- [ ] Short and long rest dialogs
-- [ ] Advancement on level-up
-- [ ] Favorites
-- [ ] Limited and Observer permission views
+1. [ ] Every roll: abilities, saves, initiative, skills, death saves, hit dice (core). Missing: tools.
+2. [ ] Item use through activities, with consumption and chat cards (core "uses an item", features; chat batch). Missing: uses, quantity and slots shown spent after a use.
+3. [ ] Drag and drop (core: dropped on a container). Missing: in from the sidebar, out to another actor, reorder, onto the hotbar.
+4. [ ] Context menus on items and effects (played on favorites). Missing: a test on an item row and an effect row.
+5. [ ] Spell slots, pact slots, prepared spells, concentration (core Spellbook tests). Missing: pact slots, a slot spent by a cast.
+6. [ ] Temp HP, max HP override, hit dice (core HP tray, portrait card, HD chip). Missing: max override through dnd5e's HP window.
+7. [ ] Conditions and exhaustion (core Effects tab, name row). Covered.
+8. [ ] Encumbrance and currency. Missing: both.
+9. [ ] Short and long rest dialogs (core). Covered.
+10. [ ] Advancement on level-up (core). Covered.
+11. [ ] Favorites (core, many). Covered.
+12. [ ] Limited and Observer views. Missing: the Limited view's look (below) and both views tested.
+
+Slices:
+
+- [x] A. The map above (2026-11-08)
+- [ ] B. Quench batch "Fallhammer Character Sheet: parity" for each missing line but 12: tools, spent uses and slots, pact slots, max override, currency and encumbrance, context menus, reorder, drag out and hotbar data
+- [ ] C. Limited view in our frame (SCOPE §4.15): mockup board, build, fixture, Quench with the actor read as Limited
+- [ ] D. Observer view: nothing editable, no edit controls; Quench with the actor read as Observer
+- [ ] E. Quench, then play as a player account (Limited and Observer need a real non-owner; Quench runs as GM)

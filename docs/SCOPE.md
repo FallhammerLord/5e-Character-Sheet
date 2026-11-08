@@ -43,7 +43,7 @@ Header decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrdDsbn
 - ~~Ability emphasis, a per-player choice~~ retired (user, 2026-10-27): score and modifier now sit side by side in one style, so there is nothing to emphasise.
 - **Leveling follows dnd5e's `levelingMode` world setting** (the GM's choice; we add no setting of our own). XP modes show the usual XP bar. Milestone mode (`noxp`) puts a Level button where the bar was; it folds out a tray of 20 pips (4 rows of 5). Each class level fills the next pip with that class's icon, in the order the levels were gained; empty pips show levels not reached. A pip fills when the player levels up through dnd5e, after its advancement finishes. Nothing to add by hand.
   - dnd5e stores levels per class, not their order, so we record the order in an actor flag after each advancement (`dnd5e.advancementManagerComplete`); characters from before that fill class by class, original class first. Icons: the class item's own image, so any source's classes work.
-- **Pinned strip** when scrolled (§4.5): portrait thumbnail, name, HP and bar, AC, conditions, inspiration.
+- **Pinned strip** when scrolled (§4.5): portrait thumbnail, name, HP and bar, AC, conditions, inspiration. Built in Phase 7 (user, 2026-11-08: an ADHD-layer feature, not parity).
 - **The stats row never wraps** (user, 2026-10-24; panels 2026-10-27): the combat panel (125px) and the abilities panel stay in one row; ability columns are 48px at the least, and the sheet stops shrinking at the width the row and the cards need (644px with six abilities; `headerMinWidth`). Text sizes stay the three styles; only the columns scale.
 - **Class, species and background cards under the abilities** (user, 2026-10-26; mockup row "Phase 5 · origin cards in the header"): moved from the Features tab into the blank space under the ability row, on that row's columns (the combat panel's, then one per ability) so their outer edges meet the panels'. Species and background span 2 ability columns each; one class takes the rest (the combat panel's and two abilities'); two split them, the first on the combat panel's column (user, 2026-10-27). The header's class line goes, and the small line keeps only size and speed (user, 2026-10-27: type was redundant, alignment lives on the Biography). At 644px with two classes a subclass drops to its own line. Card details: §4.8.
 - **Level up in the level pill's tray** (user, 2026-10-26), in XP and milestone mode: one button per class (dnd5e's level-up wizard) and New class (dnd5e's class browser; adding the class runs its wizard). In XP mode the pill turns solid with an up arrow once the XP is reached.
@@ -203,6 +203,13 @@ Ours:
 ### 4.14 Beyond the sheet: token sizes (user, 2026-11-08)
 
 The user's Wildcard size guard, taken in (user, 2026-11-08: "integrating the attached function"). Token HUD Wildcard writes width, height, alpha, texture scale and anchor on every image swap, from the new file's name tags (`_width2`, `_height2`, `_scale1.5`, `_scaleX`, `_scaleY`, `_alpha`, `_anchor`), else from the prototype token, wiping per-scene sizes. A `preUpdateToken` hook keeps the token's own value for each size key whose tag is missing, so tagged files still size the token. One change from the user's file (Claude, 2026-11-08, for the user to reverse): a key is kept only when the value written equals the prototype's (Wildcard's fallback), so a size typed in Token Config alongside a new image still saves. A world setting, "Keep token sizes on image swaps", on by default. Pure part: `src/tokens/sizes.js`.
+
+### 4.15 Mechanical parity (user, 2026-11-08)
+
+Parity is a verification phase: everything dnd5e's sheet and Tidy do works on ours (ROADMAP "Mechanical parity"). One Quench batch exercises each missing item, so one run verifies most of the list.
+
+- **Limited view in our frame, trimmed** (user, 2026-11-08): a player with Limited permission sees our portrait card and name row, then the public description and biography in our Biography tab's styling. No tabs, no stats, no controls. dnd5e's own limited parts (`LIMITED_PARTS`: portrait, name, `enriched.public`, `enriched.value`) set what's shown; we draw it. Before, dnd5e's templates drew with their look stripped.
+- **Observer view** keeps dnd5e's rule: the full sheet, nothing editable.
 
 ## 5. ADHD rules carried over
 
