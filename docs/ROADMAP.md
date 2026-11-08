@@ -185,7 +185,7 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
 - [x] 12. Token sizes kept through Token HUD Wildcard's image swaps: the user's guard, taken in (SCOPE §4.14). Built: `src/tokens/sizes.js`, a `preUpdateToken` hook, a world setting; unit cases. Waits on a session of play (user, 2026-11-08: checked later).
 - [x] 13. The portrait's light catch rests 10 + 1d6 seconds after each catch (user, 2026-11-08: it replayed as soon as it finished). Played (user, 2026-11-08: "works properly").
 - [x] 14. Inspiration's moments play out of step between players (user, 2026-11-08): the GM's local client sees them at once, remote players at uneven times. Every connected player should see a smooth moment. Research (our code, 2026-11-08): each client starts the moment when its own redraw lands, so a network's delay apart is unavoidable; two faults made it rough. Only the clicking client knew which star was clicked, so the others guessed (leftmost filled, rightmost empty) and often played it on the wrong star; and a redraw landing mid-moment replaced the stars and cut it off. Built: every client finds the star that changed between its draws; a redraw mid-moment carries it on (`--fhcs-inspire-at`, as toggles); the console says how long after the save each client drew it (`fhcs | Inspiration … ms after the save`, by Foundry's server clock). Quench's bank test spends a star from outside the sheet and checks the moment lands on it.
-- [ ] Quench and play (asks 1, 2, 5–10 passed and played, 2026-11-08; 3 and 13 played; 4, 12 and 14 to come)
+- [ ] Quench and play (asks 1, 2, 5–10 passed and played, 2026-11-08; 3, 4, 13 and 14 played; 12 to come)
 
 ## Phase 6.7: Every sheet (user, 2026-10-28)
 

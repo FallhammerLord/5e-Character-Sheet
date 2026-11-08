@@ -4,14 +4,13 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Mechanical parity** (ROADMAP, "Mechanical parity checklist"; Phase 1's three open items): the next phase (user, 2026-11-08). Recommended: a Quench batch that exercises each parity item, so one run verifies most of the list. The play round's asks are all built; 4, 12 and 14 wait on the user.
+1. **Mechanical parity** (ROADMAP, "Mechanical parity checklist"; Phase 1's three open items): the next phase (user, 2026-11-08). Recommended: a Quench batch that exercises each parity item, so one run verifies most of the list. The play round's asks are all built and played but 12, which waits on a session of play.
 2. **Favorites trap** (on the branch): the effect test fails some runs at moving steps and passes others (latest pass 2026-11-08). Not yet known. On a failure, read its text (it reports the row, tab, favorites and logged writes) and the console's `fhcs | test favorites write` warnings. The `#postNotification` TypeError seen in the chat card runs is in Foundry's own code, cause not yet known. Our code never writes `system.favorites`.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
 
 ## Waiting on the user
 
-- **Play round asks 4 and 14** (built 2026-11-08): Night in play, the full moons brighter and breathing, the moonbeam stronger, the unlit outlines as before. Inspiration from two clients: a star banked or spent by one player plays on that same star for the others, smoothly; each client's F12 console shows `fhcs | Inspiration … drawn for <user> <n>ms after the save`, to compare. Quench: the bank test now also spends a star from outside the sheet.
 - **Chat cards in play** (from a player's client): another player's attack and damage show once rolled; an effect applied from a card leaves a line; the hit line holds when targets change; each damage type its own total; a new card scrolls fully into view, down to Apply.
 - **Quench rerun:** the click-off tray test now waits for the tray's fade-out (it checked at once; a test bug, 2026-11-08). The rest passed that run, the effect favorite test included.
 - **Token sizes on Wildcard swaps** (ROADMAP play round ask 12; after a session of play, user 2026-11-08): swap a resized token's image to an untagged file (size stays), then to a tagged one like `_scale1.5` (scale applies). Not testable offline beyond the unit cases; no Quench test (it needs a scene token).
@@ -22,6 +21,7 @@ Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a p
 
 In Foundry, by the user:
 
+- **Play round 2026-11-08, asks 4 and 14** (2026-11-08, play: "worked first time"): Night's brighter moons and moonbeam; inspiration's moment on the same star for every player, carried across redraws. The Quench bank test's new step not yet run.
 - **Play round 2026-11-08, asks 3 and 13** (2026-11-08, portrait rest: "works properly"; play: "animations are better" after the trays' first-frame fix): folds and trays move both ways.
 - **Play round 2026-11-08, asks 1, 2 and 5–10** (2026-11-08, Quench and play: "quench passes. the rest plays very nicely"): toggles easing, Temp's bar and its moments, Max ± on HP's bar, exhaustion's face at 0, the Traits gear at its bar's right over the row gears, Special Traits closing from its own gear, edit-mode HP on one line. Quench passing also covers Phases 6.5–6.7's tests.
 - **Play round 2026-11-08** (play by the user; Quench pending): Day and Night's toggle moments, hit and heal at the HP line, the tab line's slide, the portrait's light catch, Day's particles, dnd5e's item menu on favorites; Forge and the "Sheet motion" setting; the item sheet saving its Category and icon, and the Cleric, Dwarf and Criminal in it; the milestone track; Level up and New class into dnd5e's wizard; level down; the biography editor; exhaustion lowered with a right-click. The Phase 6.5 polish (class card ring, resource panels, folding, arrows) seen, no issues reported. What to change is the "Play round, 2026-11-08" list in ROADMAP.
