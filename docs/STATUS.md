@@ -4,9 +4,9 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Play round 2026-11-08** (ROADMAP, "Play round, 2026-11-08"): asks 1 and 5–8 built 2026-11-08 (wait on Quench and play); asks 2–4 next (Temp HP bar, smooth folds, Night). Ask 4 is SCOPE §4.12's banked glows reaching Night's moons; no new rule needed.
+1. **Play round 2026-11-08** (ROADMAP, "Play round, 2026-11-08"): asks 1, 5–8 and 10 built and 1, 5–8 seen working in play (2026-11-08); asks 2 and 9 next (the Temp HP bar and Max HP breaks, one HP slice), then 3 and 4. Ask 11 waits on a Quench run. Ask 4 is SCOPE §4.12's banked glows reaching Night's moons; no new rule needed.
 2. **Mechanical parity** (ROADMAP, "Mechanical parity checklist"; Phase 1's three open items): the next phase after the play round (user, 2026-11-08). Recommended: a Quench batch that exercises each parity item, so one run verifies most of the list.
-3. **Favorites trap** (branch `claude/favorites-trap`, waits on the user's approval for `main`): the core batch logs every write to the test character's favorites with its caller. The effect test lost its favorite in the actor's data (user, 2026-11-08: `favorite false`), so not the test's timing; not yet known which writer. Our code never writes `system.favorites`.
+3. **Favorites trap** (on `main`): the core batch logs every write to the test character's favorites with its caller. The effect test lost its favorite twice in the actor's data, then (2026-11-08) its favorite switch just after seeing it on; not yet known which writer. The failing click now reports the trap's writes. Our code never writes `system.favorites`.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
 

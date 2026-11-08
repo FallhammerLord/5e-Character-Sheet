@@ -53,19 +53,23 @@ export function registerQuenchTests(quench)
          await sheet.render();
       };
 
-      /** @returns {HTMLElement} The sheet's element for a selector, now; fails the test if there is none. */
-      const find = (selector) =>
+      /**
+       * @param {string} selector
+       * @param {Function} [why]  What to add to the failure: what the sheet and the data hold instead.
+       * @returns {HTMLElement} The sheet's element for a selector, now; fails the test if there is none.
+       */
+      const find = (selector, why) =>
       {
          const element = sheet.element.querySelector(selector);
-         assert.ok(element, `no element matches ${selector}`);
+         assert.ok(element, `no element matches ${selector}${why ? `; ${why()}` : ''}`);
          return element;
       };
 
-      /** Once the sheet has settled, clicks the element a selector finds. */
-      const click = async (selector) =>
+      /** Once the sheet has settled, clicks the element a selector finds (`why` as `find`'s). */
+      const click = async (selector, why) =>
       {
          await settled();
-         find(selector).click(); // redraw-safe: after settled()
+         find(selector, why).click(); // redraw-safe: after settled()
       };
 
       /** Once the sheet has settled, types a value into a field and sends its input and change, as typing does. */
@@ -162,7 +166,7 @@ export function registerQuenchTests(quench)
                const write = { at: Math.round(performance.now() - start), before: favoriteIds(doc.system.favorites),
                   after: favoriteIds(change.system.favorites), caller };
                favoriteWrites.push(write);
-               console.debug('fhcs | test favorites write', write, stack);
+               console.warn('fhcs | test favorites write', write, stack);
             });
             await sheet.render({ force: true });
          });
@@ -1319,9 +1323,13 @@ export function registerQuenchTests(quench)
             const favSwitch = `.fhcs-attributes [data-favorite-id="${relative}"] .fhcs-switch`;
             await until(() => sheet.element.querySelector(favSwitch)?.getAttribute('aria-pressed') === 'true',
                () => `the favorited effect shows its switch on; the row holds ${sheet.element.querySelector(`.fhcs-attributes [data-favorite-id="${relative}"]`)?.innerText ?? 'nothing'}`);
-            await click(favSwitch);
-            await until(() => effect.disabled, 'the favorite\'s switch turns the effect off');
-            await click(favSwitch);
+            // 2026-11-08: the switch, just seen on, was gone at this click; report what the row and the data hold.
+            const favState = () => `the favorite's row holds ${sheet.element.querySelector(`.fhcs-attributes [data-favorite-id="${relative}"]`)?.outerHTML.slice(0, 300) ?? 'nothing'}; `
+               + `the tab is ${sheet.tabGroups?.primary}; favorite ${actor.system.hasFavorite(relative)}; favorites ${favoriteIds(actor.system.favorites)}; `
+               + `favorites writes since the bookmark: ${favoriteWritesSince(writesMark)}`;
+            await click(favSwitch, favState);
+            await until(() => effect.disabled, () => `the favorite's switch turns the effect off; ${favState()}`);
+            await click(favSwitch, favState);
             await until(() => !effect.disabled, 'and on again');
             await click('.fhcs-tabs [data-tab="effects"]');
             // Not yet known why this click once found no unfavorite (2026-10-28); report what the row holds.

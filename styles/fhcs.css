@@ -2109,6 +2109,8 @@
 /* The arrows, then the gear at the bar's right end (user, 2026-11-08: the gear sat mid-bar once the panel opened):
    the arrows' group takes the free room and keeps them at its right. */
 .fhcs-sheet .fhcs-traits-panel > .fhcs-group-head > .fhcs-section-move { flex: 1 0 auto; }
+/* The rows run to the panel's edge, so the bar does too: its gear stands over theirs (user, 2026-11-08: 4px left). */
+.fhcs-sheet .fhcs-traits-panel > .fhcs-group-head { padding-right: 0; }
 .fhcs-sheet .fhcs-traits-summary { flex: 1; }
 
 /* Every category on Attributes (Traits, Resources, the favorites groups) one look (user, 2026-10-29: "traits need to

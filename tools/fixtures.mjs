@@ -605,7 +605,9 @@ export const CASES = [
    { name: 'attributes-folded', template: 'sheet/attributes', context: attributes({ folded: ['inventory', 'spell-1', 'traits'] }),
       // The traits heading sits on the Skills heading's line, folded or open (user, 2026-10-27).
       align: [['.fhcs-attributes-side .fhcs-panel-head', 'top', '.fhcs-traits-panel .fhcs-group-head', 'top'], ['.fhcs-attributes-side .fhcs-panel-head', 'bottom', '.fhcs-traits-panel .fhcs-group-head', 'bottom']] },
-   { name: 'attributes-editing', template: 'sheet/attributes', context: attributes({ editing: true }), rows: '.fhcs-skills > li, .fhcs-trait-row', marks: '.fhcs-skill-name, .fhcs-skill-mod', sameRowsAs: 'attributes' },
+   { name: 'attributes-editing', template: 'sheet/attributes', context: attributes({ editing: true }),
+     // The bar's gear over the rows' gears (user, 2026-11-08: it sat 4px left of them).
+     align: [['.fhcs-traits-panel .fhcs-special-traits', 'right', '.fhcs-trait-gear', 'right']], rows: '.fhcs-skills > li, .fhcs-trait-row', marks: '.fhcs-skill-name, .fhcs-skill-mod', sameRowsAs: 'attributes' },
    { name: 'attributes-resource-tray', template: 'sheet/attributes', open: ['resource-primary'], context: attributes({ editing: true }) },
    { name: 'attributes-ability-tray', template: 'sheet/attributes', open: ['skill-ability-ath'], context: attributes({ editing: true }) },
    { name: 'attributes-empty', template: 'sheet/attributes', context: attributes({ favorites: [], resources: [], traits: [] }) },
