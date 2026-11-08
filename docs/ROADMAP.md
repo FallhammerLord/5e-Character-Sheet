@@ -174,7 +174,7 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
 - [ ] 1. Toggle moments ease in: today the icon lights and its outline pops on at once. Effective, not smooth. Keep under 300ms (SCOPE §5.3 rule 6), every theme's toggle hooks.
 - [ ] 2. Temp HP is a bar of its own: blue, filling as Temp over its own top, with the same hit and heal moments as HP. Today the Temp field sits empty. Damage takes Temp first, so a hit drains Temp's bar before HP's.
 - [ ] 3. Trays and folds open and close smoothly: today they jump on fold and unfold. Covers trays, section folds and favorites groups, in every theme; closing animates as well as opening.
-- [ ] 4. Night brighter: moonbeams and lit moons stronger; lit moons breathe (SCOPE §4.11's banked glow, slow, still under Motion off and reduced motion). The dim outlines of unlit moons stay as they are. Day unchanged.
+- [ ] 4. Night brighter: moonbeams and lit moons stronger; lit moons breathe (SCOPE §4.12's banked glows, slow, still under Motion off and reduced motion). The dim outlines of unlit moons stay as they are. Day unchanged.
 - [ ] 5. Exhaustion at 0 shows its face icon (the chip's icon at 1 and up), not the empty dot.
 - [ ] 6. Special Traits' gear sits at the right of its bar.
 - [ ] 7. Special Traits opened in edit mode can't be closed without locking the sheet (a real bug: `CharacterSheet.js` returns to Attributes only on leaving edit mode). The gear closes it again, back to Attributes.

@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Play round 2026-11-08** (ROADMAP, "Play round, 2026-11-08", asks 1–8): the user's notes from play, numbered, not yet built. Build them one ask per slice, by CLAUDE.md's polish round. Ask 4 is SCOPE §4.11's banked glow reaching Night's moons; no new rule needed.
+1. **Play round 2026-11-08** (ROADMAP, "Play round, 2026-11-08", asks 1–8): the user's notes from play, numbered, not yet built. Build them one ask per slice, by CLAUDE.md's polish round. Ask 4 is SCOPE §4.12's banked glows reaching Night's moons; no new rule needed.
 2. **Mechanical parity** (ROADMAP, "Mechanical parity checklist"; Phase 1's three open items): the next phase after the play round (user, 2026-11-08). Recommended: a Quench batch that exercises each parity item, so one run verifies most of the list.
 3. **Favorites trap** (branch `claude/favorites-trap`, waits on the user's approval for `main`): the core batch logs every write to the test character's favorites with its caller. The effect test lost its favorite in the actor's data (user, 2026-11-08: `favorite false`), so not the test's timing; not yet known which writer. Our code never writes `system.favorites`.
 
