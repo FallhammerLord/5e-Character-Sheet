@@ -4,9 +4,9 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Play round 2026-11-08, ask 4** (ROADMAP, "Play round, 2026-11-08"): Night brighter (SCOPE §4.12's banked glows reaching Night's moons; no new rule needed). Asks 3 and 12 are built and wait on play; the rest of the round is verified.
+1. **Play round 2026-11-08, ask 4** (ROADMAP, "Play round, 2026-11-08"): Night brighter (SCOPE §4.12's banked glows reaching Night's moons; no new rule needed). Ask 3 is played; 12 and 13 wait on play; the rest of the round is verified.
 2. **Mechanical parity** (ROADMAP, "Mechanical parity checklist"; Phase 1's three open items): the next phase after the play round (user, 2026-11-08). Recommended: a Quench batch that exercises each parity item, so one run verifies most of the list.
-3. **Favorites trap** (on the branch): the effect test failed again (user, 2026-11-08), a step earlier: the bookmark made the effect a favorite, but the Attributes tab never drew its row. That wait now reports the data, the tab and the logged writes too. Not yet known. Next failure: read its text and the console's `fhcs | test favorites write` warnings. A second Quench failure that run was cut off in the screenshot; ask for its text. The run's `#postNotification` TypeError is in Foundry's own code, cause not yet known. Our code never writes `system.favorites`.
+3. **Favorites trap** (on the branch): the effect test fails some runs at moving steps and passes others (latest pass 2026-11-08). Not yet known. On a failure, read its text (it reports the row, tab, favorites and logged writes) and the console's `fhcs | test favorites write` warnings. The `#postNotification` TypeError seen in the chat card runs is in Foundry's own code, cause not yet known. Our code never writes `system.favorites`.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
 
@@ -14,7 +14,7 @@ Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a p
 
 - **Chat cards in play** (from a player's client): another player's attack and damage show once rolled; an effect applied from a card leaves a line; the hit line holds when targets change; each damage type its own total; a new card scrolls fully into view, down to Apply.
 - **Portrait rest** (ask 13): after a catch, the portrait doesn't catch again for 10–16 seconds.
-- **Smooth folds and trays** (ask 3, trays reworked after "jittery"): fold and unfold a list section, a favorites group, Traits and a container; open and close a tray (HP, rest, levels) by its summary and by a click elsewhere, and the theme tray. In Plain and Forge, then with Sheet motion off (instant). No Quench test: its redraw-waiting clicks outlast the 220ms; the existing fold tests still cover the state.
+- **Quench rerun:** the click-off tray test now waits for the tray's fade-out (it checked at once; a test bug, 2026-11-08). The rest passed that run, the effect favorite test included.
 - **Token sizes on Wildcard swaps** (ROADMAP play round ask 12): swap a resized token's image to an untagged file (size stays), then to a tagged one like `_scale1.5` (scale applies). Not testable offline beyond the unit cases; no Quench test (it needs a scene token).
 - **Player sheet lock-up** (ROADMAP "Player-side bugs" 2): the F12 console output the next time it happens, and what "locked" looks like.
 - **Not yet tried:** choosing a class, species or background in edit mode; Special Traits checkboxes at 20px.
@@ -23,6 +23,7 @@ Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a p
 
 In Foundry, by the user:
 
+- **Play round 2026-11-08, ask 3** (2026-11-08, play: "animations are better" after the trays' first-frame fix): folds and trays move both ways.
 - **Play round 2026-11-08, asks 1, 2 and 5–10** (2026-11-08, Quench and play: "quench passes. the rest plays very nicely"): toggles easing, Temp's bar and its moments, Max ± on HP's bar, exhaustion's face at 0, the Traits gear at its bar's right over the row gears, Special Traits closing from its own gear, edit-mode HP on one line. Quench passing also covers Phases 6.5–6.7's tests.
 - **Play round 2026-11-08** (play by the user; Quench pending): Day and Night's toggle moments, hit and heal at the HP line, the tab line's slide, the portrait's light catch, Day's particles, dnd5e's item menu on favorites; Forge and the "Sheet motion" setting; the item sheet saving its Category and icon, and the Cleric, Dwarf and Criminal in it; the milestone track; Level up and New class into dnd5e's wizard; level down; the biography editor; exhaustion lowered with a right-click. The Phase 6.5 polish (class card ring, resource panels, folding, arrows) seen, no issues reported. What to change is the "Play round, 2026-11-08" list in ROADMAP.
 - **Phase 6 edit mode, lifecycle and styling** (2026-10-28, play by the user; Quench core all but one test, which passed by hand): the portrait card, HP tray, edit-mode header, framing, Attributes in edit mode, level down and spellcasting ability, then the styling pass: title bar, status group, combat and abilities panels, traits and resources, one chip look, concentration's mark, spacing 4 or 8. How it works: BUILT.

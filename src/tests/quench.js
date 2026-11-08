@@ -705,7 +705,8 @@ export function registerQuenchTests(quench)
             tray.querySelector('.fhcs-tray').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); // redraw-safe: after settled()
             assert.isTrue(tray.open, 'a click inside keeps it open');
             sheet.element.querySelector('.fhcs-tabs').dispatchEvent(new PointerEvent('pointerdown', { bubbles: true })); // redraw-safe: after settled()
-            assert.isFalse(tray.open, 'a click elsewhere closes it');
+            // The tray fades out first (160ms, ask 3), then closes.
+            await until(() => !tray.open, () => `a click elsewhere closes it; the tray is ${tray.isConnected ? 'still open' : 'gone from the page'}`);
          });
 
          it('shows and hides Inventory columns from edit mode, for this player', async function ()
