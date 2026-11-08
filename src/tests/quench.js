@@ -25,6 +25,21 @@ export function registerQuenchTests(quench)
       let sheet = null;
 
       /*
+       * The favorites trap (2026-11-08): the effect test twice found its favorite gone from the actor's data, not just
+       * the sheet. dnd5e's favorite writers each send the whole `system.favorites` array, so a stale one wipes another's
+       * change. Every write to the test character's favorites is logged here with the code that sent it, until found.
+       */
+      const favoriteWrites = [];
+      let favoritesHook = null;
+
+      /** @returns {string} The ids in a favorites array, short. */
+      const favoriteIds = (list) => (list ?? []).map((f) => f.id.split('.').pop()).join(', ') || 'none';
+
+      /** @returns {string} The favorites writes since a mark, each with what it held and the first caller outside Foundry. */
+      const favoriteWritesSince = (mark) => favoriteWrites.slice(mark)
+         .map((w) => `[${w.at}ms: ${w.before} → ${w.after}; from ${w.caller}]`).join(' ') || 'no favorites writes';
+
+      /*
        * The redraw rule (CLAUDE.md): a click on markup a pending redraw is about to replace never reaches the sheet,
        * and that failed several tests at random (2026-10-26). So every click and input here goes through `click`,
        * `clickReaches` or `enter`: each waits for the sheet to settle, then finds its element by selector, fresh.
@@ -137,11 +152,24 @@ export function registerQuenchTests(quench)
                flags: { core: { sheetClass: SHEET_ID } }
             });
             sheet = actor.sheet;
+            const start = performance.now();
+            favoritesHook = Hooks.on('preUpdateActor', (doc, change) =>
+            {
+               if ((doc !== actor) || !foundry.utils.hasProperty(change, 'system.favorites')) { return; }
+               const stack = (new Error().stack ?? '').split('\n').slice(1).map((line) => line.trim());
+               const caller = stack.find((line) => /systems\/dnd5e|modules\/(?!fhcs)/.test(line)
+                  && !/data\/actor\/character\.mjs/.test(line)) ?? stack.find((line) => /modules\/fhcs/.test(line)) ?? 'unknown';
+               const write = { at: Math.round(performance.now() - start), before: favoriteIds(doc.system.favorites),
+                  after: favoriteIds(change.system.favorites), caller };
+               favoriteWrites.push(write);
+               console.debug('fhcs | test favorites write', write, stack);
+            });
             await sheet.render({ force: true });
          });
 
          after(async function ()
          {
+            Hooks.off('preUpdateActor', favoritesHook);
             await sheet?.close();
             await actor?.delete();
          });
@@ -1275,6 +1303,7 @@ export function registerQuenchTests(quench)
             await click(`.fhcs-effects [data-effect-id="${effect.id}"] [data-action="toggle"]`);
             await until(() => !effect.disabled, 'a second click turns it back on');
             const relative = foundry.utils.buildRelativeUuid(effect, actor);
+            const writesMark = favoriteWrites.length;
             await click(`.fhcs-effects [data-effect-id="${effect.id}"] [data-action="favorite"]`);
             await until(() => actor.system.hasFavorite(relative), 'the bookmark makes it a favorite');
             // The favorite brings its switch to the Attributes tab, and the switch flips it there (user, 2026-10-28).
@@ -1288,7 +1317,7 @@ export function registerQuenchTests(quench)
             await until(() => !effect.disabled, 'and on again');
             await click('.fhcs-tabs [data-tab="effects"]');
             // Not yet known why this click once found no unfavorite (2026-10-28); report what the row holds.
-            const actions = () => `the row holds ${[...(row()?.querySelectorAll('[data-action]') ?? [])].map((b) => b.dataset.action).join(', ') || 'nothing'}; the tab is ${sheet.tabGroups?.primary}; favorite ${actor.system.hasFavorite(relative)}`;
+            const actions = () => `the row holds ${[...(row()?.querySelectorAll('[data-action]') ?? [])].map((b) => b.dataset.action).join(', ') || 'nothing'}; the tab is ${sheet.tabGroups?.primary}; favorite ${actor.system.hasFavorite(relative)}; favorites writes since the bookmark: ${favoriteWritesSince(writesMark)}`;
             await until(() => row()?.querySelector('[data-action="unfavorite"]'), () => `the bookmark now offers to remove it; ${actions()}`);
             await settled();
             await until(() => row()?.querySelector('[data-action="unfavorite"]'), () => `after the redraw the bookmark still offers to remove it; ${actions()}`);
