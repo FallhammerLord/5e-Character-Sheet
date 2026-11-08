@@ -167,7 +167,7 @@ Third pass, from the user's play (2026-10-28):
 - [x] Mockups: canvas row "Phase 6.55 · Plain as Day and Night" (Day, Night, 644px bloodied and edit mode, down; the marks, pips, shields, tabs and HP tray click through to their moments); waits on the user's review (2026-10-29)
 - [ ] Quench and play
 
-## Play round, 2026-11-08 (user's play; not yet built)
+## Play round, 2026-11-08 (user's play; asks 3 and 4 to build)
 
 From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.md's polish round; answer by number at the end.
 
@@ -181,8 +181,8 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
 - [x] 8. Edit-mode HP band: the HP gear takes width from the number, so a large total wraps ("HP 105 / 105" on two lines; user's screenshot). HP and its total hold one line at every width; a layout case with a three-digit HP in edit mode at 644px, so it can't return. Built: the gear hangs over the art at the bar's top left, a solid chip like the portrait's; the layout check's new `oneLine` option fails wrapped text (seen failing on the old layout).
 - [x] 9. Max HP overrides on the HP bar (user, 2026-11-08): a positive or negative Max HP change shows on the main bar, as a dashed break line where the unmodified maximum falls. Built: the bar spans the larger max; the dashed mark sits at the bar's top and bottom edges, off the numbers (a line through "97" broke the reading); a negative change shades the lost HP. Also: the Max ± and Temp fields cut "-20" to "-2"; they now use their whole width, and the layout check fails a number field whose value is cut (free text scrolls by design).
 - [x] 10. The Traits bar's gear stands over the row gears (user, 2026-11-08: 4px left of them). Built: the bar runs to the panel's edge like its rows; the edit-mode Attributes case checks the two right edges.
-- [ ] 11. Quench: the effect test's favorite switch, seen on, was gone at its click (2026-11-08). Not yet known; the click now reports the row, the actor's favorites and the trap's logged writes, which also show in the console as warnings. Waits on one more run.
-- [ ] Quench and play
+- [x] 11. Quench: the effect test's favorite switch, seen on, was gone at its click (2026-11-08). Not yet known; the click now reports the row, the actor's favorites and the trap's logged writes, which also show in the console as warnings. The next run passed (user, 2026-11-08); the cause is still not known, and the trap stays.
+- [ ] Quench and play (asks 1, 2, 5–10 passed and played, 2026-11-08; 3 and 4 to come)
 
 ## Phase 6.7: Every sheet (user, 2026-10-28)
 
