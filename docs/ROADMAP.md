@@ -237,25 +237,26 @@ Done and verified in play (2026-10-24). Runs alongside the sheet phases; works w
 
 ## Mechanical parity (user, 2026-11-08; SCOPE §4.15)
 
-What the default sheet and Tidy both do; ours must too before release. Tick when verified in a world. Each line names the Quench tests that already cover it and what's missing.
+What the default sheet and Tidy both do; ours must too before release. Tick when verified in a world.
 
-1. [ ] Every roll: abilities, saves, initiative, skills, death saves, hit dice (core). Missing: tools.
-2. [ ] Item use through activities, with consumption and chat cards (core "uses an item", features; chat batch). Missing: uses, quantity and slots shown spent after a use.
-3. [ ] Drag and drop (core: dropped on a container). Missing: in from the sidebar, out to another actor, reorder, onto the hotbar.
-4. [ ] Context menus on items and effects (played on favorites). Missing: a test on an item row and an effect row.
-5. [ ] Spell slots, pact slots, prepared spells, concentration (core Spellbook tests). Missing: pact slots, a slot spent by a cast.
-6. [ ] Temp HP, max HP override, hit dice (core HP tray, portrait card, HD chip). Missing: max override through dnd5e's HP window.
-7. [ ] Conditions and exhaustion (core Effects tab, name row). Covered.
-8. [ ] Encumbrance and currency. Missing: both.
-9. [ ] Short and long rest dialogs (core). Covered.
-10. [ ] Advancement on level-up (core). Covered.
-11. [ ] Favorites (core, many). Covered.
-12. [ ] Limited and Observer views. Missing: the Limited view's look (below) and both views tested.
+1. [ ] Every roll: abilities, saves, initiative, skills, death saves, hit dice (Quench core). **Tools don't roll:** they show as trait pills with no action (slice B).
+2. [x] Item use through activities, with consumption and chat cards (play, user 2026-11-08: resources work)
+3. [x] Drag and drop: in, out, reorder, containers, hotbar (play, user 2026-11-08)
+4. [x] Context menus on items and effects (play, user 2026-11-08: right-click works)
+5. [x] Spell slots, pact slots, prepared spells, concentration (Quench core; pact slots in play, user 2026-11-08)
+6. [x] Temp HP, max HP override, hit dice (Quench core; override in play, user 2026-11-08)
+7. [x] Conditions and exhaustion (Quench core, play)
+8. [ ] Encumbrance and currency: untested (slice C)
+9. [x] Short and long rest dialogs (Quench core, play)
+10. [x] Advancement on level-up (Quench core, play)
+11. [x] Favorites (Quench core, play)
+12. [ ] Limited and Observer views: untested; the Limited view is unstyled today (slices D, E)
 
 Slices:
 
-- [x] A. The map above (2026-11-08)
-- [ ] B. Quench batch "Fallhammer Character Sheet: parity" for each missing line but 12: tools, spent uses and slots, pact slots, max override, currency and encumbrance, context menus, reorder, drag out and hotbar data
-- [ ] C. Limited view in our frame (SCOPE §4.15): mockup board, build, fixture, Quench with the actor read as Limited
-- [ ] D. Observer view: nothing editable, no edit controls; Quench with the actor read as Observer
-- [ ] E. Quench, then play as a player account (Limited and Observer need a real non-owner; Quench runs as GM)
+- [x] A. The map (2026-11-08)
+- [ ] B. Tools roll from the Traits panel: each tool pill carries dnd5e's `roll` action (`rollable`, `data-type="tool"`, the tool's `data-key`), so dnd5e's `rollToolCheck` runs. Fixture case, Quench click test
+- [ ] C. Encumbrance and currency: Quench test that edits a coin and checks the carried bar against dnd5e's `attributes.encumbrance`; then play
+- [ ] D. Limited view in our frame (SCOPE §4.15): mockup board, build, fixture, Quench with the actor read as Limited
+- [ ] E. Observer view: nothing editable, no edit controls; Quench with the actor read as Observer
+- [ ] F. Quench, then play as a player account (Limited and Observer need a real non-owner; Quench runs as GM)

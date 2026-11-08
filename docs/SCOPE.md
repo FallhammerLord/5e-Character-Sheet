@@ -206,7 +206,9 @@ The user's Wildcard size guard, taken in (user, 2026-11-08: "integrating the att
 
 ### 4.15 Mechanical parity (user, 2026-11-08)
 
-Parity is a verification phase: everything dnd5e's sheet and Tidy do works on ours (ROADMAP "Mechanical parity"). One Quench batch exercises each missing item, so one run verifies most of the list.
+Parity is a verification phase: everything dnd5e's sheet and Tidy do works on ours (ROADMAP "Mechanical parity"). The user's play (2026-11-08) verified most of the list; what's left is built or tested in slices.
+
+- **Tools roll from the Traits panel** (user, 2026-11-08: "should be clickable in traits"): each tool pill is a roll target through dnd5e's own action, as skills are.
 
 - **Limited view in our frame, trimmed** (user, 2026-11-08): a player with Limited permission sees our portrait card and name row, then the public description and biography in our Biography tab's styling. No tabs, no stats, no controls. dnd5e's own limited parts (`LIMITED_PARTS`: portrait, name, `enriched.public`, `enriched.value`) set what's shown; we draw it. Before, dnd5e's templates drew with their look stripped.
 - **Observer view** keeps dnd5e's rule: the full sheet, nothing editable.

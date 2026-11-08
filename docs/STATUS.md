@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Mechanical parity** (ROADMAP "Mechanical parity", SCOPE §4.15; started 2026-11-08): the map is done (slice A). Next, slice B: the parity Quench batch for each missing line. Then C, the Limited view in our frame (mockup board first), and D, Observer. Phase 1 is closed: emphasis retired, milestone played, pinned strip moved to Phase 7. The play round's asks are all built and played but 12, which waits on a session of play.
+1. **Mechanical parity** (ROADMAP "Mechanical parity", SCOPE §4.15): play verified items 2–7 and 9–11 (user, 2026-11-08). Next, slice B: tools roll from the Traits panel. Then C (encumbrance and currency test), D (Limited view, mockup board first), E (Observer). Phase 1 is closed. The play round's asks are all built and played but 12, which waits on a session of play.
 2. **Favorites trap** (on the branch): the effect test fails some runs at moving steps and passes others (latest pass 2026-11-08). Not yet known. On a failure, read its text (it reports the row, tab, favorites and logged writes) and the console's `fhcs | test favorites write` warnings. The `#postNotification` TypeError seen in the chat card runs is in Foundry's own code, cause not yet known. Our code never writes `system.favorites`.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
