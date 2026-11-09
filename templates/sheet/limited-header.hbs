@@ -1,0 +1,22 @@
+{{!-- The Limited view's header (SCOPE §4.15; user, 2026-11-08: "our frame, trimmed"): the portrait card at the
+      player's framing and shape, the name, and the public biography when written. No stats, no controls. It takes
+      dnd5e's limited "header" part. --}}
+<header class="fhcs-limited-header">
+   {{#with fhcsLimited}}
+   <div class="fhcs-portrait fhcs-frame fhcs-shape-{{ portrait.shape }}">
+      <div class="fhcs-portrait-clip" style="{{ portrait.frameStyle }}">
+         {{#with portrait}}
+         {{#if isVideo}}
+         <video class="fhcs-portrait-art fhcs-fit-{{ fit }}" src="{{ src }}" autoplay muted disablepictureinpicture loop playsinline data-action="showArtwork"></video>
+         {{else}}
+         <img class="fhcs-portrait-art fhcs-fit-{{ fit }}" src="{{ src }}" alt="{{ ../name }}" data-action="showArtwork">
+         {{/if}}
+         {{/with}}
+      </div>
+   </div>
+   <div class="fhcs-limited-top">
+      <span class="fhcs-display fhcs-name">{{ name }}</span>
+      {{#if public}}<div class="fhcs-body fhcs-bio-text">{{{ public }}}</div>{{/if}}
+   </div>
+   {{/with}}
+</header>

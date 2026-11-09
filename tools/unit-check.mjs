@@ -15,6 +15,7 @@ import { featureColumnChoice, featuresView, groupingOf } from '../src/sheet/feat
 import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js';
 import { effectsView } from '../src/sheet/effects.js';
 import { biographyView, paragraphs } from '../src/sheet/biography.js';
+import { limitedView } from '../src/sheet/limited.js';
 import { arrangeSections, categoryId, pinView } from '../src/sheet/lists.js';
 import { itemSheetView } from '../src/sheet/item.js';
 import { comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, levelOrder, levelTrack, portraitFrame, signed, tabRow, themePicker, hpBars, tempTopAfter } from '../src/sheet/header.js';
@@ -392,6 +393,15 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
       view.traits.map((t) => `${t.key}:${t.config || `trait=${t.trait}`}`).join()];
    try { deepStrictEqual(got, [true, 'wis', 'senses:senses,languages:trait=languages']); }
    catch { problems.push(`attributes edit mode: ${JSON.stringify(got)}`); }
+}
+
+// The Limited view (SCOPE §4.15): the portrait in the player's shape, empty text dropped, the name kept whole.
+{
+   const view = limitedView({ name: 'Mira', portrait: { src: 'a.webp', token: true }, frame: null, shape: null,
+      public: '<p>&nbsp;</p>', biography: '<p>Born at sea.</p>' }, { localize });
+   const got = [view.name, view.portrait.shape, view.portrait.fit, view.public, view.biography];
+   try { deepStrictEqual(got, ['Mira', 'round', 'contain', '', '<p>Born at sea.</p>']); }
+   catch { problems.push(`limited view: ${JSON.stringify(got)}`); }
 }
 
 // Tools roll from the Traits panel (user, 2026-11-08): one button per tool with its bonus; other traits stay text.

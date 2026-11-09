@@ -99,7 +99,7 @@ export function levelTrack(classes, order, originalId, format)
  * The portrait as drawn: a token whole at the top; other art filling the frame at its framing, which edit mode can
  * change (a token has nothing to frame).
  */
-function framedPortrait(facts)
+export function framedPortrait(facts)
 {
    const token = !!facts.portrait?.token;
    const frame = token ? { ...FRAME_DEFAULT } : portraitFrame(facts.frame, facts.portrait?.src);

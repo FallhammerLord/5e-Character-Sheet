@@ -103,7 +103,7 @@
 
 .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet) :is(.fhcs-header, .fhcs-tabs, .fhcs-attributes-side > .fhcs-panel,
    .fhcs-attributes-main > *, .fhcs-list-bar, .fhcs-section, .fhcs-inventory-foot, .fhcs-casting, .fhcs-characteristics,
-   .fhcs-bio-column, .fhcs-empty, .fhcs-conditions)
+   .fhcs-bio-column, .fhcs-empty, .fhcs-conditions, .fhcs-limited-header, .fhcs-limited-body > .fhcs-bio-box)
 {
    background-color: var(--fhcs-surface);
 }

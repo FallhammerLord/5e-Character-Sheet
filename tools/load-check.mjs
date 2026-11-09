@@ -26,6 +26,11 @@ class SystemCharacterSheet
       warnings: { template: 'systems/dnd5e/templates/shared/sheet-warnings-dialog.hbs' },
       tabs: { id: 'tabs', classes: ['tabs-right'], template: 'systems/dnd5e/templates/shared/sidebar-tabs.hbs' }
    };
+   // As base-actor-sheet.mjs:110 has them in 6.0.6.
+   static LIMITED_PARTS = {
+      header: { template: 'systems/dnd5e/templates/actors/limited-header.hbs' },
+      biography: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/limited-body.hbs', scrollable: [''] }
+   };
    // Foundry joins every class's DEFAULT_OPTIONS; this is what dnd5e's chain gives a character sheet.
    _initializeApplicationOptions()
    {
@@ -174,6 +179,15 @@ else
       if (!existsSync(new URL(`../${part.template.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`sheet part template ${part.template} is missing`); }
    }
    for (const id of ['header', 'tabs']) { if (!parts[id]?.template.startsWith('modules/fhcs/')) { problems.push(`the ${id} part is still dnd5e's`); } }
+   // The Limited view (SCOPE §4.15): dnd5e's two limited parts, both ours, the body keeping its tab container.
+   const limited = sheet.LIMITED_PARTS ?? {};
+   if (Object.keys(limited).join() !== 'header,biography') { problems.push(`limited parts are ${Object.keys(limited).join() || 'none'}, not header,biography`); }
+   for (const [id, part] of Object.entries(limited))
+   {
+      if (!part.template?.startsWith('modules/fhcs/')) { problems.push(`the limited ${id} part is still dnd5e's`); }
+      else if (!existsSync(new URL(`../${part.template.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`limited part template ${part.template} is missing`); }
+   }
+   if (limited.biography?.container?.id !== 'tabs') { problems.push('the limited body lost its tab container'); }
    if (parts.details?.container?.id !== 'tabs') { problems.push('dnd5e\'s tab bodies lost their container'); }
    if (!parts.inventory?.template.startsWith('modules/fhcs/')) { problems.push('the inventory part is still dnd5e\'s'); }
    // The item list scrolls, not the tab, so Foundry keeps its place when an equip or quantity change re-renders.

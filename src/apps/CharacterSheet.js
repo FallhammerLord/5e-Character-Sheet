@@ -1,5 +1,5 @@
-import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES } from '../constants.js';
-import { attributesFacts, biographyFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES, VIEW_ACTIONS } from '../constants.js';
+import { attributesFacts, biographyFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, renderTemplate, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
@@ -7,6 +7,7 @@ import { EXTRA_SPELL_FILTERS, spellbookView, spellColumnChoice } from '../sheet/
 import { featureColumnChoice, featuresView } from '../sheet/features.js';
 import { effectsView } from '../sheet/effects.js';
 import { biographyView } from '../sheet/biography.js';
+import { limitedView } from '../sheet/limited.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
 import { TEMP_TOP_FLAG, comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, tabRow, themePicker } from '../sheet/header.js';
 import { inspirationGained, inspirationSpent } from './sparks.js';
@@ -25,6 +26,12 @@ export const SHEET_PARTS = {
    features: `${MODULE_PATH}/templates/sheet/features.hbs`,
    effects: `${MODULE_PATH}/templates/sheet/effects.hbs`,
    biography: `${MODULE_PATH}/templates/sheet/biography.hbs`
+};
+
+/** Our templates for dnd5e's limited parts (SCOPE §4.15): the portrait and name, then the biography. */
+export const LIMITED_SHEET_PARTS = {
+   header: `${MODULE_PATH}/templates/sheet/limited-header.hbs`,
+   biography: `${MODULE_PATH}/templates/sheet/limited-body.hbs`
 };
 
 /**
@@ -802,6 +809,19 @@ function ourParts(baseParts)
    return Object.fromEntries(entries.sort(([a], [b]) => rank(a) - rank(b)));
 }
 
+/** dnd5e's limited parts with our templates, keeping its part settings (container, scrolling) but not its classes. */
+function limitedParts(baseParts)
+{
+   return Object.fromEntries(Object.entries(baseParts ?? {}).map(([id, part]) =>
+   {
+      if (!LIMITED_SHEET_PARTS[id]) { return [id, part]; }
+      const kept = { ...part, template: LIMITED_SHEET_PARTS[id] };
+      delete kept.classes;
+      delete kept.templates;
+      return [id, kept];
+   }));
+}
+
 /**
  * Our character sheet: dnd5e's own sheet class with our layout. Built from the class dnd5e provides at init,
  * since a module can't import from the system by path. dnd5e keeps every mechanic; the look is ours alone.
@@ -826,6 +846,8 @@ export function makeCharacterSheet(Base)
 
       static PARTS = ourParts(Base.PARTS);
 
+      static LIMITED_PARTS = limitedParts(Base.LIMITED_PARTS);
+
       /** dnd5e's ⋮ menu, with every other title-bar button added, so the bar holds only ⋮ and × (user, 2026-10-28). */
       * _getHeaderControlContextEntries()
       {
@@ -840,6 +862,18 @@ export function makeCharacterSheet(Base)
          const from = row?.querySelector('.fhcs-tab.active')?.getBoundingClientRect();
          super.changeTab(tab, group, options);
          slideTabLine(row, from);
+      }
+
+      /**
+       * A viewer who can't edit (Observer) still folds, expands and opens what they read (SCOPE §4.15): Foundry has
+       * just disabled every control, and dnd5e re-enabled only `.always-interactive`.
+       */
+      _toggleDisabled(disabled)
+      {
+         super._toggleDisabled(disabled);
+         if (!disabled) { return; }
+         const selector = VIEW_ACTIONS.map((action) => `.window-content [data-action="${action}"]`).join(', ');
+         for (const control of this.element.querySelectorAll(selector)) { control.disabled = false; }
       }
 
       /** Foundry joins every parent's classes; drop dnd5e's look from the list. */
@@ -869,6 +903,12 @@ export function makeCharacterSheet(Base)
          const i18n = { localize: (key) => game.i18n.localize(key), format: (key, data) => game.i18n.format(key, data) };
          // The player's folded favorites groups and list sections.
          const folded = () => game.user.getFlag(MODULE_ID, PREFS.folded) ?? [];
+         // A Limited view (SCOPE §4.15) draws dnd5e's limited parts only: the header and the biography.
+         if (this.actor.limited)
+         {
+            if (partId in LIMITED_SHEET_PARTS) { context.fhcsLimited = limitedView(await limitedFacts(this, context, MODULE_ID), i18n); }
+            return context;
+         }
          if (partId === 'header' && !this.actor.limited)
          {
             const facts = await headerFacts(this, context, MODULE_ID);

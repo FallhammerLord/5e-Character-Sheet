@@ -1,4 +1,4 @@
-import { MODULE_ID, SHEET_ID, SYSTEM_ACTIONS } from '../constants.js';
+import { MODULE_ID, SHEET_ID, SYSTEM_ACTIONS, VIEW_ACTIONS } from '../constants.js';
 import { isStale } from '../chat/card.js';
 import { addBonus, addD20, damageFacts, systemCharacterSheet } from '../compat.js';
 
@@ -1415,6 +1415,67 @@ export function registerQuenchTests(quench)
             await click('.fhcs-effects [data-action="toggleCondition"][data-condition-id="prone"]');
             await until(() => prone() === had, 'a second click puts it back');
             await effect.delete();
+         });
+
+         /**
+          * Draws a second copy of the sheet as a viewer who isn't the owner would see it. Quench runs as GM, who is never
+          * Limited or Observer, so the test reads the actor as Limited, or the copy as not editable, for this one draw.
+          * The play check from a player account is the real test (ROADMAP "Mechanical parity" F).
+          */
+         const viewerSheet = async ({ limited = false } = {}) =>
+         {
+            await settled();
+            if (limited) { Object.defineProperty(actor, 'limited', { get: () => true, configurable: true }); }
+            // Its own window ID, so it never stands in for the open sheet in Foundry's list of windows.
+            const viewer = new sheet.constructor({ document: actor, id: 'fhcs-test-viewer-{id}' });
+            if (!limited) { Object.defineProperty(viewer, 'isEditable', { get: () => false, configurable: true }); }
+            try { await viewer.render({ force: true }); }
+            finally { if (limited) { delete actor.limited; } }
+            return viewer;
+         };
+
+         it('shows a Limited viewer the portrait, name and biography in our frame, and nothing else (parity, 2026-11-08)', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 3);
+            await actor.update({ 'system.details.biography.value': '<p>FHCS limited biography</p>',
+               'system.details.biography.public': '<p>FHCS public line</p>' });
+            const viewer = await viewerSheet({ limited: true });
+            try
+            {
+               const root = viewer.element;
+               const parts = [...root.querySelectorAll('.window-content > *, .window-content .tab-body > *')].map((n) => n.className).join(' | ');
+               assert.strictEqual(root.querySelector('.fhcs-limited-header .fhcs-name')?.textContent.trim(), actor.name,
+                  `the limited header's name; the window holds: ${parts}`);
+               assert.include(root.querySelector('.fhcs-limited-header .fhcs-bio-text')?.textContent ?? '', 'FHCS public line',
+                  'the public biography is missing from the limited header');
+               assert.include(root.querySelector('.fhcs-limited-body .fhcs-bio-text')?.textContent ?? '', 'FHCS limited biography',
+                  `the biography is missing from the limited body; the window holds: ${parts}`);
+               const extra = ['.fhcs-tabs', '.fhcs-header', '.fhcs-attributes', '[data-action="roll"]'].filter((sel) => root.querySelector(sel));
+               assert.deepEqual(extra, [], 'a Limited viewer sees more than the portrait, name and biography');
+            }
+            finally { await viewer.close(); }
+         });
+
+         it('lets an Observer fold, expand and open what they read, and nothing more (parity, 2026-11-08)', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 3);
+            const viewer = await viewerSheet();
+            try
+            {
+               const root = viewer.element;
+               assert.notOk(root.querySelector('.fhcs-lock'), 'an Observer has the edit-mode lock');
+               // What stays live: tabs and our view-only controls; everything else (rolls, changes) is disabled.
+               const live = [...root.querySelectorAll('.window-content :is(button, input, select, textarea)')]
+                  .filter((n) => !n.disabled && !n.readOnly && !n.classList.contains('always-interactive') && !VIEW_ACTIONS.includes(n.dataset.action)
+                     && !n.closest('item-list-controls'))
+                  .map((n) => n.dataset.action || n.name || n.className);
+               assert.deepEqual(live, [], 'an Observer can still use these');
+               const dead = [...root.querySelectorAll('.window-content [data-action]')]
+                  .filter((n) => VIEW_ACTIONS.includes(n.dataset.action) && n.disabled).map((n) => n.dataset.action);
+               assert.deepEqual(dead, [], 'an Observer cannot use these view-only controls');
+               assert.notOk(root.querySelector('.rollable[data-action="roll"]'), 'an Observer has a roll target (dnd5e drops `rollable` for them)');
+            }
+            finally { await viewer.close(); }
          });
 
          it('shows every biography field from dnd5e\'s data, and saves one edited without unlocking', async function ()

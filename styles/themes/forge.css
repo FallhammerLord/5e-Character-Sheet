@@ -161,7 +161,7 @@
 
 .fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-header, .fhcs-attributes-side > .fhcs-panel, .fhcs-attributes-main > *,
    .fhcs-list-bar, .fhcs-section, .fhcs-inventory-foot, .fhcs-casting, .fhcs-characteristics, .fhcs-bio-column, .fhcs-empty,
-   .fhcs-conditions)
+   .fhcs-conditions, .fhcs-limited-header, .fhcs-limited-body > .fhcs-bio-box)
 {
    background-color: var(--fhcs-theme-plate);
    backdrop-filter: blur(3px);
@@ -171,7 +171,7 @@
    an open tray rises above its neighbours. */
 .fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-header, .fhcs-attributes-side > .fhcs-panel, .fhcs-attributes-main > *,
    .fhcs-list-bar, .fhcs-section, .fhcs-inventory-foot, .fhcs-casting, .fhcs-characteristics, .fhcs-bio-column, .fhcs-empty,
-   .fhcs-conditions):has(details[open] > .fhcs-tray)
+   .fhcs-conditions, .fhcs-limited-header, .fhcs-limited-body > .fhcs-bio-box):has(details[open] > .fhcs-tray)
 {
    position: relative;
    z-index: 5;

@@ -257,6 +257,6 @@ Slices:
 - [x] A. The map (2026-11-08)
 - [x] B. Tools roll from the Traits panel (built 2026-11-08; Quench core "rolls a tool from the Traits panel"): each tool pill carries dnd5e's `roll` action (`rollable`, `data-type="tool"`, the tool's `data-key`), so dnd5e's `rollToolCheck` runs. Fixture case, Quench click test
 - [x] C. Encumbrance and currency (test written 2026-11-08, Quench core "saves coins typed…"): Quench test that edits a coin and checks the carried bar against dnd5e's `attributes.encumbrance`; then play
-- [ ] D. Limited view in our frame (SCOPE §4.15): mockup board, build, fixture, Quench with the actor read as Limited
-- [ ] E. Observer view: nothing editable, no edit controls; Quench with the actor read as Observer
+- [x] D. Limited view in our frame (built 2026-11-08; Quench core "shows a Limited viewer…"): our templates for dnd5e's two limited parts, the public biography added; layout cases `limited*`. The layout screenshots stood in for a canvas board (the user asked for the whole track in one go)
+- [x] E. Observer view (built 2026-11-08; Quench core "lets an Observer fold…"): view-only controls stay live (`VIEW_ACTIONS`), everything else off as dnd5e has it
 - [ ] F. Quench, then play as a player account (Limited and Observer need a real non-owner; Quench runs as GM)

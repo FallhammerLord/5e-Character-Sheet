@@ -3371,6 +3371,21 @@
 
 .fhcs-sheet .fhcs-biography.active { display: flex; flex-direction: column; gap: var(--fhcs-s2); }
 
+/* The Limited view (SCOPE §4.15; user, 2026-11-08): the portrait card, square or round as the player chose, beside the
+   name and public biography; then the biography's box. */
+.fhcs-sheet .fhcs-limited-header
+{
+   display: flex;
+   align-items: flex-start;
+   gap: var(--fhcs-s2);
+   padding: 0 var(--fhcs-s2) var(--fhcs-s2);
+   min-width: 0;
+   border-bottom: 1px solid var(--fhcs-line-soft);
+}
+.fhcs-sheet .fhcs-limited-header > .fhcs-portrait { display: block; flex: none; height: 160px; }
+.fhcs-sheet .fhcs-limited-top { display: flex; flex: 1; flex-direction: column; gap: var(--fhcs-s1); min-width: 0; }
+.fhcs-sheet .fhcs-limited-top > .fhcs-name { flex: none; white-space: normal; overflow-wrap: anywhere; }
+
 /* Characteristics: a label beside each value, in as many columns as fit. */
 .fhcs-sheet .fhcs-characteristics
 {

@@ -6,6 +6,14 @@ export const SHEET_CLASS_NAME = 'FHCSCharacterSheet';
 export const SHEET_ID = `${MODULE_ID}.${SHEET_CLASS_NAME}`;
 
 /**
+ * Controls that only change what this viewer sees: folds, details, opening a document to read, filters and grouping.
+ * A viewer who can't edit the character (Observer) keeps them: Foundry disables every control on such a sheet and
+ * dnd5e re-enables only `.always-interactive` (SCOPE §4.15, 2026-11-08). Rolls and changes stay off, as on dnd5e's sheet.
+ */
+export const VIEW_ACTIONS = ['fhcsToggleGroup', 'fhcsToggleSection', 'fhcsToggleContainer', 'fhcsToggleFavoriteDetails',
+   'fhcsPinFilter', 'fhcsCycleGroup', 'fhcsOpenConcentration', 'toggleExpand', 'showDocument'];
+
+/**
  * dnd5e 6.0's character sheet actions (`DEFAULT_OPTIONS.actions`), which our markup relies on. The Quench tests
  * fail if dnd5e drops one. See docs/research/dnd5e-6.0-sheet.md.
  */

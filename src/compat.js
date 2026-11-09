@@ -1257,6 +1257,25 @@ export function biographyFacts(sheet, context)
 }
 
 /**
+ * What the Limited view shows (SCOPE §4.15): dnd5e's limited parts' portrait and biography, and the public biography
+ * enriched without secrets (dnd5e's character limited header leaves it out; its NPC one shows it).
+ */
+export async function limitedFacts(sheet, context, moduleId)
+{
+   const actor = sheet.actor;
+   const biography = actor.system.details?.biography ?? {};
+   const enrich = (html) => (html ? foundry.applications.ux.TextEditor.implementation.enrichHTML(html, { secrets: false, relativeTo: actor }) : '');
+   return {
+      name: actor.name,
+      portrait: await sheet._preparePortrait(context),
+      frame: actor.getFlag(moduleId, PORTRAIT_FLAG) ?? null,
+      shape: actor.getFlag(moduleId, SHAPE_FLAG) ?? null,
+      public: await enrich(biography.public),
+      biography: context.enriched?.value ?? await enrich(biography.value)
+   };
+}
+
+/**
  * After dnd5e's advancement finishes (`dnd5e.advancementManagerComplete`), records the order of class levels: the
  * recorded order, brought up to date by `reconcile` (src/sheet/header.js levelOrder).
  */

@@ -14,6 +14,7 @@ import { spellbookView } from '../src/sheet/spellbook.js';
 import { featuresView } from '../src/sheet/features.js';
 import { effectsView } from '../src/sheet/effects.js';
 import { biographyView } from '../src/sheet/biography.js';
+import { limitedView } from '../src/sheet/limited.js';
 import { format, localize, template } from './templates.mjs';
 
 /** A usage card's context as FHCSUsageMessageData#_prepareContext builds it, with overrides. */
@@ -520,6 +521,17 @@ const LONG_BIO = ['Born to a clan of smiths in the Thunderforge holds, Brenna Co
    'The temple of Lathander took her in when the clan called the vision madness. Twenty years of service followed: field hospitals in the Goblin Wars, plague wards in Neverwinter, and one ill-advised pilgrimage with a bard who still owes her forty gold.',
    'Notes: owes the Harpers a favour; Brother Aldo knows her real name; https://example.invalid/an-unbroken-very-long-link-that-must-wrap-somewhere-sensible'];
 
+/** The Limited view's two parts as the sheet draws them, one after the other. */
+function limited(over = {})
+{
+   const context = { fhcsLimited: limitedView({
+      name: 'Brother Aldric', portrait: { src: TALL, isVideo: false, token: false }, frame: null, shape: 'square',
+      public: '', biography: '<p>Raised in the shadow of the Silver Vigil\'s great forge, Aldric swore his first oath at twelve and his second at forty, after the fall of Kharak Dun.</p><p>He walks the roads now, mending what he can.</p>',
+      ...over }, { localize }) };
+   // The body in Foundry's tab body, padded, as dnd5e's limited part container puts it.
+   return `${template('sheet/limited-header')(context)}<div class="tab-body">${template('sheet/limited-body')(context)}</div>`;
+}
+
 export const CASES = [
    { name: 'biography', template: 'sheet/biography', context: biography({}, { ...CHARACTERISTICS, faith: '', skin: '' }) },
    {
@@ -536,6 +548,11 @@ export const CASES = [
       context: biography({ editable: false, boxes: biographyFacts().boxes.map((b) => ({ ...b, value: '' })), biography: { ...biographyFacts().biography, enriched: '' } },
          Object.fromEntries(Object.keys(CHARACTERISTICS).map((k) => [k, ''])))
    },
+   // The Limited view (SCOPE §4.15): a long name, a public line and the biography; then round art and nothing written.
+   { name: 'limited', html: limited({ name: 'Brother Aldric Thorncastle of the Silver Vigil', shape: 'square',
+      public: '<p>A broad dwarf in a pilgrim\'s cloak, a holy symbol worn smooth at his throat.</p>' }) },
+   { name: 'theme-forge-limited', look: 'forge', html: limited({ public: '<p>A broad dwarf in a pilgrim\'s cloak.</p>' }) },
+   { name: 'limited-round-empty', html: limited({ name: 'Mira', shape: 'round', portrait: { src: ROUND, isVideo: false, token: true }, public: '', biography: '' }) },
    { name: 'effects', template: 'sheet/effects', context: effects() },
    {
       name: 'effects-long', template: 'sheet/effects',
