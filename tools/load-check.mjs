@@ -109,6 +109,30 @@ const systemModels = { usage: SystemUsageMessageData, check: SystemCheckMessageD
 globalThis.CONFIG = { ChatMessage: { dataModels: { ...systemModels } }, Item: { dataModels: { weapon: {}, spell: {}, feat: {}, container: {} } } };
 
 const problems = [];
+/**
+ * Every partial a part's template includes, at any depth, is loaded with the part (Foundry finds no partial it hasn't
+ * loaded) and exists.
+ */
+function missingPartials(part, name)
+{
+   const loaded = new Set(part.templates ?? []);
+   const pending = [part.template];
+   const seen = new Set();
+   while (pending.length)
+   {
+      const path = pending.pop();
+      if (seen.has(path)) { continue; }
+      seen.add(path);
+      const file = new URL(`../${path.replace(/^modules\/fhcs\//, '')}`, import.meta.url);
+      if (!existsSync(file)) { problems.push(`${name}: partial ${path} is missing`); continue; }
+      for (const [, inc] of readFileSync(file, 'utf8').matchAll(/{{>\s*"(modules\/fhcs\/[^"]+)"/g))
+      {
+         if (!loaded.has(inc)) { problems.push(`${name} includes ${inc} but does not load it`); }
+         pending.push(inc);
+      }
+   }
+}
+
 try
 {
    await import(new URL('../src/main.js', import.meta.url));
@@ -195,6 +219,15 @@ else
       else if (!existsSync(new URL(`../${npcParts[id].template.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`NPC part template ${npcParts[id].template} is missing`); }
    }
    if (npcParts.tabs?.classes) { problems.push('the NPC tab row still carries dnd5e\'s tab classes'); }
+   // Abilities, the NPC's everything tab (dnd5e's "features" part): our template, the whole tab scrolling, and every
+   // partial it includes loaded with it (Foundry finds no partial it hasn't loaded).
+   const abilities = npcParts.features;
+   if (!abilities?.template?.endsWith('/npc-abilities.hbs')) { problems.push(`the NPC features part is ${abilities?.template}, not our Abilities tab`); }
+   else
+   {
+      if (abilities.scrollable?.join() !== '') { problems.push('the NPC Abilities tab does not scroll as one'); }
+      missingPartials(abilities, 'NPC Abilities');
+   }
    const npcClasses = npcSheet.prototype._initializeApplicationOptions.call(Object.create(npcSheet.prototype), {}).classes;
    if (npcClasses.some((name) => ['dnd5e2', 'vertical-tabs', 'hidden-title'].includes(name))) { problems.push('dnd5e\'s look classes reach the NPC window'); }
    // dnd5e has no inspiration or lair action an NPC can use: ours stand in.
@@ -302,6 +335,8 @@ else
    if (!parts.biography?.template.startsWith('modules/fhcs/')) { problems.push('the biography part is still dnd5e\'s'); }
    if (!parts.biography?.templates?.some((p) => p.endsWith('/bio-box.hbs'))) { problems.push('the biography part does not load bio-box.hbs'); }
    if (parts.biography?.scrollable?.join() !== '') { problems.push('the biography tab lost dnd5e\'s scrolling'); }
+   // Partials included by a tab, at any depth, must load with its part.
+   for (const [id, part] of Object.entries(parts).filter(([, p]) => p.template.startsWith('modules/fhcs/'))) { missingPartials(part, `the ${id} part`); }
    // Partials included by a tab must load with its part: each list tab's rows and the shared search bar.
    for (const [id, row] of [['inventory', 'item-row'], ['spells', 'spell-row'], ['features', 'feature-row']])
    {

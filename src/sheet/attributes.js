@@ -12,7 +12,10 @@ const GROUP_ORDER = ['inventory', 'features', 'spell', 'effects', 'skills', 'oth
 const PROF_MARKS = { 0: 'none', 0.5: 'half', 1: 'full', 2: 'expert' };
 
 /** Traits in Classic's order, by dnd5e trait key, with the label key dnd5e doesn't give for some. */
-export const TRAIT_ORDER = ['senses', 'languages', 'di', 'dr', 'dv', 'dm', 'ci', 'weapon', 'armor', 'tool'];
+export const TRAIT_ORDER = ['senses', 'languages', 'di', 'dr', 'dv', 'dm', 'ci', 'weapon', 'armor', 'tool', 'gear', 'treasure', 'habitat'];
+
+/** Traits set in a window of dnd5e's own (`showConfiguration`'s data-config), not a trait config; gear is items. */
+const TRAIT_CONFIGS = { senses: 'senses', treasure: 'treasure', habitat: 'habitat', gear: null };
 
 /** @returns {number} Where a group sorts: spell levels by level inside the spell slot. */
 function groupRank(key)
@@ -61,7 +64,7 @@ export function attributesView(facts, { format, localize })
          // A short label, so the label column stays narrow (user's mockup, 2026-10-27); dnd5e's full name stays in the gear's.
          key: t.key, title: localize(`FHCS.Attributes.TraitShort.${t.key}`), text: t.values.length ? t.values.join(', ') : '—', empty: !t.values.length,
          // Each trait's gear opens dnd5e's window for it; senses have their own (`data-config`), the rest go by trait.
-         config: t.key === 'senses' ? 'senses' : '', trait: t.key === 'senses' ? '' : t.key,
+         config: TRAIT_CONFIGS[t.key] ?? '', trait: t.key in TRAIT_CONFIGS ? '' : t.key, noConfig: TRAIT_CONFIGS[t.key] === null,
          configLabel: format('FHCS.Attributes.TraitConfig', { trait: t.title }),
          // Tools roll (user, 2026-11-08): each a button for dnd5e's `roll` action, its bonus beside its name.
          rolls: (t.rolls ?? []).map((r, i, all) => ({ key: r.key, label: r.label, mod: signed(r.total), last: i === all.length - 1,

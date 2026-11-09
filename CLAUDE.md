@@ -134,6 +134,7 @@ Hooks (`.claude/settings.json`, scripts in `.claude/hooks/`): dependencies insta
 - **Foundry puts the interface's mode on the page and each window's own on the window** (`.themed.theme-light` inside `body.theme-dark`): a bare `.theme-dark .fhcs-sheet` reads the page's. Dark selectors add `:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))`, as dnd5e's `@scope (.theme-dark) to (.themed)` (not `@scope` itself: its proximity rule would let base tokens beat a theme's). The layout check puts every window in an interface of the other mode.
 - **A theme's light token block reaches dark mode too** unless its dark block sets the same token (Forge's darker success green showed on dark iron).
 - **dnd5e's advancement wizard writes back the whole actor when it finishes** (`#complete`, `diff: false`), from the copy it took on opening: a test that leaves one finishing on its own loses whatever the next test wrote (an effect favorite, 2026-11-09). Wait for `dnd5e.advancementManagerComplete` or close the wizard before the test ends.
+- **A column that gives way where a width container can't go** (around text fields): narrower than 700px the sheet carries `data-fhcs-narrow` (`_updatePosition`), and the layout check marks its narrow frames the same way.
 - **Headless Chromium has no hyphenation dictionary:** "Dragonbo / rn" in a screenshot is the harness, not the sheet.
 
 ### Checks and tests

@@ -187,8 +187,58 @@ const LICH_HEADER = (inside = false, over = {}) => npcHeader(LICH(inside), {
 const NPC_TABS = Object.fromEntries(['features', 'inventory', 'spells', 'effects', 'biography', 'specialTraits']
    .map((id, i) => [id, { id, label: ['Features', 'Inventory', 'Spells', 'Effects', 'Biography', 'Special Traits'][i], active: id === 'features' }]));
 const npcTabs = (mode) => ({ fhcsTabs: { ...tabRow(NPC_TABS, mode, localize, NPC_TAB_NAMES, NPC_TAB_ORDER),
-   inspiration: inspirationBar({ on: true, own: true, bank: null, linkable: INSPIRE_ITEMS }, mode, { localize, format }),
-   settingsGear: mode.editing ? { label: localize('FHCS.Attributes.SpecialTraits') } : undefined } });
+   inspiration: inspirationBar({ on: true, own: true, bank: null, linkable: INSPIRE_ITEMS }, mode, { localize, format }) } });
+
+/**
+ * An NPC's Abilities tab (SCOPE §4.13, 2026-11-09): skills and traits (gear, treasure, habitat too), then features in
+ * dnd5e's activation sections, weapons among them; a lich with many, a Bandit Captain with few.
+ */
+const NPC_SECTIONS = [['passive', 'Features'], ['action', 'Actions'], ['bonus', 'Bonus Actions'], ['reaction', 'Reactions'],
+   ['legendary', 'Legendary Actions'], ['lair', 'Lair Actions']].map(([id, label]) => ({ id, label, group: 'activation', value: id }));
+const npcFeat = (name, fill, activation, over = {}) => feat(name, fill, 'other', { activation, ...over });
+const NPC_TRAITS = (over = []) => [
+   { key: 'senses', title: 'Senses', values: ['Passive Perception 10'] },
+   { key: 'languages', title: 'Languages', values: ['Common', 'Thieves\u2019 Cant'] },
+   { key: 'di', title: 'Damage Immunities', values: [] },
+   { key: 'dr', title: 'Damage Resistances', values: [] },
+   { key: 'ci', title: 'Condition Immunities', values: [] },
+   { key: 'gear', title: 'Gear', values: ['Scimitar \u00d72', 'Dagger', 'Studded Leather Armor'] },
+   { key: 'treasure', title: 'Treasure', values: ['Individual'] },
+   { key: 'habitat', title: 'Habitat', values: ['Urban', 'Forest'] },
+   ...over
+];
+// One Traits panel and nothing to order it against: no move arrows (as the sheet draws it).
+const npcAbilities = (opts) =>
+{
+   const { fhcsAttributesFacts, ...rest } = npcAbilitiesRaw(opts);
+   return { ...rest, fhcsAttributes: { ...attributesView(fhcsAttributesFacts, { format, localize }), traitsMove: null } };
+};
+const npcAbilitiesRaw = ({ editing = false, lich = false } = {}) => ({
+   tab: { id: 'features', group: 'primary', cssClass: 'active' }, rollableClass: 'rollable',
+   fhcsAttributesFacts: attributesFacts({ favorites: [], resources: [], slots: {}, editing,
+      traits: lich ? NPC_TRAITS().map((t) => ({ ...t, values: { senses: ['Truesight 120 ft', 'Passive Perception 19'],
+         languages: ['Abyssal', 'Common', 'Draconic', 'Infernal'], di: ['Necrotic', 'Poison'], dr: ['Cold', 'Lightning'],
+         ci: ['Charmed', 'Exhaustion', 'Frightened', 'Paralyzed', 'Poisoned'], gear: [], treasure: ['Arcana', 'Relics'], habitat: ['Any'] }[t.key] ?? t.values })) : NPC_TRAITS() }),
+   fhcsFeatures: featuresView({ ...featuresFacts({ editing }), npc: true, grouping: 'activation', sections: NPC_SECTIONS,
+      filters: [{ key: 'action', group: '', label: 'Action' }, { key: 'legendary', group: '', label: 'Legendary' }],
+      features: lich ? [
+         npcFeat('Legendary Resistance (4/Day, or 5/Day in Lair)', '#6a3a8a', 'passive'),
+         npcFeat('Spirit Jar', '#3a2a5a', 'passive'),
+         npcFeat('Multiattack', '#5a3a7a', 'action', { usage: '1 Action' }),
+         npcFeat('Eldritch Burst', '#7a4a9a', 'action', { usage: '1 Action' }),
+         npcFeat('Paralyzing Touch', '#3a5a7a', 'action', { usage: '1 Action' }),
+         npcFeat('Protective Magic', '#4a4a8a', 'reaction', { usage: '1 Reaction', uses: uses(1, 1), recovery: 'Start of Turn' }),
+         npcFeat('Deathly Teleport', '#3a2a5a', 'legendary', { usage: '1 Legendary Action' }),
+         npcFeat('Disrupt Life', '#5a2a3a', 'legendary', { usage: '2 Legendary Actions', recharge: { cooldown: true, label: 'Recharge [5\u20136]' } }),
+         npcFeat('Frightening Gaze', '#6a3a3a', 'legendary', { usage: '1 Legendary Action' })
+      ] : [
+         npcFeat('Pack Tactics', '#5a7a3a', 'passive'),
+         npcFeat('Multiattack', '#8a3a2a', 'action', { usage: '1 Action' }),
+         npcFeat('Scimitar', '#8a8a9a', 'action', { usage: '1 Action' }),
+         npcFeat('Dagger', '#6a6a7a', 'action', { usage: '1 Action' }),
+         npcFeat('Parry', '#5a5a8a', 'reaction', { usage: '1 Reaction' })
+      ] }, { format, localize })
+});
 
 /** The header's second row: the HP band and the cards share its top and bottom (SCOPE §5.2 rule 1). */
 const HEADER_ALIGN = [['.fhcs-portrait-band', 'top', '.fhcs-origin-card', 'top'], ['.fhcs-portrait-band', 'bottom', '.fhcs-origin-card', 'bottom'],
@@ -684,6 +734,9 @@ export const CASES = [
       legres: { max: 1, value: 1, source: 1 }, lair: { has: false, inside: false, initiative: 20 } })) },
    { name: 'npc-header-editing', template: 'sheet/header', context: { ...npcHeader(npcFacts()), editable: true } },
    { name: 'npc-tabs', template: 'sheet/tabs', context: npcTabs({ canEdit: true, editing: false }) },
+   { name: 'npc-abilities', template: 'sheet/npc-abilities', context: npcAbilities(), rows: '.fhcs-skill, .fhcs-trait-row, .fhcs-item-row' },
+   { name: 'npc-abilities-lich', template: 'sheet/npc-abilities', context: npcAbilities({ lich: true }) },
+   { name: 'npc-abilities-lich-editing', template: 'sheet/npc-abilities', context: npcAbilities({ lich: true, editing: true }) },
    { name: 'npc-tabs-editing', template: 'sheet/tabs', context: npcTabs({ canEdit: true, editing: true }) },
    { name: 'header-tall-art', template: 'sheet/header', context: header({ portrait: { src: TALL, isVideo: false } }) },
    { name: 'header-inspired', template: 'sheet/header', context: header({ inspiration: true, exhaustion: { value: 2, max: 6 } }) },
@@ -871,7 +924,7 @@ for (const look of LOOKS)
 // every tab, edit mode, and each tray open.
 for (const name of ['features', 'effects', 'biography', 'attributes-editing', 'attributes-resource-tray', 'inventory-editing',
    'spellbook-editing', 'features-editing', 'inventory-categories', 'title-theme-tray', 'tabs-bank-big', 'tabs-inspiration-tray', 'tabs-bank-tray', 'header-editing', 'header-hp-tray', 'header-exhaustion-open',
-   'header-level-up', 'header-classes-open', 'header-milestones', 'npc-header-lich', 'npc-header-lich-editing', 'npc-tabs-editing'])
+   'header-level-up', 'header-classes-open', 'header-milestones', 'npc-header-lich', 'npc-header-lich-editing', 'npc-tabs-editing', 'npc-abilities-lich'])
 {
    const base = CASES.find((c) => c.name === name);
    CASES.push({ ...base, name: `theme-forge-${name}`, look: 'forge', sameRowsAs: undefined });

@@ -1610,6 +1610,30 @@ export function registerQuenchTests(quench)
             await until(() => actor.getFlag(MODULE_ID, 'inspired') === false, () => `spent; the flag is ${actor.getFlag(MODULE_ID, 'inspired')}`);
          });
 
+         it('opens on Abilities: skills, traits, and features by action type', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 4);
+            const [slam, sense] = await createItems([
+               { name: 'FHCS test slam', type: 'feat' },
+               { name: 'FHCS test keen sense', type: 'feat' }
+            ]);
+            await slam.createActivity('utility', { activation: { type: 'action' } }, { renderSheet: false });
+            const row = (item) => sheet.element.querySelector(`.fhcs-npc-abilities [data-item-id="${item.id}"]`);
+            const home = (item) => row(item)?.closest('.items-section')?.dataset.fhcsSection;
+            await settled();
+            assert.strictEqual(sheet.tabGroups.primary, 'features', `Abilities is open; the tab is ${sheet.tabGroups.primary}`);
+            find('.fhcs-npc-abilities .fhcs-skills [data-key="prc"]', () => 'no Perception row in the skills column');
+            find('.fhcs-npc-abilities .fhcs-traits-panel', () => 'no Traits panel');
+            await until(() => home(slam) === 'action' && home(sense) === 'passive',
+               () => `dnd5e's sections: the slam under Actions, the sense under Features; found ${home(slam)} and ${home(sense)}; the sections drawn: ${[...sheet.element.querySelectorAll('.fhcs-npc-abilities .items-section')].map((el) => el.dataset.fhcsSection).join(', ')}`);
+            assert.isNull(sheet.element.querySelector('.fhcs-npc-abilities .fhcs-toggle-fav'), 'no favorite toggles: dnd5e gives NPCs none');
+            const [skill] = await clickReaches('.fhcs-npc-abilities [data-key="prc"] [data-action="roll"]', 'dnd5e.preRollSkill');
+            assert.strictEqual(skill?.skill, 'prc', `a skill rolls from its row; dnd5e got ${skill?.skill}`);
+            const [activity] = await clickReaches(`.fhcs-npc-abilities [data-item-id="${slam.id}"] [data-action="use"]`, 'dnd5e.preUseActivity');
+            assert.strictEqual(activity?.item?.id, slam.id, 'the picture uses the feature');
+            await actor.deleteEmbeddedDocuments('Item', [slam.id, sense.id]);
+         });
+
          it('takes a CR as dnd5e writes it, in edit mode', async function ()
          {
             await click('.fhcs-tabs [data-action="changeMode"]');
@@ -1618,9 +1642,9 @@ export function registerQuenchTests(quench)
             await until(() => actor.system.details.cr === 0.5, () => `CR ½ saved as 0.5; CR is ${actor.system.details.cr}`);
             await enter('.fhcs-header [name="system.resources.legres.max"]', '3');
             await until(() => actor.system._source.resources.legres.max === 3, () => `legendary resistances most 3; it is ${actor.system._source.resources.legres.max}`);
-            await click('.fhcs-tabs .fhcs-tabs-gear');
-            await until(() => sheet.tabGroups.primary === 'specialTraits', () => `the gear opens Special Traits; the tab is ${sheet.tabGroups.primary}`);
-            await click('.fhcs-tabs .fhcs-tabs-gear');
+            await click('.fhcs-npc-abilities .fhcs-special-traits');
+            await until(() => sheet.tabGroups.primary === 'specialTraits', () => `the Traits gear opens Special Traits; the tab is ${sheet.tabGroups.primary}`);
+            await click('.fhcs-settings-head [data-action="fhcsSpecialTraits"]');
             await until(() => sheet.tabGroups.primary === 'features', () => `the gear closes it, back to Abilities; the tab is ${sheet.tabGroups.primary}`);
          });
       });

@@ -6,6 +6,8 @@
 export const SPELL_PINS = ['action', 'bonus', 'reaction', 'concentration', 'prepared'];
 export const INVENTORY_PINS = ['action', 'bonus', 'equipped'];
 export const FEATURE_PINS = ['action', 'bonus', 'reaction'];
+/** An NPC's, as dnd5e's NPC filters (npc-sheet.mjs `_prepareFeaturesContext`; the board, 2026-11-09). */
+export const NPC_FEATURE_PINS = ['action', 'bonus', 'reaction', 'legendary', 'lair'];
 
 /**
  * Pinned filter buttons beside a tab's search. dnd5e's filters are three-state: a key includes, `!key` excludes.

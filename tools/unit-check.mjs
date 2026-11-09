@@ -465,6 +465,21 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    if (row.tabs.map((t) => t.label).join() !== 'Abilities,inventory') { problems.push(`NPC tabs: ${row.tabs.map((t) => t.label)}`); }
 }
 
+// An NPC's features (SCOPE §4.13, 2026-11-09): one grouping, by activation, no switch; no favorites; dnd5e's NPC
+// pins; empty sections show only in edit mode, to add to.
+{
+   const sections = ['passive', 'action', 'bonus'].map((id) => ({ id, label: id, group: 'activation', value: id }));
+   const facts = { npc: true, sections, features: [{ id: 'a', name: 'Slam', activation: 'action' }, { id: 'b', name: 'Keen', activation: 'passive' }],
+      columns: { favorite: true }, folded: [], order: [] };
+   const play = featuresView(facts, { format, localize });
+   const edit = featuresView({ ...facts, editing: true }, { format, localize });
+   const shown = (v) => v.sections.filter((x) => !x.hidden).map((x) => `${x.id}:${x.items.map((r) => r.name).join('+')}`).join(' ');
+   if (shown(play) !== 'passive:Keen action:Slam') { problems.push(`NPC features in play: ${shown(play)}`); }
+   if (shown(edit) !== 'passive:Keen action:Slam bonus:') { problems.push(`NPC features in edit mode: ${shown(edit)}`); }
+   if (play.columns.favorite || play.groupings.length || edit.columnToggles.some((t) => t.key === 'favorite')) { problems.push('an NPC\'s features offer favorites or a grouping switch'); }
+   if (play.pins.map((p) => p.key).join() !== 'action,bonus,reaction,legendary,lair') { problems.push(`NPC pins: ${play.pins.map((p) => p.key)}`); }
+}
+
 // Every speed with a value shows, walking first and bare (user, 2026-10-27).
 {
    const base = { name: 'K', portrait: {}, classes: [], levelOrder: [], level: 1, leveling: 'xp', xp: null, origin: [],

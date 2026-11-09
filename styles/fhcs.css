@@ -2550,6 +2550,16 @@
 .fhcs-sheet .fhcs-state-fill { fill: currentColor; stroke: none; }
 .fhcs-sheet .fhcs-empty { margin: 0; padding: var(--fhcs-s2); }
 
+/* ---------- An NPC's Abilities tab (SCOPE §4.13, 2026-11-09): Attributes' columns, the Features list in the main one ---------- */
+
+/* The whole tab scrolls, so the list in it neither scrolls nor keeps a scrollbar's room of its own. */
+.fhcs-sheet .fhcs-npc-abilities .fhcs-items { flex: none; overflow: visible; scrollbar-gutter: auto; }
+.fhcs-sheet .fhcs-npc-features .fhcs-list-element > :not(.fhcs-items) { padding-right: 0; }
+/* The main column is narrower than a list tab: Uses keeps room for "Recharge", and Recovery gives way first (§5.2:
+   lesser columns give way at 644px; the board dropped it there). */
+.fhcs-sheet .fhcs-npc-features .fhcs-col-uses { min-width: 72px; }
+.fhcs-sheet[data-fhcs-narrow] .fhcs-npc-features .fhcs-col-recovery { display: none; }
+
 /* ---------- List tabs: Inventory (SCOPE §4.6) and Spellbook (§4.7) ---------- */
 
 /* The item list scrolls; the search bar above and what sits around the list stay in view. */
@@ -3314,9 +3324,6 @@
 
 /* dnd5e writes an NPC's XP into the title bar (npc-sheet.mjs `_renderFrame`); ours is in the header. */
 .fhcs-sheet .window-header .cr-xp { display: none; }
-
-/* An NPC's Special Traits gear, after the tabs (edit mode). */
-.fhcs-sheet .fhcs-tabs-gear { flex: none; }
 
 .fhcs-sheet .fhcs-class-row
 {

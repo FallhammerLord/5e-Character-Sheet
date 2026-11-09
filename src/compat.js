@@ -195,7 +195,8 @@ function npcFacts(actor)
 }
 
 /** dnd5e's label keys for each trait on the Attributes tab (config.mjs `DND5E.traits`, plus senses and languages). */
-const TRAIT_TITLES = { senses: 'FHCS.Attributes.Senses', languages: 'FHCS.Attributes.Languages' };
+const TRAIT_TITLES = { senses: 'FHCS.Attributes.Senses', languages: 'FHCS.Attributes.Languages', gear: 'FHCS.Attributes.TraitShort.gear',
+   treasure: 'FHCS.Attributes.TraitShort.treasure', habitat: 'FHCS.Attributes.TraitShort.habitat' };
 
 /** @returns {string} An HTML subtitle as plain text: dnd5e joins its parts with `&bull;`. */
 const plainSubtitle = (html) => String(html ?? '').replace(/\s*&bull;\s*/g, ' \u00b7 ').replace(/<[^>]*>/g, '').trim();
@@ -232,13 +233,25 @@ export async function attributesFacts(sheet, context, { folded, open = new Set()
          rolls: tools.map((t) => ({ key: t.key, label: t.label, total: t.total ?? 0 })) }))
    ];
 
+   // An NPC's own traits (SCOPE §4.13, 2026-11-09): gear, treasure and habitat, as dnd5e's NPC sidebar gathers them
+   // (npc-sheet.mjs `_prepareSidebarContext`). NPCs have no favorites and no legacy resources.
+   const npc = actor.type === 'npc';
+   if (npc)
+   {
+      const side = await sheet._prepareSidebarContext?.({ ...context }, {}) ?? {};
+      const labels = (list) => (list ?? []).map((v) => [v.label, v.value].filter((x) => x !== undefined && x !== '').join(' \u00d7'));
+      traits.push({ key: 'gear', title: title('gear'), values: labels(side.gear) },
+         { key: 'treasure', title: title('treasure'), values: labels(side.treasure) },
+         { key: 'habitat', title: title('habitat'), values: labels(side.habitat) });
+   }
+
    // dnd5e's three legacy resources, read from the actor (dnd5e lists one as a favorite only once it has a label and a
    // max); a panel linked to an item with uses shows that item instead (user, 2026-10-28, SCOPE §4.10).
-   const resources = RESOURCE_KEYS.map((key) => resourceFacts(actor, key));
+   const resources = npc ? [] : RESOURCE_KEYS.map((key) => resourceFacts(actor, key));
    const linkable = actor.items.filter((item) => item.system.uses?.max).map(docFacts)
       .sort((a, b) => a.name.localeCompare(b.name));
    const favorites = [];
-   for (const f of await sheet._prepareFavorites(context))
+   for (const f of npc ? [] : await sheet._prepareFavorites(context))
    {
       if (f.type === 'resource') { continue; }
       const item = f.itemId ? actor.items.get(f.itemId) : null;
@@ -1184,9 +1197,12 @@ export async function featuresFacts(sheet, context, { columns })
 {
    const actor = sheet.actor;
    const ctxs = context.itemContext ?? {};
+   // An NPC's sections are by activation alone, no grouping switch (npc-sheet.mjs `_prepareFeaturesContext`): each
+   // row's section is its `ctx.group` (`_prepareItem`), weapons among them.
+   const npc = actor.type === 'npc';
    const sections = (context.sections ?? []).map((s) =>
    {
-      const [group, value] = Object.entries(s.groups ?? {})[0] ?? ['origin', 'other'];
+      const [group, value] = Object.entries(s.groups ?? {})[0] ?? (npc ? ['activation', s.id] : ['origin', 'other']);
       return { id: s.id, label: game.i18n.localize(s.label), group, value };
    });
 
@@ -1205,7 +1221,7 @@ export async function featuresFacts(sheet, context, { columns })
       features.push({
          ...docFacts(item),
          origin: own || (ctx.groups?.origin ?? 'other'),
-         activation: own || (ctx.groups?.activation ?? 'passive'),
+         activation: own || (ctx.groups?.activation ?? ctx.group ?? 'passive'),
          expanded: !!ctx.isExpanded,
          summary: ctx.isExpanded && ctx.expanded ? await renderTemplate(ITEM_SUMMARY, ctx.expanded) : '',
          uses: uses.hasUses && !uses.hasRecharge ? { value: uses.value ?? 0, max: uses.max, prop: uses.prop } : null,
@@ -1225,7 +1241,8 @@ export async function featuresFacts(sheet, context, { columns })
       sections,
       features,
       columns,
-      grouping: listGrouping(actor, 'features'),
+      grouping: npc ? 'activation' : listGrouping(actor, 'features'),
+      npc,
       editing: sheet.isEditMode,
       activeFilters: listFilters(sheet, 'features'),
       filters: (controls.filters ?? []).map((f) => ({ key: f.key, group: f.group ?? '', label: game.i18n.localize(f.label) })),

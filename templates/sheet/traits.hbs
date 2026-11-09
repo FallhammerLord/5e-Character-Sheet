@@ -1,0 +1,39 @@
+{{!-- The Traits panel (SCOPE §4.3), shared by the Attributes tab and an NPC's Abilities tab (§4.13). Takes the
+      Attributes view (attributesView). --}}
+      {{!-- Traits beside the skills, at the column's top (user, 2026-10-27): its heading on the Skills heading's line;
+            it folds to one line of what's set, remembered like a favorites group. Every trait in both modes, one line
+            each; edit mode adds a gear in the last column. --}}
+      <div class="fhcs-group fhcs-frame fhcs-traits-panel fhcs-plate" data-fhcs-group="traits" data-fhcs-section="traits">
+         <div class="fhcs-group-head">
+            <button type="button" class="fhcs-group-toggle" data-action="fhcsToggleGroup" aria-expanded="{{#if traitsOpen}}true{{else}}false{{/if}}">
+               <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+               <span class="fhcs-label">{{ text.traits }}</span>
+            </button>
+            <span class="fhcs-body fhcs-muted fhcs-line fhcs-traits-summary" data-fhcs-folded{{#if traitsOpen}} hidden{{/if}}>{{ traitsSummary }}</span>
+            {{#if traitsMove}}{{> "modules/fhcs/templates/sheet/section-move.hbs" id="traits" move=traitsMove }}{{/if}}
+            {{#if editing}}
+            {{!-- dnd5e's Special Traits, a settings page: off the tab row since 2026-10-28 (the row's room went to
+                  inspiration), opened from here like the other settings; at the bar's right end (user, 2026-11-08). --}}
+            <button type="button" class="fhcs-toggle fhcs-gear-button fhcs-special-traits" data-action="fhcsSpecialTraits"
+                    aria-label="{{ text.specialTraits }}" data-fhcs-tip="{{ text.specialTraits }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>
+            {{/if}}
+         </div>
+         <dl class="fhcs-traits"{{#unless traitsOpen}} hidden{{/unless}}>
+            {{#each traits}}
+            {{!-- One row per trait, a ledger like the favorites groups' (user, 2026-10-28: "the same styling as the other
+                  categories"); the rows share the list's columns. --}}
+            <div class="fhcs-trait-row">
+               <dt class="fhcs-label fhcs-muted">{{ title }}</dt>
+               {{#if rolls.length}}
+               {{!-- Tools roll (user, 2026-11-08): dnd5e's `roll` action finds the tool by the button's own data-key. --}}
+               <dd class="fhcs-body fhcs-trait-rolls">{{#each rolls}}<button type="button" class="fhcs-trait-roll {{ @root.rollableClass }}" data-action="roll" data-type="tool" data-key="{{ key }}"
+                       aria-label="{{ rollLabel }}" data-fhcs-tip="{{ rollLabel }}"><span class="fhcs-trait-roll-name">{{ label }}</span> {{ mod }}</button>{{#unless last}}<span aria-hidden="true">, </span>{{/unless}}{{/each}}</dd>
+               {{else}}
+               <dd class="fhcs-body{{#if empty}} fhcs-muted{{/if}}">{{ text }}</dd>
+               {{/if}}
+               <dd class="fhcs-trait-gear">{{#if ../editing}}{{#unless noConfig}}<button type="button" class="fhcs-toggle fhcs-gear-button fhcs-muted" data-action="showConfiguration"
+                       {{#if config}}data-config="{{ config }}"{{else}}data-trait="{{ trait }}"{{/if}} aria-label="{{ configLabel }}" data-fhcs-tip="{{ configLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/unless}}{{/if}}</dd>
+            </div>
+            {{/each}}
+         </dl>
+      </div>

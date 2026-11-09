@@ -1,0 +1,54 @@
+{{!-- The Skills panel (SCOPE §4.3), shared by the Attributes tab and an NPC's Abilities tab (§4.13). Takes the
+      Attributes view (attributesView). --}}
+      <div class="fhcs-panel fhcs-plate">
+         <div class="fhcs-panel-head">
+            <span class="fhcs-label">{{ text.skills }}</span>
+            {{#if editing}}
+            <button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="skills"
+                    aria-label="{{ text.skillsConfig }}" data-fhcs-tip="{{ text.skillsConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>
+            {{/if}}
+         </div>
+         <ul class="fhcs-skills">
+            {{#each skills}}
+            {{!-- dnd5e's roll action reads the skill from the nearest data-key. --}}
+            {{!-- One row in both modes, as dnd5e builds its own (character-details.hbs, .skill-prof): the same cells, each
+                  a fixed 24px, so edit mode swaps what a cell holds and nothing else moves (SCOPE §5.2 rule 6). Play
+                  mode's mark stays drawn in edit mode too: dnd5e's proficiency cycle draws in its own shadow DOM, out of
+                  our styles' reach, so it lies over the mark unseen, takes the click and saves; the redraw shows the new
+                  mark (user's screenshots, 2026-10-27). In play the name's button covers the whole row. --}}
+            <li class="fhcs-skill{{#unless ../editing}} fhcs-skill-play{{/unless}}" data-key="{{ key }}">
+               <span class="fhcs-prof-slot">
+                  <span class="fhcs-prof-mark fhcs-prof-{{ mark }}" aria-hidden="true"></span>
+                  {{#if ../editing}}
+                  <proficiency-cycle class="fhcs-prof-cycle" type="skill" name="system.skills.{{ key }}.value" value="{{ source }}"
+                                     aria-label="{{ profLabel }}" data-fhcs-tip="{{ profLabel }}"></proficiency-cycle>
+                  {{/if}}
+               </span>
+               <button type="button" class="fhcs-skill-roll fhcs-body {{ @root.rollableClass }}" data-action="roll" data-type="skill"
+                       aria-label="{{ rollLabel }}"><span class="fhcs-skill-name">{{ label }}</span></button>
+               {{#if ../editing}}
+               {{!-- The ability opens a tray of our chips (user, 2026-10-27: the native dropdown failed contrast and its
+                     dashed underline moved the text). A small triangle under the word marks it. --}}
+               <details class="fhcs-fold fhcs-skill-ability fhcs-ability-pick" data-fold-key="skill-ability-{{ key }}">
+                  <summary class="fhcs-label fhcs-muted" aria-label="{{ abilityLabel }}" data-fhcs-tip="{{ abilityLabel }}">{{ abbr }}<svg class="fhcs-pick-mark" viewBox="0 0 8 4" aria-hidden="true"><path d="M0 0h8L4 4z"/></svg></summary>
+                  <div class="fhcs-tray fhcs-tray-row">
+                     {{#each abilities}}
+                     <button type="button" class="fhcs-chip fhcs-label{{#if selected}} fhcs-on{{/if}}" data-action="fhcsSkillAbility" data-fhcs-ability="{{ key }}"
+                             aria-pressed="{{#if selected}}true{{else}}false{{/if}}">{{ abbr }}</button>
+                     {{/each}}
+                  </div>
+               </details>
+               {{else}}
+               <span class="fhcs-label fhcs-muted fhcs-skill-ability">{{ abbr }}</span>
+               {{/if}}
+               <span class="fhcs-body fhcs-skill-mod">{{ mod }}</span>
+               {{#if ../editing}}
+               <button type="button" class="fhcs-toggle fhcs-gear-button fhcs-muted" data-action="showConfiguration" data-config="skill"
+                       aria-label="{{ configLabel }}" data-fhcs-tip="{{ configLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>
+               {{else}}
+               <span class="fhcs-label fhcs-muted fhcs-skill-passive">{{ passive }}</span>
+               {{/if}}
+            </li>
+            {{/each}}
+         </ul>
+      </div>

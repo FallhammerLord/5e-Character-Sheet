@@ -2,7 +2,7 @@
  * The Features tab's display values (SCOPE §4.8), from plain facts. Pure, like inventory.js: the unit check and the
  * layout fixtures use the same code. `compat.featuresFacts` gathers the facts from dnd5e.
  */
-import { arrangeSections, FEATURE_PINS, pinView, sectionFold } from './lists.js';
+import { arrangeSections, FEATURE_PINS, NPC_FEATURE_PINS, pinView, sectionFold } from './lists.js';
 
 /** The columns a player can show or hide, as on the other list tabs. */
 export const FEATURE_COLUMNS = ['uses', 'usage', 'recovery', 'favorite'];
@@ -36,8 +36,12 @@ export function groupingOf(saved)
  */
 export function featuresView(facts, { format, localize })
 {
-   const columns = featureColumnChoice(facts.columns);
-   const grouping = groupingOf(facts.grouping);
+   // An NPC (SCOPE §4.13, 2026-11-09): one grouping, by activation, no switch; no favorites (dnd5e gives NPCs none);
+   // its own pins; an empty section shows in edit mode, to add to.
+   const npc = !!facts.npc;
+   const columns = { ...featureColumnChoice(facts.columns), ...(npc ? { favorite: false } : {}) };
+   const grouping = npc ? 'activation' : groupingOf(facts.grouping);
+   const keys = npc ? FEATURE_COLUMNS.filter((key) => key !== 'favorite') : FEATURE_COLUMNS;
 
    const row = (f) => ({
       id: f.id,
@@ -74,7 +78,8 @@ export function featuresView(facts, { format, localize })
    const sections = arrangeSections((facts.sections ?? []).map((s) =>
    {
       const items = s.group === grouping ? rows.filter((r) => home(r) === s.value) : [];
-      return { id: s.id, label: s.label, group: s.group, value: s.value, items, hidden: !items.length, fold: sectionFold('features', s.id, facts.folded) };
+      const hidden = !items.length && !(npc && facts.editing && s.group === grouping);
+      return { id: s.id, label: s.label, group: s.group, value: s.value, items, hidden, fold: sectionFold('features', s.id, facts.folded) };
    }), facts.order, { tab: 'features', editing: !!facts.editing, format });
 
    return {
@@ -85,11 +90,11 @@ export function featuresView(facts, { format, localize })
       editing: !!facts.editing,
       filters: facts.filters ?? [],
       sorting: facts.sorting ?? [],
-      groupings: GROUPINGS.map((key) => ({ key, label: localize(`FHCS.Features.Group.${key}`) })),
-      pins: pinView(FEATURE_PINS, facts.activeFilters, localize),
+      groupings: npc ? [] : GROUPINGS.map((key) => ({ key, label: localize(`FHCS.Features.Group.${key}`) })),
+      pins: pinView(npc ? NPC_FEATURE_PINS : FEATURE_PINS, facts.activeFilters, localize),
       // The Columns menu is edit mode's; play mode keeps its place, so the search field keeps one width (SCOPE §5.2 rule 6).
       hasColumns: true,
-      columnToggles: facts.editing ? FEATURE_COLUMNS.map((key) => ({
+      columnToggles: facts.editing ? keys.map((key) => ({
          key, pressed: columns[key], label: localize(`FHCS.Features.Column.${key}`)
       })) : [],
       empty: !rows.length,

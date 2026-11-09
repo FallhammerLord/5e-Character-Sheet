@@ -1,42 +1,3 @@
-{{#*inline "fhcs-traits"}}
-      {{!-- Traits beside the skills, at the column's top (user, 2026-10-27): its heading on the Skills heading's line;
-            it folds to one line of what's set, remembered like a favorites group. Every trait in both modes, one line
-            each; edit mode adds a gear in the last column. --}}
-      <div class="fhcs-group fhcs-frame fhcs-traits-panel fhcs-plate" data-fhcs-group="traits" data-fhcs-section="traits">
-         <div class="fhcs-group-head">
-            <button type="button" class="fhcs-group-toggle" data-action="fhcsToggleGroup" aria-expanded="{{#if traitsOpen}}true{{else}}false{{/if}}">
-               <svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
-               <span class="fhcs-label">{{ text.traits }}</span>
-            </button>
-            <span class="fhcs-body fhcs-muted fhcs-line fhcs-traits-summary" data-fhcs-folded{{#if traitsOpen}} hidden{{/if}}>{{ traitsSummary }}</span>
-            {{#if traitsMove}}{{> "modules/fhcs/templates/sheet/section-move.hbs" id="traits" move=traitsMove }}{{/if}}
-            {{#if editing}}
-            {{!-- dnd5e's Special Traits, a settings page: off the tab row since 2026-10-28 (the row's room went to
-                  inspiration), opened from here like the other settings; at the bar's right end (user, 2026-11-08). --}}
-            <button type="button" class="fhcs-toggle fhcs-gear-button fhcs-special-traits" data-action="fhcsSpecialTraits"
-                    aria-label="{{ text.specialTraits }}" data-fhcs-tip="{{ text.specialTraits }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>
-            {{/if}}
-         </div>
-         <dl class="fhcs-traits"{{#unless traitsOpen}} hidden{{/unless}}>
-            {{#each traits}}
-            {{!-- One row per trait, a ledger like the favorites groups' (user, 2026-10-28: "the same styling as the other
-                  categories"); the rows share the list's columns. --}}
-            <div class="fhcs-trait-row">
-               <dt class="fhcs-label fhcs-muted">{{ title }}</dt>
-               {{#if rolls.length}}
-               {{!-- Tools roll (user, 2026-11-08): dnd5e's `roll` action finds the tool by the button's own data-key. --}}
-               <dd class="fhcs-body fhcs-trait-rolls">{{#each rolls}}<button type="button" class="fhcs-trait-roll {{ @root.rollableClass }}" data-action="roll" data-type="tool" data-key="{{ key }}"
-                       aria-label="{{ rollLabel }}" data-fhcs-tip="{{ rollLabel }}"><span class="fhcs-trait-roll-name">{{ label }}</span> {{ mod }}</button>{{#unless last}}<span aria-hidden="true">, </span>{{/unless}}{{/each}}</dd>
-               {{else}}
-               <dd class="fhcs-body{{#if empty}} fhcs-muted{{/if}}">{{ text }}</dd>
-               {{/if}}
-               <dd class="fhcs-trait-gear">{{#if ../editing}}<button type="button" class="fhcs-toggle fhcs-gear-button fhcs-muted" data-action="showConfiguration"
-                       {{#if config}}data-config="{{ config }}"{{else}}data-trait="{{ trait }}"{{/if}} aria-label="{{ configLabel }}" data-fhcs-tip="{{ configLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</dd>
-            </div>
-            {{/each}}
-         </dl>
-      </div>
-{{/inline}}
 {{#*inline "fhcs-group"}}
       {{!-- Each group folds and stays as the player left it (user, 2026-10-24); its slot pips sit outside the fold button. --}}
       <div class="fhcs-group fhcs-frame fhcs-plate" data-fhcs-group="{{ key }}" data-fhcs-section="{{ key }}">
@@ -197,58 +158,7 @@
 <section class="tab fhcs-attributes {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
    {{#with fhcsAttributes}}
    <div class="fhcs-attributes-side">
-      <div class="fhcs-panel fhcs-plate">
-         <div class="fhcs-panel-head">
-            <span class="fhcs-label">{{ text.skills }}</span>
-            {{#if editing}}
-            <button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="skills"
-                    aria-label="{{ text.skillsConfig }}" data-fhcs-tip="{{ text.skillsConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>
-            {{/if}}
-         </div>
-         <ul class="fhcs-skills">
-            {{#each skills}}
-            {{!-- dnd5e's roll action reads the skill from the nearest data-key. --}}
-            {{!-- One row in both modes, as dnd5e builds its own (character-details.hbs, .skill-prof): the same cells, each
-                  a fixed 24px, so edit mode swaps what a cell holds and nothing else moves (SCOPE §5.2 rule 6). Play
-                  mode's mark stays drawn in edit mode too: dnd5e's proficiency cycle draws in its own shadow DOM, out of
-                  our styles' reach, so it lies over the mark unseen, takes the click and saves; the redraw shows the new
-                  mark (user's screenshots, 2026-10-27). In play the name's button covers the whole row. --}}
-            <li class="fhcs-skill{{#unless ../editing}} fhcs-skill-play{{/unless}}" data-key="{{ key }}">
-               <span class="fhcs-prof-slot">
-                  <span class="fhcs-prof-mark fhcs-prof-{{ mark }}" aria-hidden="true"></span>
-                  {{#if ../editing}}
-                  <proficiency-cycle class="fhcs-prof-cycle" type="skill" name="system.skills.{{ key }}.value" value="{{ source }}"
-                                     aria-label="{{ profLabel }}" data-fhcs-tip="{{ profLabel }}"></proficiency-cycle>
-                  {{/if}}
-               </span>
-               <button type="button" class="fhcs-skill-roll fhcs-body {{ @root.rollableClass }}" data-action="roll" data-type="skill"
-                       aria-label="{{ rollLabel }}"><span class="fhcs-skill-name">{{ label }}</span></button>
-               {{#if ../editing}}
-               {{!-- The ability opens a tray of our chips (user, 2026-10-27: the native dropdown failed contrast and its
-                     dashed underline moved the text). A small triangle under the word marks it. --}}
-               <details class="fhcs-fold fhcs-skill-ability fhcs-ability-pick" data-fold-key="skill-ability-{{ key }}">
-                  <summary class="fhcs-label fhcs-muted" aria-label="{{ abilityLabel }}" data-fhcs-tip="{{ abilityLabel }}">{{ abbr }}<svg class="fhcs-pick-mark" viewBox="0 0 8 4" aria-hidden="true"><path d="M0 0h8L4 4z"/></svg></summary>
-                  <div class="fhcs-tray fhcs-tray-row">
-                     {{#each abilities}}
-                     <button type="button" class="fhcs-chip fhcs-label{{#if selected}} fhcs-on{{/if}}" data-action="fhcsSkillAbility" data-fhcs-ability="{{ key }}"
-                             aria-pressed="{{#if selected}}true{{else}}false{{/if}}">{{ abbr }}</button>
-                     {{/each}}
-                  </div>
-               </details>
-               {{else}}
-               <span class="fhcs-label fhcs-muted fhcs-skill-ability">{{ abbr }}</span>
-               {{/if}}
-               <span class="fhcs-body fhcs-skill-mod">{{ mod }}</span>
-               {{#if ../editing}}
-               <button type="button" class="fhcs-toggle fhcs-gear-button fhcs-muted" data-action="showConfiguration" data-config="skill"
-                       aria-label="{{ configLabel }}" data-fhcs-tip="{{ configLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>
-               {{else}}
-               <span class="fhcs-label fhcs-muted fhcs-skill-passive">{{ passive }}</span>
-               {{/if}}
-            </li>
-            {{/each}}
-         </ul>
-      </div>
+      {{> "modules/fhcs/templates/sheet/skills.hbs" }}
 
    </div>
 
@@ -257,7 +167,7 @@
             any is set, each favorites group; edit mode's arrows move them. With none set, edit mode draws the
             resources at the column's foot, so nothing above moves when the lock opens (rule 6). --}}
       {{#each blocks}}
-      {{#if traits}}{{> fhcs-traits .. }}{{/if}}
+      {{#if traits}}{{> "modules/fhcs/templates/sheet/traits.hbs" .. }}{{/if}}
       {{#if resources}}{{> fhcs-resources .. }}{{/if}}
       {{#if group}}{{> fhcs-group }}{{/if}}
       {{/each}}

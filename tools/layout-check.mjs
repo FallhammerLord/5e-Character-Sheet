@@ -46,10 +46,13 @@ const FRAMES = {
 /** Foundry's light and dark themes, as the page and text colors a card sits on. */
 const THEMES = { light: 'background:#f4f1ea;color:#191813', dark: 'background:#26252b;color:#e8e6e3' };
 
+/** Below this width our sheet marks itself narrow (`data-fhcs-narrow`, src/apps/CharacterSheet.js `_updatePosition`). */
+const NARROW_WIDTH = 700;
+
 /** A window like Foundry's, with the classes dnd5e, Foundry's theme and our code put on it. */
 // The window sits in an interface of the other mode: Foundry sets the interface's mode on the page and each window's own
 // on the window (user, 2026-10-29: the sheet kept the dark interface's colours with windows set to light).
-const frame = (kind, width, theme, body, { look = '', hp = null, titleBar = '', titleTray = '' } = {}) => `<div class="theme-${theme === 'light' ? 'dark' : 'light'}"><section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"${look ? ` data-fhcs-theme="${look}"` : ''}${hp === null ? '' : ` data-fhcs-hp="${hp <= 0 ? 'down' : hp <= 0.5 ? 'bloodied' : 'full'}"`}
+const frame = (kind, width, theme, body, { look = '', hp = null, titleBar = '', titleTray = '' } = {}) => `<div class="theme-${theme === 'light' ? 'dark' : 'light'}"><section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"${look ? ` data-fhcs-theme="${look}"` : ''}${kind === 'sheet' && width < NARROW_WIDTH ? ' data-fhcs-narrow' : ''}${hp === null ? '' : ` data-fhcs-hp="${hp <= 0 ? 'down' : hp <= 0.5 ? 'bloodied' : 'full'}"`}
    style="${hp === null ? '' : `--fhcs-hp:${hp};`}position:relative;width:${width}px;height:${HEIGHT}px;display:flex;flex-direction:column;border:1px solid #000;margin:8px;
    ${THEMES[theme]}">
    ${kind !== 'chat'

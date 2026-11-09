@@ -41,14 +41,18 @@ export const LIMITED_SHEET_PARTS = {
  */
 const LIST_BAR = `${MODULE_PATH}/templates/sheet/list-bar.hbs`;
 const SECTION_MOVE = `${MODULE_PATH}/templates/sheet/section-move.hbs`;
+/** Partials shared by the Attributes and Features tabs and an NPC's Abilities tab (SCOPE §4.13). */
+const SKILLS = `${MODULE_PATH}/templates/sheet/skills.hbs`;
+const TRAITS = `${MODULE_PATH}/templates/sheet/traits.hbs`;
+const FEATURES_LIST = `${MODULE_PATH}/templates/sheet/features-list.hbs`;
 const PART_OPTIONS = {
    header: { templates: [`${MODULE_PATH}/templates/sheet/level-up.hbs`, `${MODULE_PATH}/templates/sheet/gear.hbs`] },
    inventory: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/item-row.hbs`, LIST_BAR, SECTION_MOVE] },
    spells: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/spell-row.hbs`, LIST_BAR, `${MODULE_PATH}/templates/sheet/gear.hbs`, `${MODULE_PATH}/templates/sheet/conc-c.hbs`, SECTION_MOVE] },
-   features: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/feature-row.hbs`, LIST_BAR, SECTION_MOVE] },
+   features: { scrollable: ['.fhcs-items'], templates: [FEATURES_LIST, `${MODULE_PATH}/templates/sheet/feature-row.hbs`, LIST_BAR, SECTION_MOVE] },
    effects: { scrollable: ['.fhcs-items'], templates: [LIST_BAR, `${MODULE_PATH}/templates/sheet/conc-c.hbs`, SECTION_MOVE] },
    biography: { templates: [`${MODULE_PATH}/templates/sheet/bio-box.hbs`] },
-   details: { templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`, SECTION_MOVE] },
+   details: { templates: [SKILLS, TRAITS, `${MODULE_PATH}/templates/sheet/gear.hbs`, SECTION_MOVE] },
    tabs: { templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`] }
 };
 
@@ -87,6 +91,9 @@ async function toggleGroup(event, target)
 
 /** How long a theme's moment (a hit taken, a heal) stays marked on the sheet: its animation runs within it. */
 const MOMENT_MS = 650;
+
+/** Below this width the sheet is narrow (`data-fhcs-narrow`), matching the layout check's frames. */
+const NARROW_WIDTH = 700;
 
 /**
  * The sheet's state for its theme (SCOPE §4.11): the character's theme (`flags.fhcs.theme`, else the world's), the
@@ -952,6 +959,12 @@ export function makeCharacterSheet(Base)
          {
             const columns = featureColumnChoice(game.settings.get(MODULE_ID, 'featureColumns'));
             context.fhcsFeatures = featuresView({ ...await featuresFacts(this, context, { columns }), folded: folded(), order: sectionOrder(this.actor, 'features') }, i18n);
+            // An NPC's Abilities tab (SCOPE §4.13): its skills and traits beside the features.
+            if (this.actor.type === 'npc')
+            {
+               // One Traits panel and nothing to order it against: no move arrows.
+               context.fhcsAttributes = { ...attributesView({ ...await attributesFacts(this, context, { folded: folded() }), order: [] }, i18n), traitsMove: null };
+            }
          }
          if (partId === 'effects')
          {
@@ -966,8 +979,6 @@ export function makeCharacterSheet(Base)
             const mode = { canEdit: this.isEditable, editing: this.isEditMode };
             const { names, order } = this.fhcsTabNames ?? {};
             context.fhcsTabs = { ...tabRow(context.tabs, mode, i18n.localize, names, order), inspiration: inspirationBar(inspirationFacts(this.actor), mode, i18n) };
-            // An NPC's Special Traits opens from a gear on the row, in edit mode, until its Abilities tab has a Traits panel.
-            if (this.fhcsTabNames && mode.editing) { context.fhcsTabs.settingsGear = { label: i18n.localize('FHCS.Attributes.SpecialTraits') }; }
          }
          return context;
       }
@@ -1003,6 +1014,9 @@ export function makeCharacterSheet(Base)
       {
          const min = headerMinWidth(Object.keys(CONFIG.DND5E?.abilities ?? {}).length || 6);
          if (typeof position.width === 'number') { position.width = comfortWidth(position.width, min); }
+         // Narrow (under 700px, the 644 minimum's band): lesser columns give way where a width container can't be used
+         // (no container-type around text fields, CLAUDE.md). The layout check marks its narrow frames the same way.
+         if (typeof position.width === 'number') { this.element?.toggleAttribute('data-fhcs-narrow', position.width < NARROW_WIDTH); }
          const tabs = this.element?.querySelector('.fhcs-tabs');
          if (typeof position.height === 'number' && tabs && !this.minimized)
          {
@@ -1064,8 +1078,18 @@ export function makeCharacterSheet(Base)
 
 /* ---------- The NPC sheet (SCOPE §4.13, user 2026-11-09) ---------- */
 
-/** dnd5e's NPC parts we draw now: the header and the tab row. The tab bodies keep dnd5e's until their slices. */
-const NPC_OUR_PARTS = ['header', 'tabs'];
+/** dnd5e's NPC parts we draw now: the header, the tab row and Abilities. The other tab bodies keep dnd5e's until their slices. */
+const NPC_OUR_PARTS = ['header', 'tabs', 'features'];
+
+/**
+ * An NPC's own templates and part settings where they differ from the character's: Abilities (dnd5e's "features")
+ * holds the skills, traits and features, and the whole tab scrolls.
+ */
+const NPC_PART_TEMPLATES = { features: `${MODULE_PATH}/templates/sheet/npc-abilities.hbs` };
+const NPC_PART_OPTIONS = {
+   features: { scrollable: [''], templates: [SKILLS, TRAITS, FEATURES_LIST, `${MODULE_PATH}/templates/sheet/feature-row.hbs`, LIST_BAR, SECTION_MOVE,
+      `${MODULE_PATH}/templates/sheet/gear.hbs`] }
+};
 
 /** dnd5e's NPC sidebar and its collapser go: its skills and traits move to the Abilities tab (its own slice). */
 const NPC_DROPPED_PARTS = ['sidebarCollapser', 'sidebar'];
@@ -1078,10 +1102,10 @@ function npcParts(baseParts)
       .map(([id, part]) =>
       {
          if (!NPC_OUR_PARTS.includes(id)) { return [id, part]; }
-         const kept = { ...part, template: SHEET_PARTS[id] };
+         const kept = { ...part, template: NPC_PART_TEMPLATES[id] ?? SHEET_PARTS[id] };
          delete kept.classes;
          delete kept.templates;
-         return [id, { ...kept, ...PART_OPTIONS[id] }];
+         return [id, { ...kept, ...(NPC_PART_OPTIONS[id] ?? PART_OPTIONS[id]) }];
       });
    const rank = (id) => (LEADING_PARTS.includes(id) ? LEADING_PARTS.indexOf(id) : LEADING_PARTS.length);
    return Object.fromEntries(entries.sort(([a], [b]) => rank(a) - rank(b)));

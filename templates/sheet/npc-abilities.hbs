@@ -1,0 +1,16 @@
+{{!-- An NPC's Abilities tab, its everything tab (SCOPE §4.13, user 2026-11-09; Tidy Classic's NPC Abilities): the
+      skills on the left as on Attributes, then the Traits panel and every feature by dnd5e's activation sections on
+      the right. It takes dnd5e's NPC "features" part; the tab scrolls as one. --}}
+<section class="tab fhcs-attributes fhcs-npc-abilities {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
+   {{#with fhcsAttributes}}
+   <div class="fhcs-attributes-side">
+      {{> "modules/fhcs/templates/sheet/skills.hbs" }}
+   </div>
+   {{/with}}
+   <div class="fhcs-attributes-main">
+      {{#with fhcsAttributes}}{{> "modules/fhcs/templates/sheet/traits.hbs" }}{{/with}}
+      <div class="fhcs-list-tab fhcs-features fhcs-npc-features">
+         {{#with fhcsFeatures}}{{> "modules/fhcs/templates/sheet/features-list.hbs" }}{{/with}}
+      </div>
+   </div>
+</section>
