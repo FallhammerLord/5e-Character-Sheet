@@ -83,6 +83,15 @@ export function registerQuenchTests(quench)
          field.dispatchEvent(new Event('change', { bubbles: true })); // redraw-safe: after settled()
       };
 
+      /** Once the sheet has settled, starts a drag on an element and returns the data the sheet put on it. */
+      const dragFrom = async (selector) =>
+      {
+         await settled();
+         const dataTransfer = new DataTransfer();
+         find(selector).dispatchEvent(new DragEvent('dragstart', { bubbles: true, cancelable: true, dataTransfer })); // redraw-safe: after settled()
+         return dataTransfer.getData('text/plain') || dataTransfer.getData('application/json');
+      };
+
       /**
        * Creates items and returns them in the order given, matched by name: Foundry's result need not keep that order,
        * and a test that took it on trust mixed up its spells (2026-10-26).
@@ -1297,6 +1306,26 @@ export function registerQuenchTests(quench)
                'dnd5e.preUseActivity');
             assert.strictEqual(activity.item.id, axe.id, 'the picture uses the item');
             await axe.delete();
+         });
+
+         it('drags an item favorite from Attributes as the item, as onto an Enchant tray (2026-11-09)', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 3);
+            const [blade] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test blade', type: 'weapon' }]);
+            try
+            {
+               await actor.system.addFavorite({ type: 'item', id: blade.getRelativeUUID(actor) });
+               const row = `.fhcs-attributes .favorites [data-item-id="${blade.id}"]`;
+               await until(() => sheet.element.querySelector(row), 'the blade never showed as a favorite');
+               await settled();
+               assert.isTrue(find(row).classList.contains('draggable'), `the favorite row's classes: ${find(row).className}`);
+               const text = await dragFrom(row);
+               let data = null;
+               try { data = JSON.parse(text); }
+               catch { data = null; }
+               assert.deepInclude(data ?? {}, { type: 'Item', uuid: blade.uuid }, `the drag carried: ${text || 'nothing'}`);
+            }
+            finally { await blade.delete(); }
          });
 
          it('lists features by source, switches to active and passive, uses and favorites a feature', async function ()

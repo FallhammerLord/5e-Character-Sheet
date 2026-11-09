@@ -232,7 +232,9 @@ export async function attributesFacts(sheet, context, { folded, open = new Set()
          itemId: f.itemId ?? '', activityId: f.activityId ?? '', effectId: f.effectId ?? '', key: f.key ?? '',
          rollableClass: f.rollableClass ?? '', group, level: item?.type === 'spell' ? item.system.level : null, state, kind,
          // An effect's on or off (dnd5e's favorite data); a click on the row or its switch flips it (dnd5e's useFavorite).
-         toggle: f.toggle?.applicable ? { on: !!f.toggle.value } : null
+         toggle: f.toggle?.applicable ? { on: !!f.toggle.value } : null,
+         // dnd5e's own rule: item and effect favorites drag (user, 2026-11-09: onto an Enchant tray, another sheet).
+         draggable: !!f.draggable
       });
    }
 

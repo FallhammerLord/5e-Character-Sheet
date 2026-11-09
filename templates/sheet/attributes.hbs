@@ -60,7 +60,7 @@
          <ul class="fhcs-favorites favorites"{{#unless open}} hidden{{/unless}}>
             {{#each rows}}
             {{!-- dnd5e's useFavorite reads these ids from the row and the button. --}}
-            <li class="fhcs-favorite{{#if equipped}} fhcs-equipped{{/if}}{{#if prepared}} fhcs-prepared{{/if}}{{#if kind}} fhcs-kind-{{ kind }}{{/if}}{{#if expanded}} fhcs-open{{/if}}"
+            <li class="fhcs-favorite{{#if equipped}} fhcs-equipped{{/if}}{{#if prepared}} fhcs-prepared{{/if}}{{#if kind}} fhcs-kind-{{ kind }}{{/if}}{{#if expanded}} fhcs-open{{/if}}{{#if draggable}} draggable{{/if}}"
                 data-favorite-id="{{ id }}"{{#if itemId}} data-item-id="{{ itemId }}"{{/if}}{{#if key}} data-key="{{ key }}"{{/if}}
                 {{#if effectId}} data-effect-id="{{ effectId }}"{{/if}}{{#if activityId}} data-activity-id="{{ activityId }}"{{/if}}>
                {{!-- An item's picture uses it and its name opens its details, as on its own tab; anything else (a skill,
