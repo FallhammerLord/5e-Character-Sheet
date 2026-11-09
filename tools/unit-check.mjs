@@ -18,7 +18,7 @@ import { biographyView, paragraphs } from '../src/sheet/biography.js';
 import { limitedView } from '../src/sheet/limited.js';
 import { arrangeSections, categoryId, pinView } from '../src/sheet/lists.js';
 import { itemSheetView } from '../src/sheet/item.js';
-import { comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, levelOrder, levelTrack, portraitFrame, signed, tabRow, themePicker, hpBars, tempTopAfter } from '../src/sheet/header.js';
+import { comfortWidth, crText, headerMinWidth, headerView, hpPreview, inspirationBar, legendaryPips, levelOrder, levelTrack, NPC_TAB_NAMES, NPC_TAB_ORDER, npcView, portraitFrame, signed, tabRow, themePicker, hpBars, tempTopAfter } from '../src/sheet/header.js';
 import { format, localize } from './templates.mjs';
 import { sizesToKeep } from '../src/tokens/sizes.js';
 
@@ -426,6 +426,43 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
          'Type an amount, then choose']);
    }
    catch { problems.push(`HP preview: ${JSON.stringify(got)}`); }
+}
+
+// NPCs (SCOPE §4.13, 2026-11-09): CR as dnd5e writes it; legendary pips as dnd5e's (left first, data-n counting down,
+// so its togglePip spends the last one left); the legendary row only while there is any; XP and no level; their own
+// inspiration action; Features named Abilities and first.
+{
+   const i18n = { format, localize };
+   const crs = [null, 0, 0.125, 0.25, 0.5, 1, 21].map(crText);
+   try { deepStrictEqual(crs, ['\u2014', '0', '\u215b', '\u00bc', '\u00bd', '1', '21']); }
+   catch { problems.push(`CR text: ${JSON.stringify(crs)}`); }
+   const pips = legendaryPips({ max: 3, value: 2 }, 'Legendary action', format).map((p) => [p.n, p.filled]);
+   try { deepStrictEqual(pips, [[2, true], [1, true], [0, false]]); }
+   catch { problems.push(`legendary pips: ${JSON.stringify(pips)}`); }
+   const plain = { cr: 2, crSource: 2, xp: 450, xpLabel: '450', legact: { max: 0, value: 0, source: 0 }, legres: { max: 0, value: 0, source: 0 },
+      modern: true, lair: { has: false, inside: false, initiative: null } };
+   if (npcView(plain, 7, i18n).legendary.shows) { problems.push('an NPC without legendary actions, resistances or a lair shows the legendary row'); }
+   const lich = npcView({ ...plain, cr: 21, legact: { max: 4, value: 3, source: 3 }, lair: { has: true, inside: true, initiative: null } }, 7, i18n);
+   const spans = ['actions', 'resistances', 'lair'].map((k) => lich.legendary[k].span);
+   if (!lich.legendary.shows || spans.reduce((a, b) => a + b, 0) !== 7) { problems.push(`legendary row: shows ${lich.legendary.shows}, spans ${spans}`); }
+   // Edit mode sets the most as stored: the lair's +1 isn't saved back.
+   if (lich.legendary.actions.max !== 3) { problems.push(`legendary actions field shows ${lich.legendary.actions.max}, not the stored 3`); }
+   const legacy = npcView({ ...plain, modern: false, lair: { has: false, inside: false, initiative: 20 } }, 7, i18n).legendary;
+   if (!legacy.shows || legacy.lair.initiativeText !== 'Initiative 20') { problems.push(`legacy lair: ${JSON.stringify(legacy.lair)}`); }
+   const base = { name: 'K', portrait: {}, classes: [], levelOrder: [], level: 0, leveling: 'xp', xp: null, origin: ['Medium', 'Undead', 'Neutral Evil'],
+      speed: '', prof: 2, ac: 10, init: 0, inspiration: false, exhaustion: { value: 0, max: 6 }, hd: { value: 1, max: 1 },
+      showRests: false, restTypes: [], abilities: [], hp: { value: 5, max: 10, temp: 0 }, npc: plain };
+   const view = headerView(base, i18n);
+   if (view.xp || view.milestones || view.npc?.cr !== '2' || view.npc?.xp !== '450 XP' || view.origin !== 'Medium · Undead · Neutral Evil')
+   {
+      problems.push(`NPC header: xp ${JSON.stringify(view.xp)}, milestones ${!!view.milestones}, CR ${view.npc?.cr}, XP ${view.npc?.xp}, origin ${view.origin}`);
+   }
+   const mode = { canEdit: true, editing: false };
+   const own = inspirationBar({ on: false, own: true, bank: null, linkable: [] }, mode, i18n).toggle;
+   const pc = inspirationBar({ on: false, bank: null, linkable: [] }, mode, i18n).toggle;
+   if (own !== 'fhcsToggleInspiration' || pc !== 'toggleInspiration') { problems.push(`inspiration toggles: NPC ${own}, character ${pc}`); }
+   const row = tabRow(Object.fromEntries(['inventory', 'features', 'specialTraits'].map((id) => [id, { id, label: id }])), mode, localize, NPC_TAB_NAMES, NPC_TAB_ORDER);
+   if (row.tabs.map((t) => t.label).join() !== 'Abilities,inventory') { problems.push(`NPC tabs: ${row.tabs.map((t) => t.label)}`); }
 }
 
 // Every speed with a value shows, walking first and bare (user, 2026-10-27).

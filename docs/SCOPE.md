@@ -204,6 +204,8 @@ Ours:
   - **Header:** the character's header with NPC facts: a CR badge where the level sits; XP as a number, no bar; the line under the name "size · type · alignment"; the card row under the abilities becomes three panels, legendary actions, legendary resistances and the lair, with pips or a toggle, so they show on every tab.
   - **Portrait chips as the player sheet's** (user: "as our player sheet"): exhaustion, inspiration, rest, hit dice, death saves at 0 HP; loyalty too for an important NPC (GM only, as dnd5e). dnd5e rolls an NPC's hit die from its HP formula's die (actor.mjs:1997). **Inspiration on NPCs** (user: "sometimes Strahd needs to steal a player's inspiration if they use it and still fail"): dnd5e's NPC has no inspiration field (only character.mjs:83), so an NPC's on or off is a flag of ours; the bank (an item's uses) works as on a character.
   - **Biography:** our Biography layout with dnd5e's NPC fields: Public first (players see it), then Details, then Ideals, Bonds and Flaws.
+  - **The boards** (user, 2026-11-09, approving them: "wrap the label, then start the header slice"; canvas row "Phase 6.7 · the NPC sheet"). Claude's picks the user kept: all 18 skills, as the player sheet (dnd5e's NPC sidebar lists only proficient ones); no favorite column (dnd5e gives NPCs no favorites); gear, treasure and habitat in the Traits panel; feature sections in dnd5e's order, Features (passive) first, empty ones only in edit mode. At narrow widths the legendary panels' names wrap between words (user). The legendary row shows only while the NPC has any (dnd5e's own rule), edit mode always.
+  - **Built in the header slice** (Claude, 2026-11-09): legendary pips are dnd5e's `togglePip` on what's spent, left ones filled first, in ink (§5.1), no count beside them (§5.0); the panels take the cards' columns 2, 3, 2 ("Legendary resistances" is the longest name); "In lair" is the effects' switch; edit mode sets each most as stored (dnd5e adds one in the lair) and the lair ("Has a lair", or its initiative on the legacy rules); CR is a field in the level pill's place, taking ½ and 1/4 as dnd5e does. Until the Abilities tab has its Traits panel, Special Traits opens from a gear after the tabs in edit mode. The tab bodies stay dnd5e's until their slices.
 
 ### 4.14 Beyond the sheet: token sizes (user, 2026-11-08)
 
@@ -256,6 +258,8 @@ Check here before choosing a mark, and add new ones. Every tint has an icon, mar
 | R | Ritual | Beside the spell's name |
 | Shield on the save button: filled, outline | Proficient save, not proficient | The abilities panel (user, 2026-10-27; filled means proficient, as the skill dots) |
 | Soft blue dot, 12px in a 24px target: filled, ring, dotted ring | Slot left, spent, temporary | Spell level headings on Spellbook and Attributes; no count beside them |
+| The same dot in ink: filled, ring | Legendary action or resistance left, spent | An NPC's legendary panels in the header (2026-11-09); no count beside them |
+| Switch (as on effects) with "In lair" | The NPC is in its lair (dnd5e's modern rules: XP and legendary counts +1) | An NPC's lair panel, play mode (2026-11-09) |
 | Caret: pointing right, pointing down | Folded, open | Row names (details), favorite groups, containers, list sections in the picture column (user, 2026-10-28) |
 | Faint panel with a line under it | An open row | Inventory, Spellbook, Attributes favorites |
 | Pin: heavier edge; dashed and struck through | Filter on; filter excluding | Pinned filters beside a list's search |

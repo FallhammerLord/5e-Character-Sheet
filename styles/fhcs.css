@@ -3295,6 +3295,29 @@
 .fhcs-sheet .fhcs-more-chip::-webkit-details-marker { display: none; }
 .fhcs-sheet .fhcs-more .fhcs-tray { left: auto; right: 0; z-index: 3; width: 15rem; }
 
+/* ---------- An NPC's card row: legendary actions, legendary resistances, the lair (SCOPE §4.13, 2026-11-09) ---------- */
+
+/* Each panel is a card: its name as a label (wrapping at narrow widths, user 2026-11-09), then its pips, switch or field. */
+.fhcs-sheet .fhcs-legendary { padding-right: var(--fhcs-s2); }
+/* The name wraps between its words, never inside one; the pips, switch or field keep one line. */
+.fhcs-sheet .fhcs-legendary-name { white-space: normal; }
+.fhcs-sheet :is(.fhcs-legendary-line, .fhcs-legendary-pips) { flex-wrap: nowrap; }
+/* Legendary pips in ink, not the slots' blue: they aren't spell slots (§5.1). */
+.fhcs-sheet .fhcs-legendary-pips { --fhcs-slot: var(--fhcs-ink); gap: 0; }
+.fhcs-sheet .fhcs-legendary-max { flex: none; width: 48px; height: 24px; }
+.fhcs-sheet .fhcs-legendary-line > input[type="checkbox"] { flex: none; width: 20px; height: 20px; margin: 0; }
+
+/* An NPC's CR where a character's level sits; edit mode types it in the same pill. */
+.fhcs-sheet .fhcs-cr-edit { gap: var(--fhcs-s1); padding: 0 var(--fhcs-s1); }
+.fhcs-sheet .fhcs-cr-input { flex: 1; min-width: 0; height: 24px; text-align: center; }
+.fhcs-sheet .fhcs-npc-xp { flex: none; white-space: nowrap; }
+
+/* dnd5e writes an NPC's XP into the title bar (npc-sheet.mjs `_renderFrame`); ours is in the header. */
+.fhcs-sheet .window-header .cr-xp { display: none; }
+
+/* An NPC's Special Traits gear, after the tabs (edit mode). */
+.fhcs-sheet .fhcs-tabs-gear { flex: none; }
+
 .fhcs-sheet .fhcs-class-row
 {
    display: flex;

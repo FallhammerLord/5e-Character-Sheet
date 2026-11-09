@@ -452,6 +452,27 @@
       "wind": "Wind and Wrath",
       "sand": "Sand and Sanctuary",
       "valley": "Valley and Valor"
+    },
+    "Npc": {
+      "SheetLabel": "Fallhammer NPC sheet",
+      "CR": "CR",
+      "CRField": "Challenge rating",
+      "CRLabel": "Challenge rating {cr}",
+      "XP": "{value} XP",
+      "LegendaryActions": "Legendary actions",
+      "LegendaryResistances": "Legendary resistances",
+      "LegendaryActionsMax": "Legendary actions per round",
+      "LegendaryResistancesMax": "Legendary resistances per day",
+      "PipLeft": "{word} {n}: left",
+      "PipSpent": "{word} {n}: spent",
+      "Lair": "Lair",
+      "InLair": "In lair",
+      "HasLair": "Has a lair",
+      "LairInitiative": "Initiative",
+      "LairInitiativeText": "Initiative {n}",
+      "None": "None",
+      "Max": "Max",
+      "Abilities": "Abilities"
     }
   }
 }

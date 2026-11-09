@@ -1,9 +1,9 @@
 import { MODULE_ID } from './constants.js';
-import { extendChatModel, keepTokenSizes, preloadTemplates, quietPosts, recordLevelOrder, recordTempTop, registerCharacterSheet, registerItemSheet, systemItemSheet,
-   systemCharacterSheet, watchApplications, watchItemCategories } from './compat.js';
+import { extendChatModel, keepTokenSizes, preloadTemplates, quietPosts, recordLevelOrder, recordTempTop, registerCharacterSheet, registerItemSheet, registerNpcSheet,
+   systemItemSheet, systemCharacterSheet, systemNpcSheet, watchApplications, watchItemCategories } from './compat.js';
 import { levelOrder } from './sheet/header.js';
 import { keepStable } from './sheet/death.js';
-import { makeCharacterSheet } from './apps/CharacterSheet.js';
+import { makeCharacterSheet, makeNpcSheet } from './apps/CharacterSheet.js';
 import { makeItemSheet } from './apps/ItemSheet.js';
 import { registerQuenchTests } from './tests/quench.js';
 import { registerSettings } from './settings.js';
@@ -32,6 +32,10 @@ Hooks.once('init', () =>
    }
    registerCharacterSheet(makeCharacterSheet(Base), 'FHCS.SheetLabel');
    console.log(`${MODULE_ID} | Character sheet registered (dnd5e ${game.system?.version}).`);
+   // The NPC sheet (SCOPE §4.13, user 2026-11-09): offered beside dnd5e's own, as the character's.
+   const NpcBase = systemNpcSheet();
+   if (NpcBase) { registerNpcSheet(makeNpcSheet(NpcBase), 'FHCS.Npc.SheetLabel'); }
+   else { console.error(`${MODULE_ID} | dnd5e's NPC sheet was not found; the NPC sheet is not registered.`); }
    // The item sheet (SCOPE §4.13): every item type but containers, offered beside dnd5e's own.
    const ItemBase = systemItemSheet();
    if (ItemBase) { registerItemSheet(makeItemSheet(ItemBase), 'FHCS.Item.SheetLabel'); }

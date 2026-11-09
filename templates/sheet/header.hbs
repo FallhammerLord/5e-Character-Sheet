@@ -248,6 +248,8 @@
             {{/if}}
          </div>
          {{/if}}
+         {{!-- An NPC's XP, from its CR (and its lair, when in it): a number, no bar (SCOPE §4.13). --}}
+         {{#if npc.xp}}<span class="fhcs-body fhcs-muted fhcs-npc-xp">{{ npc.xp }}</span>{{/if}}
       </div>
 
       {{!-- Two panels on one row, never wrapped (user, 2026-10-27): the combat panel (AC, Init, Prof on the abilities'
@@ -268,6 +270,16 @@
                     aria-label="{{ text.initLabel }}">{{ init }}</button>
             <span class="fhcs-display fhcs-prof-value" role="img" aria-label="{{ text.profLabel }}">{{ prof }}</span>
             <div class="fhcs-combat-level">
+               {{#if npc}}
+               {{!-- An NPC's CR where a character's level sits (SCOPE §4.13, 2026-11-09); edit mode types it, as dnd5e's
+                     field takes ½, 1/4 or — (npc-sheet.mjs _processFormData). --}}
+               {{#if @root.editable}}
+               <label class="fhcs-pill fhcs-body fhcs-cr fhcs-cr-edit"><span class="fhcs-label">{{ text.cr }}</span><input type="text" class="fhcs-input fhcs-body fhcs-cr-input" name="system.details.cr"
+                      value="{{ npc.crField }}" placeholder="—" aria-label="{{ text.crField }}"></label>
+               {{else}}
+               <span class="fhcs-pill fhcs-body fhcs-cr" role="img" aria-label="{{ npc.crLabel }}">{{ text.cr }} {{ npc.cr }}</span>
+               {{/if}}
+               {{/if}}
                {{#if xp}}
                {{#if levelUp}}
                {{!-- The level pill opens Level up (user, 2026-10-26); solid with an arrow once the XP is there. --}}
@@ -369,6 +381,74 @@
             </span>
          </div>
          {{/each}}
+         {{#if npc}}{{#with npc.legendary}}
+         {{!-- An NPC's card row (SCOPE §4.13, user 2026-11-09): legendary actions, legendary resistances and the lair, on
+               every tab, as the character's cards. Pips are dnd5e's togglePip on what's spent, in ink (§5.1); in edit
+               mode each panel sets its most, and the lair whether it has one (modern rules) or its initiative. --}}
+         {{#if @root.editable}}
+         <div class="fhcs-origin-card fhcs-frame fhcs-legendary" style="grid-column: span {{ actions.span }}">
+            <span class="fhcs-origin-text">
+               <span class="fhcs-label fhcs-muted fhcs-legendary-name">{{ actions.label }}</span>
+               <label class="fhcs-origin-line fhcs-legendary-line"><span class="fhcs-body fhcs-muted">{{ max }}</span><input type="text" class="fhcs-input fhcs-body fhcs-legendary-max"
+                      name="system.resources.legact.max" data-dtype="Number" value="{{ actions.max }}" placeholder="0" aria-label="{{ actions.maxLabel }}"></label>
+            </span>
+         </div>
+         <div class="fhcs-origin-card fhcs-frame fhcs-legendary" style="grid-column: span {{ resistances.span }}">
+            <span class="fhcs-origin-text">
+               <span class="fhcs-label fhcs-muted fhcs-legendary-name">{{ resistances.label }}</span>
+               <label class="fhcs-origin-line fhcs-legendary-line"><span class="fhcs-body fhcs-muted">{{ max }}</span><input type="text" class="fhcs-input fhcs-body fhcs-legendary-max"
+                      name="system.resources.legres.max" data-dtype="Number" value="{{ resistances.max }}" placeholder="0" aria-label="{{ resistances.maxLabel }}"></label>
+            </span>
+         </div>
+         <div class="fhcs-origin-card fhcs-frame fhcs-legendary" style="grid-column: span {{ lair.span }}">
+            <span class="fhcs-origin-text">
+               <span class="fhcs-label fhcs-muted fhcs-legendary-name">{{ lair.label }}</span>
+               {{#if lair.modern}}
+               <label class="fhcs-origin-line fhcs-legendary-line fhcs-body"><input type="checkbox" name="system.resources.lair.value"{{#if lair.has}} checked{{/if}}>{{ lair.hasLabel }}</label>
+               {{else}}
+               <label class="fhcs-origin-line fhcs-legendary-line"><span class="fhcs-body fhcs-muted">{{ lair.initiativeLabel }}</span><input type="text" class="fhcs-input fhcs-body fhcs-legendary-max"
+                      name="system.resources.lair.initiative" data-dtype="Number" value="{{ lair.initiative }}" placeholder="—" aria-label="{{ lair.initiativeLabel }}"></label>
+               {{/if}}
+            </span>
+         </div>
+         {{else if shows}}
+         <div class="fhcs-origin-card fhcs-frame fhcs-legendary" style="grid-column: span {{ actions.span }}">
+            <span class="fhcs-origin-text">
+               <span class="fhcs-label fhcs-muted fhcs-legendary-name">{{ actions.label }}</span>
+               <span class="fhcs-origin-line fhcs-legendary-pips" data-prop="{{ actions.prop }}">
+                  {{#each actions.pips}}<button type="button" class="fhcs-slot{{#if filled}} fhcs-on{{/if}}" data-action="togglePip" data-n="{{ n }}"
+                          aria-pressed="{{#if filled}}true{{else}}false{{/if}}" aria-label="{{ label }}" data-fhcs-tip="{{ label }}"></button>{{/each}}
+                  {{#if actions.none}}<span class="fhcs-body fhcs-muted">{{ none }}</span>{{/if}}
+               </span>
+            </span>
+         </div>
+         <div class="fhcs-origin-card fhcs-frame fhcs-legendary" style="grid-column: span {{ resistances.span }}">
+            <span class="fhcs-origin-text">
+               <span class="fhcs-label fhcs-muted fhcs-legendary-name">{{ resistances.label }}</span>
+               <span class="fhcs-origin-line fhcs-legendary-pips" data-prop="{{ resistances.prop }}">
+                  {{#each resistances.pips}}<button type="button" class="fhcs-slot{{#if filled}} fhcs-on{{/if}}" data-action="togglePip" data-n="{{ n }}"
+                          aria-pressed="{{#if filled}}true{{else}}false{{/if}}" aria-label="{{ label }}" data-fhcs-tip="{{ label }}"></button>{{/each}}
+                  {{#if resistances.none}}<span class="fhcs-body fhcs-muted">{{ none }}</span>{{/if}}
+               </span>
+            </span>
+         </div>
+         <div class="fhcs-origin-card fhcs-frame fhcs-legendary" style="grid-column: span {{ lair.span }}">
+            <span class="fhcs-origin-text">
+               <span class="fhcs-label fhcs-muted fhcs-legendary-name">{{ lair.label }}</span>
+               <span class="fhcs-origin-line fhcs-legendary-line">
+                  {{#if lair.modern}}{{#if lair.has}}
+                  {{!-- In the lair or out: the switch of §5.1, as on effects; dnd5e raises XP and both counts by one inside. --}}
+                  <button type="button" class="fhcs-toggle fhcs-switch" data-action="fhcsLairInside" aria-pressed="{{#if lair.inside}}true{{else}}false{{/if}}"
+                          aria-label="{{ lair.insideLabel }}" data-fhcs-tip="{{ lair.insideLabel }}">
+                     <svg class="fhcs-switch-mark" viewBox="0 0 20 12" aria-hidden="true"><rect x="1" y="1" width="18" height="10" rx="5"/><circle cy="6" r="3"/></svg>
+                  </button><span class="fhcs-body">{{ lair.insideLabel }}</span>
+                  {{else}}<span class="fhcs-body fhcs-muted">{{ none }}</span>{{/if}}
+                  {{else}}<span class="fhcs-body{{#unless lair.initiativeText}} fhcs-muted{{/unless}}">{{#if lair.initiativeText}}{{ lair.initiativeText }}{{else}}{{ none }}{{/if}}</span>{{/if}}
+               </span>
+            </span>
+         </div>
+         {{/if}}
+         {{/with}}{{/if}}
    </div>
    {{/with}}
 </header>

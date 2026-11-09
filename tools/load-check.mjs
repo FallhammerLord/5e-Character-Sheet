@@ -77,7 +77,29 @@ class SystemItemSheet
       warnings: { template: 'systems/dnd5e/templates/shared/sheet-warnings-dialog.hbs' }
    };
 }
-globalThis.dnd5e = { applications: { actor: { CharacterActorSheet: SystemCharacterSheet }, item: { ItemSheet5e: SystemItemSheet } } };
+// dnd5e's NPC sheet, as its PARTS stand in 6.0.6 (npc-sheet.mjs:30), on the same base as the character's.
+class SystemNpcSheet
+{
+   static PARTS = {
+      header: { template: 'systems/dnd5e/templates/actors/npc-header.hbs' },
+      sidebarCollapser: { container: { classes: ['main-content'], id: 'main' }, template: 'systems/dnd5e/templates/actors/parts/sidebar-collapser.hbs' },
+      sidebar: { container: { classes: ['main-content'], id: 'main' }, template: 'systems/dnd5e/templates/actors/npc-sidebar.hbs' },
+      features: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/actor-features.hbs', scrollable: [''] },
+      inventory: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/actor-inventory.hbs', scrollable: [''] },
+      spells: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/creature-spells.hbs', scrollable: [''] },
+      effects: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/actor-effects.hbs', scrollable: [''] },
+      biography: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/npc-biography.hbs', scrollable: [''] },
+      specialTraits: { classes: ['flexcol'], container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/creature-special-traits.hbs', scrollable: [''] },
+      warnings: { template: 'systems/dnd5e/templates/shared/sheet-warnings-dialog.hbs' },
+      tabs: { id: 'tabs', classes: ['tabs-right'], template: 'systems/dnd5e/templates/shared/sidebar-tabs.hbs' }
+   };
+   static LIMITED_PARTS = SystemCharacterSheet.LIMITED_PARTS;
+   _initializeApplicationOptions()
+   {
+      return { classes: ['dnd5e2', 'sheet', 'actor', 'standard-form', 'npc', 'vertical-tabs', 'fhcs-sheet', 'fhcs-npc'] };
+   }
+}
+globalThis.dnd5e = { applications: { actor: { CharacterActorSheet: SystemCharacterSheet, NPCActorSheet: SystemNpcSheet }, item: { ItemSheet5e: SystemItemSheet } } };
 class SystemUsageMessageData {}
 class SystemCheckMessageData {}
 class SystemSaveMessageData {}
@@ -151,7 +173,42 @@ else
    if (!itemParts.details?.template.startsWith('systems/dnd5e/')) { problems.push('the item sheet lost dnd5e\'s details form'); }
 }
 
-const characterRegistrations = registered.filter(([doc]) => doc !== globalThis.Item);
+// The NPC sheet (SCOPE §4.13, 2026-11-09): NPCs only, not the default, dnd5e's NPC class with our header and tab row
+// first, its sidebar gone, its tab bodies dnd5e's until their slices.
+const npcRegistrations = registered.filter(([doc, , , opts]) => doc === globalThis.Actor && opts?.types?.includes('npc'));
+if (npcRegistrations.length !== 1) { problems.push(`expected one NPC sheet registration, got ${npcRegistrations.length}`); }
+else
+{
+   const [, npcScope, npcSheet, npcOptions] = npcRegistrations[0];
+   const { NPC_SHEET_CLASS_NAME } = await import('../src/constants.js');
+   if (npcScope !== 'fhcs') { problems.push(`NPC sheet registered under "${npcScope}", not "fhcs"`); }
+   if (!(npcSheet.prototype instanceof SystemNpcSheet)) { problems.push('NPC sheet does not extend dnd5e\'s NPC sheet'); }
+   if (npcSheet.name !== NPC_SHEET_CLASS_NAME) { problems.push(`NPC sheet class is named ${npcSheet.name}, not ${NPC_SHEET_CLASS_NAME}`); }
+   if (npcOptions?.types?.join() !== 'npc') { problems.push('NPC sheet is not limited to NPCs'); }
+   if (npcOptions?.makeDefault) { problems.push('NPC sheet must not make itself the default'); }
+   const npcParts = npcSheet.PARTS ?? {};
+   const npcExpected = 'header,tabs,features,inventory,spells,effects,biography,specialTraits,warnings';
+   if (Object.keys(npcParts).join() !== npcExpected) { problems.push(`NPC sheet parts are ${Object.keys(npcParts).join()}, not ${npcExpected}`); }
+   for (const id of ['header', 'tabs'])
+   {
+      if (!npcParts[id]?.template.startsWith('modules/fhcs/')) { problems.push(`the NPC ${id} part is still dnd5e's`); }
+      else if (!existsSync(new URL(`../${npcParts[id].template.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`NPC part template ${npcParts[id].template} is missing`); }
+   }
+   if (npcParts.tabs?.classes) { problems.push('the NPC tab row still carries dnd5e\'s tab classes'); }
+   const npcClasses = npcSheet.prototype._initializeApplicationOptions.call(Object.create(npcSheet.prototype), {}).classes;
+   if (npcClasses.some((name) => ['dnd5e2', 'vertical-tabs', 'hidden-title'].includes(name))) { problems.push('dnd5e\'s look classes reach the NPC window'); }
+   // dnd5e has no inspiration or lair action an NPC can use: ours stand in.
+   const { DEFAULT_OPTIONS } = npcSheet;
+   for (const action of ['fhcsLairInside', 'fhcsToggleInspiration'])
+   {
+      if (typeof DEFAULT_OPTIONS?.actions?.[action] !== 'function') { problems.push(`the NPC sheet has no ${action} action`); }
+   }
+   const npcLabel = npcOptions?.label ?? '';
+   const npcLang = JSON.parse(readFileSync(new URL('../lang/en.json', import.meta.url), 'utf8'));
+   if (!npcLabel.split('.').reduce((node, part) => node?.[part], npcLang)) { problems.push(`NPC sheet label ${npcLabel} is not in lang/en.json`); }
+}
+
+const characterRegistrations = registered.filter(([doc, , , opts]) => doc !== globalThis.Item && !opts?.types?.includes('npc'));
 const [documentClass, scope, sheet, options] = characterRegistrations[0] ?? [];
 if (characterRegistrations.length !== 1) { problems.push(`expected one character sheet registration, got ${characterRegistrations.length}`); }
 else

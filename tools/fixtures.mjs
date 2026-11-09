@@ -6,7 +6,7 @@
  * must not wrap }
  */
 import { appliedLines, cardParts, d20Band, damageBand, saveRow } from '../src/chat/card.js';
-import { headerView, inspirationBar, tabRow, themePicker } from '../src/sheet/header.js';
+import { NPC_TAB_NAMES, NPC_TAB_ORDER, headerView, inspirationBar, tabRow, themePicker } from '../src/sheet/header.js';
 import { itemSheetView } from '../src/sheet/item.js';
 import { attributesView } from '../src/sheet/attributes.js';
 import { inventoryView } from '../src/sheet/inventory.js';
@@ -163,6 +163,33 @@ const MULTICLASS = {
    })
 };
 
+/**
+ * NPCs (SCOPE §4.13, 2026-11-09): a Bandit Captain with no legendary actions, and a lich with a long name, legendary
+ * actions and resistances, and a lair (modern rules), in it or not; one on the legacy rules' lair initiative.
+ */
+const npcFacts = (over = {}) => ({ cr: 2, crSource: 2, xp: 450, xpLabel: '450', type: 'Humanoid', alignment: 'Neutral',
+   legact: { max: 0, value: 0, source: 0 }, legres: { max: 0, value: 0, source: 0 }, modern: true,
+   lair: { has: false, inside: false, initiative: null }, ...over });
+const LICH = (inside = false, over = {}) => npcFacts({ cr: 21, crSource: 21, xp: inside ? 41000 : 33000, xpLabel: inside ? '41,000' : '33,000',
+   type: 'Undead (Wizard)', alignment: 'Neutral Evil',
+   legact: { max: inside ? 4 : 3, value: inside ? 3 : 2, source: 3 }, legres: { max: inside ? 5 : 4, value: inside ? 3 : 2, source: 4 },
+   lair: { has: true, inside, initiative: null }, ...over });
+const npcHeader = (npc, over = {}) => header({
+   name: 'Bandit Captain', classes: [], level: 0, xp: null, originCards: null, inspiration: false,
+   origin: ['Medium', npc.type, npc.alignment], speeds: [{ key: 'walk', label: 'Speed', value: 30 }],
+   prof: 2, ac: 15, init: 3, hp: { value: 52, max: 65, temp: 0 }, hd: { value: 10, max: 10 }, npc, ...over
+});
+const LICH_HEADER = (inside = false, over = {}) => npcHeader(LICH(inside), {
+   name: 'Maelgrath the Unhallowed, Keeper of the Ninth Vault', prof: 7, ac: 17, init: 7, inspiration: true,
+   hp: { value: 135, max: 135, temp: 0 }, hd: { value: 18, max: 18 }, portrait: { src: TALL, isVideo: false }, ...over
+});
+/** dnd5e's NPC tabs as `_getTabs` gives them (npc-sheet.mjs TABS), with an NPC's own inspiration on or off. */
+const NPC_TABS = Object.fromEntries(['features', 'inventory', 'spells', 'effects', 'biography', 'specialTraits']
+   .map((id, i) => [id, { id, label: ['Features', 'Inventory', 'Spells', 'Effects', 'Biography', 'Special Traits'][i], active: id === 'features' }]));
+const npcTabs = (mode) => ({ fhcsTabs: { ...tabRow(NPC_TABS, mode, localize, NPC_TAB_NAMES, NPC_TAB_ORDER),
+   inspiration: inspirationBar({ on: true, own: true, bank: null, linkable: INSPIRE_ITEMS }, mode, { localize, format }),
+   settingsGear: mode.editing ? { label: localize('FHCS.Attributes.SpecialTraits') } : undefined } });
+
 /** The header's second row: the HP band and the cards share its top and bottom (SCOPE §5.2 rule 1). */
 const HEADER_ALIGN = [['.fhcs-portrait-band', 'top', '.fhcs-origin-card', 'top'], ['.fhcs-portrait-band', 'bottom', '.fhcs-origin-card', 'bottom'],
    // The two stats panels share their top and foot; the cards' outer edges meet the panels' (user, 2026-10-27).
@@ -170,6 +197,13 @@ const HEADER_ALIGN = [['.fhcs-portrait-band', 'top', '.fhcs-origin-card', 'top']
    ['.fhcs-combat', 'left', '.fhcs-cards > :first-child', 'left'], ['.fhcs-abilities', 'right', '.fhcs-cards > :last-child', 'right'],
    // An ability's score and the AC shield share a line; its save and Level share the foot.
    ['.fhcs-combat .fhcs-button', 'top', '.fhcs-ability-pair', 'top'], ['.fhcs-combat-level', 'bottom', '.fhcs-abilities .saving-throw', 'bottom']];
+
+/**
+ * NPCs' alignment: the band's top meets the panels' top, and the portrait's outer edge their foot. (A theme's thicker
+ * portrait frame, Forge's 2px, holds the band inside it, so band and card feet differ by the frame.)
+ */
+const NPC_ALIGN = [['.fhcs-portrait-band', 'top', '.fhcs-origin-card', 'top'], ['.fhcs-portrait', 'bottom', '.fhcs-origin-card', 'bottom'],
+   ...HEADER_ALIGN.slice(2)];
 
 /** Four classes, highest first after sorting: Cleric and Fighter take the cards, Rogue and Wizard the class tray. */
 const FOUR_CLASSES = (over = {}) => originFacts({
@@ -641,6 +675,16 @@ export const CASES = [
    { name: 'title-theme-tray', template: 'sheet/tabs', context: tabs({ canEdit: true, editing: false }), titleBar: titleBarPick, titleTray: titleTrayOpen },
    { name: 'special-traits', html: SPECIAL_TRAITS },
    { name: 'header', template: 'sheet/header', context: header(), align: HEADER_ALIGN, rows: '.fhcs-header, .fhcs-ability' },
+   // NPCs (SCOPE §4.13, 2026-11-09): CR in the level's place, XP as a number, the legendary row (shown while it has any).
+   { name: 'npc-header', template: 'sheet/header', context: npcHeader(npcFacts()), rows: '.fhcs-header, .fhcs-ability' },
+   { name: 'npc-header-lich', template: 'sheet/header', context: LICH_HEADER(), align: NPC_ALIGN, rows: '.fhcs-header, .fhcs-ability' },
+   { name: 'npc-header-lich-lair', template: 'sheet/header', context: LICH_HEADER(true) },
+   { name: 'npc-header-lich-editing', template: 'sheet/header', context: { ...LICH_HEADER(), editable: true }, align: NPC_ALIGN, rows: '.fhcs-header, .fhcs-ability', sameRowsAs: 'npc-header-lich' },
+   { name: 'npc-header-legacy', template: 'sheet/header', context: npcHeader(npcFacts({ cr: 0.5, crSource: 0.5, xp: 100, xpLabel: '100', modern: false,
+      legres: { max: 1, value: 1, source: 1 }, lair: { has: false, inside: false, initiative: 20 } })) },
+   { name: 'npc-header-editing', template: 'sheet/header', context: { ...npcHeader(npcFacts()), editable: true } },
+   { name: 'npc-tabs', template: 'sheet/tabs', context: npcTabs({ canEdit: true, editing: false }) },
+   { name: 'npc-tabs-editing', template: 'sheet/tabs', context: npcTabs({ canEdit: true, editing: true }) },
    { name: 'header-tall-art', template: 'sheet/header', context: header({ portrait: { src: TALL, isVideo: false } }) },
    { name: 'header-inspired', template: 'sheet/header', context: header({ inspiration: true, exhaustion: { value: 2, max: 6 } }) },
    {
@@ -827,7 +871,7 @@ for (const look of LOOKS)
 // every tab, edit mode, and each tray open.
 for (const name of ['features', 'effects', 'biography', 'attributes-editing', 'attributes-resource-tray', 'inventory-editing',
    'spellbook-editing', 'features-editing', 'inventory-categories', 'title-theme-tray', 'tabs-bank-big', 'tabs-inspiration-tray', 'tabs-bank-tray', 'header-editing', 'header-hp-tray', 'header-exhaustion-open',
-   'header-level-up', 'header-classes-open', 'header-milestones'])
+   'header-level-up', 'header-classes-open', 'header-milestones', 'npc-header-lich', 'npc-header-lich-editing', 'npc-tabs-editing'])
 {
    const base = CASES.find((c) => c.name === name);
    CASES.push({ ...base, name: `theme-forge-${name}`, look: 'forge', sameRowsAs: undefined });

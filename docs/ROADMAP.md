@@ -212,7 +212,10 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
 - [ ] Mockups for the rest
 - [x] Chat cards in the world theme (world setting "Themed chat cards", on by default); Forge's card: a riveted iron plate, Grenze title and totals, iron-edged bands that heat on hover; every card case checked in Forge; Quench test added
 - [x] Item sheet (every type, spells included): header, our tab row and lock, Description with the properties column and Category; dnd5e's forms for the rest; layout cases (500–740px, Forge), unit and load checks, a Quench test (built 2026-10-28; waits on Quench and play)
-- [ ] NPC sheet
+- [ ] NPC sheet, in slices:
+  - [x] Header and tab row (2026-11-09; offline checks pass; waits on Quench and play): registered beside dnd5e's NPC sheet, not the default; CR, XP, size · type · alignment; the legendary row (pips, lair switch, edit-mode fields); the player's chips; inspiration of its own; tab row with Abilities first and Special Traits' gear. The tab bodies are still dnd5e's, unstyled
+  - [ ] Abilities tab: skills and traits column, features by action type
+  - [ ] Inventory, Spellbook, Effects on ours; Biography with the NPC's fields
 - [ ] Container, group, encounter, vehicle
 - [ ] The smaller windows: a skin
 - [ ] Quench and play

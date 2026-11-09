@@ -189,6 +189,64 @@ export function hpPreview(amount, hp, { format, localize })
    return format('FHCS.Header.HpPreview', { temp: fromTemp, hp: fromHp, left: hp.value - fromHp });
 }
 
+/** A challenge rating as dnd5e writes it (`dnd5e-formatCR`): ⅛, ¼, ½, whole numbers, or — when there is none. */
+export function crText(cr)
+{
+   if (cr === null || cr === undefined || cr === '' || !Number.isFinite(Number(cr))) { return '\u2014'; }
+   return { 0.125: '\u215b', 0.25: '\u00bc', 0.5: '\u00bd' }[Number(cr)] ?? String(Number(cr));
+}
+
+/**
+ * Legendary actions or resistances as pips, dnd5e's way (npc-sheet.mjs `_prepareHeaderContext`): left to right, those
+ * left filled first; each carries dnd5e's `data-n` (counting down from max − 1), so its `togglePip` spends the last one
+ * left, or gets back the first one spent.
+ */
+export function legendaryPips(res, word, format)
+{
+   return Array.from({ length: res.max }, (_, i) => ({
+      n: res.max - 1 - i,
+      filled: res.value >= i + 1,
+      label: format(res.value >= i + 1 ? 'FHCS.Npc.PipLeft' : 'FHCS.Npc.PipSpent', { word, n: i + 1 })
+   }));
+}
+
+/**
+ * An NPC's header (SCOPE §4.13, user 2026-11-09): CR where a character's level sits, XP as a number, and the card row
+ * as three panels, legendary actions, legendary resistances and the lair, shown while it has any (edit mode always).
+ * @param {object} npc  From compat's `npcFacts`.
+ * @param {number} columns  The card grid's columns: the combat panel's, then one per ability.
+ */
+export function npcView(npc, columns, { format, localize })
+{
+   const actions = localize('FHCS.Npc.LegendaryActions');
+   const resistances = localize('FHCS.Npc.LegendaryResistances');
+   const lairShows = npc.modern ? npc.lair.has : Number.isFinite(npc.lair.initiative);
+   const cr = crText(npc.cr);
+   return {
+      cr,
+      crLabel: format('FHCS.Npc.CRLabel', { cr }),
+      // Edit mode writes the CR as typed; dnd5e reads ½, 1/4 and — back into numbers (npc-sheet.mjs `_processFormData`).
+      crField: npc.crSource === null || npc.crSource === undefined ? '' : crText(npc.crSource),
+      xp: npc.xpLabel ? format('FHCS.Npc.XP', { value: npc.xpLabel }) : '',
+      legendary: {
+         // Spans 2, 3, 2 on the combat panel's column and the abilities': "Legendary resistances" is the longest name.
+         actions: { label: actions, span: Math.max(1, columns - 5), max: npc.legact.source, maxLabel: localize('FHCS.Npc.LegendaryActionsMax'),
+            pips: legendaryPips(npc.legact, actions, format), prop: 'system.resources.legact.spent', none: !npc.legact.max },
+         resistances: { label: resistances, span: 3, max: npc.legres.source, maxLabel: localize('FHCS.Npc.LegendaryResistancesMax'),
+            pips: legendaryPips(npc.legres, resistances, format), prop: 'system.resources.legres.spent', none: !npc.legres.max },
+         lair: {
+            label: localize('FHCS.Npc.Lair'), span: 2, modern: npc.modern, has: npc.lair.has, shows: lairShows,
+            inside: npc.lair.inside, insideLabel: localize('FHCS.Npc.InLair'), hasLabel: localize('FHCS.Npc.HasLair'),
+            initiative: npc.lair.initiative ?? '', initiativeLabel: localize('FHCS.Npc.LairInitiative'),
+            initiativeText: Number.isFinite(npc.lair.initiative) ? format('FHCS.Npc.LairInitiativeText', { n: npc.lair.initiative }) : ''
+         },
+         // In play only while it has any; edit mode always, to set them.
+         shows: !!(npc.legact.max || npc.legres.max || lairShows),
+         none: localize('FHCS.Npc.None'), max: localize('FHCS.Npc.Max')
+      }
+   };
+}
+
 /**
  * Everything the header template shows.
  * @param {object} facts  From compat.headerFacts (or a fixture).
@@ -200,7 +258,8 @@ export function headerView(facts, { format, localize })
    const columns = facts.abilities.length + 1;
    const i18n = { format, localize };
    const { hp, xp } = facts;
-   const milestones = facts.leveling === 'noxp';
+   const npc = facts.npc ? npcView(facts.npc, columns, i18n) : null;
+   const milestones = !npc && facts.leveling === 'noxp';
    const level = format('FHCS.Header.Level', { level: facts.level });
    return {
       name: facts.name,
@@ -219,7 +278,8 @@ export function headerView(facts, { format, localize })
          : facts.speed,
       prof: signed(facts.prof),
       level,
-      xp: !milestones && xp ? {
+      npc,
+      xp: !npc && !milestones && xp ? {
          value: xp.value, max: xp.max, pct: xp.pct ?? percent(xp.value, xp.max),
          text: format('FHCS.Header.XP', { value: xp.valueLabel ?? xp.value, max: xp.maxLabel ?? xp.max }),
          maxText: format('FHCS.Header.XPMax', { max: xp.maxLabel ?? xp.max })
@@ -301,6 +361,7 @@ export function headerView(facts, { format, localize })
          profLabel: format('FHCS.Header.ProfLabel', { prof: signed(facts.prof) }),
          save: localize('FHCS.Header.Save'), inspiration: localize('FHCS.Header.Inspiration'),
          rest: localize('FHCS.Header.Rest'), milestones: localize('FHCS.Header.Milestones'),
+         cr: localize('FHCS.Npc.CR'), crField: localize('FHCS.Npc.CRField'),
          initLabel: format('FHCS.Header.InitLabel', { mod: signed(facts.init) })
       }
    };
@@ -318,6 +379,10 @@ export const TAB_ORDER = ['details', 'inventory', 'spells', 'features', 'effects
 
 /** Our names for the character's tabs where they differ from dnd5e's; the item sheet keeps dnd5e's own. */
 export const CHARACTER_TAB_NAMES = { details: 'FHCS.Tabs.Attributes', spells: 'FHCS.Tabs.Spellbook' };
+
+/** An NPC's tabs: Features is its everything tab, Abilities (SCOPE §4.13, user 2026-11-09), first as in dnd5e. */
+export const NPC_TAB_NAMES = { features: 'FHCS.Npc.Abilities', spells: 'FHCS.Tabs.Spellbook' };
+export const NPC_TAB_ORDER = ['features', 'inventory', 'spells', 'effects', 'biography', 'specialTraits'];
 
 /**
  * The tab row (SCOPE §4.2): dnd5e's tabs in Classic's order, with our names where Classic's differ.
@@ -359,7 +424,8 @@ export function inspirationBar(facts, { canEdit, editing }, { localize, format }
    const bank = facts.bank;
    const count = bank ? bank.value : facts.on ? 1 : 0;
    const label = localize('FHCS.Inspiration.Label');
-   const view = { label, canEdit, editing, count, bank: !!bank, on: facts.on };
+   // A character's on or off is dnd5e's own action; an NPC's is ours (dnd5e keeps inspiration on characters only).
+   const view = { label, canEdit, editing, count, bank: !!bank, on: facts.on, toggle: facts.own ? 'fhcsToggleInspiration' : 'toggleInspiration' };
    if (bank)
    {
       const spend = localize('FHCS.Inspiration.Spend');

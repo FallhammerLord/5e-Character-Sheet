@@ -1,4 +1,4 @@
-import { MODULE_ID, SHEET_ID, SYSTEM_ACTIONS, VIEW_ACTIONS } from '../constants.js';
+import { MODULE_ID, NPC_SHEET_ID, SHEET_ID, SYSTEM_ACTIONS, VIEW_ACTIONS } from '../constants.js';
 import { isStale } from '../chat/card.js';
 import { addBonus, addD20, damageFacts, systemCharacterSheet } from '../compat.js';
 
@@ -1537,6 +1537,91 @@ export function registerQuenchTests(quench)
             await enter('.fhcs-biography [name="system.details.bond"]', 'FHCS test bond');
             await until(() => actor.system.details.bond === 'FHCS test bond', () => `the box saves to dnd5e's field; bond is "${actor.system.details.bond}"`);
             await actor.update({ 'system.details.ideal': before.ideal ?? '', 'system.details.bond': before.bond ?? '' });
+         });
+      });
+
+      // The NPC sheet (SCOPE §4.13, 2026-11-09): the header slice. A lich-like NPC with legendary actions and
+      // resistances and a lair (modern rules); the helpers above work on whichever sheet `sheet` holds.
+      describe('Fallhammer NPC sheet: header', function ()
+      {
+         before(async function ()
+         {
+            if (!game.user.isGM) { this.skip(); }
+            actor = await Actor.implementation.create({
+               name: 'FHCS NPC test (safe to delete)',
+               type: 'npc',
+               system: { details: { cr: 5 }, resources: { legact: { max: 3, spent: 0 }, legres: { max: 2, spent: 0 }, lair: { value: true, inside: false } } },
+               flags: { core: { sheetClass: NPC_SHEET_ID } }
+            });
+            sheet = actor.sheet;
+            await sheet.render({ force: true });
+         });
+
+         after(async function ()
+         {
+            await sheet?.close();
+            await actor?.delete();
+         });
+
+         afterEach(async function ()
+         {
+            if (sheet?.rendered) { await leaveEditMode(); }
+         });
+
+         it('is offered for NPCs and opens as ours, on its everything tab', async function ()
+         {
+            const entry = CONFIG.Actor.sheetClasses.npc?.[NPC_SHEET_ID];
+            assert.ok(entry, `${NPC_SHEET_ID} is registered for NPCs`);
+            await settled();
+            assert.ok(sheet.element.classList.contains('fhcs-npc'), `the window is ours; classes: ${sheet.element.className}`);
+            find('.fhcs-header .fhcs-cr', () => 'no CR in the header');
+            const tabs = [...sheet.element.querySelectorAll('.fhcs-tabs .fhcs-tab:not([hidden])')].map((t) => t.dataset.tab);
+            assert.strictEqual(tabs[0], 'features', `the first tab is Features (Abilities); the row holds ${tabs.join(', ')}`);
+            assert.isNull(sheet.element.querySelector('[data-application-part="sidebar"]'), 'dnd5e\'s sidebar is gone');
+         });
+
+         it('spends a legendary action and gets it back through dnd5e\'s pips', async function ()
+         {
+            // The last one left: dnd5e's togglePip spends it (base-actor-sheet.mjs #togglePip).
+            await click('.fhcs-legendary-pips[data-prop="system.resources.legact.spent"] .fhcs-slot:nth-last-child(1 of .fhcs-on)');
+            await until(() => actor.system.resources.legact.spent === 1, () => `one legendary action spent; spent is ${actor.system.resources.legact.spent}`);
+            await click('.fhcs-legendary-pips[data-prop="system.resources.legact.spent"] .fhcs-slot:not(.fhcs-on)');
+            await until(() => actor.system.resources.legact.spent === 0, () => `the spent one back; spent is ${actor.system.resources.legact.spent}`);
+         });
+
+         it('puts the NPC in its lair and out', async function ()
+         {
+            if (game.settings.get('dnd5e', 'rulesVersion') !== 'modern') { this.skip(); }
+            const xp = actor.system.details.xp.value;
+            await click('.fhcs-legendary [data-action="fhcsLairInside"]');
+            await until(() => actor.system.resources.lair.inside === true, () => `in the lair; inside is ${actor.system.resources.lair.inside}`);
+            assert.isAbove(actor.system.details.xp.value, xp, 'dnd5e raises the XP in the lair');
+            await until(() => sheet.element.querySelector('.fhcs-legendary [data-action="fhcsLairInside"]')?.getAttribute('aria-pressed') === 'true',
+               'the switch shows it');
+            await click('.fhcs-legendary [data-action="fhcsLairInside"]');
+            await until(() => actor.system.resources.lair.inside === false, () => `out of the lair; inside is ${actor.system.resources.lair.inside}`);
+         });
+
+         it('holds inspiration of its own', async function ()
+         {
+            await click('.fhcs-inspiration [data-action="fhcsToggleInspiration"]');
+            await until(() => actor.getFlag(MODULE_ID, 'inspired') === true, () => `inspired; the flag is ${actor.getFlag(MODULE_ID, 'inspired')}`);
+            await click('.fhcs-inspiration [data-action="fhcsToggleInspiration"]');
+            await until(() => actor.getFlag(MODULE_ID, 'inspired') === false, () => `spent; the flag is ${actor.getFlag(MODULE_ID, 'inspired')}`);
+         });
+
+         it('takes a CR as dnd5e writes it, in edit mode', async function ()
+         {
+            await click('.fhcs-tabs [data-action="changeMode"]');
+            await until(() => sheet.isEditMode, 'the sheet unlocks');
+            await enter('.fhcs-header [name="system.details.cr"]', '\u00bd');
+            await until(() => actor.system.details.cr === 0.5, () => `CR ½ saved as 0.5; CR is ${actor.system.details.cr}`);
+            await enter('.fhcs-header [name="system.resources.legres.max"]', '3');
+            await until(() => actor.system._source.resources.legres.max === 3, () => `legendary resistances most 3; it is ${actor.system._source.resources.legres.max}`);
+            await click('.fhcs-tabs .fhcs-tabs-gear');
+            await until(() => sheet.tabGroups.primary === 'specialTraits', () => `the gear opens Special Traits; the tab is ${sheet.tabGroups.primary}`);
+            await click('.fhcs-tabs .fhcs-tabs-gear');
+            await until(() => sheet.tabGroups.primary === 'features', () => `the gear closes it, back to Abilities; the tab is ${sheet.tabGroups.primary}`);
          });
       });
    }, { displayName: 'Fallhammer Character Sheet: core' });

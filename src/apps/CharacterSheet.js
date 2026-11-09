@@ -1,6 +1,6 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES, VIEW_ACTIONS } from '../constants.js';
 import { attributesFacts, biographyFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
-   passesExtraFilters, renderTemplate, spellbookFacts, toggleListFilter, watchListFilters } from '../compat.js';
+   passesExtraFilters, renderTemplate, setLairInside, spellbookFacts, toggleInspired, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
 import { EXTRA_SPELL_FILTERS, spellbookView, spellColumnChoice } from '../sheet/spellbook.js';
@@ -9,7 +9,7 @@ import { effectsView } from '../sheet/effects.js';
 import { biographyView } from '../sheet/biography.js';
 import { limitedView } from '../sheet/limited.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
-import { TEMP_TOP_FLAG, comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, tabRow, themePicker } from '../sheet/header.js';
+import { NPC_TAB_NAMES, NPC_TAB_ORDER, TEMP_TOP_FLAG, comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, tabRow, themePicker } from '../sheet/header.js';
 import { themeMoment } from './sparks.js';
 import { delayTips, keepFolds } from '../chat/card.js';
 import { startFraming } from './framing.js';
@@ -195,7 +195,7 @@ function showThemeTray(element, open)
 function openSpecialTraits()
 {
    const open = this.tabGroups.primary === 'specialTraits';
-   this.changeTab(open ? 'details' : 'specialTraits', 'primary', { force: true });
+   this.changeTab(open ? this.fhcsHomeTab : 'specialTraits', 'primary', { force: true });
 }
 
 const SETTINGS_HEAD = `${MODULE_PATH}/templates/sheet/settings-head.hbs`;
@@ -850,6 +850,18 @@ export function makeCharacterSheet(Base)
 
       static LIMITED_PARTS = limitedParts(Base.LIMITED_PARTS);
 
+      /** The tab Special Traits closes back to, and a locked sheet leaves it for. */
+      get fhcsHomeTab()
+      {
+         return 'details';
+      }
+
+      /** Whether this sheet draws a part with our template (an NPC's tab bodies stay dnd5e's until their slices). */
+      fhcsDraws(partId)
+      {
+         return String(this.constructor.PARTS?.[partId]?.template ?? '').startsWith(`${MODULE_PATH}/`);
+      }
+
       /** dnd5e's ⋮ menu, with every other title-bar button added, so the bar holds only ⋮ and × (user, 2026-10-28). */
       * _getHeaderControlContextEntries()
       {
@@ -911,6 +923,7 @@ export function makeCharacterSheet(Base)
             if (partId in LIMITED_SHEET_PARTS) { context.fhcsLimited = limitedView(await limitedFacts(this, context, MODULE_ID), i18n); }
             return context;
          }
+         if (!this.fhcsDraws(partId)) { return context; }
          if (partId === 'header' && !this.actor.limited)
          {
             const facts = await headerFacts(this, context, MODULE_ID);
@@ -951,7 +964,10 @@ export function makeCharacterSheet(Base)
          if (partId === 'tabs')
          {
             const mode = { canEdit: this.isEditable, editing: this.isEditMode };
-            context.fhcsTabs = { ...tabRow(context.tabs, mode, i18n.localize), inspiration: inspirationBar(inspirationFacts(this.actor), mode, i18n) };
+            const { names, order } = this.fhcsTabNames ?? {};
+            context.fhcsTabs = { ...tabRow(context.tabs, mode, i18n.localize, names, order), inspiration: inspirationBar(inspirationFacts(this.actor), mode, i18n) };
+            // An NPC's Special Traits opens from a gear on the row, in edit mode, until its Abilities tab has a Traits panel.
+            if (this.fhcsTabNames && mode.editing) { context.fhcsTabs.settingsGear = { label: i18n.localize('FHCS.Attributes.SpecialTraits') }; }
          }
          return context;
       }
@@ -1027,7 +1043,7 @@ export function makeCharacterSheet(Base)
          catchLight(this.element);
          middleClickOpens(this.element, this.actor);
          // Special Traits is a settings page: locking the sheet leaves it for Attributes.
-         if (!this.isEditMode && this.tabGroups.primary === 'specialTraits') { this.changeTab('details', 'primary'); }
+         if (!this.isEditMode && this.tabGroups.primary === 'specialTraits') { this.changeTab(this.fhcsHomeTab, 'primary'); }
          await drawSettingsHead(this);
          await drawThemePicker(this);
          const items = this.element.querySelector('.fhcs-inventory .fhcs-items');
@@ -1042,6 +1058,83 @@ export function makeCharacterSheet(Base)
             if (controls) { showPins(controls); }
          }
          delayTips(this.element);
+      }
+   };
+}
+
+/* ---------- The NPC sheet (SCOPE §4.13, user 2026-11-09) ---------- */
+
+/** dnd5e's NPC parts we draw now: the header and the tab row. The tab bodies keep dnd5e's until their slices. */
+const NPC_OUR_PARTS = ['header', 'tabs'];
+
+/** dnd5e's NPC sidebar and its collapser go: its skills and traits move to the Abilities tab (its own slice). */
+const NPC_DROPPED_PARTS = ['sidebarCollapser', 'sidebar'];
+
+/** dnd5e's NPC parts with ours swapped in, its sidebar gone, the header and tab row first. */
+function npcParts(baseParts)
+{
+   const entries = Object.entries(baseParts ?? {})
+      .filter(([id]) => !NPC_DROPPED_PARTS.includes(id))
+      .map(([id, part]) =>
+      {
+         if (!NPC_OUR_PARTS.includes(id)) { return [id, part]; }
+         const kept = { ...part, template: SHEET_PARTS[id] };
+         delete kept.classes;
+         delete kept.templates;
+         return [id, { ...kept, ...PART_OPTIONS[id] }];
+      });
+   const rank = (id) => (LEADING_PARTS.includes(id) ? LEADING_PARTS.indexOf(id) : LEADING_PARTS.length);
+   return Object.fromEntries(entries.sort(([a], [b]) => rank(a) - rank(b)));
+}
+
+/** In the lair or out (the NPC's lair panel, play mode, modern rules). */
+function lairInsideAction(event, target)
+{
+   return setLairInside(this.actor, target.getAttribute('aria-pressed') !== 'true');
+}
+
+/** An NPC's inspiration on or off, without a bank (dnd5e's own action is the character sheet's). */
+function toggleInspiredAction()
+{
+   return toggleInspired(this.actor);
+}
+
+/**
+ * Our NPC sheet: dnd5e's NPC sheet with the character sheet's layer on top (the same base class, BaseActorSheet), the
+ * header and tab row ours, its everything tab first.
+ */
+export function makeNpcSheet(Base)
+{
+   return class FHCSNpcSheet extends makeCharacterSheet(Base)
+   {
+      static DEFAULT_OPTIONS = {
+         classes: ['fhcs-npc'],
+         actions: { fhcsLairInside: lairInsideAction, fhcsToggleInspiration: toggleInspiredAction }
+      };
+
+      static PARTS = npcParts(Base.PARTS);
+
+      /** Our names and order for the NPC's tabs. */
+      fhcsTabNames = { names: NPC_TAB_NAMES, order: NPC_TAB_ORDER };
+
+      /** @inheritDoc */
+      get fhcsHomeTab()
+      {
+         return 'features';
+      }
+
+      /** dnd5e's attunement counter, while the Inventory tab is still dnd5e's. */
+      _renderAttunement(...args)
+      {
+         if (!this.fhcsDraws('inventory')) { return Base.prototype._renderAttunement.apply(this, args); }
+         return super._renderAttunement(...args);
+      }
+
+      /** dnd5e's slot pips, while the Spellbook tab is still dnd5e's. */
+      _renderSpellbook(...args)
+      {
+         if (!this.fhcsDraws('spells')) { return Base.prototype._renderSpellbook.apply(this, args); }
+         return super._renderSpellbook(...args);
       }
    };
 }

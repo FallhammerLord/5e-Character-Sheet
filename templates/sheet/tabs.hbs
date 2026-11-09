@@ -12,6 +12,9 @@
    {{/each}}
    {{!-- Settings pages (Special Traits) open from a gear, not the row; their buttons stay here, hidden, for Foundry's
          tab switch, which works through the row's buttons. --}}
+   {{!-- An NPC's Special Traits (edit mode): a gear at the row's end of tabs, until its Abilities tab has a Traits panel. --}}
+   {{#if fhcsTabs.settingsGear}}<button type="button" class="fhcs-toggle fhcs-gear-button fhcs-tabs-gear always-interactive" data-action="fhcsSpecialTraits"
+           aria-label="{{ fhcsTabs.settingsGear.label }}" data-fhcs-tip="{{ fhcsTabs.settingsGear.label }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}
    {{#each fhcsTabs.settings}}
    <button type="button" class="fhcs-tab always-interactive{{#if active}} active{{/if}}" data-action="tab" data-group="primary" data-tab="{{ id }}" hidden></button>
    {{/each}}
@@ -46,7 +49,7 @@
          </div>
       </details>
       {{else}}
-      <button type="button" class="fhcs-star{{#if on}} fhcs-on fhcs-star-last{{else}} fhcs-star-cooled{{/if}}" data-action="toggleInspiration" aria-pressed="{{#if on}}true{{else}}false{{/if}}"
+      <button type="button" class="fhcs-star{{#if on}} fhcs-on fhcs-star-last{{else}} fhcs-star-cooled{{/if}}" data-action="{{ toggle }}" aria-pressed="{{#if on}}true{{else}}false{{/if}}"
               aria-label="{{ label }}" data-fhcs-tip="{{ label }}"{{#unless canEdit}} disabled{{/unless}}>{{> fhcs-star-mark }}</button>
       {{/if}}
    </div>

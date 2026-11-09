@@ -9,7 +9,7 @@ import { canCast, spellKind } from './sheet/spellbook.js';
 import { TEMP_TOP_FLAG, tempTopAfter } from './sheet/header.js';
 import { sizesToKeep } from './tokens/sizes.js';
 import { categoryId } from './sheet/lists.js';
-import { APPLIED_FLAG, CATEGORY_FLAG, INSPIRATION_FLAG, SECTION_ORDER_FLAG, INSPIRATION_SLOTS_FLAG, MODULE_ID, PORTRAIT_FLAG, RESOURCES_FLAG, SHAPE_FLAG } from './constants.js';
+import { APPLIED_FLAG, CATEGORY_FLAG, INSPIRATION_FLAG, INSPIRED_FLAG, SECTION_ORDER_FLAG, INSPIRATION_SLOTS_FLAG, MODULE_ID, PORTRAIT_FLAG, RESOURCES_FLAG, SHAPE_FLAG } from './constants.js';
 
 /** dnd5e's own character sheet, which ours extends so every mechanic keeps working. Set by dnd5e before init. */
 export function systemCharacterSheet()
@@ -22,6 +22,22 @@ export function registerCharacterSheet(sheetClass, label)
 {
    foundry.applications.apps.DocumentSheetConfig.registerSheet(Actor, 'fhcs', sheetClass, {
       types: ['character'],
+      makeDefault: false,
+      label
+   });
+}
+
+/** dnd5e's own NPC sheet (npc-sheet.mjs), which ours extends as the character's does. */
+export function systemNpcSheet()
+{
+   return globalThis.dnd5e?.applications?.actor?.NPCActorSheet;
+}
+
+/** Registers a sheet for NPC actors, offered beside dnd5e's own (not the default). */
+export function registerNpcSheet(sheetClass, label)
+{
+   foundry.applications.apps.DocumentSheetConfig.registerSheet(Actor, 'fhcs', sheetClass, {
+      types: ['npc'],
       makeDefault: false,
       label
    });
@@ -118,10 +134,13 @@ export async function headerFacts(sheet, context, moduleId)
       xp: { value: xp.value ?? 0, max: Number.isFinite(xp.max) ? xp.max : xp.value ?? 0, pct: xp.pct ?? 0,
          valueLabel: (xp.value ?? 0).toLocaleString(game.i18n.lang),
          maxLabel: Number.isFinite(xp.max) ? xp.max.toLocaleString(game.i18n.lang) : '\u2014' },
-      // Size and speed only (user, 2026-10-27): type and alignment were noise here; alignment is on the Biography.
-      origin: [config.actorSizes?.[traits.size]?.label ?? traits.size],
-      // Species and background are cards under the abilities now (SCOPE §4.1), not words in this line.
-      originCards: originFacts(sheet),
+      // Size and speed only (user, 2026-10-27): type and alignment were noise here; alignment is on the Biography. An
+      // NPC's line is size · type · alignment (SCOPE §4.13, 2026-11-09).
+      origin: [config.actorSizes?.[traits.size]?.label ?? traits.size,
+         ...(actor.type === 'npc' ? [details.type?.label, details.alignment] : [])],
+      // Species and background are cards under the abilities now (SCOPE §4.1), not words in this line. An NPC's row
+      // holds its legendary panels instead.
+      originCards: actor.type === 'npc' ? null : originFacts(sheet),
       speed: `${walk} ${config.movementUnits?.[units]?.abbreviation ?? units}`,
       // Every speed with a value, in dnd5e's order, walking first (user, 2026-10-27).
       speeds: Object.entries(config.movementTypes ?? {}).filter(([key]) => key === 'walk' || speeds[key] > 0)
@@ -134,7 +153,8 @@ export async function headerFacts(sheet, context, moduleId)
          // Max HP before Max ± (dnd5e's `max`; `effectiveMax` adds `tempmax`), and Temp's top (header.js hpBars).
          base: attributes.hp.max ?? 0, tempTop: actor.flags?.[MODULE_ID]?.[TEMP_TOP_FLAG] ?? 0,
          temp: attributes.hp.temp ?? 0, tempmax: actor.system._source.attributes?.hp?.tempmax ?? 0 },
-      inspiration: attributes.inspiration,
+      inspiration: isInspired(actor),
+      npc: actor.type === 'npc' ? npcFacts(actor) : null,
       death: { success: attributes.death?.success ?? 0, failure: attributes.death?.failure ?? 0 },
       exhaustion: { value: attributes.exhaustion ?? 0, max: config.conditionTypes?.exhaustion?.levels ?? 6 },
       hd: { value: attributes.hd?.value ?? 0, max: attributes.hd?.max ?? 0 },
@@ -145,6 +165,32 @@ export async function headerFacts(sheet, context, moduleId)
          source: actor.system._source.abilities?.[a.key]?.value ?? a.value,
          save: a.save?.value ?? abilities[a.key]?.save?.value ?? a.mod, proficient: a.proficient ?? 0
       }))
+   };
+}
+
+/**
+ * An NPC's own header facts (SCOPE §4.13, the NPC sheet; npc-sheet.mjs `_prepareHeaderContext`): its challenge rating
+ * and XP, creature type and alignment, legendary actions and resistances (dnd5e stores what's spent; `value` is what's
+ * left, npc.mjs:458), and the lair, which dnd5e's modern rules mark "has a lair" and "in it" (raising XP and both
+ * legendary counts by one, npc.mjs:377) and its legacy rules give an initiative.
+ */
+function npcFacts(actor)
+{
+   const { details, resources } = actor.system;
+   const res = (key) => ({ max: resources?.[key]?.max ?? 0, value: resources?.[key]?.value ?? 0,
+      source: actor.system._source.resources?.[key]?.max ?? 0 });
+   const lair = resources?.lair ?? {};
+   return {
+      cr: details.cr ?? null,
+      crSource: actor.system._source.details?.cr ?? null,
+      xp: details.xp?.value ?? null,
+      xpLabel: Number.isFinite(details.xp?.value) ? details.xp.value.toLocaleString(game.i18n.lang) : '',
+      type: details.type?.label ?? '',
+      alignment: details.alignment ?? '',
+      legact: res('legact'),
+      legres: res('legres'),
+      modern: game.settings.get('dnd5e', 'rulesVersion') === 'modern',
+      lair: { has: !!lair.value, inside: !!lair.inside, initiative: lair.initiative ?? null }
    };
 }
 
@@ -739,7 +785,9 @@ export function inspirationFacts(actor)
 {
    const item = inspirationItem(actor);
    return {
-      on: !!actor.system.attributes?.inspiration,
+      on: isInspired(actor),
+      // A character's on or off is dnd5e's own action; an NPC's is ours (dnd5e has none).
+      own: actor.type !== 'character',
       bank: item ? { link: docFacts(item), value: item.system.uses.value ?? 0, max: item.system.uses.max, filled: bankSlots(actor, item) } : null,
       linkable: actor.items.filter((i) => i.system.uses?.max).map(docFacts).sort((a, b) => a.name.localeCompare(b.name))
    };
@@ -760,7 +808,7 @@ export async function setInspirationSlot(actor, slot)
    // clicked (user, 2026-10-28: drawn between the two writes, the bank showed the default place filled first).
    await actor.update({
       [`flags.${MODULE_ID}.${INSPIRATION_SLOTS_FLAG}`]: { item: item.id, filled: filled.flatMap((on, i) => (on ? [i] : [])) },
-      'system.attributes.inspiration': value > 0
+      ...inspiredUpdate(actor, value > 0)
    }, { render: false });
    return item.update({ 'system.uses.spent': item.system.uses.max - value });
 }
@@ -781,7 +829,31 @@ export function lastSavedAgo(actor)
 function syncInspiration(actor, banked)
 {
    const on = banked > 0;
-   return !!actor.system.attributes?.inspiration === on ? null : actor.update({ 'system.attributes.inspiration': on });
+   return isInspired(actor) === on ? null : actor.update(inspiredUpdate(actor, on));
+}
+
+/** Whether the actor holds inspiration: dnd5e's on or off for a character, our flag for anyone else (an NPC). */
+export function isInspired(actor)
+{
+   return actor.type === 'character' ? !!actor.system.attributes?.inspiration : !!actor.flags?.[MODULE_ID]?.[INSPIRED_FLAG];
+}
+
+/** The update that sets inspiration on or off, wherever this actor keeps it. */
+function inspiredUpdate(actor, on)
+{
+   return actor.type === 'character' ? { 'system.attributes.inspiration': on } : { [`flags.${MODULE_ID}.${INSPIRED_FLAG}`]: on };
+}
+
+/** An NPC's inspiration on or off (the tab row's star, without a bank); a character's goes through dnd5e's action. */
+export function toggleInspired(actor)
+{
+   return actor.update(inspiredUpdate(actor, !isInspired(actor)));
+}
+
+/** An NPC in its lair or out (dnd5e's modern rules; npc-header.hbs's slide toggle, `system.resources.lair.inside`). */
+export function setLairInside(actor, inside)
+{
+   return actor.update({ 'system.resources.lair.inside': !!inside });
 }
 
 /** Banks inspiration in an item's uses, or goes back to dnd5e's on or off (no id). */
@@ -1342,11 +1414,12 @@ export function keepTokenSizes(token, change)
    for (const key of keys) { setProperty(change, key, getProperty(token._source, key)); }
 }
 
-export function rerenderSheets(className)
+export function rerenderSheets(classNames)
 {
+   const names = [classNames].flat();
    for (const app of foundry.applications.instances?.values() ?? [])
    {
-      if (app.constructor.name === className) { app.render(); }
+      if (names.includes(app.constructor.name)) { app.render(); }
    }
 }
 

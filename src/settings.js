@@ -1,4 +1,4 @@
-import { MODULE_ID, SHEET_CLASS_NAME, THEMES } from './constants.js';
+import { MODULE_ID, SHEET_CLASS_NAMES, THEMES } from './constants.js';
 import { rerenderSheets } from './compat.js';
 import { rethemeCards } from './chat/card.js';
 import { DEFAULT_COLUMNS } from './sheet/inventory.js';
@@ -29,7 +29,7 @@ export function registerSettings()
       default: 'plain',
       onChange: () =>
       {
-         rerenderSheets(SHEET_CLASS_NAME);
+         rerenderSheets(SHEET_CLASS_NAMES);
          rethemeCards();
       }
    });
@@ -54,7 +54,7 @@ export function registerSettings()
       config: true,
       type: Boolean,
       default: true,
-      onChange: () => rerenderSheets(SHEET_CLASS_NAME)
+      onChange: () => rerenderSheets(SHEET_CLASS_NAMES)
    });
 
    // Token sizes kept through image swaps (user, 2026-11-08): Token HUD Wildcard falls back to the prototype's size.
@@ -75,7 +75,7 @@ export function registerSettings()
       config: false,
       type: Object,
       default: { ...DEFAULT_COLUMNS },
-      onChange: () => rerenderSheets(SHEET_CLASS_NAME)
+      onChange: () => rerenderSheets(SHEET_CLASS_NAMES)
    });
 
    // Which Spellbook columns show (SCOPE §4.7), chosen the same way.
@@ -86,7 +86,7 @@ export function registerSettings()
       config: false,
       type: Object,
       default: { ...DEFAULT_SPELL_COLUMNS },
-      onChange: () => rerenderSheets(SHEET_CLASS_NAME)
+      onChange: () => rerenderSheets(SHEET_CLASS_NAMES)
    });
 
    // Which Features columns show (SCOPE §4.8), chosen the same way.
@@ -97,7 +97,7 @@ export function registerSettings()
       config: false,
       type: Object,
       default: { ...DEFAULT_FEATURE_COLUMNS },
-      onChange: () => rerenderSheets(SHEET_CLASS_NAME)
+      onChange: () => rerenderSheets(SHEET_CLASS_NAMES)
    });
 
    // World: the table plays by one rule.

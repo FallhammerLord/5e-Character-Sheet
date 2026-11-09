@@ -5,6 +5,13 @@ export const MODULE_PATH = `modules/${MODULE_ID}`;
 export const SHEET_CLASS_NAME = 'FHCSCharacterSheet';
 export const SHEET_ID = `${MODULE_ID}.${SHEET_CLASS_NAME}`;
 
+/** Our NPC sheet's class name and ID (SCOPE §4.13, the NPC sheet). */
+export const NPC_SHEET_CLASS_NAME = 'FHCSNpcSheet';
+export const NPC_SHEET_ID = `${MODULE_ID}.${NPC_SHEET_CLASS_NAME}`;
+
+/** Our sheets' class names, for settings that redraw every open sheet. */
+export const SHEET_CLASS_NAMES = [SHEET_CLASS_NAME, NPC_SHEET_CLASS_NAME];
+
 /**
  * Controls that only change what this viewer sees: folds, details, opening a document to read, filters and grouping.
  * A viewer who can't edit the character (Observer) keeps them: Foundry disables every control on such a sheet and
@@ -34,6 +41,12 @@ export const RESOURCES_FLAG = 'resources';
 
 /** Actor flag: the item, by id, whose uses are the character's banked inspiration (SCOPE §4.12). */
 export const INSPIRATION_FLAG = 'inspiration';
+
+/**
+ * Actor flag: an NPC's inspiration, on or off (user, 2026-11-09: "sometimes Strahd needs to steal a player's
+ * inspiration"). dnd5e keeps inspiration on characters only (character.mjs:83).
+ */
+export const INSPIRED_FLAG = 'inspired';
 
 /** Actor flag: which places in that bank are filled ({ item: id, filled: [index] }), so any may be spent or banked. */
 export const INSPIRATION_SLOTS_FLAG = 'inspirationSlots';
