@@ -206,7 +206,8 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
 - [x] Design answers (rebuild item and NPC; reuse Inventory for the rest; skin the smaller windows; theme by owner, else world)
 - [x] Item sheet decisions (SCOPE §4.13, user 2026-10-28)
 - [x] Item sheet mocked up (canvas row "Phase 6.7 · the item sheet": a weapon light, a spell dark, a feature in Forge, 500px edit mode), waits on the user's review
-- [ ] Mockups for the NPC and the rest
+- [x] NPC research: dnd5e 6.0.6's NPC sheet and Tidy Classic's, against our code (research note, "The NPC sheet, closer", 2026-11-09)
+- [ ] NPC design questions, then mockups for the NPC and the rest
 - [x] Chat cards in the world theme (world setting "Themed chat cards", on by default); Forge's card: a riveted iron plate, Grenze title and totals, iron-edged bands that heat on hover; every card case checked in Forge; Quench test added
 - [x] Item sheet (every type, spells included): header, our tab row and lock, Description with the properties column and Category; dnd5e's forms for the rest; layout cases (500–740px, Forge), unit and load checks, a Quench test (built 2026-10-28; waits on Quench and play)
 - [ ] NPC sheet

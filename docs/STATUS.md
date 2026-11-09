@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6.7, every sheet** (ROADMAP; SCOPE §4.13, §5.4): the NPC sheet first. Start with dnd5e's NPC sheet source (research note `dnd5e-6.0-other-sheets.md`), then the design questions and mockup boards. Chosen over Phase 7 so the NPC sheet gets the ADHD layer with the rest. Its plates carry `fhcs-plate`, so every theme dresses it (SCOPE §5.3 rule 11). The play round's ask 12 waits on a session of play.
+1. **Phase 6.7, every sheet** (ROADMAP; SCOPE §4.13, §5.4): the NPC sheet first. Research done (research note `dnd5e-6.0-other-sheets.md`, "The NPC sheet, closer"); next the design questions, then the mockup boards. Chosen over Phase 7 so the NPC sheet gets the ADHD layer with the rest. Its plates carry `fhcs-plate`, so every theme dresses it (SCOPE §5.3 rule 11). The play round's ask 12 waits on a session of play.
 2. **`#postNotification` TypeError** seen in the chat card runs: in Foundry's own code, cause not yet known; no test fails on it.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
