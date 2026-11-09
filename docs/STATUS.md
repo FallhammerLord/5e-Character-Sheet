@@ -4,14 +4,13 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Mechanical parity** (ROADMAP "Mechanical parity", SCOPE §4.15): slices A–E and G–H built, Quench passed 2026-11-09; F's play check from a player account waits on the user (below). When it passes, tick items 1, 8, 12 and 13, write the BUILT entry, close the phase. Then Phase 6.7 (the NPC sheet first), recommended over Phase 7. The play round's ask 12 waits on a session of play.
+1. **Phase 6.7, every sheet** (ROADMAP; SCOPE §4.13, §5.4): the NPC sheet first. Start with dnd5e's NPC sheet source (research note `dnd5e-6.0-other-sheets.md`), then the design questions and mockup boards. Chosen over Phase 7 so the NPC sheet gets the ADHD layer with the rest. The play round's ask 12 waits on a session of play.
 2. **`#postNotification` TypeError** seen in the chat card runs: in Foundry's own code, cause not yet known; no test fails on it.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
 
 ## Waiting on the user
 
-- **Parity play** (Quench passed in full 2026-11-09, the parity tests and the fixed effects test included): Quench core's five new tests: "rolls a tool from the Traits panel", "saves coins typed…", "shows a Limited viewer…", "lets an Observer fold…", "drags an item favorite from Attributes…"; Quench chat's "gives an Enchant activity's tray its place…". Favorites drag played 2026-11-09 ("works as advertised"). Then in play: Then, from a player account: give the player Limited on a character (portrait, name, public line, biography; nothing else) and Observer on another (folds, details, item sheets open; nothing rolls or edits); roll a tool from Traits; type coins and watch the carried bar.
 - **Chat cards in play** (from a player's client): another player's attack and damage show once rolled; an effect applied from a card leaves a line; the hit line holds when targets change; each damage type its own total; a new card scrolls fully into view, down to Apply.
 - **Token sizes on Wildcard swaps** (ROADMAP play round ask 12; after a session of play, user 2026-11-08): swap a resized token's image to an untagged file (size stays), then to a tagged one like `_scale1.5` (scale applies). Not testable offline beyond the unit cases; no Quench test (it needs a scene token).
 - **Player sheet lock-up** (ROADMAP "Player-side bugs" 2): the F12 console output the next time it happens, and what "locked" looks like.
@@ -21,6 +20,7 @@ Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a p
 
 In Foundry, by the user:
 
+- **Mechanical parity** (2026-11-09, Quench core and chat, play): tools from Traits, coins and carried weight, the Limited and Observer views, favorites drag, Infuse Item's tray; the rest of the list needed no change. How it works: BUILT.
 - **Effects test's moving failure** (2026-11-09, Quench passes): a test bug, the level-up test's dnd5e wizard finishing late and writing back the actor (CLAUDE.md trap).
 - **Play round 2026-11-08, asks 4 and 14** (2026-11-08, play: "worked first time"): Night's brighter moons and moonbeam; inspiration's moment on the same star for every player, carried across redraws. The Quench bank test's new step not yet run.
 - **Play round 2026-11-08, asks 3 and 13** (2026-11-08, portrait rest: "works properly"; play: "animations are better" after the trays' first-frame fix): folds and trays move both ways.

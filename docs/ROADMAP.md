@@ -235,23 +235,23 @@ Done and verified in play (2026-10-24). Runs alongside the sheet phases; works w
 1. [x] Cards without their rolls: a card's draw is async, and a roll created meanwhile asks for a redraw that finds no card in the log yet, or two redraws race and the older one lands. Each card now records the rolls it drew (`data-fhcs-drawn`); after every draw the chat log draws a card again when it missed one, three times at most, saying so in the console (`fhcs | Card … was drawn before its latest roll arrived`). Cause found by reading dnd5e's source, not seen happen. Quench chat cards: new test. Waits on play.
 2. [ ] Sheet locks up: no cause found in our code yet. Our after-render steps now can't leave the sheet half-wired (a failure logs `fhcs | The sheet's extras failed…`), and a part that fails to draw names itself and the user (`fhcs | The <part> part failed to draw…`). Waits on the user: the next time it happens, F12 console output, and whether fields look greyed, clicks do nothing, or the window won't drag.
 
-## Mechanical parity (user, 2026-11-08; SCOPE §4.15)
+## Mechanical parity (user, 2026-11-08; SCOPE §4.15; done, verified 2026-11-09)
 
 What the default sheet and Tidy both do; ours must too before release. Tick when verified in a world.
 
-1. [ ] Every roll: abilities, saves, initiative, skills, death saves, hit dice (Quench core). **Tools don't roll:** they show as trait pills with no action (slice B).
+1. [x] Every roll: abilities, saves, initiative, skills, death saves, hit dice, and tools from Traits (slice B; Quench core 2026-11-09)
 2. [x] Item use through activities, with consumption and chat cards (play, user 2026-11-08: resources work)
 3. [x] Drag and drop: in, out, reorder, containers, hotbar (play, user 2026-11-08)
 4. [x] Context menus on items and effects (play, user 2026-11-08: right-click works)
 5. [x] Spell slots, pact slots, prepared spells, concentration (Quench core; pact slots in play, user 2026-11-08)
 6. [x] Temp HP, max HP override, hit dice (Quench core; override in play, user 2026-11-08)
 7. [x] Conditions and exhaustion (Quench core, play)
-8. [ ] Encumbrance and currency: untested (slice C)
+8. [x] Encumbrance and currency (slice C; Quench core 2026-11-09)
 9. [x] Short and long rest dialogs (Quench core, play)
 10. [x] Advancement on level-up (Quench core, play)
 11. [x] Favorites (Quench core, play)
-12. [ ] Limited and Observer views: untested; the Limited view is unstyled today (slices D, E)
-13. [ ] Every activity type on our chat card (user, 2026-11-09: Infuse Item showed nothing; slice G)
+12. [x] Limited and Observer views (slices D, E; Quench 2026-11-09; played 2026-11-09)
+13. [x] Every activity type on our chat card (user, 2026-11-09: Infuse Item showed nothing; slice G)
 
 Slices:
 
@@ -262,4 +262,4 @@ Slices:
 - [x] E. Observer view (built 2026-11-08; Quench core "lets an Observer fold…"): view-only controls stay live (`VIEW_ACTIONS`), everything else off as dnd5e has it
 - [x] G. Activity types (2026-11-09; SCOPE §6.8, chat research note): surveyed all 13; Enchant's tray was the only miss, now in an Enchant section. Quench chat "gives an Enchant activity's tray its place…"; layout `card-enchant-*`
 - [x] H. Favorites drag from Attributes (user, 2026-11-09; SCOPE §4.15): item and effect favorites carry dnd5e's `draggable`. Quench core "drags an item favorite from Attributes…"; played 2026-11-09 ("works as advertised")
-- [ ] F. Quench (passed 2026-11-09), then play as a player account (Limited and Observer need a real non-owner; Quench runs as GM)
+- [x] F. Quench (passed 2026-11-09), then play as a player account (Limited and Observer, 2026-11-09) (Limited and Observer need a real non-owner; Quench runs as GM)
