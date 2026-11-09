@@ -262,4 +262,4 @@ Slices:
 - [x] E. Observer view (built 2026-11-08; Quench core "lets an Observer fold…"): view-only controls stay live (`VIEW_ACTIONS`), everything else off as dnd5e has it
 - [x] G. Activity types (2026-11-09; SCOPE §6.8, chat research note): surveyed all 13; Enchant's tray was the only miss, now in an Enchant section. Quench chat "gives an Enchant activity's tray its place…"; layout `card-enchant-*`
 - [x] H. Favorites drag from Attributes (user, 2026-11-09; SCOPE §4.15): item and effect favorites carry dnd5e's `draggable`. Quench core "drags an item favorite from Attributes…"; played 2026-11-09 ("works as advertised")
-- [ ] F. Quench, then play as a player account (Limited and Observer need a real non-owner; Quench runs as GM)
+- [ ] F. Quench (passed 2026-11-09), then play as a player account (Limited and Observer need a real non-owner; Quench runs as GM)

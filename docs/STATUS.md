@@ -4,16 +4,15 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Mechanical parity** (ROADMAP "Mechanical parity", SCOPE §4.15): slices A–E built 2026-11-08 G (activity types on chat cards) and H (favorites drag) 2026-11-09; F waits on the user (below). When F passes, tick items 1, 8, 12 and 13, write the BUILT entry and close the phase. Phase 1 is closed. The play round's asks are all built and played but 12, which waits on a session of play.
-2. **Favorites trap: found, a test bug** (2026-11-09): the effects test's failure named dnd5e's advancement wizard (`#complete`) as the write that cleared its favorite. The level-up test before it left dnd5e's wizard finishing on its own; the wizard writes back the whole actor from its opening copy, so a late finish wiped the next test's favorite. The level-up test now waits for the wizard to finish or close. Waits on a Quench run. The `#postNotification` TypeError seen in the chat card runs is in Foundry's own code, cause not yet known.
+1. **Mechanical parity** (ROADMAP "Mechanical parity", SCOPE §4.15): slices A–E and G–H built, Quench passed 2026-11-09; F's play check from a player account waits on the user (below). When it passes, tick items 1, 8, 12 and 13, write the BUILT entry, close the phase. Then Phase 6.7 (the NPC sheet first), recommended over Phase 7. The play round's ask 12 waits on a session of play.
+2. **`#postNotification` TypeError** seen in the chat card runs: in Foundry's own code, cause not yet known; no test fails on it.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
 
 ## Waiting on the user
 
-- **Parity Quench and play** (Quench passed 2026-11-09, all but the effects test, now fixed; rerun that one): Quench core's five new tests: "rolls a tool from the Traits panel", "saves coins typed…", "shows a Limited viewer…", "lets an Observer fold…", "drags an item favorite from Attributes…"; Quench chat's "gives an Enchant activity's tray its place…". Favorites drag played 2026-11-09 ("works as advertised"). Then in play: Then, from a player account: give the player Limited on a character (portrait, name, public line, biography; nothing else) and Observer on another (folds, details, item sheets open; nothing rolls or edits); roll a tool from Traits; type coins and watch the carried bar.
+- **Parity play** (Quench passed in full 2026-11-09, the parity tests and the fixed effects test included): Quench core's five new tests: "rolls a tool from the Traits panel", "saves coins typed…", "shows a Limited viewer…", "lets an Observer fold…", "drags an item favorite from Attributes…"; Quench chat's "gives an Enchant activity's tray its place…". Favorites drag played 2026-11-09 ("works as advertised"). Then in play: Then, from a player account: give the player Limited on a character (portrait, name, public line, biography; nothing else) and Observer on another (folds, details, item sheets open; nothing rolls or edits); roll a tool from Traits; type coins and watch the carried bar.
 - **Chat cards in play** (from a player's client): another player's attack and damage show once rolled; an effect applied from a card leaves a line; the hit line holds when targets change; each damage type its own total; a new card scrolls fully into view, down to Apply.
-- **Quench rerun:** the click-off tray test now waits for the tray's fade-out (it checked at once; a test bug, 2026-11-08). The rest passed that run, the effect favorite test included.
 - **Token sizes on Wildcard swaps** (ROADMAP play round ask 12; after a session of play, user 2026-11-08): swap a resized token's image to an untagged file (size stays), then to a tagged one like `_scale1.5` (scale applies). Not testable offline beyond the unit cases; no Quench test (it needs a scene token).
 - **Player sheet lock-up** (ROADMAP "Player-side bugs" 2): the F12 console output the next time it happens, and what "locked" looks like.
 - **Not yet tried:** choosing a class, species or background in edit mode; Special Traits checkboxes at 20px.
@@ -22,6 +21,7 @@ Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a p
 
 In Foundry, by the user:
 
+- **Effects test's moving failure** (2026-11-09, Quench passes): a test bug, the level-up test's dnd5e wizard finishing late and writing back the actor (CLAUDE.md trap).
 - **Play round 2026-11-08, asks 4 and 14** (2026-11-08, play: "worked first time"): Night's brighter moons and moonbeam; inspiration's moment on the same star for every player, carried across redraws. The Quench bank test's new step not yet run.
 - **Play round 2026-11-08, asks 3 and 13** (2026-11-08, portrait rest: "works properly"; play: "animations are better" after the trays' first-frame fix): folds and trays move both ways.
 - **Play round 2026-11-08, asks 1, 2 and 5–10** (2026-11-08, Quench and play: "quench passes. the rest plays very nicely"): toggles easing, Temp's bar and its moments, Max ± on HP's bar, exhaustion's face at 0, the Traits gear at its bar's right over the row gears, Special Traits closing from its own gear, edit-mode HP on one line. Quench passing also covers Phases 6.5–6.7's tests.
