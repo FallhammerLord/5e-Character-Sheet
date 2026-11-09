@@ -4,7 +4,7 @@ Goal: Tidy 5e's classic layout, maintained, with the ADHD-friendly rules from ou
 
 Every phase ends with the user testing in their own v14 world. A phase is done when it's verified there, not when the code lands.
 
-## Theme kit (user, 2026-11-09; before any new theme; built 2026-11-09, waits on a look in Foundry)
+## Theme kit (user, 2026-11-09; before any new theme; done; verified 2026-11-09)
 
 A new theme should be textures, marks and motion, not new plumbing. Before the kit it wasn't: no BUILT entry says how a theme plugs in, Plain and Forge each keep their own copy of the plate list (the Limited view had to be added to both, Forge's twice), particles branch per theme in `src/apps/sparks.js`, and Wind, Sand and Valley stopped at about 80 lines of tokens. The class themes parked in SCOPE §7 waited for it.
 

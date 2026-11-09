@@ -11,7 +11,6 @@ Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a p
 
 ## Waiting on the user
 
-- **Theme kit in Foundry** (built 2026-11-09, offline checks pass): open a character in Plain (Day and Night) and Forge and see nothing changed: plates, the emblem at the inspiration bar's left, sparks, motes, moonbeam, cloud, nova. In Wind, Sand or Valley the emblem now sits left of the stars instead of under them. Any F12 errors after a hit or heal (the sheet now asks the theme for a `hit` and `heal` answer). The class themes (SCOPE §7) can start after this.
 - **Chat cards in play** (from a player's client): another player's attack and damage show once rolled; an effect applied from a card leaves a line; the hit line holds when targets change; each damage type its own total; a new card scrolls fully into view, down to Apply.
 - **Token sizes on Wildcard swaps** (ROADMAP play round ask 12; after a session of play, user 2026-11-08): swap a resized token's image to an untagged file (size stays), then to a tagged one like `_scale1.5` (scale applies). Not testable offline beyond the unit cases; no Quench test (it needs a scene token).
 - **Player sheet lock-up** (ROADMAP "Player-side bugs" 2): the F12 console output the next time it happens, and what "locked" looks like.
@@ -21,6 +20,7 @@ Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a p
 
 In Foundry, by the user:
 
+- **Theme kit** (2026-11-09, play: "working properly"): plates through `fhcs-plate`, the particle registry, one emblem place, the starter file and its load check. The class themes (SCOPE §7) may start. How it works: BUILT.
 - **Mechanical parity** (2026-11-09, Quench core and chat, play): tools from Traits, coins and carried weight, the Limited and Observer views, favorites drag, Infuse Item's tray; the rest of the list needed no change. How it works: BUILT.
 - **Effects test's moving failure** (2026-11-09, Quench passes): a test bug, the level-up test's dnd5e wizard finishing late and writing back the actor (CLAUDE.md trap).
 - **Play round 2026-11-08, asks 4 and 14** (2026-11-08, play: "worked first time"): Night's brighter moons and moonbeam; inspiration's moment on the same star for every player, carried across redraws. The Quench bank test's new step not yet run.
