@@ -82,6 +82,16 @@
    </details>
    {{/if}}
 
+   {{#if fhcs.enchant}}
+   {{!-- An Enchant activity's tray (Infuse Item and the like; user, 2026-11-09): dnd5e places its
+         <enchantment-application> before the first `.card-footer` after each draw (enchant.mjs:102), so the marker
+         sits where the tray belongs. The section hides until dnd5e adds the tray (it skips it when concentration ends). --}}
+   <div class="fhcs-enchant">
+      <span class="fhcs-band-heading">{{ fhcs.enchant.heading }}</span>
+      <span class="card-footer" hidden></span>
+   </div>
+   {{/if}}
+
    {{#if fhcs.applied.length}}
    {{!-- What Apply did (user, 2026-10-28): kept on the card, open, whatever is selected or targeted next. --}}
    <div class="fhcs-applied">

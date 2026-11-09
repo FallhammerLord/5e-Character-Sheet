@@ -722,6 +722,14 @@ export const CASES = [
       }), { supplements: ['Kira regains 1 hit point.'], others: [{ action: 'breakConcentration', index: 0, label: 'Break Concentration' }] })
    },
    { name: 'card-request', template: 'chat/request-card', frame: 'chat', context: request() },
+   // Infuse Item, an Enchant activity (user, 2026-11-09): dnd5e's tray as it builds it after the draw (empty, then holding
+   // a long-named item), placed before the marker as dnd5e does.
+   ...[['empty', '<div class="drop-area empty"><p>Drop an item here to enchant it.</p></div>'],
+      ['held', '<div class="drop-area"><div class="preview"><img class="gold-icon" src="icons/svg/sword.svg" alt=""><span class="name">Longsword of the Seventh Lantern-Bearer</span><a aria-label="Remove"><i class="fa-solid fa-rotate-left" inert></i></a></div></div>']]
+      .map(([state, tray]) => ({ name: `card-enchant-${state}`, frame: 'chat',
+         html: template('chat/usage-card')({ ...card({ title: 'Infuse Item', subtitle: 'Enchant', tags: [], description: '', hasDetails: false,
+            enchant: { heading: 'Enchant' } }) }).replace('<span class="card-footer" hidden></span>',
+            `<enchantment-application class="dnd5e2">${tray}<div class="count-area">Enchanted 0 / 1</div></enchantment-application><span class="card-footer" hidden></span>`) })),
    { name: 'card-fireball-saves', template: 'chat/usage-card', frame: 'chat', context: fireball() },
    { name: 'card-attack-crit', template: 'chat/usage-card', frame: 'chat', context: rolledAttack(attack(), ['6 + 5 + 3 = 14', '1 + 5 + 3 = 9'], damage()) },
    // Another player's view (user, 2026-11-02): dnd5e hides the roll buttons from them; the attack shows once rolled,

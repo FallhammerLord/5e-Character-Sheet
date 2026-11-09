@@ -54,6 +54,28 @@ So SCOPE §6.4's "saves on the same card" exists already; our work there is word
 - `CONFIG.ChatMessage.dataModels` is set in dnd5e's init; swapping `usage` for a subclass in our init (later) applies to every message, since the world's messages are built after init. The subclass keeps `metadata`, schema and migrations; we override `template` and extend `_prepareContext`.
 - `activity.use(usage, dialog, { create: false })` returns the message data without posting; `usage.subsequentActions: false` skips the automatic follow-up roll. **dnd5e already rolls the attack after an attack activity is used** (`AttackActivity#_triggerSubsequentActions`), and a damage activity's damage likewise.
 
+## Every activity type on the usage card (checked 2026-11-09)
+
+The user found Infuse Item drew nothing past its header. dnd5e 6.0.6 has 13 activity types (`module/documents/activity/`). What each adds to its usage card, and where ours shows it:
+
+| Type | Card buttons (`_usageChatButtons`) | Ours |
+|---|---|---|
+| attack | `rollAttack`, `rollDamage` | bands |
+| save | `rollSave` per ability, `rollDamage` | bands |
+| check | `rollCheck` per ability, skill or tool | save-kind band |
+| damage | `rollDamage` | band |
+| heal | `rollHealing` | band |
+| utility | `rollFormula` | band |
+| summon | `placeSummons` (hidden unless `canSummon`) | plain button |
+| transform | `transformActor` (labelled with the form) | plain button |
+| teleport | `planTeleport` | plain button |
+| enchant | none: `onRenderChatCard` (enchant.mjs:102) adds `<enchantment-application>` after each draw, before the first `.card-footer` or at the end of `.chat-card`, only when the message has `flags.dnd5e.use.enchantmentProfile`, its content is visible and any concentration still holds | was missing; now an Enchant section holding a hidden `.card-footer` marker |
+| cast | none; casts the spell, whose own card draws | its spell's card |
+| forward | none; uses another activity, whose card draws | that activity's card |
+| order | bastion orders; not a usage card | dnd5e's card |
+
+Every activity also gets `placeTemplate` (with a template), `consumeResource` and `refundResource` (with consumption): plain buttons on ours. Enchant is the only `onRenderChatCard` override in 6.0.6; a type that brings back one later would need the same check. A module's activity that supplies a legacy `usage.chatCard` sets the message's `content`, and ours steps aside (`useCard`). Other message types (rest, hit die, recharge, turn, time passed, bastion) keep dnd5e's own look.
+
 ## Requests (checked for standalone rolls, 2026-10-23)
 
 - `RequestMessageData` (`type: "request"`): `system.targets` = `{ actor (uuid), result (message), user }`; `system.handler` names a function in `CONFIG.DND5E.requests`; `system.button` its label and icon. The template's per-target button is `data-action="handleRequest"` inside `[data-uuid]`.

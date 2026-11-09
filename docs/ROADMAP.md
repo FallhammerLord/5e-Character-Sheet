@@ -251,6 +251,7 @@ What the default sheet and Tidy both do; ours must too before release. Tick when
 10. [x] Advancement on level-up (Quench core, play)
 11. [x] Favorites (Quench core, play)
 12. [ ] Limited and Observer views: untested; the Limited view is unstyled today (slices D, E)
+13. [ ] Every activity type on our chat card (user, 2026-11-09: Infuse Item showed nothing; slice G)
 
 Slices:
 
@@ -259,4 +260,5 @@ Slices:
 - [x] C. Encumbrance and currency (test written 2026-11-08, Quench core "saves coins typed…"): Quench test that edits a coin and checks the carried bar against dnd5e's `attributes.encumbrance`; then play
 - [x] D. Limited view in our frame (built 2026-11-08; Quench core "shows a Limited viewer…"): our templates for dnd5e's two limited parts, the public biography added; layout cases `limited*`. The layout screenshots stood in for a canvas board (the user asked for the whole track in one go)
 - [x] E. Observer view (built 2026-11-08; Quench core "lets an Observer fold…"): view-only controls stay live (`VIEW_ACTIONS`), everything else off as dnd5e has it
+- [x] G. Activity types (2026-11-09; SCOPE §6.8, chat research note): surveyed all 13; Enchant's tray was the only miss, now in an Enchant section. Quench chat "gives an Enchant activity's tray its place…"; layout `card-enchant-*`
 - [ ] F. Quench, then play as a player account (Limited and Observer need a real non-owner; Quench runs as GM)

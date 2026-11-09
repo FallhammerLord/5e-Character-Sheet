@@ -407,6 +407,10 @@ The same frame serves every roll: a skill check from the sheet is header plus d2
 - **Who can click:** a card's author uses its rolls, late adds and saves; the GM uses every card. Foundry lets a player control and change only what they own, so a player's Apply reaches their own tokens (healing themselves); damage to enemies is the GM's click.
 - **Selected tokens, not targets.** Player targeting is too unreliable to drive anything. Apply buttons and "roll for" buttons act on selected tokens: in practice the GM's selection. A player's targets may show as information (the hit or miss against each); nothing happens automatically because of them. dnd5e's trays open in "selected" mode, said in words.
 
+### 6.8 Every activity type (user, 2026-11-09)
+
+"Chat cards don't reflect every activity type, i.e. infuse weapon doesn't show": every activity type's card shows what dnd5e's shows. Enchant's tray sits in its own section, headed "Enchant", where Apply sits (Claude, 2026-11-09), in the card's body style. The survey is in the chat research note.
+
 ### 6.7 Polish (user, 2026-10-28)
 
 - **Each damage type its own total:** the damage band splits a roll as dnd5e's Apply does (`aggregateDamageRolls`): radiant dice in a slashing roll read "9 Slashing · 6 Radiant" under the total, not all as slashing.

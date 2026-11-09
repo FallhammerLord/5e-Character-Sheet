@@ -784,6 +784,47 @@
    padding: var(--fhcs-s1) var(--fhcs-s2) var(--fhcs-s2);
 }
 
+/* Enchant (user, 2026-11-09: Infuse Item showed no tray): a heading over dnd5e's <enchantment-application>, which
+   dnd5e builds after the draw; its drop area and enchanted items in our look. Hidden until the tray arrives. */
+.fhcs-chat .fhcs-enchant
+{
+   display: flex;
+   flex-direction: column;
+   gap: var(--fhcs-s1);
+   padding: var(--fhcs-s1) var(--fhcs-s2) var(--fhcs-s2);
+   border-top: 1px solid var(--fhcs-line-soft);
+   text-align: center;
+}
+.fhcs-chat .fhcs-enchant:not(:has(enchantment-application)) { display: none; }
+.fhcs-chat .fhcs-enchant enchantment-application { display: flex; flex-direction: column; gap: var(--fhcs-s1); margin: 0; }
+.fhcs-chat .fhcs-enchant .drop-area
+{
+   display: flex;
+   flex-direction: column;
+   gap: var(--fhcs-s1);
+   min-height: var(--fhcs-control);
+   padding: var(--fhcs-s1) var(--fhcs-s2);
+   border: 1px dashed var(--fhcs-line);
+   border-radius: var(--fhcs-radius);
+   color: var(--fhcs-ink);
+   text-align: left;
+}
+.fhcs-chat .fhcs-enchant .drop-area.empty { justify-content: center; text-align: center; }
+.fhcs-chat .fhcs-enchant .drop-area p { margin: 0; }
+.fhcs-chat .fhcs-enchant .preview { display: flex; align-items: center; gap: var(--fhcs-s2); min-height: var(--fhcs-control); }
+.fhcs-chat .fhcs-enchant .preview > img { flex: none; width: 24px; height: 24px; margin: 0; border: 0; }
+.fhcs-chat .fhcs-enchant .preview > .name { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.fhcs-chat .fhcs-enchant .preview > a { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 24px; height: 24px; }
+.fhcs-chat .fhcs-enchant .count-area { margin: 0; color: var(--fhcs-ink); text-align: right; }
+/* dnd5e's tray sets its own sizes, slab and capitals (chat.less:559); ours keeps the card's body style. */
+.fhcs-chat .fhcs-enchant :is(.drop-area, .drop-area p, .preview > .name, .count-area)
+{
+   font: inherit;
+   font-style: normal;
+   text-transform: none;
+   letter-spacing: normal;
+}
+
 /* The record of what was applied: a heading, then one line per target; long records scroll like the history. */
 .fhcs-chat .fhcs-applied
 {

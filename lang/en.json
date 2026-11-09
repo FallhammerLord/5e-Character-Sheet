@@ -94,6 +94,7 @@
       "Apply": "Apply",
       "ApplyNote": "To selected tokens. Damage halves for each token that saved, if the spell says so.",
       "Applied": "Applied",
+      "Enchant": "Enchant",
       "TakesType": "{who} takes {amount} {type}",
       "TakesTypes": "{who} takes {amount}: {types}",
       "TakesNone": "{who} takes no damage",

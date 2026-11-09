@@ -495,6 +495,8 @@ export function makeUsageMessageData(Base)
             apply: (damageId || context.effects?.length)
                ? { damageId, heading: localize('FHCS.Card.Apply'), note: localize('FHCS.Card.ApplyNote') }
                : null,
+            // Enchant activities (Infuse Item): dnd5e adds its tray after the draw; the section gives it a place.
+            enchant: this.parent.getFlag?.('dnd5e', 'use.enchantmentProfile') ? { heading: localize('FHCS.Card.Enchant') } : null,
             applied: appliedLines(appliedFacts(this.parent), format),
             appliedHeading: localize('FHCS.Card.Applied'),
             drawn: drawnRolls(this.parent, [...FOLDED_TYPES])

@@ -1551,6 +1551,29 @@ export function registerQuenchTests(quench)
             assert.strictEqual(CONFIG.ChatMessage.dataModels.usage.name, 'FHCSUsageMessageData');
          });
 
+         it('gives an Enchant activity\'s tray its place on the card, as for Infuse Item (2026-11-09)', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 3);
+            const id = foundry.utils.randomID();
+            const [feat] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test infusion', type: 'feat',
+               effects: [{ _id: id, name: 'FHCS test infusion bonus', type: 'enchantment' }] }]);
+            try
+            {
+               await feat.createActivity('enchant', { effects: [{ _id: id }] }, { renderSheet: false });
+               const enchant = feat.system.activities.getByType('enchant')[0];
+               assert.ok(enchant, `no enchant activity; the item holds: ${feat.system.activities.map((a) => a.type).join(', ') || 'none'}`);
+               const results = await enchant.use({ subsequentActions: false, consume: false }, { configure: false }, { create: false });
+               const message = new ChatMessage.implementation(results.message);
+               assert.strictEqual(message.getFlag('dnd5e', 'use.enchantmentProfile'), id,
+                  `the card's enchantment profile is ${message.getFlag('dnd5e', 'use.enchantmentProfile')}; offered: ${enchant.availableEnchantments.map((e) => e._id).join(', ') || 'none'}`);
+               const html = await message.renderHTML();
+               const section = html.querySelector('.fhcs-enchant');
+               assert.ok(section, `no Enchant section; the card's parts: ${[...(html.querySelector('.fhcs-card')?.children ?? [])].map((n) => n.className).join(' | ')}`);
+               assert.ok(section.querySelector('enchantment-application'), 'dnd5e placed no enchantment tray in the Enchant section');
+            }
+            finally { await feat.delete(); }
+         });
+
          it('posts folded rolls without scrolling the chat log', function ()
          {
             assert.isTrue(Boolean(ui.chat.constructor.prototype.postOne.fhcsQuiet), 'ChatLog#postOne wrapped');
