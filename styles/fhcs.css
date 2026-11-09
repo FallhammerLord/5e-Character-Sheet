@@ -2283,6 +2283,11 @@
 .fhcs-sheet .fhcs-ability-pick > summary::-webkit-details-marker { display: none; }
 .fhcs-sheet .fhcs-pick-mark { position: absolute; bottom: 1px; left: 8px; width: 6px; height: 3px; fill: currentColor; }
 .fhcs-sheet .fhcs-ability-pick > .fhcs-tray { left: auto; right: 0; }
+/* An NPC's spellcasting ability on its Spellbook card (SCOPE §4.13): the label's own height, so nothing moves in edit
+   mode; its tray opens under the card's left. */
+.fhcs-sheet .fhcs-casting-ability > summary { height: auto; justify-content: center; }
+.fhcs-sheet .fhcs-casting-ability > .fhcs-tray { left: 0; right: auto; z-index: 3; }
+.fhcs-sheet .fhcs-caster-level { width: 100%; height: calc(var(--fhcs-display-size) * var(--fhcs-display-line)); min-height: 0; padding: 0; text-align: center; }
 
 .fhcs-sheet .fhcs-skill-roll
 {

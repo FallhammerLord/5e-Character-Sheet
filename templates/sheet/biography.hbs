@@ -31,17 +31,18 @@
       </div>
       <div class="fhcs-bio-column fhcs-bio-wide fhcs-plate">
          {{#each right}}{{> "modules/fhcs/templates/sheet/bio-box.hbs" editable=../editable }}{{/each}}
-         {{#if biography}}
+         {{#each stories}}
+         {{!-- The biography; an NPC's public biography, then its details (SCOPE §4.13). --}}
          <section class="fhcs-bio-box fhcs-bio-story">
-            <h3 class="fhcs-label">{{ biography.label }}</h3>
-            {{#if editable}}
+            <h3 class="fhcs-label">{{ label }}</h3>
+            {{#if ../editable}}
             {{!-- Toggled, without open: the text shows until the player chooses to edit it (the quest log's rule). --}}
-            <prose-mirror name="{{ biography.name }}" value="{{ biography.source }}" document-uuid="{{ uuid }}" toggled>{{{ biography.enriched }}}</prose-mirror>
+            <prose-mirror name="{{ name }}" value="{{ source }}" document-uuid="{{ ../uuid }}" toggled>{{{ enriched }}}</prose-mirror>
             {{else}}
-            <div class="fhcs-body fhcs-bio-text">{{{ biography.enriched }}}</div>
+            <div class="fhcs-body fhcs-bio-text">{{{ enriched }}}</div>
             {{/if}}
          </section>
-         {{/if}}
+         {{/each}}
       </div>
    </div>
    {{/with}}

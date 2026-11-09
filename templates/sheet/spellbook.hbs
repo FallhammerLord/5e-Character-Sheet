@@ -9,12 +9,33 @@
          {{!-- dnd5e's setSpellcastingAbility reads the ability from the nearest [data-ability]. --}}
          <div class="fhcs-casting-class fhcs-frame{{#if primary}} fhcs-primary{{/if}}" data-ability="{{ ability }}">
             <span class="fhcs-label fhcs-casting-name">{{ label }}</span>
-            {{#if ../editing}}<button type="button" class="fhcs-toggle fhcs-radio" data-action="setSpellcastingAbility"
-                    aria-pressed="{{#if primary}}true{{else}}false{{/if}}" aria-label="{{ primaryLabel }}" data-fhcs-tip="{{ primaryLabel }}"><span class="fhcs-radio-mark" aria-hidden="true"></span></button>{{/if}}
-            <span class="fhcs-stat"><span class="fhcs-label fhcs-muted">{{ abbr }}</span><span class="fhcs-display">{{ mod }}</span></span>
+            {{#unless npc}}{{#if ../editing}}<button type="button" class="fhcs-toggle fhcs-radio" data-action="setSpellcastingAbility"
+                    aria-pressed="{{#if primary}}true{{else}}false{{/if}}" aria-label="{{ primaryLabel }}" data-fhcs-tip="{{ primaryLabel }}"><span class="fhcs-radio-mark" aria-hidden="true"></span></button>{{/if}}{{/unless}}
+            {{#if ownCasting}}{{#if ../editing}}
+            {{!-- An NPC with no casting class (SCOPE §4.13): its ability from a tray of chips, as a skill's. --}}
+            <span class="fhcs-stat">
+               <details class="fhcs-fold fhcs-ability-pick fhcs-casting-ability" data-fold-key="casting-ability">
+                  <summary class="fhcs-label fhcs-muted" aria-label="{{ abilityLabel }}" data-fhcs-tip="{{ abilityLabel }}">{{ abbr }}<svg class="fhcs-pick-mark" viewBox="0 0 8 4" aria-hidden="true"><path d="M0 0h8L4 4z"/></svg></summary>
+                  <div class="fhcs-tray fhcs-tray-row">
+                     {{#each abilities}}
+                     <button type="button" class="fhcs-chip fhcs-label{{#if selected}} fhcs-on{{/if}}" data-action="fhcsSpellAbility" data-fhcs-ability="{{ key }}"
+                             aria-pressed="{{#if selected}}true{{else}}false{{/if}}">{{ abbr }}</button>
+                     {{/each}}
+                  </div>
+               </details>
+               <span class="fhcs-display">{{ mod }}</span>
+            </span>
+            {{else}}<span class="fhcs-stat"><span class="fhcs-label fhcs-muted">{{ abbr }}</span><span class="fhcs-display">{{ mod }}</span></span>{{/if}}
+            {{else}}<span class="fhcs-stat"><span class="fhcs-label fhcs-muted">{{ abbr }}</span><span class="fhcs-display">{{ mod }}</span></span>{{/if}}
             <span class="fhcs-stat"><span class="fhcs-label fhcs-muted">{{ ../text.attack }}</span><span class="fhcs-display">{{ attack }}</span></span>
             <span class="fhcs-stat"><span class="fhcs-label fhcs-muted">{{ ../text.save }}</span><span class="fhcs-display">{{ save }}</span></span>
+            {{#if npc}}
+            {{!-- An NPC's caster level in Prepared's place (dnd5e's NPC card); its own, typed in edit mode. --}}
+            <span class="fhcs-stat"><span class="fhcs-label fhcs-muted">{{ levelLabel }}</span>{{#if ownCasting}}{{#if ../editing}}<input type="text" class="fhcs-input fhcs-display fhcs-caster-level"
+                  name="system.attributes.spell.level" data-dtype="Number" value="{{ levelSource }}" placeholder="—" aria-label="{{ levelLabel }}">{{else}}<span class="fhcs-display">{{ level }}</span>{{/if}}{{else}}<span class="fhcs-display">{{ level }}</span>{{/if}}</span>
+            {{else}}
             <span class="fhcs-stat" role="group" aria-label="{{ preparedLabel }}"><span class="fhcs-label fhcs-muted">{{ ../text.prepared }}</span><span class="fhcs-display">{{ prepared }}</span></span>
+            {{/if}}
          </div>
          {{/each}}
       </div>

@@ -619,6 +619,28 @@ function limited(over = {})
 
 export const CASES = [
    { name: 'biography', template: 'sheet/biography', context: biography({}, { ...CHARACTERISTICS, faith: '', skin: '' }) },
+   // An NPC's biography (SCOPE §4.13): public first, then details, beside ideals, bonds and flaws.
+   { name: 'npc-biography', template: 'sheet/biography', context: { tab: { id: 'biography', group: 'primary', cssClass: 'active' },
+      fhcsBiography: biographyView({ characteristics: [], editable: true, uuid: 'Actor.n',
+         boxes: [['ideal', 'Ideals', 'Power is the only truth.'], ['bond', 'Bonds', 'The phylactery in the Ninth Vault.'], ['flaw', 'Flaws', '']]
+            .map(([key, label, value]) => ({ key, name: `system.details.${key}`, label, value })),
+         stories: [{ name: 'system.details.biography.public', label: 'Public', enriched: '<p>A robed figure, ash-grey, who smells of old paper.</p>', source: '' },
+            { name: 'system.details.biography.value', label: 'Details', enriched: '<p>Maelgrath bargained a kingdom for a century, then took the century anyway.</p>', source: '' }] },
+      { format, localize }) } },
+   { name: 'npc-biography-viewer', template: 'sheet/biography', context: { tab: { id: 'biography', group: 'primary', cssClass: 'active' },
+      fhcsBiography: biographyView({ characteristics: [], editable: false, uuid: 'Actor.n',
+         boxes: [{ key: 'ideal', name: 'system.details.ideal', label: 'Ideals', value: 'Power is the only truth.' }],
+         stories: [{ name: 'system.details.biography.public', label: 'Public', enriched: '<p>A robed figure, ash-grey.</p>', source: '' },
+            { name: 'system.details.biography.value', label: 'Details', enriched: '', source: '' }] },
+      { format, localize }) } },
+   // An NPC's Spellbook card: a class's (its level), and its own casting with no class, in edit mode setting ability and level.
+   { name: 'npc-spellbook', rows: '.fhcs-casting-class, .fhcs-list-bar, .fhcs-item-row', marks: '.fhcs-casting-name', template: 'sheet/spellbook', context: spellbook({ npc: true, spellLevelSource: 9,
+      abilityOptions: ['str', 'dex', 'con', 'int', 'wis', 'cha'].map((key) => ({ key, abbr: key.toUpperCase() })),
+      classes: [{ label: 'Spellcasting (NPC)', abbr: 'INT', ability: 'int', mod: 5, attack: 12, save: 20, level: 18, noSpellcaster: true, primary: true }] }) },
+   { name: 'npc-spellbook-editing', rows: '.fhcs-casting-class, .fhcs-list-bar, .fhcs-item-row', marks: '.fhcs-casting-name', sameRowsAs: 'npc-spellbook',
+      template: 'sheet/spellbook', context: spellbook({ npc: true, spellLevelSource: 9, editing: true,
+      abilityOptions: ['str', 'dex', 'con', 'int', 'wis', 'cha'].map((key) => ({ key, abbr: key.toUpperCase() })),
+      classes: [{ label: 'Spellcasting (NPC)', abbr: 'INT', ability: 'int', mod: 5, attack: 12, save: 20, level: 18, noSpellcaster: true, primary: true }] }) },
    {
       name: 'biography-viewer', template: 'sheet/biography',
       context: biography({
@@ -924,7 +946,7 @@ for (const look of LOOKS)
 // every tab, edit mode, and each tray open.
 for (const name of ['features', 'effects', 'biography', 'attributes-editing', 'attributes-resource-tray', 'inventory-editing',
    'spellbook-editing', 'features-editing', 'inventory-categories', 'title-theme-tray', 'tabs-bank-big', 'tabs-inspiration-tray', 'tabs-bank-tray', 'header-editing', 'header-hp-tray', 'header-exhaustion-open',
-   'header-level-up', 'header-classes-open', 'header-milestones', 'npc-header-lich', 'npc-header-lich-editing', 'npc-tabs-editing', 'npc-abilities-lich'])
+   'header-level-up', 'header-classes-open', 'header-milestones', 'npc-header-lich', 'npc-header-lich-editing', 'npc-tabs-editing', 'npc-abilities-lich', 'npc-spellbook', 'npc-biography'])
 {
    const base = CASES.find((c) => c.name === name);
    CASES.push({ ...base, name: `theme-forge-${name}`, look: 'forge', sameRowsAs: undefined });

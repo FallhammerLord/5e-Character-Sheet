@@ -760,13 +760,21 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
       biography: { name: 'system.details.biography.value', label: 'Biography', enriched, source: enriched }
    });
    const play = biographyView(facts(false, '<p> </p>'), { format, localize });
-   const shape = [play.characteristics.length, play.left.map((b) => b.key).join(), play.right.map((b) => b.key).join(), play.biography];
-   try { deepStrictEqual(shape, [1, 'trait,ideal,bond', 'appearance', null]); }
+   const shape = [play.characteristics.length, play.left.map((b) => b.key).join(), play.right.map((b) => b.key).join(), play.stories.length];
+   try { deepStrictEqual(shape, [1, 'trait,ideal,bond', 'appearance', 0]); }
    catch { problems.push(`biography in play: ${JSON.stringify(shape)}`); }
    const edit = biographyView(facts(true, ''), { format, localize });
-   if (edit.characteristics.length !== 2 || edit.left.length !== 4 || !edit.biography || edit.empty) { problems.push('an owner does not see every biography field'); }
+   if (edit.characteristics.length !== 2 || edit.left.length !== 4 || edit.stories.length !== 1 || edit.empty) { problems.push('an owner does not see every biography field'); }
    const blank = biographyView({ characteristics: [], boxes: [], biography: { enriched: '' } }, { format, localize });
    if (!blank.empty) { problems.push('an empty Biography is not marked empty'); }
+   // An NPC (SCOPE §4.13): public first, then details; a reader sees only what's written.
+   const npcFacts = (editable) => ({ characteristics: [], editable, uuid: 'Actor.n',
+      boxes: [{ key: 'ideal', name: 'system.details.ideal', label: 'Ideals', value: '' }],
+      stories: [{ name: 'system.details.biography.public', label: 'Public', enriched: '<p>Seen</p>', source: '' },
+         { name: 'system.details.biography.value', label: 'Details', enriched: '', source: '' }] });
+   const npcRead = biographyView(npcFacts(false), { format, localize }).stories.map((x) => x.label).join();
+   const npcEdit = biographyView(npcFacts(true), { format, localize }).stories.map((x) => x.label).join();
+   if (npcRead !== 'Public' || npcEdit !== 'Public,Details') { problems.push(`NPC biography: reads ${npcRead}, edits ${npcEdit}`); }
    try { deepStrictEqual(paragraphs('One\r\n\n  Two  \n'), ['One', 'Two']); }
    catch { problems.push(`paragraphs: ${JSON.stringify(paragraphs('One\r\n\n  Two  \n'))}`); }
 }

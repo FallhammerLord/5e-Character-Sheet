@@ -215,7 +215,8 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
 - [ ] NPC sheet, in slices:
   - [x] Header and tab row (2026-11-09; offline checks pass; waits on Quench and play): registered beside dnd5e's NPC sheet, not the default; CR, XP, size · type · alignment; the legendary row (pips, lair switch, edit-mode fields); the player's chips; inspiration of its own; tab row with Abilities first and Special Traits' gear. The tab bodies are still dnd5e's, unstyled
   - [x] Abilities tab (2026-11-09; offline checks pass; waits on Quench and play): skills, traits (gear, treasure, habitat), features by dnd5e's activation sections with NPC pins; shared Skills, Traits and Features-list partials with the character's tabs
-  - [ ] Inventory, Spellbook, Effects on ours; Biography with the NPC's fields
+  - [x] Inventory, Spellbook, Effects on ours; Biography with the NPC's fields (2026-11-09; offline checks pass; waits on Quench and play)
+  - [ ] Quench and play (the user's world), then the BUILT entry
 - [ ] Container, group, encounter, vehicle
 - [ ] The smaller windows: a skin
 - [ ] Quench and play

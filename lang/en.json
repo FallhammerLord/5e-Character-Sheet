@@ -395,7 +395,9 @@
         "pact": "Pact Magic, prepared",
         "innate": "Innate",
         "atwill": "At will"
-      }
+      },
+      "CasterLevel": "Level",
+      "CastingAbility": "Spellcasting ability"
     },
     "Favorite": {
       "On": "Favorite: click to remove",

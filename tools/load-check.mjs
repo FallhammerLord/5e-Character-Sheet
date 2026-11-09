@@ -228,11 +228,17 @@ else
       if (abilities.scrollable?.join() !== '') { problems.push('the NPC Abilities tab does not scroll as one'); }
       missingPartials(abilities, 'NPC Abilities');
    }
+   // Every other tab body ours too (Special Traits keeps dnd5e's form, as the character's), each with its partials.
+   for (const id of ['inventory', 'spells', 'effects', 'biography'])
+   {
+      if (!npcParts[id]?.template.startsWith('modules/fhcs/')) { problems.push(`the NPC ${id} part is still dnd5e's`); }
+      else { missingPartials(npcParts[id], `the NPC ${id} part`); }
+   }
    const npcClasses = npcSheet.prototype._initializeApplicationOptions.call(Object.create(npcSheet.prototype), {}).classes;
    if (npcClasses.some((name) => ['dnd5e2', 'vertical-tabs', 'hidden-title'].includes(name))) { problems.push('dnd5e\'s look classes reach the NPC window'); }
    // dnd5e has no inspiration or lair action an NPC can use: ours stand in.
    const { DEFAULT_OPTIONS } = npcSheet;
-   for (const action of ['fhcsLairInside', 'fhcsToggleInspiration'])
+   for (const action of ['fhcsLairInside', 'fhcsToggleInspiration', 'fhcsSpellAbility'])
    {
       if (typeof DEFAULT_OPTIONS?.actions?.[action] !== 'function') { problems.push(`the NPC sheet has no ${action} action`); }
    }

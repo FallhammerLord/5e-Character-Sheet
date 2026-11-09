@@ -1,6 +1,6 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES, VIEW_ACTIONS } from '../constants.js';
 import { attributesFacts, biographyFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
-   passesExtraFilters, renderTemplate, setLairInside, spellbookFacts, toggleInspired, toggleListFilter, watchListFilters } from '../compat.js';
+   passesExtraFilters, renderTemplate, setLairInside, setSpellcastingAbility, spellbookFacts, toggleInspired, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, inventoryView } from '../sheet/inventory.js';
 import { EXTRA_SPELL_FILTERS, spellbookView, spellColumnChoice } from '../sheet/spellbook.js';
@@ -1078,8 +1078,8 @@ export function makeCharacterSheet(Base)
 
 /* ---------- The NPC sheet (SCOPE §4.13, user 2026-11-09) ---------- */
 
-/** dnd5e's NPC parts we draw now: the header, the tab row and Abilities. The other tab bodies keep dnd5e's until their slices. */
-const NPC_OUR_PARTS = ['header', 'tabs', 'features'];
+/** dnd5e's NPC parts we draw: every one but Special Traits, which keeps dnd5e's form under our styles, as the character's. */
+const NPC_OUR_PARTS = ['header', 'tabs', 'features', 'inventory', 'spells', 'effects', 'biography'];
 
 /**
  * An NPC's own templates and part settings where they differ from the character's: Abilities (dnd5e's "features")
@@ -1111,6 +1111,13 @@ function npcParts(baseParts)
    return Object.fromEntries(entries.sort(([a], [b]) => rank(a) - rank(b)));
 }
 
+/** An NPC's spellcasting ability, with no casting class (its Spellbook card, edit mode). */
+function spellAbilityAction(event, target)
+{
+   target.closest('details')?.removeAttribute('open');
+   return setSpellcastingAbility(this.actor, target.dataset.fhcsAbility);
+}
+
 /** In the lair or out (the NPC's lair panel, play mode, modern rules). */
 function lairInsideAction(event, target)
 {
@@ -1133,7 +1140,7 @@ export function makeNpcSheet(Base)
    {
       static DEFAULT_OPTIONS = {
          classes: ['fhcs-npc'],
-         actions: { fhcsLairInside: lairInsideAction, fhcsToggleInspiration: toggleInspiredAction }
+         actions: { fhcsLairInside: lairInsideAction, fhcsToggleInspiration: toggleInspiredAction, fhcsSpellAbility: spellAbilityAction }
       };
 
       static PARTS = npcParts(Base.PARTS);

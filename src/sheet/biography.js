@@ -27,16 +27,17 @@ export function biographyView(facts, { localize })
       .map((c) => ({ ...c }));
    const box = (b) => ({ ...b, paragraphs: paragraphs(b.value) });
    const boxes = (facts.boxes ?? []).filter((b) => editable || b.value.trim()).map(box);
-   const bio = facts.biography ?? {};
-   const hasBio = !!String(bio.enriched ?? '').replace(/<[^>]*>/g, '').trim();
+   // The long texts: a character's biography; an NPC's public biography, then its details (SCOPE §4.13).
+   const written = (story) => !!String(story.enriched ?? '').replace(/<[^>]*>/g, '').trim();
+   const stories = (facts.stories ?? (facts.biography ? [facts.biography] : [])).filter((story) => editable || written(story));
    return {
       editable,
       uuid: facts.uuid ?? '',
       characteristics,
       left: boxes.filter((b) => LEFT.includes(b.key)),
       right: boxes.filter((b) => !LEFT.includes(b.key)),
-      biography: editable || hasBio ? { ...bio } : null,
-      empty: !editable && !characteristics.length && !boxes.length && !hasBio,
+      stories,
+      empty: !editable && !characteristics.length && !boxes.length && !stories.length,
       text: { empty: localize('FHCS.Biography.Empty') }
    };
 }

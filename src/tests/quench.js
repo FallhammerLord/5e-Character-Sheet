@@ -1540,9 +1540,9 @@ export function registerQuenchTests(quench)
          });
       });
 
-      // The NPC sheet (SCOPE §4.13, 2026-11-09): the header slice. A lich-like NPC with legendary actions and
+      // The NPC sheet (SCOPE §4.13, 2026-11-09): every tab. A lich-like NPC with legendary actions and
       // resistances and a lair (modern rules); the helpers above work on whichever sheet `sheet` holds.
-      describe('Fallhammer NPC sheet: header', function ()
+      describe('Fallhammer NPC sheet', function ()
       {
          before(async function ()
          {
@@ -1632,6 +1632,35 @@ export function registerQuenchTests(quench)
             const [activity] = await clickReaches(`.fhcs-npc-abilities [data-item-id="${slam.id}"] [data-action="use"]`, 'dnd5e.preUseActivity');
             assert.strictEqual(activity?.item?.id, slam.id, 'the picture uses the feature');
             await actor.deleteEmbeddedDocuments('Item', [slam.id, sense.id]);
+         });
+
+         it('draws Inventory, Spellbook, Effects and Biography as ours, with the NPC\'s own fields', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 6);
+            const [blade] = await createItems([{ name: 'FHCS test blade', type: 'weapon' }]);
+            for (const [tab, selector] of [['inventory', '.fhcs-inventory'], ['spells', '.fhcs-spellbook'], ['effects', '.fhcs-effects'], ['biography', '.fhcs-biography']])
+            {
+               await click(`.fhcs-tabs [data-tab="${tab}"]`);
+               await until(() => sheet.element.querySelector(`${selector}.active`), () => `${tab} opens as ours; the open tab is ${sheet.tabGroups.primary}`);
+            }
+            await settled();
+            const stories = [...sheet.element.querySelectorAll('.fhcs-biography .fhcs-bio-story h3')].map((h) => h.textContent.trim());
+            assert.deepEqual(stories, [game.i18n.localize('DND5E.Public'), game.i18n.localize('DND5E.Details')], `public first, then details; found ${stories.join(', ')}`);
+            await enter('.fhcs-biography [name="system.details.ideal"]', 'FHCS test ideal');
+            await until(() => actor.system.details.ideal === 'FHCS test ideal', () => `the ideal saves; it is "${actor.system.details.ideal}"`);
+            await click('.fhcs-tabs [data-tab="inventory"]');
+            await until(() => sheet.element.querySelector(`.fhcs-inventory [data-item-id="${blade.id}"]`), 'the weapon has a row on our Inventory');
+            // Spellcasting of its own (no class): edit mode sets the ability from the card's tray.
+            await click('.fhcs-tabs [data-tab="spells"]');
+            await click('.fhcs-tabs [data-action="changeMode"]');
+            await until(() => sheet.isEditMode, 'the sheet unlocks');
+            await click('.fhcs-spellbook .fhcs-casting-ability > summary');
+            await click('.fhcs-spellbook [data-action="fhcsSpellAbility"][data-fhcs-ability="wis"]');
+            await until(() => actor.system.attributes.spellcasting === 'wis', () => `Wisdom is its spellcasting ability; it is ${actor.system.attributes.spellcasting}`);
+            await leaveEditMode();
+            await click('.fhcs-tabs [data-tab="features"]');
+            await actor.update({ 'system.details.ideal': '' });
+            await actor.deleteEmbeddedDocuments('Item', [blade.id]);
          });
 
          it('takes a CR as dnd5e writes it, in edit mode', async function ()

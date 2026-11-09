@@ -631,6 +631,9 @@ export async function spellbookFacts(sheet, context, { columns })
       ...['vocal', 'somatic', 'material'].map((key) => ({ key, group: 'components', label: config.itemProperties?.[key]?.label ?? key }))
    ];
    return {
+      npc: actor.type === 'npc',
+      abilityOptions: Object.entries(config.abilities ?? {}).map(([key, a]) => ({ key, abbr: game.i18n.localize(a.abbreviation ?? key) })),
+      spellLevelSource: actor.system._source.attributes?.spell?.level ?? null,
       classes: (context.spellcasting ?? []).map((k) => ({
          label: k.label,
          ability: k.ability?.ability ?? '',
@@ -639,6 +642,10 @@ export async function spellbookFacts(sheet, context, { columns })
          attack: k.attack ?? 0,
          save: k.save ?? '',
          prepared: { value: k.preparation?.value ?? 0, max: k.preparation?.max ?? 0 },
+         // An NPC's card (npc-sheet.mjs `_prepareSpellsContext`): its caster level, and with no casting class its own
+         // ability and level, set in edit mode (`system.attributes.spellcasting`, `system.attributes.spell.level`).
+         level: k.level ?? null,
+         noSpellcaster: !!k.noSpellcaster,
          primary: !!k.primary
       })),
       concentration,
@@ -861,6 +868,13 @@ function inspiredUpdate(actor, on)
 export function toggleInspired(actor)
 {
    return actor.update(inspiredUpdate(actor, !isInspired(actor)));
+}
+
+/** An NPC's spellcasting ability when it has no casting class (npc-sheet.mjs: `system.attributes.spellcasting`). */
+export function setSpellcastingAbility(actor, ability)
+{
+   if (!(ability in (CONFIG.DND5E.abilities ?? {}))) { return null; }
+   return actor.update({ 'system.attributes.spellcasting': ability });
 }
 
 /** An NPC in its lair or out (dnd5e's modern rules; npc-header.hbs's slide toggle, `system.resources.lair.inside`). */
@@ -1315,6 +1329,9 @@ export async function effectsFacts(sheet, context)
 }
 
 /** The five text boxes of dnd5e's Biography, by field: Classic's order, personality first (character-biography.hbs). */
+/** An NPC's text boxes (npc-biography.hbs). */
+const NPC_BIOGRAPHY_BOXES = [['ideal', 'DND5E.Ideals'], ['bond', 'DND5E.Bonds'], ['flaw', 'DND5E.Flaws']];
+
 const BIOGRAPHY_BOXES = [
    ['trait', 'DND5E.PersonalityTraits'], ['ideal', 'DND5E.Ideals'], ['bond', 'DND5E.Bonds'], ['flaw', 'DND5E.Flaws'],
    ['appearance', 'DND5E.Appearance']
@@ -1328,6 +1345,22 @@ const BIOGRAPHY_BOXES = [
 export function biographyFacts(sheet, context)
 {
    const details = sheet.actor.system.details ?? {};
+   // An NPC (SCOPE §4.13, 2026-11-09): its public biography first (players see it), then dnd5e's details, beside its
+   // ideals, bonds and flaws (npc-biography.hbs); no characteristics or appearance.
+   if (sheet.actor.type === 'npc')
+   {
+      const story = (key, label) => ({ name: `system.details.biography.${key}`, label: game.i18n.localize(label),
+         enriched: context.enriched?.[key] ?? '', source: details.biography?.[key] ?? '' });
+      return {
+         characteristics: [],
+         boxes: NPC_BIOGRAPHY_BOXES.map(([key, label]) => ({
+            key, name: `system.details.${key}`, label: game.i18n.localize(label), value: String(details[key] ?? '')
+         })),
+         stories: [story('public', 'DND5E.Public'), story('value', 'DND5E.Details')],
+         uuid: sheet.actor.uuid,
+         editable: sheet.isEditable
+      };
+   }
    return {
       characteristics: (context.characteristics ?? []).map((c) => ({
          name: c.name, label: game.i18n.localize(c.label ?? ''), value: String(c.value ?? ''), source: String(c.source ?? '')

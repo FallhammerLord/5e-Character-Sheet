@@ -4,14 +4,14 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6.7, every sheet** (ROADMAP; SCOPE §4.13, §5.4): the NPC sheet first. Research done (research note `dnd5e-6.0-other-sheets.md`, "The NPC sheet, closer"); design questions answered (SCOPE §4.13, 2026-11-09); boards approved; the header and Abilities slices are built (wait on Quench and a look); next Inventory, Spellbook, Effects and Biography on ours. Chosen over Phase 7 so the NPC sheet gets the ADHD layer with the rest. Its plates carry `fhcs-plate`, so every theme dresses it (SCOPE §5.3 rule 11). The play round's ask 12 waits on a session of play.
+1. **Phase 6.7, every sheet** (ROADMAP; SCOPE §4.13, §5.4): the NPC sheet first. Research done (research note `dnd5e-6.0-other-sheets.md`, "The NPC sheet, closer"); design questions answered (SCOPE §4.13, 2026-11-09); every tab built (waits on Quench and play, below); after it, BUILT and container, group, encounter, vehicle. Chosen over Phase 7 so the NPC sheet gets the ADHD layer with the rest. Its plates carry `fhcs-plate`, so every theme dresses it (SCOPE §5.3 rule 11). The play round's ask 12 waits on a session of play.
 2. **`#postNotification` TypeError** seen in the chat card runs: in Foundry's own code, cause not yet known; no test fails on it.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
 
 ## Waiting on the user
 
-- **NPC sheet, header slice** (built 2026-11-09, offline checks pass): choose "Fallhammer NPC sheet" on an NPC (sheet settings), run Quench core (new: "Fallhammer NPC sheet: header", six tests), and look at the header and Abilities in play and edit mode: CR, XP, the legendary pips and lair switch, inspiration; skills, traits, features by action type; at 644px Recovery drops. Inventory, Spellbook, Effects and Biography are still dnd5e's, unstyled.
+- **NPC sheet** (built 2026-11-09, offline checks pass): choose "Fallhammer NPC sheet" on an NPC (sheet settings), run Quench core (new group "Fallhammer NPC sheet", seven tests), and play a real NPC in play and edit mode: the header (CR, XP, legendary pips, lair switch, inspiration); Abilities (skills, traits, features by action type; at 644px Recovery drops); Inventory, Spellbook (the caster level; with no class, its ability and level in edit mode), Effects, Biography (Public, then Details).
 - **Chat cards in play** (from a player's client): another player's attack and damage show once rolled; an effect applied from a card leaves a line; the hit line holds when targets change; each damage type its own total; a new card scrolls fully into view, down to Apply.
 - **Token sizes on Wildcard swaps** (ROADMAP play round ask 12; after a session of play, user 2026-11-08): swap a resized token's image to an untagged file (size stays), then to a tagged one like `_scale1.5` (scale applies). Not testable offline beyond the unit cases; no Quench test (it needs a scene token).
 - **Player sheet lock-up** (ROADMAP "Player-side bugs" 2): the F12 console output the next time it happens, and what "locked" looks like.

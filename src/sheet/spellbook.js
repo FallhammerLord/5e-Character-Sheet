@@ -180,7 +180,16 @@ export function spellbookView(facts, { format, localize })
          primary: !!k.primary,
          // Edit mode: which ability is the character's primary for spellcasting (dnd5e's setSpellcastingAbility).
          ability: k.ability ?? '',
-         primaryLabel: format(k.primary ? 'FHCS.Spellbook.PrimaryOn' : 'FHCS.Spellbook.SetPrimary', { ability: k.abbr })
+         primaryLabel: format(k.primary ? 'FHCS.Spellbook.PrimaryOn' : 'FHCS.Spellbook.SetPrimary', { ability: k.abbr }),
+         // An NPC (SCOPE §4.13): its caster level in Prepared's place; with no casting class, edit mode sets its ability
+         // (a tray of chips, as a skill's) and its level.
+         npc: !!facts.npc,
+         level: k.level ?? '\u2014',
+         levelSource: facts.spellLevelSource ?? '',
+         ownCasting: !!(facts.npc && k.noSpellcaster),
+         abilities: (facts.abilityOptions ?? []).map((a) => ({ ...a, selected: a.key === k.ability })),
+         abilityLabel: localize('FHCS.Spellbook.CastingAbility'),
+         levelLabel: localize('FHCS.Spellbook.CasterLevel')
       })),
       concentration: {
          on: conc.spells.length > 0,
