@@ -9,7 +9,7 @@
 
       <section class="items-list features-list fhcs-items" data-item-list="features">
          {{#each sections}}
-         <div class="items-section fhcs-section{{#unless fold.open}} fhcs-folded{{/unless}}" data-fhcs-fold="{{ fold.key }}" data-fhcs-section="{{ id }}" data-group-{{ group }}="{{ value }}"{{#if hidden}} hidden{{/if}}>
+         <div class="items-section fhcs-section{{#unless fold.open}} fhcs-folded{{/unless}} fhcs-plate" data-fhcs-fold="{{ fold.key }}" data-fhcs-section="{{ id }}" data-group-{{ group }}="{{ value }}"{{#if hidden}} hidden{{/if}}>
             <div class="items-header fhcs-item-head">
                <span class="fhcs-col-name"><button type="button" class="fhcs-section-toggle" data-action="fhcsToggleSection" aria-expanded="{{#if fold.open}}true{{else}}false{{/if}}"><span class="fhcs-section-caret" aria-hidden="true"><svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span><span class="fhcs-label">{{ label }}</span></button></span>
                {{#if ../columns.uses}}<span class="fhcs-label fhcs-muted fhcs-col-uses">{{ ../text.head.uses }}</span>{{/if}}
@@ -23,7 +23,7 @@
             </ol>
          </div>
          {{/each}}
-         {{#if empty}}<p class="fhcs-body fhcs-muted fhcs-empty">{{ text.empty }}</p>{{/if}}
+         {{#if empty}}<p class="fhcs-body fhcs-muted fhcs-empty fhcs-plate">{{ text.empty }}</p>{{/if}}
       </section>
    </dnd5e-inventory>
    {{/with}}

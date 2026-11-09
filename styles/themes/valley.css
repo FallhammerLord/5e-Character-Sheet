@@ -47,7 +47,6 @@
 /* The open tab's line ends in a pennant's notch. */
 .fhcs-sheet[data-fhcs-theme="valley"] .fhcs-tab.active { border-image: linear-gradient(to right, var(--fhcs-theme-accent) 80%, transparent 80% 88%, var(--fhcs-theme-accent) 88%) 1; }
 
-.fhcs-sheet[data-fhcs-theme="valley"] .fhcs-tabs { background: var(--fhcs-theme-emblem) right calc(var(--fhcs-control) + 2 * var(--fhcs-s2)) center / 20px no-repeat; }
 
 @media (prefers-reduced-motion: no-preference)
 {

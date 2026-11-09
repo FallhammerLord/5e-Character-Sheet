@@ -3,12 +3,12 @@
 <section class="tab fhcs-biography fhcs-limited-body active" data-tab="biography" data-group="primary">
    {{#with fhcsLimited}}
    {{#if biography}}
-   <section class="fhcs-bio-box fhcs-bio-story">
+   <section class="fhcs-bio-box fhcs-bio-story fhcs-plate">
       <h3 class="fhcs-label">{{ text.biography }}</h3>
       <div class="fhcs-body fhcs-bio-text">{{{ biography }}}</div>
    </section>
    {{else}}
-   <p class="fhcs-body fhcs-muted fhcs-empty">{{ text.empty }}</p>
+   <p class="fhcs-body fhcs-muted fhcs-empty fhcs-plate">{{ text.empty }}</p>
    {{/if}}
    {{/with}}
 </section>

@@ -1,0 +1,106 @@
+/* The starter theme (the theme kit; docs/BUILT.md, "How a theme plugs in"). Copy to styles/themes/<key>.css, replace
+   every `starter` with the key, and fill what the theme draws; delete what it leaves as Plain's. Not in module.json:
+   it is a recipe, not a theme. The rules are SCOPE §5.3; the look of each theme is SCOPE §4.11.
+
+   Plumbing a new theme needs, outside this file (the load check fails until each is there):
+   - its key in `THEMES` (src/constants.js), which gives it the picker and its layout cases (tools/fixtures.mjs);
+   - this file in module.json's `styles`;
+   - its label, `FHCS.Theme.<key>`, in lang/en.json;
+   - `--fhcs-theme-emblem` set below.
+   Its particles (optional) are `registerMoments('<key>', …)` at the foot of src/apps/sparks.js. */
+
+/* ---------- Tokens: light, then dark ----------
+   One look in both of Foundry's modes (rule 5): the dark block sets every token the light one does, or the light
+   value shows in dark mode. Meaning colours keep their hue (rule 2; SCOPE §5.1); text 4.5:1 on its plate. */
+
+.fhcs-sheet[data-fhcs-theme="starter"]
+{
+   --fhcs-surface: #f4f1ea;            /* plates and panels */
+   --fhcs-ink: #191813;                /* body text */
+   --fhcs-die-ink: #191813;            /* a die's numeral */
+   --fhcs-die-on-ink: #fff;            /* a numeral on a filled die */
+   --fhcs-theme-edge: #8a8478;         /* frames' edge */
+   --fhcs-theme-accent: #5a4a2a;       /* decoration only, never a meaning */
+   /* The emblem, at the inspiration bar's left (fhcs.css draws it; a narrow edit row goes without). */
+   --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='7' fill='none' stroke='%235a4a2a' stroke-width='1.8'/%3E%3C/svg%3E");
+}
+
+.theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="starter"],
+.fhcs-sheet.theme-dark[data-fhcs-theme="starter"]
+{
+   --fhcs-surface: #26252b;
+   --fhcs-ink: #e8e6e3;
+   --fhcs-die-ink: #f4f1ea;
+   --fhcs-die-on-ink: #191813;
+   --fhcs-theme-edge: #8f8a80;
+   --fhcs-theme-accent: #d8c49a;
+   --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='7' fill='none' stroke='%23d8c49a' stroke-width='1.8'/%3E%3C/svg%3E");
+}
+
+/* ---------- The ground: the window behind the plates ----------
+   Art here is marked `--fhcs-art: 1`, so the layout check reads text over it against black and white (rule 1). A
+   texture sets `--fhcs-texture-hi` and `-lo`, its brightest and darkest stroke, from its texture script (rule 5). */
+
+.fhcs-sheet[data-fhcs-theme="starter"] .window-content
+{
+   background-image: none;
+}
+
+/* ---------- Plates: every text sits on one ----------
+   The sheet marks each `fhcs-plate` (header, tab row, panels, sections, list bars, the Limited view's boxes); a theme
+   never lists them. A blurred, translucent plate is its own layer: the plate holding an open tray rises (rule 8). */
+
+.fhcs-sheet[data-fhcs-theme="starter"] .fhcs-plate
+{
+   background-color: var(--fhcs-surface);
+}
+
+/* ---------- Frames: every bordered box (`fhcs-frame`) ---------- */
+
+.fhcs-sheet[data-fhcs-theme="starter"] .fhcs-frame
+{
+   border-color: var(--fhcs-theme-edge);
+}
+
+/* ---------- Heading bands ---------- */
+
+.fhcs-sheet[data-fhcs-theme="starter"] :is(.fhcs-panel-head, .fhcs-group-head) { border-bottom-color: var(--fhcs-theme-edge); }
+
+/* ---------- The tab row (also a plate) and the open tab; the open tab never glows (rule 3) ---------- */
+
+.fhcs-sheet[data-fhcs-theme="starter"] .fhcs-tab.active { border-bottom-color: var(--fhcs-theme-accent); }
+
+/* ---------- Inspiration's marks ----------
+   A mark and its banked form (masks, any SVG), the banked glow and its slow breathing, and the moments (about 600ms,
+   rule 6): `--fhcs-inspire-on`, `-off`, `-on-glow`, `-off-glow` name an animation each. */
+
+.fhcs-sheet[data-fhcs-theme="starter"] .fhcs-inspiration
+{
+   /* --fhcs-mark: url(…); --fhcs-mark-on: url(…); */
+   /* --fhcs-inspire-glow: #c99a1e; --fhcs-inspire-breath: fhcs-starter-breath 4s ease-in-out infinite; */
+}
+
+/* ---------- Toggles' moments (rule 6): `--fhcs-toggle-on`, `-off`, `-off-fill`, `--fhcs-toggle-box-on`, `-off` ---------- */
+
+/* ---------- State art (rule 7): beside the marks, never in their place ----------
+   `--fhcs-hp` (0–1) on the window; `data-fhcs-hp` full, bloodied or down. */
+
+.fhcs-sheet[data-fhcs-theme="starter"][data-fhcs-hp="bloodied"] { }
+.fhcs-sheet[data-fhcs-theme="starter"][data-fhcs-hp="down"] { }
+
+/* ---------- Moments: a hit, a heal (classes on the window for 650ms) ----------
+   `.fhcs-moment-hit`, `-heal` (HP), `.fhcs-moment-temp-hit`, `-heal` (Temp), `.fhcs-moment-inspire`, `-uninspire`.
+   Everything moving sits in the media query and off under the Motion switch. Particles answer the same events from
+   src/apps/sparks.js (`gained`, `spent`, `hit`, `heal`). */
+
+@media (prefers-reduced-motion: no-preference)
+{
+   .fhcs-sheet[data-fhcs-theme="starter"]:not([data-fhcs-motion="off"]).fhcs-moment-hit .fhcs-hp-meter { }
+}
+
+/* ---------- The chat card (rule 10: the world's theme, on the message) ---------- */
+
+.fhcs-chat[data-fhcs-theme="starter"]
+{
+   /* the same tokens as the sheet, light then dark */
+}

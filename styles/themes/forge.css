@@ -159,9 +159,8 @@
 
 /* ---------- Plates: every text sits on one ---------- */
 
-.fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-header, .fhcs-attributes-side > .fhcs-panel, .fhcs-attributes-main > *,
-   .fhcs-list-bar, .fhcs-section, .fhcs-inventory-foot, .fhcs-casting, .fhcs-characteristics, .fhcs-bio-column, .fhcs-empty,
-   .fhcs-conditions, .fhcs-limited-header, .fhcs-limited-body > .fhcs-bio-box)
+/* Forge's tab row is a plate too, but drawn as its steel rail (below), without the blur. */
+.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-plate:not(.fhcs-tabs)
 {
    background-color: var(--fhcs-theme-plate);
    backdrop-filter: blur(3px);
@@ -169,9 +168,7 @@
 
 /* The blur makes each plate its own layer, so a tray opening from one would slide under the next: the plate holding
    an open tray rises above its neighbours. */
-.fhcs-sheet[data-fhcs-theme="forge"] :is(.fhcs-header, .fhcs-attributes-side > .fhcs-panel, .fhcs-attributes-main > *,
-   .fhcs-list-bar, .fhcs-section, .fhcs-inventory-foot, .fhcs-casting, .fhcs-characteristics, .fhcs-bio-column, .fhcs-empty,
-   .fhcs-conditions, .fhcs-limited-header, .fhcs-limited-body > .fhcs-bio-box):has(details[open] > .fhcs-tray)
+.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-plate:not(.fhcs-tabs):has(details[open] > .fhcs-tray)
 {
    position: relative;
    z-index: 5;
@@ -229,16 +226,6 @@
    background-repeat: no-repeat;
 }
 
-/* The anvil rides at the inspiration bar's left (user, 2026-10-28: the controls there had covered it); a narrow edit
-   row, which needs its room for Special Traits and the gear, goes without. */
-.fhcs-sheet[data-fhcs-theme="forge"] .fhcs-inspiration::before
-{
-   content: '';
-   flex: none;
-   width: 20px;
-   height: 20px;
-   background: var(--fhcs-theme-emblem) center / contain no-repeat;
-}
 /* Inspiration in Forge (user, 2026-10-28): runes in place of stars, the first banked at the right, by the lock; banked,
    they glow like embers, flickering as coals do. */
 .fhcs-sheet[data-fhcs-theme="forge"] .fhcs-inspiration
@@ -293,11 +280,6 @@
    55% { filter: drop-shadow(0 0 6px var(--fhcs-inspire-glow)); }
    70% { filter: drop-shadow(0 0 2px var(--fhcs-inspire-glow)); }
    85% { filter: drop-shadow(0 0 4px var(--fhcs-inspire-glow)); }
-}
-
-@container fhcs-tabs (width < 720px)
-{
-   .fhcs-sheet[data-fhcs-theme="forge"] .fhcs-tabs:has(.fhcs-lock[aria-pressed="true"]) .fhcs-inspiration::before { display: none; }
 }
 
 /* ---------- The portrait, lit from below by the hearth ---------- */

@@ -4,14 +4,14 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6.7, every sheet** (ROADMAP; SCOPE §4.13, §5.4): the NPC sheet first. Start with dnd5e's NPC sheet source (research note `dnd5e-6.0-other-sheets.md`), then the design questions and mockup boards. Chosen over Phase 7 so the NPC sheet gets the ADHD layer with the rest. The play round's ask 12 waits on a session of play.
-2. **Theme kit** (ROADMAP's top, user 2026-11-09): before any new theme; one session.
-3. **`#postNotification` TypeError** seen in the chat card runs: in Foundry's own code, cause not yet known; no test fails on it.
+1. **Phase 6.7, every sheet** (ROADMAP; SCOPE §4.13, §5.4): the NPC sheet first. Start with dnd5e's NPC sheet source (research note `dnd5e-6.0-other-sheets.md`), then the design questions and mockup boards. Chosen over Phase 7 so the NPC sheet gets the ADHD layer with the rest. Its plates carry `fhcs-plate`, so every theme dresses it (SCOPE §5.3 rule 11). The play round's ask 12 waits on a session of play.
+2. **`#postNotification` TypeError** seen in the chat card runs: in Foundry's own code, cause not yet known; no test fails on it.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
 
 ## Waiting on the user
 
+- **Theme kit in Foundry** (built 2026-11-09, offline checks pass): open a character in Plain (Day and Night) and Forge and see nothing changed: plates, the emblem at the inspiration bar's left, sparks, motes, moonbeam, cloud, nova. In Wind, Sand or Valley the emblem now sits left of the stars instead of under them. Any F12 errors after a hit or heal (the sheet now asks the theme for a `hit` and `heal` answer). The class themes (SCOPE §7) can start after this.
 - **Chat cards in play** (from a player's client): another player's attack and damage show once rolled; an effect applied from a card leaves a line; the hit line holds when targets change; each damage type its own total; a new card scrolls fully into view, down to Apply.
 - **Token sizes on Wildcard swaps** (ROADMAP play round ask 12; after a session of play, user 2026-11-08): swap a resized token's image to an untagged file (size stays), then to a tagged one like `_scale1.5` (scale applies). Not testable offline beyond the unit cases; no Quench test (it needs a scene token).
 - **Player sheet lock-up** (ROADMAP "Player-side bugs" 2): the F12 console output the next time it happens, and what "locked" looks like.

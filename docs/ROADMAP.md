@@ -4,15 +4,16 @@ Goal: Tidy 5e's classic layout, maintained, with the ADHD-friendly rules from ou
 
 Every phase ends with the user testing in their own v14 world. A phase is done when it's verified there, not when the code lands.
 
-## Theme kit (user, 2026-11-09; before any new theme)
+## Theme kit (user, 2026-11-09; before any new theme; built 2026-11-09, waits on a look in Foundry)
 
-A new theme should be textures, marks and motion, not new plumbing. Today it isn't: no BUILT entry says how a theme plugs in, Plain and Forge each keep their own copy of the plate list (the Limited view had to be added to both, Forge's twice), particles branch per theme in `src/apps/sparks.js`, and Wind, Sand and Valley stop at about 80 lines of tokens. One session; the class themes parked in SCOPE §7 wait for it.
+A new theme should be textures, marks and motion, not new plumbing. Before the kit it wasn't: no BUILT entry says how a theme plugs in, Plain and Forge each keep their own copy of the plate list (the Limited view had to be added to both, Forge's twice), particles branch per theme in `src/apps/sparks.js`, and Wind, Sand and Valley stopped at about 80 lines of tokens. The class themes parked in SCOPE §7 waited for it.
 
-- [ ] One plate class on the sheet's elements (`fhcs-plate`), so no theme lists them; Plain and Forge read it
-- [ ] A particle registry: each theme registers its answers (inspiration gained and spent, hit, heal) as settings; the engine never changes for a new theme
-- [ ] A starter theme file with every hook named: tokens, ground, frames, heading bands, tab row, emblem, inspiration marks, state art (`--fhcs-hp`, `data-fhcs-hp`), moments, chat card
-- [ ] A load check: each entry in `THEMES` has its CSS file in the manifest, its label, a layout case and an emblem
-- [ ] BUILT entry, "how a theme plugs in", with the recipe; CLAUDE.md's "How a theme goes" points to it
+- [x] One plate class on the sheet's elements (`fhcs-plate`), so no theme lists them; Plain and Forge read it (screenshots pixel-identical before and after)
+- [x] A particle registry: each theme registers its answers (inspiration gained and spent, hit, heal); the engine never changes for a new theme (`registerMoments` in `src/apps/sparks.js`; the sheet now also calls `hit` and `heal`, which no theme answers yet)
+- [x] A starter theme file with every hook named (`styles/themes/_starter.css`): tokens, ground, frames, heading bands, tab row, emblem, inspiration marks, state art (`--fhcs-hp`, `data-fhcs-hp`), moments, chat card
+- [x] A load check: each entry in `THEMES` has its CSS file in the manifest, its label, a layout case and an emblem; every theme file and every registered theme is in `THEMES` (seen failing on Plain's old emblem name). Layout cases now come from `THEMES`
+- [x] Extended (Claude): one emblem place for every theme, in `styles/fhcs.css`; Wind, Sand and Valley's emblems had sat under the inspiration star
+- [x] BUILT entry, "how a theme plugs in", with the recipe; CLAUDE.md's "How a theme goes" points to it
 
 ## Phase 0: Foundations (done; Quench verified 2026-10-24)
 

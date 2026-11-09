@@ -335,6 +335,7 @@ Every theme, and Plain where it applies. The look of each theme is §4.11.
 8. **Layers:** a translucent plate with a blur is its own layer, so a plate holding an open tray rises above its neighbours; a tray sets its own ink, not the bar's it opens from.
 9. **Self-contained:** one CSS file per theme (with its font and generated textures), so a theme can travel to the quest log later; not shared yet.
 10. **Chat cards follow the world theme,** not the speaker's; a world setting keeps them plain.
+11. **A theme plugs in, never rewires** (the theme kit; user, 2026-11-09: "textures, marks and motion, not new plumbing"; the details Claude's): a theme styles hooks the sheet already marks and never lists the sheet's elements. Plates are `fhcs-plate` (every new plate in a template carries it); the emblem is `--fhcs-theme-emblem`, drawn in one place for every theme, at the inspiration bar's left (as §4.11 already said; Wind, Sand and Valley had drawn theirs on the tab row's right, under the inspiration star); particles answer events through `registerMoments` (`gained`, `spent`, `hit`, `heal`). The recipe and the starter file: BUILT, "How a theme plugs in". *check (load: each theme's file, label, emblem and cases)*
 
 ### 5.4 Other sheets (Claude, 2026-10-29, from SCOPE §4.13 and the item sheet)
 

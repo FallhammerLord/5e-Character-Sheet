@@ -25,7 +25,7 @@
    --fhcs-plain-moon: none;
    /* The emblem at the inspiration bar's left: the sun rising. Inspiration's marks: a sun, rayed; banked, its disc
       filled. */
-   --fhcs-plain-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 18h18M6 18a6 6 0 0 1 12 0M12 8.5v-3M5.6 11.6l-2-2M18.4 11.6l2-2M8.2 9.5l-1-2M15.8 9.5l1-2' fill='none' stroke='%238a5a00' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+   --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 18h18M6 18a6 6 0 0 1 12 0M12 8.5v-3M5.6 11.6l-2-2M18.4 11.6l2-2M8.2 9.5l-1-2M15.8 9.5l1-2' fill='none' stroke='%238a5a00' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
    --fhcs-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='4.5' fill='none' stroke='%23000' stroke-width='2'/%3E%3Cpath d='M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
    --fhcs-mark-on: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='5.5'/%3E%3Cpath d='M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3M4.6 4.6l2.1 2.1M17.3 17.3l2.1 2.1M4.6 19.4l2.1-2.1M17.3 6.7l2.1-2.1' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
    /* Banked, the sun burns red-orange with a glow to match (user, 2026-10-29: "it should glow red instead of being
@@ -52,7 +52,7 @@
       wane across the row (user, 2026-10-29): crescent, gibbous, new, gibbous, crescent, each a thin disc with its lit
       part filled; banked, any of them a full moon with a pale halo that breathes slower than the sun's. A lone mark
       (no bank) is the waxing crescent. */
-   --fhcs-plain-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 19h18M13.5 4a6.5 6.5 0 1 0 4.5 11.2 5 5 0 0 1-4.5-11.2z' fill='none' stroke='%23c5d2f0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+   --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 19h18M13.5 4a6.5 6.5 0 1 0 4.5 11.2 5 5 0 0 1-4.5-11.2z' fill='none' stroke='%23c5d2f0' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
    --fhcs-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3Cpath d='M12 4a8 8 0 0 1 0 16a3.5 8 0 0 0 0-16z'/%3E%3C/svg%3E");
    --fhcs-mark-on: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8.75'/%3E%3C/svg%3E");
    --fhcs-plain-moon-1: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='8' fill='none' stroke='%23000' stroke-width='1.5'/%3E%3Cpath d='M12 4a8 8 0 0 1 0 16a3.5 8 0 0 0 0-16z'/%3E%3C/svg%3E");
@@ -101,9 +101,7 @@
 
 /* ---------- Plates: every text sits on one ---------- */
 
-.fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet) :is(.fhcs-header, .fhcs-tabs, .fhcs-attributes-side > .fhcs-panel,
-   .fhcs-attributes-main > *, .fhcs-list-bar, .fhcs-section, .fhcs-inventory-foot, .fhcs-casting, .fhcs-characteristics,
-   .fhcs-bio-column, .fhcs-empty, .fhcs-conditions, .fhcs-limited-header, .fhcs-limited-body > .fhcs-bio-box)
+.fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet) .fhcs-plate
 {
    background-color: var(--fhcs-surface);
 }
@@ -208,23 +206,6 @@
    {
       transform: translateY(1px);
    }
-}
-
-/* ---------- The emblem: the sun or the moon rising, at the inspiration bar's left ----------
-   As Forge's anvil: a narrow edit row, which needs its room, goes without. */
-
-.fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet) .fhcs-inspiration::before
-{
-   content: '';
-   flex: none;
-   width: 20px;
-   height: 20px;
-   background: var(--fhcs-plain-emblem) center / contain no-repeat;
-}
-
-@container fhcs-tabs (width < 720px)
-{
-   .fhcs-sheet:not([data-fhcs-theme], .fhcs-item-sheet) .fhcs-tabs:has(.fhcs-lock[aria-pressed="true"]) .fhcs-inspiration::before { display: none; }
 }
 
 /* ---------- The portrait catches the light (Phase 6.55) ----------

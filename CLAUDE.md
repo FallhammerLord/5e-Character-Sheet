@@ -57,6 +57,7 @@ Learned building Fire and Forge (2026-10-28):
 1. **Look up the real thing before drawing it** (forging heat, temper colours, Damascus patterns) and write it into the theme's research note. Drawn from memory, the first Damascus came out as wood grain.
 2. **Preview a texture alone,** at 4× and on its bar, before the layout check: the check can judge contrast, not whether it reads as steel.
 3. **Keep to SCOPE §5.3:** one look in both of Foundry's modes, no texture inside panels, effects that answer events where they happen, one CSS file plus its texture script.
+4. **Start from the kit:** copy `styles/themes/_starter.css` and follow BUILT's "How a theme plugs in". A theme styles the hooks the sheet marks (`fhcs-plate`, `fhcs-frame`, `--fhcs-theme-emblem`, `registerMoments`); a need it can't meet that way is plumbing, added to the kit for every theme.
 
 ## Commands
 

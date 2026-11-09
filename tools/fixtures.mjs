@@ -15,6 +15,7 @@ import { featuresView } from '../src/sheet/features.js';
 import { effectsView } from '../src/sheet/effects.js';
 import { biographyView } from '../src/sheet/biography.js';
 import { limitedView } from '../src/sheet/limited.js';
+import { THEMES } from '../src/constants.js';
 import { format, localize, template } from './templates.mjs';
 
 /** A usage card's context as FHCSUsageMessageData#_prepareContext builds it, with overrides. */
@@ -215,7 +216,7 @@ const INSPIRE = {
 };
 const tabs = (mode, inspire = 'none') => ({ fhcsTabs: { ...tabRow(DND5E_TABS, mode, localize), inspiration: inspirationBar(INSPIRE[inspire], mode, { localize, format }) } });
 // The theme picker on the title bar (SCOPE §4.11), its tray open: this character wears Forge, the world Plain.
-const THEME_PICK = themePicker({ chosen: 'forge', world: 'plain', keys: ['plain', 'forge', 'wind', 'sand', 'valley'] }, { localize, format });
+const THEME_PICK = themePicker({ chosen: 'forge', world: 'plain', keys: THEMES }, { localize, format });
 const themePick = template('sheet/theme-pick')(THEME_PICK);
 const titleBarPick = themePick.slice(0, themePick.indexOf('<div class="fhcs-tray'));
 // The tray open, as CharacterSheet places it: a child of the window, just under the 28px title bar.
@@ -805,9 +806,10 @@ export const CASES = [
    { name: 'card-no-details', template: 'chat/usage-card', frame: 'chat', context: card({ hasDetails: false }, []) }
 ];
 
-// The four themes (SCOPE §4.11): the header, Attributes and Spellbook in each, light and dark, every width; `look` sets
+// Every theme but Plain (the cases above), from `THEMES` so a new theme has its cases without a line here (the theme
+// kit): the header, Attributes, Spellbook, Inventory and the tab row in each, light and dark, every width; `look` sets
 // the sheet's data-fhcs-theme.
-export const LOOKS = ['forge', 'wind', 'sand', 'valley'];
+export const LOOKS = THEMES.filter((key) => key !== 'plain');
 for (const look of LOOKS)
 {
    CASES.push({ name: `theme-${look}-header`, template: 'sheet/header', look,

@@ -306,5 +306,37 @@ for (const { scope, key, config } of settings)
    for (const text of [config.name, config.hint]) { if (!inLang(text ?? '')) { problems.push(`setting ${key}: ${text} is not in lang/en.json`); } }
 }
 
+// The theme kit (docs/BUILT.md, "How a theme plugs in"): every theme in `THEMES` has its stylesheet in the manifest,
+// its emblem, its label and its layout cases; every theme stylesheet (on disk and in the manifest) and every theme with
+// particle answers is in it.
+{
+   const { THEMES } = await import('../src/constants.js');
+   const { momentThemes } = await import('../src/apps/sparks.js');
+   const { CASES } = await import('./fixtures.mjs');
+   for (const key of THEMES)
+   {
+      const css = `styles/themes/${key}.css`;
+      if (!manifest.styles.includes(css)) { problems.push(`theme ${key}: ${css} is not in module.json's styles`); }
+      else if (!/--fhcs-theme-emblem\s*:/.test(readFileSync(new URL(css, root), 'utf8'))) { problems.push(`theme ${key}: ${css} sets no --fhcs-theme-emblem`); }
+      if (!inLang(`FHCS.Theme.${key}`)) { problems.push(`theme ${key}: label FHCS.Theme.${key} is not in lang/en.json`); }
+      // Plain is the cases' own look; every other theme is a `look`.
+      if (key !== 'plain' && !CASES.some((c) => c.look === key)) { problems.push(`theme ${key}: no layout case wears it`); }
+   }
+   for (const css of manifest.styles.filter((path) => path.startsWith('styles/themes/')))
+   {
+      const key = css.slice('styles/themes/'.length, -'.css'.length);
+      if (!THEMES.includes(key)) { problems.push(`${css} is in module.json but ${key} is not in THEMES (src/constants.js)`); }
+   }
+   // A theme file left out of the manifest never loads in Foundry; the starter is a recipe, not a theme.
+   for (const file of readdirSync(new URL('styles/themes/', root)).filter((f) => f.endsWith('.css') && f !== '_starter.css'))
+   {
+      if (!manifest.styles.includes(`styles/themes/${file}`)) { problems.push(`styles/themes/${file} is not in module.json's styles`); }
+   }
+   for (const key of momentThemes())
+   {
+      if (!THEMES.includes(key)) { problems.push(`particle answers registered for ${key}, which is not in THEMES`); }
+   }
+}
+
 if (problems.length) { console.error(problems.join('\n')); process.exit(1); }
 console.log('Module graph loads; the sheet registers as a dnd5e character sheet; usage cards and settings are wired; manifest files exist.');

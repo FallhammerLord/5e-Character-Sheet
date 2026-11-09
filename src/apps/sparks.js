@@ -1,7 +1,8 @@
 /**
  * A theme's particles, drawn on a canvas over the content that never takes a click (SCOPE §5.3 rule 6; user,
  * 2026-10-29: "keep any particle effects as high quality scripts instead of static css"). Each answers an event, never
- * a timer, and starts where the event shows: today, inspiration gained, from the mark that was struck.
+ * a timer, and starts where the event shows (the mark struck, the HP bar). Each theme registers its answers at the
+ * foot of this file (`registerMoments`); the sheet calls `themeMoment` and never names a theme.
  *
  * - Fire and Forge (SCOPE §4.11, user 2026-10-28: "a nice 'forge sparks' animation spray ... rendered fresh each
  *   time"): a burst fans up and out from the mark, each spark with its own speed, angle, size and life, falling under
@@ -31,20 +32,42 @@ const CLOUD_S = 0.6;
 const NOVA_PEAK_S = 0.18;
 const NOVA_S = 0.6;
 
-/** A theme's answer to inspiration gained, from the mark that was struck. */
-export function inspirationGained(element, mark)
+/**
+ * The registry: each theme's answers to the sheet's events, by its key in `THEMES` (Plain is `plain`). An answer is
+ * `(element, mark) => void`, or `{ light, dark }` for a theme that answers each of Foundry's modes its own way. A new
+ * theme registers its own (`registerMoments`) and the engine below never changes; an event a theme leaves out draws
+ * nothing. The events:
+ * - `gained`, `spent`: inspiration, at the mark struck or spent;
+ * - `hit`, `heal`: HP fell or rose between two draws, at the HP bar.
+ */
+export const MOMENT_EVENTS = ['gained', 'spent', 'hit', 'heal'];
+const MOMENTS = new Map();
+
+/** Registers a theme's answers, replacing any it had; an unknown event is refused, so a misspelt one can't sit silent. */
+export function registerMoments(theme, answers)
 {
-   const theme = element.dataset.fhcsTheme;
-   if (theme === 'forge') { sparkBurst(element, mark); }
-   else if (!theme) { if (darkMode(element)) { moonbeam(element, mark); } else { sunMotes(element, mark); } }
+   const unknown = Object.keys(answers).filter((event) => !MOMENT_EVENTS.includes(event));
+   if (unknown.length) { throw new Error(`fhcs | Theme ${theme}: no event ${unknown.join(', ')} (events: ${MOMENT_EVENTS.join(', ')})`); }
+   MOMENTS.set(theme, { ...answers });
 }
 
-/** A theme's answer to inspiration spent, at the mark spent: Night's cloud wipes the full moon away; Day's sun goes nova. */
-export function inspirationSpent(element, mark)
+/** The themes that registered answers, for the load check (each must be in `THEMES`). */
+export function momentThemes()
 {
-   if (element.dataset.fhcsTheme) { return; }
-   if (darkMode(element)) { cloudWipe(element, mark); }
-   else { sunNova(element, mark); }
+   return [...MOMENTS.keys()];
+}
+
+/**
+ * The sheet's event, answered by the theme it wears (`data-fhcs-theme`, else Plain), at the mark where it shows.
+ * @param {HTMLElement} element  The sheet's window element.
+ * @param {string} event         One of MOMENT_EVENTS.
+ * @param {HTMLElement} [mark]   Where the event shows.
+ */
+export function themeMoment(element, event, mark = null)
+{
+   const answer = MOMENTS.get(element.dataset.fhcsTheme || 'plain')?.[event];
+   const draw = typeof answer === 'function' ? answer : answer?.[darkMode(element) ? 'dark' : 'light'];
+   draw?.(element, mark);
 }
 
 /** Whether the sheet may move now. */
@@ -398,3 +421,13 @@ export function sunNova(element, mark = null)
       return 1;
    });
 }
+
+/* ---------- The themes' answers ---------- */
+
+// Plain as Day and Night (Phase 6.55): Day's sun motes and nova, Night's moonbeam and cloud.
+registerMoments('plain', {
+   gained: { light: sunMotes, dark: moonbeam },
+   spent: { light: sunNova, dark: cloudWipe }
+});
+// Fire and Forge (SCOPE §4.11): sparks when inspiration is gained; the rune's cooling is its styles' alone.
+registerMoments('forge', { gained: sparkBurst });

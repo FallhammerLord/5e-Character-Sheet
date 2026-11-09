@@ -2,7 +2,7 @@
       on dnd5e's own inventory element, as on Inventory (inventory.hbs). It takes dnd5e's "spells" part ID. --}}
 <section class="tab fhcs-list-tab fhcs-spellbook {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
    {{#with fhcsSpellbook}}
-   <div class="fhcs-casting">
+   <div class="fhcs-casting fhcs-plate">
       {{#if classes.length}}
       <div class="fhcs-casting-classes">
          {{#each classes}}
@@ -47,7 +47,7 @@
 
       <section class="items-list spells-list fhcs-items" data-item-list="spells">
          {{#each sections}}
-         <div class="items-section fhcs-section{{#unless fold.open}} fhcs-folded{{/unless}}" data-fhcs-fold="{{ fold.key }}" data-fhcs-section="{{ id }}" data-level="{{ level }}" data-method="{{ method }}">
+         <div class="items-section fhcs-section{{#unless fold.open}} fhcs-folded{{/unless}} fhcs-plate" data-fhcs-fold="{{ fold.key }}" data-fhcs-section="{{ id }}" data-level="{{ level }}" data-method="{{ method }}">
             <div class="items-header fhcs-item-head">
                {{!-- The fold (user, 2026-10-28): its caret in the picture column, then the name; the slot pips stay outside
                      it, so a pip click never folds. --}}
@@ -86,7 +86,7 @@
             </ol>
          </div>
          {{/each}}
-         {{#if empty}}<p class="fhcs-body fhcs-muted fhcs-empty">{{ text.empty }}</p>{{/if}}
+         {{#if empty}}<p class="fhcs-body fhcs-muted fhcs-empty fhcs-plate">{{ text.empty }}</p>{{/if}}
       </section>
    </dnd5e-inventory>
    {{/with}}

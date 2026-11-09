@@ -58,7 +58,6 @@
 .fhcs-sheet[data-fhcs-theme="sand"] :is(.fhcs-panel-head, .fhcs-group-head) { border-bottom: 1px double var(--fhcs-theme-edge); border-bottom-width: 3px; }
 .fhcs-sheet[data-fhcs-theme="sand"] .fhcs-tab.active { border-bottom-color: var(--fhcs-theme-accent); }
 
-.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-tabs { background: var(--fhcs-theme-emblem) right calc(var(--fhcs-control) + 2 * var(--fhcs-s2)) center / 20px no-repeat; }
 
 @media (prefers-reduced-motion: no-preference)
 {

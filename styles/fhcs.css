@@ -1065,6 +1065,21 @@
    (Bastion, Special Traits, the gear) has no room to spare. */
 .fhcs-sheet .fhcs-tabs { container: fhcs-tabs / inline-size; }
 .fhcs-sheet .fhcs-inspiration { position: relative; display: flex; flex: 1 0 auto; justify-content: flex-end; align-items: center; gap: 0; }
+/* The theme's emblem (`--fhcs-theme-emblem`; every theme sets one, the load check holds it) at the inspiration bar's
+   left (user, 2026-10-28: the controls there had covered Forge's anvil); a narrow edit row, which needs its room for
+   Special Traits and the gear, goes without. One place for every theme (the theme kit, 2026-11-09). */
+.fhcs-sheet .fhcs-inspiration::before
+{
+   content: '';
+   flex: none;
+   width: 20px;
+   height: 20px;
+   background: var(--fhcs-theme-emblem) center / contain no-repeat;
+}
+@container fhcs-tabs (width < 720px)
+{
+   .fhcs-sheet .fhcs-tabs:has(.fhcs-lock[aria-pressed="true"]) .fhcs-inspiration::before { display: none; }
+}
 .fhcs-sheet .fhcs-tabs .fhcs-inspiration + .fhcs-lock { margin-left: var(--fhcs-s1); }
 .fhcs-sheet .fhcs-inspiration > details { position: static; display: flex; }
 .fhcs-sheet .fhcs-inspiration > .fhcs-inspiration-stars { display: flex; align-items: center; }

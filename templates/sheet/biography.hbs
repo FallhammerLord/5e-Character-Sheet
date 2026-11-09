@@ -6,7 +6,7 @@
 <section class="tab fhcs-biography {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
    {{#with fhcsBiography}}
    {{#if characteristics.length}}
-   <div class="fhcs-characteristics">
+   <div class="fhcs-characteristics fhcs-plate">
       {{#each characteristics}}
       {{#if ../editable}}
       <label class="fhcs-characteristic">
@@ -23,13 +23,13 @@
    </div>
    {{/if}}
 
-   {{#if empty}}<p class="fhcs-body fhcs-muted fhcs-empty">{{ text.empty }}</p>{{/if}}
+   {{#if empty}}<p class="fhcs-body fhcs-muted fhcs-empty fhcs-plate">{{ text.empty }}</p>{{/if}}
 
    <div class="fhcs-bio-columns">
-      <div class="fhcs-bio-column">
+      <div class="fhcs-bio-column fhcs-plate">
          {{#each left}}{{> "modules/fhcs/templates/sheet/bio-box.hbs" editable=../editable }}{{/each}}
       </div>
-      <div class="fhcs-bio-column fhcs-bio-wide">
+      <div class="fhcs-bio-column fhcs-bio-wide fhcs-plate">
          {{#each right}}{{> "modules/fhcs/templates/sheet/bio-box.hbs" editable=../editable }}{{/each}}
          {{#if biography}}
          <section class="fhcs-bio-box fhcs-bio-story">

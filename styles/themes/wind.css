@@ -48,7 +48,6 @@
 .fhcs-sheet[data-fhcs-theme="wind"] :is(.fhcs-panel-head, .fhcs-group-head) { border-image: linear-gradient(to right, var(--fhcs-theme-edge), transparent 85%) 1; }
 .fhcs-sheet[data-fhcs-theme="wind"] .fhcs-tab.active { border-bottom-color: var(--fhcs-theme-accent); border-bottom-width: 3px; }
 
-.fhcs-sheet[data-fhcs-theme="wind"] .fhcs-tabs { background: var(--fhcs-theme-emblem) right calc(var(--fhcs-control) + 2 * var(--fhcs-s2)) center / 20px no-repeat; }
 
 @media (prefers-reduced-motion: no-preference)
 {

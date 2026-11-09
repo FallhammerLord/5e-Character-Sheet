@@ -4,7 +4,7 @@
 {{#*inline "fhcs-star-mark"}}<span class="fhcs-mark" aria-hidden="true"></span>{{/inline}}
 {{#*inline "fhcs-bank-stars"}}{{#each stars}}<button type="button" class="fhcs-star{{#if filled}} fhcs-on{{/if}}{{#if last}} fhcs-star-last{{/if}}{{#if cooled}} fhcs-star-cooled{{/if}}"
    data-action="fhcsInspiration" data-slot="{{ slot }}" aria-label="{{ label }}" aria-pressed="{{#if filled}}true{{else}}false{{/if}}" data-fhcs-tip="{{ label }}"{{#unless can}} disabled{{/unless}}>{{> fhcs-star-mark }}</button>{{/each}}{{/inline}}
-<nav class="tabs fhcs-tabs" data-group="primary" aria-label="{{ fhcsTabs.label }}">
+<nav class="tabs fhcs-tabs fhcs-plate" data-group="primary" aria-label="{{ fhcsTabs.label }}">
    {{#each fhcsTabs.tabs}}
    {{!-- `always-interactive`: dnd5e's item sheet disables every button in play mode but those (application-v2-mixin.mjs:301). --}}
    <button type="button" class="fhcs-tab fhcs-body always-interactive{{#if active}} active{{/if}}" data-action="tab" data-group="primary"
