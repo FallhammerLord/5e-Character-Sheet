@@ -1364,7 +1364,7 @@ export function registerQuenchTests(quench)
 
          it('shows the class card in the header, levels it up from the level tray, and offers to choose what is missing', async function ()
          {
-            this.timeout(HOOK_WAIT_MS * 4);
+            this.timeout(HOOK_WAIT_MS * 6);
             const [cls] = await actor.createEmbeddedDocuments('Item', [
                { name: 'FHCS test class', type: 'class', system: { identifier: 'fhcs-test', levels: 1 } }
             ]);
@@ -1384,11 +1384,27 @@ export function registerQuenchTests(quench)
                'the level tray offers New class');
             const Manager = globalThis.dnd5e.applications.advancement.AdvancementManager;
             const wizard = () => [...foundry.applications.instances.values()].find((app) => app instanceof Manager && app.actor === actor);
-            await click(`.fhcs-header .fhcs-level-up [data-action="fhcsLevelUp"][data-item-id="${cls.id}"]`);
-            // With advancement steps, dnd5e's wizard opens; with none (or advancements off), the level just goes up.
-            await until(() => wizard() || cls.system.levels === 2,
-               () => `Level up opens dnd5e's wizard or raises the level; the class is level ${cls.system.levels}`);
-            await wizard()?.close();
+            // dnd5e's wizard finishes by itself when no step needs input, and its last act writes back the whole actor as
+            // it was when the wizard opened (advancement-manager.mjs:893, `diff: false`). Landing after this test ended,
+            // that write wiped the next test's favorite (2026-11-09; the effects test's moving failure). So the test waits
+            // for the wizard to finish, or closes one left waiting for input, before it ends.
+            let finished = false;
+            const hook = Hooks.on('dnd5e.advancementManagerComplete', (manager) => { if (manager?.actor === actor) { finished = true; } });
+            try
+            {
+               await click(`.fhcs-header .fhcs-level-up [data-action="fhcsLevelUp"][data-item-id="${cls.id}"]`);
+               // With advancement steps, dnd5e's wizard opens; with none (or advancements off), the level just goes up.
+               await until(() => wizard() || cls.system.levels === 2,
+                  () => `Level up opens dnd5e's wizard or raises the level; the class is level ${cls.system.levels}`);
+               for (let waited = 0; wizard() && !finished && waited < HOOK_WAIT_MS; waited += 50)
+               {
+                  await new Promise((resolve) => { setTimeout(resolve, 50); });
+               }
+               await wizard()?.close({ skipConfirmation: true });
+               await until(() => !wizard(), () => `dnd5e's wizard is still open (finished: ${finished})`);
+            }
+            finally { Hooks.off('dnd5e.advancementManagerComplete', hook); }
+            await settled();
             await cls.delete();
          });
 

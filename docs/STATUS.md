@@ -5,7 +5,7 @@ The current state: what the next session does, what waits on the user, what's ve
 ## Next session
 
 1. **Mechanical parity** (ROADMAP "Mechanical parity", SCOPE §4.15): slices A–E built 2026-11-08 G (activity types on chat cards) and H (favorites drag) 2026-11-09; F waits on the user (below). When F passes, tick items 1, 8, 12 and 13, write the BUILT entry and close the phase. Phase 1 is closed. The play round's asks are all built and played but 12, which waits on a session of play.
-2. **Favorites trap** (on the branch): the effect test fails some runs at moving steps and passes others (latest pass 2026-11-08). Not yet known. On a failure, read its text (it reports the row, tab, favorites and logged writes) and the console's `fhcs | test favorites write` warnings. The `#postNotification` TypeError seen in the chat card runs is in Foundry's own code, cause not yet known. Our code never writes `system.favorites`.
+2. **Favorites trap: found, a test bug** (2026-11-09): the effects test's failure named dnd5e's advancement wizard (`#complete`) as the write that cleared its favorite. The level-up test before it left dnd5e's wizard finishing on its own; the wizard writes back the whole actor from its opening copy, so a late finish wiped the next test's favorite. The level-up test now waits for the wizard to finish or close. Waits on a Quench run. The `#postNotification` TypeError seen in the chat card runs is in Foundry's own code, cause not yet known.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
 
