@@ -222,6 +222,9 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
   - [x] Container mocked up (canvas row "Phase 6.7 · the container sheet": a backpack light, a Bag of Holding with a pouch open dark, 500px with long names), waits on the user's review
   - [x] Container sheet built (2026-11-10): our item sheet around dnd5e's `ContainerSheet`, Contents on our Inventory rows, capacity and coins, Effects always for an editor; layout cases (`container*`, 500–740px, Forge), unit, load and a Quench test
   - [ ] Container: Quench and play, BUILT entry
+  - [x] Group research (research note "The group sheet, closer", 2026-11-10) and decisions (SCOPE §4.13, user 2026-11-10)
+  - [x] Group mocked up (canvas row "Phase 6.7 · the group sheet": a party of four light, its Inventory, allies and a wagon dark, 644px edit mode), waits on the user's review
+  - [ ] Group sheet built, in slices: header and tab row; Members; Inventory, Effects, Biography
 - [ ] The smaller windows: a skin
 - [ ] Quench and play
 
