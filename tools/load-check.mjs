@@ -234,6 +234,12 @@ else
       if (!npcParts[id]?.template.startsWith('modules/fhcs/')) { problems.push(`the NPC ${id} part is still dnd5e's`); }
       else { missingPartials(npcParts[id], `the NPC ${id} part`); }
    }
+   // dnd5e's NPC sheet draws into its own markup after each render; ours has none of it, so each is replaced, or the
+   // render throws and stops before our own steps (Quench, 2026-11-10: `_renderCreateInventory` found no `.bottom`).
+   for (const name of ['_renderCreateInventory', '_renderAttunement', '_renderSpellbook'])
+   {
+      if (!Object.hasOwn(Object.getPrototypeOf(npcSheet.prototype), name) && !Object.hasOwn(npcSheet.prototype, name)) { problems.push(`the NPC sheet does not replace dnd5e's ${name}`); }
+   }
    const npcClasses = npcSheet.prototype._initializeApplicationOptions.call(Object.create(npcSheet.prototype), {}).classes;
    if (npcClasses.some((name) => ['dnd5e2', 'vertical-tabs', 'hidden-title'].includes(name))) { problems.push('dnd5e\'s look classes reach the NPC window'); }
    // dnd5e has no inspiration or lair action an NPC can use: ours stand in.

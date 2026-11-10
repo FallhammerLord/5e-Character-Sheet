@@ -992,6 +992,16 @@ export function makeCharacterSheet(Base)
          // Drawn by templates/sheet/inventory.hbs.
       }
 
+      /**
+       * dnd5e's NPC sheet adds an add button into its own inventory's `.bottom` after each render (npc-sheet.mjs:527,
+       * base-actor-sheet.mjs:1033); ours has no such slot, and it threw there, stopping the rest of the render (Quench,
+       * 2026-11-10). The window's own add button (primary-sheet-mixin.mjs:263) serves Inventory, as on a character's.
+       */
+      _renderCreateInventory()
+      {
+         // The window's add button is shown on Inventory by styles/fhcs.css.
+      }
+
       /** dnd5e adds slot pips into its own spell headings after each render (base-actor-sheet.mjs:1054); ours draw them. */
       _renderSpellbook()
       {
@@ -1154,18 +1164,5 @@ export function makeNpcSheet(Base)
          return 'features';
       }
 
-      /** dnd5e's attunement counter, while the Inventory tab is still dnd5e's. */
-      _renderAttunement(...args)
-      {
-         if (!this.fhcsDraws('inventory')) { return Base.prototype._renderAttunement.apply(this, args); }
-         return super._renderAttunement(...args);
-      }
-
-      /** dnd5e's slot pips, while the Spellbook tab is still dnd5e's. */
-      _renderSpellbook(...args)
-      {
-         if (!this.fhcsDraws('spells')) { return Base.prototype._renderSpellbook.apply(this, args); }
-         return super._renderSpellbook(...args);
-      }
    };
 }
