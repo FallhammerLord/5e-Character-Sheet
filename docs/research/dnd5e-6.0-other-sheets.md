@@ -180,3 +180,39 @@ dnd5e 6.0.6 `module/applications/item/container-sheet.mjs`; Tidy Classic v13.0.0
   **Activities never**, since `ContainerData` has no activities template (no `activities` in its system); Effects only
   when it already holds one (`metadata.hasEffects: null` → `item.effects.size > 0`); Advancement never. Our
   `makeItemSheet` passes `Base.TABS` through, so wrapping `ContainerSheet` keeps these as they are.
+
+## The group sheet, closer (2026-11-10)
+
+dnd5e 6.0.6 `module/applications/actor/group-sheet.mjs`, `api/multi-actor-sheet.mjs`, `templates/actors/group/*.hbs`;
+Tidy Classic v13.0.0 `group/GroupSheet.svelte`, `group/tabs/*`, `group/parts/*`.
+
+- **Class:** `GroupActorSheet extends MultiActorSheet extends BaseActorSheet`, the character's base: edit mode and
+  its lock, `_prepareEffectsContext`, the inventory helpers. Exposed as `dnd5e.applications.actor.GroupActorSheet`.
+  700 × 700. Tabs `members` (first), `inventory`, `effects`, `biography`; parts `header`, `tabs` (horizontal), the four
+  bodies in a `tab-body` container.
+- **Header (`group/header.hbs`):** portrait (`editImage` in edit mode), name; buttons `placeMembers` and one `rest`
+  per `CONFIG.restTypes` (`data-type`); a Travel card: `travelPace` (`system.getTravelPace()`: `pace.label`,
+  `pace.available`, `pace.slowed`, `paces.land/water/air`), `changePace` with `data-increment` ±1 in play, a
+  `showConfiguration` gear (`data-config="movement"`) in edit mode; an Advancement card: `award` (trophy), the XP pool
+  (`system.details.xp.value`, a field in edit mode, hidden when `levelingMode` is `noxp`) and the average level
+  (`system.level`).
+- **Members (`_prepareMembersContext`):** sections `character`, `npc`, `vehicle` by `actor.system.groupSection`, each
+  sorted by name. Per member: `uuid`, `name`, `img`, `portrait` (token art when the group's
+  `flags.dnd5e.showTokenPortrait`), `canView` (LIMITED), `hiddenStats` (not OBSERVER: HP and stats hidden), `classes`,
+  `encumbrance`, `skills` (each `total`, `passive`, `css` rollable for an owner, `label`). The row (`member.hbs`,
+  `li.member[data-uuid]`): portrait, name (`showDocument`), HP and HD meters, a vehicle's AC / DT / speed pills, in
+  edit mode `removeMember`, else class icons; characters and NPCs add AC, walk speed (slowed mark), and Perception,
+  Stealth and Survival (`data-action="roll" data-type="skill" data-key`, the travel pace passed to the roll), each
+  with its passive. A context menu on `.member[data-uuid]`: View, Remove, Set or Unset primary vehicle.
+- **Inventory:** `BaseActorSheet._prepareInventoryContext` on `inventorySource` (the group, or its primary vehicle
+  when `flags.dnd5e.inventorySource` is `"vehicle"` and the user owns it; the `toggleInventory` split button is drawn
+  into the currency after render, `_renderInventoryToggle`). A sidebar card per member (not the source): carried
+  meter (`hiddenStats` hides its numbers), portrait, name, coins. `_onDropItem` onto a `[data-uuid]` member gives the
+  item to that member. Only physical items drop (`_onDropCreateItems`). Currency edits go to the vehicle when it's the
+  source (`_onChangeForm`, reading `data-name`).
+- **Effects:** the actor's `actor-effects.hbs`, as ours. **Biography:** `system.description.summary` and `.full`,
+  each with an `editDescription` feather opening one `prose-mirror` (`editingDescriptionTarget`).
+- **Life-cycle:** the sheet registers itself in each member's `apps`, so a member's change redraws it.
+- **Tidy Classic:** the header shows a summary line (members, level), movement and XP, and GM buttons (rests, award,
+  place); Members has a search bar, a GM panel of the group's languages and skills, and rows of portrait with HP,
+  name, AC shield, senses, condition immunities, Perception and the top skills; Inventory and Description follow.
