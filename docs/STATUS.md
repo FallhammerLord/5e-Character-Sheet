@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6.7, the rest of every sheet** (ROADMAP; SCOPE §4.13, §5.4): container, group, encounter and vehicle, reusing our Inventory tab and parts; the container first (an item sheet holding our Inventory list). Start with dnd5e's source (research note `dnd5e-6.0-other-sheets.md`), then the design questions and boards. Then the smaller windows' skin. The play round's ask 12 waits on a session of play.
+1. **Phase 6.7, the container sheet** (ROADMAP; SCOPE §4.13 "The container sheet"): research and decisions done, boards on the canvas (row "Phase 6.7 · the container sheet") waiting on the user's review. Once approved, build it: wrap dnd5e's `ContainerSheet` with `makeItemSheet`, a Contents part on our Inventory rows from `item.system.contents`, capacity and coins in the foot, Effects always for an editor. Then group, encounter, vehicle, and the smaller windows' skin. The play round's ask 12 waits on a session of play.
 2. **`#postNotification` TypeError** seen in the chat card runs: in Foundry's own code, cause not yet known; no test fails on it.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
