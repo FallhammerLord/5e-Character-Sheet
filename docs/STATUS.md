@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6.7, the vehicle sheet** (ROADMAP; SCOPE §4.13): the container, group and encounter sheets are built and wait on the user (below). Next: the vehicle (research, design questions, boards), then the smaller windows' skin. The play round's ask 12 waits on a session of play.
+1. **Phase 6.7, the vehicle sheet** (ROADMAP; SCOPE §4.13): the container, group and encounter sheets are built and wait on the user (below). The vehicle: research and decisions done (SCOPE §4.13 "The vehicle sheet"), boards on the canvas (row "Phase 6.7 · the vehicle sheet") waiting on the user's review; once approved, build it in slices (ROADMAP). Then the smaller windows' skin. The play round's ask 12 waits on a session of play.
 2. **`#postNotification` TypeError** seen in the chat card runs: in Foundry's own code, cause not yet known; no test fails on it.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.

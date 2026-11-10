@@ -232,6 +232,9 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
   - [x] Encounter research (research note "The encounter sheet, closer") and decisions (SCOPE §4.13, user 2026-11-10); no boards, at the user's word
   - [x] Encounter sheet built (2026-11-10): header, Members with counts and formulas, the difficulty bar, Loot, Description; resizable from 500px; unit, load and layout cases (`encounter*`, 500–740px, Forge), a Quench test
   - [ ] Encounter: Quench and play, BUILT entry
+  - [x] Vehicle research (research note "The vehicle sheet, closer") and decisions (SCOPE §4.13, user 2026-11-10)
+  - [x] Vehicle mocked up (canvas row "Phase 6.7 · the vehicle sheet": a ship light, a siege wagon dark, 644px edit mode, Crew & Passengers), waits on the user's review
+  - [ ] Vehicle sheet built, in slices: header and tab row; Stations; Cargo, Crew & Passengers, Effects, Description
 - [ ] The smaller windows: a skin
 - [ ] Quench and play
 
