@@ -9,7 +9,7 @@ import { countingDie, d20Row, modeForSides } from '../src/chat/d20.js';
 import { diceMath } from '../src/chat/math.js';
 import { attributesView } from '../src/sheet/attributes.js';
 import { keepStable } from '../src/sheet/death.js';
-import { columnChoice, inventoryView } from '../src/sheet/inventory.js';
+import { columnChoice, containerColumnChoice, inventoryView } from '../src/sheet/inventory.js';
 import { canCast, prepState, spellbookView, spellColumnChoice, spellKind } from '../src/sheet/spellbook.js';
 import { featureColumnChoice, featuresView, groupingOf } from '../src/sheet/features.js';
 import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js';
@@ -575,6 +575,20 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    try { deepStrictEqual(shape, [2, true, false, 0, null]); }
    catch { problems.push(`container contents: ${JSON.stringify(shape)}`); }
    if (inventoryView({ ...base, editing: true }, { format, localize }).columnToggles.length !== 7) { problems.push('the column menu is missing in edit mode'); }
+
+   // A container's Contents (SCOPE §4.13, 2026-11-10): weight, uses and quantity, weight on by default; its own column
+   // setting; the menu for whoever may edit, without a lock; no arrows, pins or attunement; its bar is its capacity.
+   try { deepStrictEqual(containerColumnChoice(null), { weight: true, uses: true, usage: false, quantity: true, equipped: false, attuned: false, favorite: false }); }
+   catch { problems.push(`default container columns: ${JSON.stringify(containerColumnChoice(null))}`); }
+   if (containerColumnChoice({ weight: false, equipped: true }).weight || containerColumnChoice({ equipped: true }).equipped) { problems.push('a saved container choice is not kept, or shows a column a container lacks'); }
+   const bagFacts = { ...base, container: true, canEdit: true, editing: false, order: ['loot', 'weapons'],
+      encumbrance: { value: '17', max: '30', pct: 57, stops: {}, units: 'lb' } };
+   const bagView = inventoryView(bagFacts, { format, localize });
+   const bagShape = [bagView.columnToggles.map((t) => t.key).join(), bagView.columnsList, bagView.editing, bagView.pins.length, bagView.attunement,
+      bagView.sections[0].move ?? null, bagView.sections[0].fold.key, bagView.text.carried, bagView.encumbrance.text];
+   try { deepStrictEqual(bagShape, ['weight,uses,quantity', 'container', false, 0, null, null, 'contents:weapons', 'Capacity', '17 / 30 lb']); }
+   catch { problems.push(`container contents view: ${JSON.stringify(bagShape)}`); }
+   if (inventoryView({ ...bagFacts, canEdit: false }, { format, localize }).columnToggles.length) { problems.push('a reader of a container gets its Columns menu'); }
 }
 
 // Spellbook (SCOPE §4.7): preparation states and kinds, Can cast, section order, slot pips, the concentration mark.

@@ -44,7 +44,7 @@
       <div class="fhcs-tray fhcs-columns-tray">
          {{#each columnToggles}}
          <button type="button" class="fhcs-button fhcs-body fhcs-column-toggle" data-action="fhcsToggleColumn"
-                 data-list="{{ ../list }}" data-column="{{ key }}" aria-pressed="{{#if pressed}}true{{else}}false{{/if}}">
+                 data-list="{{#if ../columnsList}}{{ ../columnsList }}{{else}}{{ ../list }}{{/if}}" data-column="{{ key }}" aria-pressed="{{#if pressed}}true{{else}}false{{/if}}">
             <svg class="fhcs-icon fhcs-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>{{ label }}
          </button>
          {{/each}}

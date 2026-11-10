@@ -1,21 +1,29 @@
-import { MODULE_ID, MODULE_PATH, THEME_FLAG } from '../constants.js';
-import { extraHeaderControls, itemSheetFacts, toggleItemField } from '../compat.js';
+import { CONTAINER_SHEET_CLASS_NAME, MODULE_ID, MODULE_PATH, THEME_FLAG } from '../constants.js';
+import { containerFacts, extraHeaderControls, itemSheetFacts, toggleItemField } from '../compat.js';
 import { comfortWidth, tabRow } from '../sheet/header.js';
 import { itemSheetView } from '../sheet/item.js';
-import { delayTips } from '../chat/card.js';
+import { containerColumnChoice, inventoryView } from '../sheet/inventory.js';
+import { delayTips, keepFolds } from '../chat/card.js';
+import { INVENTORY_LIST_ACTIONS, wireInventoryList } from './CharacterSheet.js';
 
 /** Our item sheet's own parts, by dnd5e's part ID: the header, the tab row and the Description tab (SCOPE §4.13). */
 export const ITEM_PARTS = {
    header: `${MODULE_PATH}/templates/item/header.hbs`,
    tabs: `${MODULE_PATH}/templates/sheet/tabs.hbs`,
-   description: `${MODULE_PATH}/templates/item/description.hbs`
+   description: `${MODULE_PATH}/templates/item/description.hbs`,
+   // A container's Contents (SCOPE §4.13, the container sheet): the character's Inventory tab on the container's items.
+   contents: `${MODULE_PATH}/templates/sheet/inventory.hbs`
 };
 
 /** Partials our parts include, loaded with them. */
 const ITEM_PART_OPTIONS = {
    header: { templates: [`${MODULE_PATH}/templates/sheet/conc-c.hbs`] },
    tabs: { templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`] },
-   description: { templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`] }
+   description: { templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`] },
+   contents: {
+      scrollable: ['.fhcs-items'],
+      templates: [`${MODULE_PATH}/templates/sheet/item-row.hbs`, `${MODULE_PATH}/templates/sheet/list-bar.hbs`, `${MODULE_PATH}/templates/sheet/section-move.hbs`]
+   }
 };
 
 /** The narrowest an item sheet may be (SCOPE §4.13: dnd5e's own width). */
@@ -140,4 +148,70 @@ export function makeItemSheet(Base)
          delayTips(this.element);
       }
    };
+}
+
+/* ---------- The container sheet (SCOPE §4.13, user 2026-11-10) ---------- */
+
+/** Each player's own folds and open containers, the same flags the character sheet keeps. */
+const FOLDED_FLAG = 'foldedFavorites';
+const OPEN_FLAG = 'openContainers';
+
+/**
+ * dnd5e's item tabs, as dnd5e gives a container (research note, "The container sheet, closer"), except Effects: dnd5e
+ * shows it only once an effect exists, so there was nowhere to add the first; ours shows it to whoever may edit
+ * (user, 2026-11-10), once identified, as dnd5e's own rule for the tab.
+ */
+function containerTabs(baseTabs)
+{
+   return (baseTabs ?? []).map((tab) =>
+   {
+      if (tab.tab !== 'effects' || !tab.condition) { return tab; }
+      const shows = tab.condition;
+      const identified = (item) => !!game.user?.isGM || item.system?.identified !== false;
+      return { ...tab, condition: (item) => shows(item) || (identified(item) && item.isOwner && !item.compendium?.locked) };
+   });
+}
+
+/**
+ * Our container sheet: our item sheet around dnd5e's `ContainerSheet`, with Contents drawn by our Inventory tab. dnd5e
+ * keeps the drag and drop, filters, sorting and the inventory element's row actions; the rows keep its hooks.
+ */
+export function makeContainerSheet(Base)
+{
+   const ItemSheet = makeItemSheet(Base);
+   const sheet = class extends ItemSheet
+   {
+      static DEFAULT_OPTIONS = {
+         classes: ['fhcs-container-sheet'],
+         actions: { ...INVENTORY_LIST_ACTIONS }
+      };
+
+      static TABS = containerTabs(Base.TABS);
+
+      /** @inheritDoc */
+      async _preparePartContext(partId, context, options)
+      {
+         context = await super._preparePartContext(partId, context, options);
+         if (partId === 'contents')
+         {
+            const i18n = { localize: (key) => game.i18n.localize(key), format: (key, data) => game.i18n.format(key, data) };
+            const columns = containerColumnChoice(game.settings.get(MODULE_ID, 'containerColumns'));
+            const openContainers = game.user.getFlag(MODULE_ID, OPEN_FLAG) ?? [];
+            const folded = game.user.getFlag(MODULE_ID, FOLDED_FLAG) ?? [];
+            context.fhcsInventory = inventoryView({ ...await containerFacts(this, context, { columns, openContainers }), folded }, i18n);
+         }
+         return context;
+      }
+
+      /** @inheritDoc */
+      async _onRender(context, options)
+      {
+         await super._onRender(context, options);
+         keepFolds(this.element, `sheet-${this.id}`);
+         wireInventoryList(this.element);
+      }
+   };
+   // Foundry files a sheet by its class name (`fhcs.FHCSContainerSheet`), so it needs its own.
+   Object.defineProperty(sheet, 'name', { value: CONTAINER_SHEET_CLASS_NAME });
+   return sheet;
 }

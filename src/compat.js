@@ -345,8 +345,41 @@ function isFavorite(actor, item)
    return (actor.system.favorites ?? []).some((f) => f.type === 'item' && f.id === id);
 }
 
+/**
+ * Where a row's facts come from. On an actor sheet: a container's contents are the actor's items that name it, their
+ * context is dnd5e's actor steps, favorites are the actor's. On a container sheet (`CONTAINER_ROWS`) the rows come
+ * from the container itself, so a world or compendium container works too.
+ */
+const ACTOR_ROWS = {
+   contents: (sheet, item) => sheet.actor.items.filter((i) => i.system.container === item.id && (sheet._isItemVisible?.(i) ?? true))
+      .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)),
+   context: containedContext,
+   favorite: (sheet, item) => isFavorite(sheet.actor, item)
+};
+
+/**
+ * A row's context on a container sheet: what dnd5e's `_prepareContentsContext` gives (container-sheet.mjs), plus the
+ * uses its actor sheet adds (`_prepareItem`, base-actor-sheet.mjs:861), which the container's own list leaves out.
+ */
+async function containerRowContext(sheet, item)
+{
+   const ctx = { clickAction: item.type === 'container' ? 'view' : 'use' };
+   ctx.totalWeight = await item.system.totalWeight;
+   ctx.isExpanded = sheet.expandedSections?.get(`items.${item.id}`) === true;
+   if (ctx.isExpanded) { ctx.expanded = await item.getChatData({ secrets: sheet.item?.isOwner ?? item.isOwner }); }
+   if (item.hasLimitedUses) { ctx.uses = { hasUses: true, value: item.system.uses?.value ?? 0, max: item.system.uses?.max, prop: 'system.uses.value' }; }
+   if (item.type === 'container') { ctx.capacity = await item.system.computeCapacity(); }
+   return ctx;
+}
+
+const CONTAINER_ROWS = {
+   contents: async (sheet, item) => [...(await item.system.contents ?? [])].sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)),
+   context: containerRowContext,
+   favorite: () => false
+};
+
 /** One Inventory row's facts; a container's carries its contents, unless dnd5e hides them from this user. */
-async function rowFacts(sheet, item, ctx, depth = 0)
+async function rowFacts(sheet, item, ctx, depth = 0, from = ACTOR_ROWS)
 {
    const uses = ctx.uses?.hasUses ? { value: ctx.uses.value ?? 0, max: ctx.uses.max, prop: ctx.uses.prop } : null;
    let sub = '';
@@ -363,9 +396,10 @@ async function rowFacts(sheet, item, ctx, depth = 0)
       contents = [];
       if (item.system.canViewContents !== false && depth < MAX_DEPTH)
       {
-         const inside = sheet.actor.items.filter((i) => i.system.container === item.id && (sheet._isItemVisible?.(i) ?? true))
-            .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
-         for (const child of inside) { contents.push(await rowFacts(sheet, child, await containedContext(sheet, child), depth + 1)); }
+         for (const child of await from.contents(sheet, item))
+         {
+            contents.push(await rowFacts(sheet, child, await from.context(sheet, child), depth + 1, from));
+         }
       }
    }
    return {
@@ -381,7 +415,7 @@ async function rowFacts(sheet, item, ctx, depth = 0)
       uses,
       usage: item.isActive ? (item.labels?.activation ?? '') : '',
       quantity: item.system.quantity ?? null,
-      favorite: isFavorite(sheet.actor, item),
+      favorite: from.favorite(sheet, item),
       equip: ctx.equip?.applicable ? { on: !!item.system.equipped, disabled: !!ctx.equip.disabled } : null,
       attune: ctx.attunement?.applicable ? {
          on: !!item.system.attuned,
@@ -447,6 +481,54 @@ export async function inventoryFacts(sheet, context, { columns, openContainers }
          sourceMax: actor.system._source?.attributes?.attunement?.max ?? actor.system.attributes?.attunement?.max ?? 0
       },
       encumbrance
+   };
+}
+
+/**
+ * Plain facts for a container's Contents tab (SCOPE §4.13, the container sheet), in the Inventory tab's shape
+ * (src/sheet/inventory.js reads both), from what dnd5e's `ContainerSheet#_prepareContentsContext` puts on the
+ * context: its sections by item type, its list controls, its capacity (`computeCapacity`) and its own coins.
+ */
+export async function containerFacts(sheet, context, { columns, openContainers })
+{
+   const config = CONFIG.DND5E;
+   const container = sheet.item;
+   const sections = (context.inventory ?? [])
+      .filter((s) => s.groups?.type)
+      .map((s) => ({ id: s.id, type: s.groups.type, label: game.i18n.localize(s.label), items: [] }));
+   const other = { id: 'other', type: null, label: game.i18n.localize('FHCS.Inventory.Other'), items: [] };
+   const custom = new Map();
+   const items = [...(context.items ?? [])].sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
+   for (const item of items)
+   {
+      const category = itemCategory(item);
+      const home = category ? customSection(custom, category, () => ({ type: null })) : sections.find((s) => s.type === item.type) ?? other;
+      home.items.push(await rowFacts(sheet, item, await containerRowContext(sheet, item), 0, CONTAINER_ROWS));
+   }
+
+   // The capacity in the Carried bar's place: dnd5e counts items ("Items", already a label) or weighs them.
+   const cap = context.encumbrance ?? {};
+   const capacity = cap.hidden || !Number.isFinite(cap.max) ? null : {
+      value: tenths(cap.value), max: tenths(cap.max), pct: cap.pct ?? 0, stops: {},
+      units: container.system.capacity?.count ? cap.units ?? '' : weightUnit(container.system.capacity?.weight?.units)
+   };
+   const controls = context.listControls ?? {};
+   return {
+      container: true,
+      canEdit: !!sheet.isEditable,
+      sections: [...sections, ...custom.values(), other],
+      columns,
+      openContainers,
+      editing: false,
+      activeFilters: listFilters(sheet, 'inventory'),
+      filters: (controls.filters ?? []).map((f) => ({ key: f.key, group: f.group ?? '', label: game.i18n.localize(f.label) })),
+      sorting: (controls.sorting ?? []).map((s) => ({ key: s.key, icon: s.dataset?.icon ?? '', label: game.i18n.localize(s.label) })),
+      currency: Object.entries(context.currency ?? {}).map(([key, value]) => ({
+         key, value, prop: `system.currency.${key}`,
+         abbr: game.i18n.localize(config.currencies?.[key]?.abbreviation ?? key),
+         name: game.i18n.localize(config.currencies?.[key]?.label ?? key)
+      })),
+      encumbrance: capacity
    };
 }
 
@@ -904,6 +986,18 @@ export async function linkInspiration(actor, itemId)
 export function systemItemSheet()
 {
    return globalThis.dnd5e?.applications?.item?.ItemSheet5e;
+}
+
+/** dnd5e's container sheet, which ours extends (SCOPE §4.13, the container sheet). */
+export function systemContainerSheet()
+{
+   return globalThis.dnd5e?.applications?.item?.ContainerSheet;
+}
+
+/** Registers our container sheet for containers, offered beside dnd5e's own (not the default). */
+export function registerContainerSheet(sheetClass, label)
+{
+   foundry.applications.apps.DocumentSheetConfig.registerSheet(Item, 'fhcs', sheetClass, { types: ['container'], makeDefault: false, label });
 }
 
 /** Registers our item sheet for every item type but containers, offered beside dnd5e's own (not the default). */

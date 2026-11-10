@@ -1,10 +1,10 @@
 import { MODULE_ID } from './constants.js';
-import { extendChatModel, keepTokenSizes, preloadTemplates, quietPosts, recordLevelOrder, recordTempTop, registerCharacterSheet, registerItemSheet, registerNpcSheet,
+import { extendChatModel, keepTokenSizes, preloadTemplates, quietPosts, recordLevelOrder, recordTempTop, registerCharacterSheet, registerContainerSheet, registerItemSheet, registerNpcSheet, systemContainerSheet,
    systemItemSheet, systemCharacterSheet, systemNpcSheet, watchApplications, watchItemCategories } from './compat.js';
 import { levelOrder } from './sheet/header.js';
 import { keepStable } from './sheet/death.js';
 import { makeCharacterSheet, makeNpcSheet } from './apps/CharacterSheet.js';
-import { makeItemSheet } from './apps/ItemSheet.js';
+import { makeContainerSheet, makeItemSheet } from './apps/ItemSheet.js';
 import { registerQuenchTests } from './tests/quench.js';
 import { registerSettings } from './settings.js';
 import { CARD_PARTS, isStale, makeUsageMessageData } from './chat/card.js';
@@ -40,6 +40,10 @@ Hooks.once('init', () =>
    const ItemBase = systemItemSheet();
    if (ItemBase) { registerItemSheet(makeItemSheet(ItemBase), 'FHCS.Item.SheetLabel'); }
    else { console.error(`${MODULE_ID} | dnd5e's item sheet was not found; the item sheet is not registered.`); }
+   // The container sheet (SCOPE §4.13, user 2026-11-10): our item sheet around dnd5e's, offered beside it.
+   const ContainerBase = systemContainerSheet();
+   if (ContainerBase) { registerContainerSheet(makeContainerSheet(ContainerBase), 'FHCS.Container.SheetLabel'); }
+   else { console.error(`${MODULE_ID} | dnd5e's container sheet was not found; the container sheet is not registered.`); }
 });
 
 // One card per action: rolls made from a card draw in its bands.

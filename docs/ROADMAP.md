@@ -220,7 +220,8 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
 - [ ] Container, group, encounter, vehicle
   - [x] Container research (research note "The container sheet, closer", 2026-11-10) and decisions (SCOPE §4.13, user 2026-11-10)
   - [x] Container mocked up (canvas row "Phase 6.7 · the container sheet": a backpack light, a Bag of Holding with a pouch open dark, 500px with long names), waits on the user's review
-  - [ ] Container sheet built: our item sheet around dnd5e's `ContainerSheet`, Contents on our Inventory rows, capacity and coins, Effects always for an editor; fixtures, unit, load and a Quench test
+  - [x] Container sheet built (2026-11-10): our item sheet around dnd5e's `ContainerSheet`, Contents on our Inventory rows, capacity and coins, Effects always for an editor; layout cases (`container*`, 500–740px, Forge), unit, load and a Quench test
+  - [ ] Container: Quench and play, BUILT entry
 - [ ] The smaller windows: a skin
 - [ ] Quench and play
 

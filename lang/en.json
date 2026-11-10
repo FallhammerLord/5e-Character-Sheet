@@ -46,6 +46,10 @@
       "KeepTokenSizes": {
         "Name": "Keep token sizes on image swaps",
         "Hint": "When Token HUD Wildcard swaps a token's image, keep the token's own size, scale, opacity and anchor unless the new file's name sets them (_width2, _scale1.5). Off: Wildcard resets them to the prototype token's."
+      },
+      "ContainerColumns": {
+        "Name": "Container columns",
+        "Hint": "Which columns a container's Contents tab shows. Change them from the tab's Columns menu."
       }
     },
     "Chat": {
@@ -480,6 +484,12 @@
       "None": "None",
       "Max": "Max",
       "Abilities": "Abilities"
+    },
+    "Container": {
+      "SheetLabel": "Fallhammer container sheet",
+      "Capacity": "Capacity",
+      "CapacityLabel": "Holding {value} of {max} {units}",
+      "Empty": "Nothing inside yet. Drop items here."
     }
   }
 }

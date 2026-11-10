@@ -21,6 +21,20 @@ export function columnChoice(saved)
    return choice;
 }
 
+/**
+ * A container's columns (SCOPE §4.13, user 2026-11-10): weight, uses and quantity; weight shows by default, since
+ * filling a bag is the point. Equipped, attuned and favorite don't apply to an item packed away.
+ */
+export const CONTAINER_COLUMNS = ['weight', 'uses', 'quantity'];
+
+/** @returns {object} Every Inventory column, on only where the player's container choice has it. */
+export function containerColumnChoice(saved)
+{
+   const choice = Object.fromEntries(INVENTORY_COLUMNS.map((key) => [key, false]));
+   for (const key of CONTAINER_COLUMNS) { choice[key] = typeof saved?.[key] === 'boolean' ? saved[key] : true; }
+   return choice;
+}
+
 /** @returns {number} A percentage clamped to 0–100. */
 const pct = (n) => Math.max(0, Math.min(100, Number(n) || 0));
 
@@ -31,7 +45,11 @@ const pct = (n) => Math.max(0, Math.min(100, Number(n) || 0));
  */
 export function inventoryView(facts, { format, localize })
 {
-   const columns = columnChoice(facts.columns);
+   // A container (facts.container) has its own columns, no section arrows and no attunement; its bar is its capacity.
+   const isContainer = !!facts.container;
+   const columns = isContainer ? containerColumnChoice(facts.columns) : columnChoice(facts.columns);
+   const columnKeys = isContainer ? CONTAINER_COLUMNS : INVENTORY_COLUMNS;
+   const menu = isContainer ? !!facts.canEdit : !!facts.editing;
    const open = new Set(facts.openContainers ?? []);
 
    /** One row, and for a container its contents, at any depth. */
@@ -85,8 +103,8 @@ export function inventoryView(facts, { format, localize })
    // In the player's order, with edit mode's arrows (SCOPE §4.13).
    const sections = arrangeSections(facts.sections
       .filter((s) => s.items.length)
-      .map((s) => ({ id: s.id, label: s.label, count: s.items.length, items: s.items.map(row), fold: sectionFold('inventory', s.id, facts.folded) })),
-   facts.order, { tab: 'inventory', editing: !!facts.editing, format });
+      .map((s) => ({ id: s.id, label: s.label, count: s.items.length, items: s.items.map(row), fold: sectionFold(isContainer ? 'contents' : 'inventory', s.id, facts.folded) })),
+   facts.order, { tab: 'inventory', editing: !isContainer && !!facts.editing, format });
 
    const enc = facts.encumbrance;
    const encumbrance = enc ? {
@@ -94,24 +112,27 @@ export function inventoryView(facts, { format, localize })
       low: pct(enc.stops?.encumbered),
       high: pct(enc.stops?.heavilyEncumbered),
       text: `${enc.value} / ${enc.max} ${enc.units}`.trim(),
-      label: format('FHCS.Inventory.CarriedLabel', { value: enc.value, max: enc.max, units: enc.units })
+      label: format(isContainer ? 'FHCS.Container.CapacityLabel' : 'FHCS.Inventory.CarriedLabel', { value: enc.value, max: enc.max, units: enc.units })
    } : null;
 
    return {
       sections,
       columns,
-      editing: !!facts.editing,
+      editing: !isContainer && !!facts.editing,
       filters: facts.filters ?? [],
       sorting: facts.sorting ?? [],
-      pins: pinView(INVENTORY_PINS, facts.activeFilters, localize),
+      // A container pins no filters (the board, 2026-11-10): dnd5e's menu holds them.
+      pins: isContainer ? [] : pinView(INVENTORY_PINS, facts.activeFilters, localize),
       // The column menu is a setting, so it shows only in edit mode, like dnd5e's gear icons (user, 2026-10-26).
       // The Columns menu is edit mode's; play mode keeps its place, so the search field keeps one width (SCOPE §5.2 rule 6).
       hasColumns: true,
-      columnToggles: facts.editing ? INVENTORY_COLUMNS.map((key) => ({
+      // A container's menu shows for whoever may edit it (no lock), and keeps its own setting.
+      columnToggles: menu ? columnKeys.map((key) => ({
          key, pressed: columns[key], label: localize(`FHCS.Inventory.Column.${key}`)
       })) : [],
+      columnsList: isContainer ? 'container' : '',
       currency: facts.currency.map((c) => ({ ...c, label: format('FHCS.Inventory.CurrencyLabel', { name: c.name }) })),
-      attunement: (facts.attunement?.max || facts.editing) ? {
+      attunement: !isContainer && (facts.attunement?.max || facts.editing) ? {
          text: `${facts.attunement.value} / ${facts.attunement.max}`,
          value: facts.attunement.value,
          sourceMax: facts.attunement.sourceMax ?? facts.attunement.max,
@@ -125,8 +146,8 @@ export function inventoryView(facts, { format, localize })
          search: localize('FHCS.Inventory.Search'),
          columns: localize('FHCS.Inventory.Columns'),
          attuned: localize('FHCS.Inventory.Attuned'),
-         carried: localize('FHCS.Inventory.Carried'),
-         empty: localize('FHCS.Inventory.Empty'),
+         carried: localize(isContainer ? 'FHCS.Container.Capacity' : 'FHCS.Inventory.Carried'),
+         empty: localize(isContainer ? 'FHCS.Container.Empty' : 'FHCS.Inventory.Empty'),
          head: Object.fromEntries(INVENTORY_COLUMNS.map((key) => [key, localize(`FHCS.Inventory.Column.${key}`)]))
       }
    };

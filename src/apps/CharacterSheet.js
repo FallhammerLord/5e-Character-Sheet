@@ -2,7 +2,7 @@ import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES, VIEW_ACTIONS } from '../con
 import { attributesFacts, biographyFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, renderTemplate, setLairInside, setSpellcastingAbility, spellbookFacts, toggleInspired, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
-import { columnChoice, inventoryView } from '../sheet/inventory.js';
+import { columnChoice, containerColumnChoice, inventoryView } from '../sheet/inventory.js';
 import { EXTRA_SPELL_FILTERS, spellbookView, spellColumnChoice } from '../sheet/spellbook.js';
 import { featureColumnChoice, featuresView } from '../sheet/features.js';
 import { effectsView } from '../sheet/effects.js';
@@ -60,7 +60,9 @@ const PART_OPTIONS = {
 const COLUMN_SETTINGS = {
    inventory: { setting: 'inventoryColumns', choice: columnChoice },
    spells: { setting: 'spellColumns', choice: spellColumnChoice },
-   features: { setting: 'featureColumns', choice: featureColumnChoice }
+   features: { setting: 'featureColumns', choice: featureColumnChoice },
+   // A container's Contents (SCOPE §4.13, the container sheet): the list is dnd5e's "inventory", the setting its own.
+   container: { setting: 'containerColumns', choice: containerColumnChoice }
 };
 
 /** Each list tab's pinned filters, by dnd5e's list name. */
@@ -783,6 +785,28 @@ function showMatchesInContainers(list)
    pass();
    // Our own changes come back as mutations; the pass changes nothing the second time, so it settles.
    new MutationObserver(pass).observe(list, { subtree: true, attributes: true, attributeFilter: ['hidden'] });
+}
+
+/**
+ * The Inventory list's own actions, shared with the container sheet's Contents tab (SCOPE §4.13): folds for sections
+ * and containers, and the Columns menu.
+ */
+export const INVENTORY_LIST_ACTIONS = { fhcsToggleContainer: toggleContainer, fhcsToggleSection: toggleSection, fhcsToggleColumn: toggleColumn };
+
+/**
+ * What an Inventory list needs after each render on a sheet that isn't ours by class (the container sheet): trays that
+ * close on a click elsewhere, and search matches kept in view inside containers.
+ * @param {HTMLElement} element  The window.
+ */
+export function wireInventoryList(element)
+{
+   closeTraysOnClickOff();
+   const items = element.querySelector('.fhcs-inventory .fhcs-items');
+   if (items && !items.dataset.fhcsWatched)
+   {
+      items.dataset.fhcsWatched = 'true';
+      showMatchesInContainers(items);
+   }
 }
 
 /**

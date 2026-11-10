@@ -77,6 +77,18 @@ class SystemItemSheet
       warnings: { template: 'systems/dnd5e/templates/shared/sheet-warnings-dialog.hbs' }
    };
 }
+// dnd5e's container sheet (container-sheet.mjs): the item sheet with a Contents part and Contents first in its tabs.
+class SystemContainerSheet extends SystemItemSheet
+{
+   static PARTS = { ...SystemItemSheet.PARTS, contents: { template: 'systems/dnd5e/templates/items/contents.hbs', templates: ['systems/dnd5e/templates/inventory/inventory.hbs'], scrollable: [''] } };
+   static TABS = [
+      { tab: 'contents', label: 'DND5E.ITEM.SECTIONS.Contents', condition: () => true },
+      { tab: 'description', label: 'DND5E.ITEM.SECTIONS.Description' },
+      { tab: 'details', label: 'DND5E.ITEM.SECTIONS.Details', condition: () => true },
+      { tab: 'activities', label: 'DND5E.ITEM.SECTIONS.Activities', condition: () => false },
+      { tab: 'effects', label: 'DND5E.ITEM.SECTIONS.Effects', condition: (item) => item.effects.size > 0 }
+   ];
+}
 // dnd5e's NPC sheet, as its PARTS stand in 6.0.6 (npc-sheet.mjs:30), on the same base as the character's.
 class SystemNpcSheet
 {
@@ -99,7 +111,7 @@ class SystemNpcSheet
       return { classes: ['dnd5e2', 'sheet', 'actor', 'standard-form', 'npc', 'vertical-tabs', 'fhcs-sheet', 'fhcs-npc'] };
    }
 }
-globalThis.dnd5e = { applications: { actor: { CharacterActorSheet: SystemCharacterSheet, NPCActorSheet: SystemNpcSheet }, item: { ItemSheet5e: SystemItemSheet } } };
+globalThis.dnd5e = { applications: { actor: { CharacterActorSheet: SystemCharacterSheet, NPCActorSheet: SystemNpcSheet }, item: { ItemSheet5e: SystemItemSheet, ContainerSheet: SystemContainerSheet } } };
 class SystemUsageMessageData {}
 class SystemCheckMessageData {}
 class SystemSaveMessageData {}
@@ -195,6 +207,42 @@ else
    }
    if (!itemParts.header?.templates?.some((p) => p.endsWith('/conc-c.hbs'))) { problems.push('the item header part does not load conc-c.hbs'); }
    if (!itemParts.details?.template.startsWith('systems/dnd5e/')) { problems.push('the item sheet lost dnd5e\'s details form'); }
+}
+
+// The container sheet (SCOPE §4.13, 2026-11-10): containers only, not the default, dnd5e's container class with our
+// item parts and our Inventory tab as Contents; Effects shows to an owner with no effect yet.
+const containerRegistrations = registered.filter(([doc, , , opts]) => doc === globalThis.Item && opts?.types?.includes('container'));
+if (containerRegistrations.length !== 1) { problems.push(`expected one container sheet registration, got ${containerRegistrations.length}`); }
+else
+{
+   const [, scope, sheet, options] = containerRegistrations[0];
+   const { CONTAINER_SHEET_CLASS_NAME } = await import('../src/constants.js');
+   if (scope !== 'fhcs') { problems.push(`container sheet registered under "${scope}", not "fhcs"`); }
+   if (!(sheet.prototype instanceof SystemContainerSheet)) { problems.push('container sheet does not extend dnd5e\'s container sheet'); }
+   if (sheet.name !== CONTAINER_SHEET_CLASS_NAME) { problems.push(`container sheet class is named ${sheet.name}, not ${CONTAINER_SHEET_CLASS_NAME}`); }
+   if (options?.types?.join() !== 'container') { problems.push('container sheet is not limited to containers'); }
+   if (options?.makeDefault) { problems.push('container sheet must not make itself the default'); }
+   const parts = sheet.PARTS ?? {};
+   for (const id of ['header', 'tabs', 'description', 'contents'])
+   {
+      const part = parts[id];
+      if (!part?.template.startsWith('modules/fhcs/')) { problems.push(`the container sheet's ${id} part is still dnd5e's`); continue; }
+      if (!existsSync(new URL(`../${part.template.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`container part template ${part.template} is missing`); }
+      for (const path of part.templates ?? []) { if (!existsSync(new URL(`../${path.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`container ${id} partial ${path} is missing`); } }
+   }
+   if (!parts.contents?.templates?.some((p) => p.endsWith('/item-row.hbs'))) { problems.push('the contents part does not load item-row.hbs'); }
+   if (!parts.contents?.templates?.some((p) => p.endsWith('/list-bar.hbs'))) { problems.push('the contents part does not load list-bar.hbs'); }
+   if (!parts.details?.template.startsWith('systems/dnd5e/')) { problems.push('the container sheet lost dnd5e\'s details form'); }
+   const tabs = sheet.TABS ?? [];
+   if (tabs[0]?.tab !== 'contents') { problems.push(`the container's first tab is ${tabs[0]?.tab}, not contents`); }
+   const effects = tabs.find((t) => t.tab === 'effects');
+   const bare = { isOwner: true, effects: new Map(), system: { identified: true } };
+   if (!effects?.condition?.(bare)) { problems.push('the container\'s Effects tab is hidden from its owner before any effect exists'); }
+   if (effects?.condition?.({ ...bare, isOwner: false })) { problems.push('the container\'s Effects tab shows to a non-owner with no effects'); }
+   for (const key of ['fhcsToggleContainer', 'fhcsToggleSection', 'fhcsToggleColumn'])
+   {
+      if (!sheet.DEFAULT_OPTIONS?.actions?.[key]) { problems.push(`the container sheet lacks the ${key} action`); }
+   }
 }
 
 // The NPC sheet (SCOPE §4.13, 2026-11-09): NPCs only, not the default, dnd5e's NPC class with our header and tab row

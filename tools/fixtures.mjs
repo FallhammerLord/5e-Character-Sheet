@@ -1039,6 +1039,42 @@ for (const kind of Object.keys(ITEMS))
    CASES.push({ name: `theme-forge-item-${kind}-editing`, frame: 'item', look: 'forge', html: itemSheet(kind, { editing: true }) });
    CASES.push({ name: `theme-forge-item-${kind}`, frame: 'item', look: 'forge', html: itemSheet(kind) });
 }
+// The container sheet (SCOPE §4.13, 2026-11-10): the item header and tab row over our Inventory list on its contents,
+// the board's backpack and Bag of Holding with a pouch open inside; weight, uses and quantity; capacity and coins.
+const CONTAINER_TABS = Object.fromEntries(['contents', 'description', 'details', 'effects']
+   .map((id, i) => [id, { id, label: ['Contents', 'Description', 'Details', 'Effects'][i], active: id === 'contents' }]));
+const bagFacts = (over = {}) => ({
+   container: true, canEdit: true, editing: false, columns: null, folded: [],
+   sections: [
+      { id: 'weapons', label: 'Weapons', items: [gear('Javelin of Lightning, Stormwrought in the High Spires', '#3a6aa8', { weight: '2 lb' })] },
+      { id: 'consumables', label: 'Consumables', items: [
+         gear('Potion of Healing', '#a3221b', { weight: '1 lb', quantity: 2, uses: { value: 1, max: 1, prop: 'system.uses.value' } }),
+         gear('Crossbow Bolts', '#5a4a3a', { weight: '1.5 lb', quantity: 20 })] },
+      { id: 'containers', label: 'Containers', items: [
+         gear('Pouch of Spell Components (Arcane Focus)', '#6a5a3a', { useAction: 'view', weight: '3.5 lb', sub: '1.5 / 6 lb', contents: [
+            gear('Bat Guano', '#3a3a3a', { weight: '0.5 lb', quantity: 3 }), gear('Diamond Dust', '#c8d8e8', { sub: '300 gp' })] })] },
+      { id: 'tools', label: 'Tools', items: [gear("Healer's Kit", '#2e7a5a', { weight: '3 lb', uses: { value: 7, max: 10, prop: 'system.uses.value' } })] }
+   ],
+   openContainers: ['PouchofSpellComponentsArcaneFocus'],
+   filters: inventoryFacts().filters, sorting: inventoryFacts().sorting, currency: inventoryFacts().currency,
+   encumbrance: { value: '104', max: '500', pct: 21, stops: {}, units: 'lb' },
+   ...over
+});
+const containerSheet = ({ editing = true, ...over } = {}) =>
+{
+   const view = itemSheetView({ ...ITEMS.weapon, type: 'container', name: 'Bag of Holding', subtitles: ['Container', 'Uncommon', 'DMG 2024'],
+      toggles: [{ key: 'equipped', on: false }, { key: 'identified', on: true }], editable: editing, editing }, { localize, format });
+   const tab = { id: 'contents', group: 'primary', cssClass: 'active' };
+   return template('item/header')({ fhcsItem: view })
+      + template('sheet/tabs')({ fhcsTabs: tabRow(CONTAINER_TABS, { canEdit: false, editing }, localize, {}, []) })
+      + template('sheet/inventory')({ tab, rollableClass: 'rollable',
+         fhcsInventory: inventoryView(bagFacts({ canEdit: editing, ...over }), { format, localize }) });
+};
+CASES.push({ name: 'container', frame: 'container', html: containerSheet(), rows: '.fhcs-item-header, .fhcs-tabs, .fhcs-list-bar, .fhcs-item-row' });
+CASES.push({ name: 'container-columns', frame: 'container', open: ['inventory-columns'], html: containerSheet() });
+CASES.push({ name: 'container-reader', frame: 'container', html: containerSheet({ editing: false }) });
+CASES.push({ name: 'container-empty', frame: 'container', html: containerSheet({ sections: [], encumbrance: null }) });
+CASES.push({ name: 'theme-forge-container', frame: 'container', look: 'forge', html: containerSheet() });
 CASES.push({ name: 'item-long-name', frame: 'item', html: itemSheet('weapon', { name: 'Sun Blade of the Dawnwarden, Twice-Forged in the Ember Halls' }) });
 
 // Chat cards in the world's theme (SCOPE §5.3 rule 10): every card case again in Forge.

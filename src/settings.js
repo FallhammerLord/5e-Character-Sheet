@@ -1,4 +1,4 @@
-import { MODULE_ID, SHEET_CLASS_NAMES, THEMES } from './constants.js';
+import { CONTAINER_SHEET_CLASS_NAME, MODULE_ID, SHEET_CLASS_NAMES, THEMES } from './constants.js';
 import { rerenderSheets } from './compat.js';
 import { rethemeCards } from './chat/card.js';
 import { DEFAULT_COLUMNS } from './sheet/inventory.js';
@@ -76,6 +76,17 @@ export function registerSettings()
       type: Object,
       default: { ...DEFAULT_COLUMNS },
       onChange: () => rerenderSheets(SHEET_CLASS_NAMES)
+   });
+
+   // Which columns a container's Contents tab shows (SCOPE §4.13, user 2026-11-10): weight, uses and quantity, all on.
+   game.settings.register(MODULE_ID, 'containerColumns', {
+      name: 'FHCS.Settings.ContainerColumns.Name',
+      hint: 'FHCS.Settings.ContainerColumns.Hint',
+      scope: 'client',
+      config: false,
+      type: Object,
+      default: { weight: true, uses: true, quantity: true },
+      onChange: () => rerenderSheets(CONTAINER_SHEET_CLASS_NAME)
    });
 
    // Which Spellbook columns show (SCOPE §4.7), chosen the same way.

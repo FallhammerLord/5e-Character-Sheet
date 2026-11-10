@@ -1102,6 +1102,54 @@ export function registerQuenchTests(quench)
             }
          });
 
+         it('opens a container in our container sheet: Contents first on our rows, uses and quantity saved, capacity, Effects for its owner', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 10);
+            const [bag] = await createItems([{ name: 'FHCS test bag', type: 'container', flags: { core: { sheetClass: `${MODULE_ID}.FHCSContainerSheet` } },
+               system: { capacity: { weight: { value: 30, units: 'lb' } } } }]);
+            const [potion] = await createItems([{ name: 'FHCS test tonic', type: 'consumable',
+               system: { container: bag.id, quantity: 2, weight: { value: 1, units: 'lb' }, uses: { max: '3', spent: 0 } } }]);
+            const bagSheet = bag.sheet;
+            const inSheet = (selector) => bagSheet.element?.querySelector(selector);
+            const tabs = () => [...(bagSheet.element?.querySelectorAll('.fhcs-tabs [data-tab]') ?? [])].map((t) => t.dataset.tab).join(', ');
+            const row = `.fhcs-inventory [data-item-id="${potion.id}"]`;
+            /** Types into a row's field after the sheet has drawn again, as a player does (`enter` waits on the character sheet). */
+            const type = async (selector, value) =>
+            {
+               await new Promise((resolve) => { setTimeout(resolve, REDRAW_START_MS); });
+               await bagSheet.render();
+               const field = inSheet(selector);
+               assert.ok(field, `no field matches ${selector}; the contents hold ${inSheet('.fhcs-inventory')?.textContent.replace(/\s+/g, ' ').trim().slice(0, 200)}`);
+               field.value = value;
+               field.dispatchEvent(new Event('change', { bubbles: true })); // redraw-safe: after the render settled, found fresh
+            };
+            try
+            {
+               await bagSheet.render({ force: true });
+               await until(() => inSheet('.fhcs-item-header') && inSheet('.fhcs-inventory'),
+                  () => `our header and Contents draw; the sheet is ${bagSheet.constructor.name}, tabs ${tabs()}`);
+               await until(() => tabs().startsWith('contents') && tabs().includes('effects') && !tabs().includes('activities'),
+                  () => `Contents leads, Effects shows with no effect yet, no Activities; tabs ${tabs()}`);
+               await until(() => inSheet(`${row} .fhcs-item-title`)?.textContent.includes('FHCS test tonic'),
+                  () => `the tonic has a row in the bag; rows ${[...(bagSheet.element?.querySelectorAll('.fhcs-inventory [data-item-id]') ?? [])].map((r) => r.dataset.itemName).join(', ') || 'none'}`);
+               const heads = () => [...(bagSheet.element?.querySelectorAll('.fhcs-inventory .fhcs-item-head .fhcs-label.fhcs-muted[class*="fhcs-col-"]') ?? [])].map((h) => h.className.match(/fhcs-col-(\w+)/)?.[1]);
+               await until(() => ['weight', 'uses', 'quantity'].every((c) => heads().includes(c)) && !inSheet('.fhcs-inventory .fhcs-col-toggle'),
+                  () => `a container's columns are weight, uses and quantity, no toggles; it shows ${heads().join(', ')}, toggles ${!!inSheet('.fhcs-inventory .fhcs-col-toggle')}`);
+               await until(() => inSheet('.fhcs-carried-text')?.textContent.includes('30'),
+                  () => `the foot shows the bag's capacity; it reads "${inSheet('.fhcs-carried-text')?.textContent ?? 'nothing'}"`);
+               await type(`${row} .fhcs-quantity-input`, '5');
+               await until(() => potion.system.quantity === 5, () => `the quantity field saves through dnd5e's inventory element; it holds ${potion.system.quantity}`);
+               await type(`${row} .fhcs-uses-input`, '1');
+               await until(() => potion.system.uses.value === 1, () => `the uses field saves; the tonic has ${potion.system.uses.value} of ${potion.system.uses.max} (spent ${potion.system.uses.spent})`);
+            }
+            finally
+            {
+               await bagSheet.close();
+               await potion.delete();
+               await bag.delete();
+            }
+         });
+
          it('keeps dnd5e\'s item fields and adds: rarity, units and the other descriptions; the add button on Advancement', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 8);

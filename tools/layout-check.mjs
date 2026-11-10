@@ -20,7 +20,7 @@ mkdirSync(out, { recursive: true });
 // Classic Tidy opens at 740 wide (SCOPE §4); dnd5e's own sheet at 800. Foundry's chat sidebar is about 300 wide;
 // players drag it narrower or wider, and pop messages out.
 // The sheet never goes narrower than its ability row needs (headerMinWidth).
-const WIDTHS = { sheet: [headerMinWidth(6), 740, 900], chat: [240, 300, 380], item: [500, 560, 740] };
+const WIDTHS = { sheet: [headerMinWidth(6), 740, 900], chat: [240, 300, 380], item: [500, 560, 740], container: [500, 560, 740] };
 const HEIGHT = 810;
 // Every stylesheet module.json loads, in its order.
 const css = JSON.parse(readFileSync(`${root}module.json`, 'utf8')).styles
@@ -34,6 +34,8 @@ const FRAMES = {
    sheet: { classes: 'sheet actor character fhcs-sheet', wrap: (body) => body },
    // The item sheet (SCOPE §4.13): its header, tab row and Description tab, as Foundry stacks a sheet's parts.
    item: { classes: 'sheet item fhcs-sheet fhcs-item-sheet', wrap: (body) => body },
+   // The container sheet (SCOPE §4.13, the container sheet): the item sheet's header and tab row over Contents.
+   container: { classes: 'sheet item fhcs-sheet fhcs-item-sheet fhcs-container-sheet', wrap: (body) => body },
    // A card's theme sits on its message, as `themeCard` puts it (the world's theme, SCOPE §5.3 rule 10).
    chat: {
       classes: 'chat-sidebar',
