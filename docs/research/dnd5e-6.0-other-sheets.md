@@ -244,3 +244,37 @@ dnd5e 6.0.6 `module/applications/actor/encounter-sheet.mjs`, `templates/actors/e
 - **Description:** the group's biography template (Summary, Description).
 - **Tidy Classic:** header with name, a summary, the XP, and GM buttons (Roll quantities, Award, Place members);
   Members, Inventory, Description tabs.
+
+## The vehicle sheet, closer (2026-11-10)
+
+dnd5e 6.0.6 `module/applications/actor/vehicle-sheet.mjs`, `templates/actors/vehicle/*.hbs`; Tidy Classic v13.0.0
+`vehicle/VehicleSheetFull.svelte`, `vehicle/tabs/*`, `vehicle/parts/*`.
+
+- **Class:** `VehicleActorSheet extends BaseActorSheet` (the character's base). `dnd5e.applications.actor.VehicleActorSheet`.
+  700 × 800, `vertical-tabs`. Parts: `sidebarCollapser`, `sidebar`, `stations` (always shown, outside the tabs), `tabs`
+  (sidebar tabs, right), and the tab bodies `inventory` (Cargo, first), `crew` (Crew & Passengers, only when
+  `vehicleHasCrew`), `effects`, `description`. Items it won't take: background, class, facility, race, spell, subclass.
+- **Display options** (edit mode switches in the sidebar): `flags.dnd5e.showVehicleAbilities`, `showVehicleInitiative`,
+  `showVehicleQuality`, and `system.attributes.actions.stations` (actions come from crewed stations, not a count).
+- **Sidebar (`vehicle/sidebar.hbs`):** portrait (`editImage`; `showArtwork`), initiative (roll; a gear in edit mode)
+  and quality (a field in edit mode) when shown; action pips (`togglePip` on `system.attributes.actions.spent`) when
+  actions are a count; name; type (`CONFIG.vehicleTypes`, a select in edit mode); in edit mode the action count and
+  its three crew thresholds; HP (value / max, edited inline with `toggleEditInline`; DT and mishap threshold as pills;
+  `hitPoints` gear); AC (`armorClass`); combat speed (`movement` gear; hover), travel speed (per hour), travel pace (per
+  day); cost (value and denomination); size; weight, keel, beam (value and units); cargo capacity; crew and passenger
+  maximums; resistances, immunities, condition immunities, vulnerabilities (trait pills).
+- **Stations (`vehicle/stations.hbs`, `data-area="draft"`):** the abilities grid when shown (proficiency cycle, score,
+  mod, save, gear); features in dnd5e's inventory element by activation (Features, Bonus, Reaction; columns uses and
+  controls); draft animals (`.station.drafted[data-uuid]`: name, "size • type • pulls N", `removeMember` in edit
+  mode); action stations, the mountable items (`.station[data-item-id][data-uuid]`, its own context menu): name with
+  cover, AC and DT (`useItem`), a weapon's attack and damage enriched, HP and uses bars (inline-edited, `data-name`),
+  speed, crew slots (`.slot[data-index]`, a portrait or empty; `uncrew` in edit mode); in edit mode four drop areas:
+  `createItem` feat, equipment (vehicle), weapon (siege), and `browseActors` for draft animals.
+- **Cargo:** the base inventory on the vehicle, with `encumbrance` from `system.getEncumbrance()` (its cargo).
+- **Crew & Passengers (`vehicle/crew.hbs`):** `data-area="crew"` unassigned (or all crew) and assigned, and
+  `data-area="passengers"`; each `.crew[data-uuid]` (draggable; `showDocument`) with a quantity: − and +
+  (`adjustCrew`, `data-delta`) around a `.crew-quantity` field and a hidden diff, or "× N". Drop zones when empty.
+  Actors dropped go to the area under the pointer (`_onDropActor`), onto a station to crew it.
+- **Description:** one editor, `system.details.biography.value`.
+- **Tidy Classic:** a header with profile, HP, AC, movement and the damage and mishap thresholds; tabs Attributes
+  (stations and features), Cargo, Crew & Passengers, Description.
