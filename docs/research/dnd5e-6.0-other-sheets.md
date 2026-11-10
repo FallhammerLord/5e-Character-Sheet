@@ -175,3 +175,8 @@ dnd5e 6.0.6 `module/applications/item/container-sheet.mjs`; Tidy Classic v13.0.0
   encumbrance. A container needs its own facts: rows from `item.system.contents` (nested through
   `getContainedItem`/`contents`, which works off an actor too), capacity in Carried's place, the container's coins.
   `src/sheet/inventory.js` and `item-row.hbs` can serve unchanged with equip, attune and favorite off.
+- **The inherited tabs** (checked 2026-11-10, item-sheet.mjs:96, 1131–1168): `ContainerSheet.TABS` is Contents plus
+  `ItemSheet5e.TABS`, each with its condition. For a container: Description always; Details once identified (or GM);
+  **Activities never**, since `ContainerData` has no activities template (no `activities` in its system); Effects only
+  when it already holds one (`metadata.hasEffects: null` → `item.effects.size > 0`); Advancement never. Our
+  `makeItemSheet` passes `Base.TABS` through, so wrapping `ContainerSheet` keeps these as they are.
