@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES, VIEW_ACTIONS } from '../constants.js';
-import { attributesFacts, biographyFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, groupHeaderFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, renderTemplate, setLairInside, setSpellcastingAbility, spellbookFacts, toggleInspired, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, containerColumnChoice, inventoryView } from '../sheet/inventory.js';
@@ -8,6 +8,7 @@ import { featureColumnChoice, featuresView } from '../sheet/features.js';
 import { effectsView } from '../sheet/effects.js';
 import { biographyView } from '../sheet/biography.js';
 import { limitedView } from '../sheet/limited.js';
+import { groupHeaderView } from '../sheet/group.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
 import { NPC_TAB_NAMES, NPC_TAB_ORDER, TEMP_TOP_FLAG, comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, tabRow, themePicker } from '../sheet/header.js';
 import { themeMoment } from './sparks.js';
@@ -1188,5 +1189,66 @@ export function makeNpcSheet(Base)
          return 'features';
       }
 
+   };
+}
+
+/* ---------- The group sheet (SCOPE §4.13, user 2026-11-10) ---------- */
+
+/** dnd5e's group parts we draw, with their templates and part settings. The tab bodies follow in their slices. */
+const GROUP_PARTS = {
+   header: { template: `${MODULE_PATH}/templates/group/header.hbs`, templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`] },
+   tabs: { template: SHEET_PARTS.tabs, ...PART_OPTIONS.tabs }
+};
+
+/** dnd5e's group parts with ours swapped in, keeping its part settings (container, scrolling) but not its classes. */
+function groupParts(baseParts)
+{
+   return Object.fromEntries(Object.entries(baseParts ?? {}).map(([id, part]) =>
+   {
+      if (!GROUP_PARTS[id]) { return [id, part]; }
+      const kept = { ...part };
+      delete kept.classes;
+      delete kept.templates;
+      return [id, { ...kept, ...GROUP_PARTS[id] }];
+   }));
+}
+
+/**
+ * Our group sheet: dnd5e's group sheet with the character sheet's layer on top (the same base class, BaseActorSheet):
+ * our lock, theme and title bar; the header, tab row and tab bodies ours.
+ */
+export function makeGroupSheet(Base)
+{
+   return class FHCSGroupSheet extends makeCharacterSheet(Base)
+   {
+      static DEFAULT_OPTIONS = {
+         classes: ['fhcs-group']
+      };
+
+      static PARTS = groupParts(Base.PARTS);
+
+      /** @inheritDoc */
+      get fhcsHomeTab()
+      {
+         return 'members';
+      }
+
+      /** The group's header and tab row; the rest as the character sheet draws them. */
+      async fhcsPartContext(partId, context)
+      {
+         const i18n = { localize: (key) => game.i18n.localize(key), format: (key, data) => game.i18n.format(key, data) };
+         if (partId === 'header')
+         {
+            context.fhcsGroup = groupHeaderView(groupHeaderFacts(this, context), i18n);
+            return context;
+         }
+         if (partId === 'tabs')
+         {
+            // dnd5e's tab names; no inspiration (a group has none).
+            context.fhcsTabs = tabRow(context.tabs, { canEdit: this.isEditable, editing: this.isEditMode }, i18n.localize, {}, []);
+            return context;
+         }
+         return super.fhcsPartContext(partId, context);
+      }
    };
 }

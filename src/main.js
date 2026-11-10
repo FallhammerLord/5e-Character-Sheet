@@ -1,9 +1,9 @@
 import { MODULE_ID } from './constants.js';
-import { extendChatModel, keepTokenSizes, preloadTemplates, quietPosts, recordLevelOrder, recordTempTop, registerCharacterSheet, registerContainerSheet, registerItemSheet, registerNpcSheet, systemContainerSheet,
+import { extendChatModel, keepTokenSizes, preloadTemplates, quietPosts, recordLevelOrder, recordTempTop, registerCharacterSheet, registerContainerSheet, registerGroupSheet, registerItemSheet, registerNpcSheet, systemContainerSheet, systemGroupSheet,
    systemItemSheet, systemCharacterSheet, systemNpcSheet, watchApplications, watchItemCategories } from './compat.js';
 import { levelOrder } from './sheet/header.js';
 import { keepStable } from './sheet/death.js';
-import { makeCharacterSheet, makeNpcSheet } from './apps/CharacterSheet.js';
+import { makeCharacterSheet, makeGroupSheet, makeNpcSheet } from './apps/CharacterSheet.js';
 import { makeContainerSheet, makeItemSheet } from './apps/ItemSheet.js';
 import { registerQuenchTests } from './tests/quench.js';
 import { registerSettings } from './settings.js';
@@ -36,6 +36,10 @@ Hooks.once('init', () =>
    const NpcBase = systemNpcSheet();
    if (NpcBase) { registerNpcSheet(makeNpcSheet(NpcBase), 'FHCS.Npc.SheetLabel'); }
    else { console.error(`${MODULE_ID} | dnd5e's NPC sheet was not found; the NPC sheet is not registered.`); }
+   // The group sheet (SCOPE §4.13, user 2026-11-10): offered beside dnd5e's own, as the NPC's.
+   const GroupBase = systemGroupSheet();
+   if (GroupBase) { registerGroupSheet(makeGroupSheet(GroupBase), 'FHCS.Group.SheetLabel'); }
+   else { console.error(`${MODULE_ID} | dnd5e's group sheet was not found; the group sheet is not registered.`); }
    // The item sheet (SCOPE §4.13): every item type but containers, offered beside dnd5e's own.
    const ItemBase = systemItemSheet();
    if (ItemBase) { registerItemSheet(makeItemSheet(ItemBase), 'FHCS.Item.SheetLabel'); }

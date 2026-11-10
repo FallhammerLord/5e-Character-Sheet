@@ -1,0 +1,87 @@
+{{!-- The group sheet's header (SCOPE §4.13, the group sheet; the board, 2026-11-10): the portrait, then the name with
+      the group's chips (Place members and dnd5e's rests), the member line, and two panels, Travel and Advancement.
+      dnd5e's actions keep their names: editImage, placeMembers, rest, changePace, showConfiguration, award. --}}
+{{#with fhcsGroup}}
+<header class="fhcs-header fhcs-plate fhcs-group-header">
+   <div class="fhcs-group-portrait fhcs-frame">
+      <img class="fhcs-portrait-art" src="{{ img }}" alt="{{ name }}"
+           {{#if editing}}data-action="editImage" data-edit="img"{{else}}data-action="showArtwork"{{/if}}>
+   </div>
+   <div class="fhcs-header-top">
+      <div class="fhcs-header-row">
+         {{#if editing}}
+         <input type="text" class="fhcs-input fhcs-display fhcs-name fhcs-name-input" name="name" value="{{ nameSource }}" aria-label="{{ text.name }}">
+         {{else}}
+         <span class="fhcs-display fhcs-name" data-fhcs-tip="{{ name }}" data-fhcs-tip-cut>{{ name }}</span>
+         {{/if}}
+         <div class="fhcs-status fhcs-frame">
+            <button type="button" class="fhcs-chip" data-action="placeMembers" aria-label="{{ text.place }}" data-fhcs-tip="{{ text.place }}">
+               <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg>
+            </button>
+            {{#each rests}}
+            <button type="button" class="fhcs-chip" data-action="rest" data-type="{{ key }}" aria-label="{{ label }}" data-fhcs-tip="{{ label }}">
+               {{#if short}}
+               <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9h11v5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5z"/><path d="M16 10h1.5a2.5 2.5 0 0 1 0 5H16M8 3v3M11 3v3"/></svg>
+               {{else}}
+               <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 18V8M3 14h18v4M21 14v-2a3 3 0 0 0-3-3h-7v5"/><circle cx="7" cy="11" r="1.6"/></svg>
+               {{/if}}
+            </button>
+            {{/each}}
+         </div>
+      </div>
+      <div class="fhcs-header-row">
+         <span class="fhcs-body fhcs-muted fhcs-line">{{ summary }}</span>
+      </div>
+      <div class="fhcs-group-panels">
+         {{#with travel}}
+         <div class="fhcs-origin-card fhcs-frame fhcs-group-travel">
+            <div class="fhcs-origin-head">
+               <span class="fhcs-label fhcs-line">{{ ../text.travel }}</span>
+               {{#if arrows}}
+               <span class="fhcs-group-pace{{#if slowed}} fhcs-slowed{{/if}}">
+                  <button type="button" class="fhcs-toggle" data-action="changePace" data-increment="-1" aria-label="{{ ../text.slower }}" data-fhcs-tip="{{ ../text.slower }}">
+                     <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+                  </button>
+                  <span class="fhcs-body fhcs-group-pace-name"{{#if slowed}} data-fhcs-tip="{{ slowedLabel }}"{{/if}}>{{ pace }}</span>
+                  <button type="button" class="fhcs-toggle" data-action="changePace" data-increment="1" aria-label="{{ ../text.faster }}" data-fhcs-tip="{{ ../text.faster }}">
+                     <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+                  </button>
+               </span>
+               {{else}}
+               {{#unless gear}}<span class="fhcs-body fhcs-group-pace-name">{{ pace }}</span>{{/unless}}
+               {{/if}}
+               {{#if gear}}
+               <button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="movement"
+                       aria-label="{{ ../text.travelConfig }}" data-fhcs-tip="{{ ../text.travelConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>
+               {{/if}}
+            </div>
+            <dl class="fhcs-group-speeds">
+               {{#each speeds}}
+               <div class="fhcs-group-speed"><dt class="fhcs-label fhcs-muted">{{ label }}</dt><dd class="fhcs-body">{{ value }}</dd></div>
+               {{/each}}
+            </dl>
+         </div>
+         {{/with}}
+         <div class="fhcs-origin-card fhcs-frame fhcs-group-advancement">
+            <div class="fhcs-origin-head">
+               <span class="fhcs-label fhcs-line">{{ text.advancement }}</span>
+               <button type="button" class="fhcs-button fhcs-body fhcs-group-award" data-action="award">
+                  <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M8 21h8M10 17h4"/></svg>{{ text.award }}
+               </button>
+            </div>
+            {{#if xp}}
+            <div class="fhcs-group-xp">
+               <span class="fhcs-label fhcs-muted">{{ text.xpPool }}</span>
+               {{#if editing}}
+               <input type="text" class="fhcs-input fhcs-body fhcs-group-xp-input" name="system.details.xp.value" data-dtype="Number"
+                      value="{{ xp.value }}" placeholder="0" aria-label="{{ text.xpPool }}">
+               {{else}}
+               <span class="fhcs-body">{{ xp.text }}</span>
+               {{/if}}
+            </div>
+            {{/if}}
+         </div>
+      </div>
+   </div>
+</header>
+{{/with}}

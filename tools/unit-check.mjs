@@ -10,6 +10,7 @@ import { diceMath } from '../src/chat/math.js';
 import { attributesView } from '../src/sheet/attributes.js';
 import { keepStable } from '../src/sheet/death.js';
 import { columnChoice, containerColumnChoice, inventoryView } from '../src/sheet/inventory.js';
+import { groupHeaderView } from '../src/sheet/group.js';
 import { canCast, prepState, spellbookView, spellColumnChoice, spellKind } from '../src/sheet/spellbook.js';
 import { featureColumnChoice, featuresView, groupingOf } from '../src/sheet/features.js';
 import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js';
@@ -589,6 +590,23 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    try { deepStrictEqual(bagShape, ['weight,uses,quantity', 'container', false, 0, null, null, 'contents:weapons', 'Capacity', '17 / 30 lb']); }
    catch { problems.push(`container contents view: ${JSON.stringify(bagShape)}`); }
    if (inventoryView({ ...bagFacts, canEdit: false }, { format, localize }).columnToggles.length) { problems.push('a reader of a container gets its Columns menu'); }
+}
+
+// The group's header (SCOPE §4.13, 2026-11-10): the member line, the pace's arrows in play and its gear in edit mode,
+// each travel speed with its unit or a dash, the XP pool only when dnd5e levels by XP.
+{
+   const facts = { name: 'The Lantern Company', img: '', editing: false, members: 4, level: 6,
+      rests: [{ key: 'short', label: 'Short Rest' }, { key: 'long', label: 'Long Rest' }],
+      travel: { pace: 'Normal', available: true, slowed: false, speeds: { land: 24, water: 0 }, units: 'mi/d' }, xp: { show: true, value: 1250, text: '1,250' } };
+   const play = groupHeaderView(facts, { format, localize });
+   const shape = [play.summary, play.travel.arrows, play.travel.gear, play.travel.speeds.map((x) => x.value).join('|'), play.xp?.text, play.rests.map((r) => r.short).join()];
+   try { deepStrictEqual(shape, ['4 members · average level 6', true, false, '24 mi/d|—|—', '1,250', 'true,false']); }
+   catch { problems.push(`group header in play: ${JSON.stringify(shape)}`); }
+   const edit = groupHeaderView({ ...facts, editing: true, members: 1, level: null, xp: { show: false } }, { format, localize });
+   const editShape = [edit.summary, edit.travel.arrows, edit.travel.gear, edit.xp];
+   try { deepStrictEqual(editShape, ['1 member', false, true, null]); }
+   catch { problems.push(`group header in edit mode: ${JSON.stringify(editShape)}`); }
+   if (groupHeaderView({ ...facts, travel: { ...facts.travel, available: false } }, { format, localize }).travel.arrows) { problems.push('a ship\'s pace shows arrows the group can\'t use'); }
 }
 
 // Spellbook (SCOPE §4.7): preparation states and kinds, Can cast, section order, slot pips, the concentration mark.

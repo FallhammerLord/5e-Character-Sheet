@@ -111,7 +111,24 @@ class SystemNpcSheet
       return { classes: ['dnd5e2', 'sheet', 'actor', 'standard-form', 'npc', 'vertical-tabs', 'fhcs-sheet', 'fhcs-npc'] };
    }
 }
-globalThis.dnd5e = { applications: { actor: { CharacterActorSheet: SystemCharacterSheet, NPCActorSheet: SystemNpcSheet }, item: { ItemSheet5e: SystemItemSheet, ContainerSheet: SystemContainerSheet } } };
+// dnd5e's group sheet, as its PARTS stand in 6.0.6 (group-sheet.mjs:38), on the same base as the character's.
+class SystemGroupSheet
+{
+   static PARTS = {
+      header: { template: 'systems/dnd5e/templates/actors/group/header.hbs' },
+      tabs: { template: 'systems/dnd5e/templates/shared/horizontal-tabs.hbs', templates: ['templates/generic/tab-navigation.hbs'] },
+      members: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/group/members.hbs', templates: ['systems/dnd5e/templates/actors/group/member.hbs'], scrollable: [''] },
+      inventory: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/group/inventory.hbs', scrollable: ['.sidebar', '.body'] },
+      effects: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/actor-effects.hbs', scrollable: [''] },
+      biography: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/group/biography.hbs', scrollable: [''] }
+   };
+   static LIMITED_PARTS = SystemCharacterSheet.LIMITED_PARTS;
+   _initializeApplicationOptions()
+   {
+      return { classes: ['dnd5e2', 'sheet', 'actor', 'standard-form', 'group', 'fhcs-sheet', 'fhcs-group'] };
+   }
+}
+globalThis.dnd5e = { applications: { actor: { CharacterActorSheet: SystemCharacterSheet, NPCActorSheet: SystemNpcSheet, GroupActorSheet: SystemGroupSheet }, item: { ItemSheet5e: SystemItemSheet, ContainerSheet: SystemContainerSheet } } };
 class SystemUsageMessageData {}
 class SystemCheckMessageData {}
 class SystemSaveMessageData {}
@@ -245,6 +262,33 @@ else
    }
 }
 
+// The group sheet (SCOPE §4.13, 2026-11-10): groups only, not the default, dnd5e's group class with our header and tab
+// row, its parts in dnd5e's order (header, tabs, then Members first).
+const groupRegistrations = registered.filter(([doc, , , opts]) => doc === globalThis.Actor && opts?.types?.includes('group'));
+if (groupRegistrations.length !== 1) { problems.push(`expected one group sheet registration, got ${groupRegistrations.length}`); }
+else
+{
+   const [, scope, sheet, options] = groupRegistrations[0];
+   const { GROUP_SHEET_CLASS_NAME } = await import('../src/constants.js');
+   if (scope !== 'fhcs') { problems.push(`group sheet registered under "${scope}", not "fhcs"`); }
+   if (!(sheet.prototype instanceof SystemGroupSheet)) { problems.push('group sheet does not extend dnd5e\'s group sheet'); }
+   if (sheet.name !== GROUP_SHEET_CLASS_NAME) { problems.push(`group sheet class is named ${sheet.name}, not ${GROUP_SHEET_CLASS_NAME}`); }
+   if (options?.types?.join() !== 'group') { problems.push('group sheet is not limited to groups'); }
+   if (options?.makeDefault) { problems.push('group sheet must not make itself the default'); }
+   const parts = sheet.PARTS ?? {};
+   if (Object.keys(parts).join() !== 'header,tabs,members,inventory,effects,biography') { problems.push(`group sheet parts are ${Object.keys(parts).join()}`); }
+   for (const [id, part] of Object.entries(parts).filter(([, p]) => p.template?.startsWith('modules/fhcs/')))
+   {
+      if (!existsSync(new URL(`../${part.template.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`group part template ${part.template} is missing`); }
+      for (const path of part.templates ?? []) { if (!existsSync(new URL(`../${path.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`group ${id} partial ${path} is missing`); } }
+   }
+   for (const id of ['header', 'tabs'])
+   {
+      if (!parts[id]?.template?.startsWith('modules/fhcs/')) { problems.push(`the group sheet's ${id} part is still dnd5e's`); }
+   }
+   if (!parts.header?.template?.endsWith('/group/header.hbs')) { problems.push('the group header is not the group\'s own template'); }
+}
+
 // The NPC sheet (SCOPE §4.13, 2026-11-09): NPCs only, not the default, dnd5e's NPC class with our header and tab row
 // first, its sidebar gone, its tab bodies dnd5e's until their slices.
 const npcRegistrations = registered.filter(([doc, , , opts]) => doc === globalThis.Actor && opts?.types?.includes('npc'));
@@ -301,7 +345,7 @@ else
    if (!npcLabel.split('.').reduce((node, part) => node?.[part], npcLang)) { problems.push(`NPC sheet label ${npcLabel} is not in lang/en.json`); }
 }
 
-const characterRegistrations = registered.filter(([doc, , , opts]) => doc !== globalThis.Item && !opts?.types?.includes('npc'));
+const characterRegistrations = registered.filter(([doc, , , opts]) => doc !== globalThis.Item && !opts?.types?.includes('npc') && !opts?.types?.includes('group'));
 const [documentClass, scope, sheet, options] = characterRegistrations[0] ?? [];
 if (characterRegistrations.length !== 1) { problems.push(`expected one character sheet registration, got ${characterRegistrations.length}`); }
 else

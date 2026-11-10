@@ -43,6 +43,48 @@ export function registerNpcSheet(sheetClass, label)
    });
 }
 
+/** dnd5e's group sheet, which ours extends (SCOPE §4.13, the group sheet). */
+export function systemGroupSheet()
+{
+   return globalThis.dnd5e?.applications?.actor?.GroupActorSheet;
+}
+
+/** Registers a sheet for group actors, offered beside dnd5e's own (not the default). */
+export function registerGroupSheet(sheetClass, label)
+{
+   foundry.applications.apps.DocumentSheetConfig.registerSheet(Actor, 'fhcs', sheetClass, { types: ['group'], makeDefault: false, label });
+}
+
+/**
+ * Plain facts for the group's header (src/sheet/group.js), from what dnd5e's `GroupActorSheet#_prepareHeaderContext`
+ * puts on the context (`travelPace`, `showXP`) and the group's data: its members, average level and rests.
+ */
+export function groupHeaderFacts(sheet, context)
+{
+   const actor = sheet.actor;
+   const system = actor.system;
+   const travel = context.travelPace ?? system.getTravelPace?.() ?? {};
+   const unit = CONFIG.DND5E.travelUnits?.[system.attributes?.travel?.units];
+   const xp = system.details?.xp?.value;
+   return {
+      name: actor.name,
+      nameSource: actor._source?.name ?? actor.name,
+      img: actor.img,
+      editing: !!sheet.isEditMode && !!sheet.isEditable,
+      members: (system.members ?? []).filter((m) => m.actor).length,
+      level: system.level ? Math.round(system.level) : null,
+      rests: Object.entries(CONFIG.DND5E.restTypes ?? {}).map(([key, rest]) => ({ key, label: game.i18n.localize(rest.label ?? key) })),
+      travel: {
+         pace: game.i18n.localize(travel.pace?.label ?? ''),
+         available: !!travel.pace?.available,
+         slowed: !!travel.pace?.slowed,
+         speeds: travel.paces ?? {},
+         units: unit ? game.i18n.localize(unit.abbreviationDay ?? unit.label ?? '') : ''
+      },
+      xp: { show: context.showXP ?? game.settings.get('dnd5e', 'levelingMode') !== 'noxp', value: xp ?? '', text: xp ? xp.toLocaleString(game.i18n.lang) : '—' }
+   };
+}
+
 /**
  * Swaps dnd5e's data model for one chat message type with our subclass of it. Runs at init, after dnd5e's init set
  * CONFIG.ChatMessage.dataModels and before the world's messages are built.

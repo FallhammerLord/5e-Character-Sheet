@@ -490,6 +490,27 @@
       "Capacity": "Capacity",
       "CapacityLabel": "Holding {value} of {max} {units}",
       "Empty": "Nothing inside yet. Drop items here."
+    },
+    "Group": {
+      "SheetLabel": "Fallhammer group sheet",
+      "Name": "Group name",
+      "MemberOne": "{count} member",
+      "MemberMany": "{count} members",
+      "AverageLevel": "average level {level}",
+      "Place": "Place members",
+      "TravelLabel": "Travel",
+      "Slower": "Slower pace",
+      "Faster": "Faster pace",
+      "Slowed": "Slowed by a member",
+      "TravelConfig": "Configure travel",
+      "Travel": {
+        "land": "Land",
+        "water": "Water",
+        "air": "Air"
+      },
+      "Advancement": "Advancement",
+      "Award": "Award",
+      "XpPool": "XP pool"
     }
   }
 }

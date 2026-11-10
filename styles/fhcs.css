@@ -3458,6 +3458,40 @@
 .fhcs-sheet .fhcs-condition:not([aria-pressed="true"]) .fhcs-switch-mark { color: var(--fhcs-muted); }
 .fhcs-sheet .fhcs-condition[aria-pressed="true"] { border-color: currentColor; background: var(--fhcs-fill); }
 
+/* ---------- The group sheet's header (SCOPE §4.13, the group sheet; the board, 2026-11-10) ---------- */
+
+/* One row: a 112px portrait, then the name, the member line and the two panels. */
+.fhcs-sheet .fhcs-group-header { grid-template-columns: 112px minmax(0, 1fr); grid-template-rows: auto; }
+.fhcs-sheet .fhcs-group-portrait
+{
+   position: relative;
+   grid-row: 1;
+   grid-column: 1;
+   width: 112px;
+   height: 112px;
+   overflow: hidden;
+   border-radius: var(--fhcs-radius);
+}
+.fhcs-sheet .fhcs-group-header > .fhcs-header-top { padding-bottom: 0; }
+/* Place members, Short and Long rest: the status group's chips, one width each. */
+.fhcs-sheet .fhcs-group-header .fhcs-status > .fhcs-chip { box-sizing: border-box; width: 40px; min-width: 40px; justify-content: center; }
+
+/* Travel takes three parts of the row, Advancement two (the board). */
+.fhcs-sheet .fhcs-group-panels { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: var(--fhcs-s1); min-width: 0; }
+.fhcs-sheet .fhcs-group-panels > .fhcs-origin-card { flex-direction: column; align-items: stretch; gap: var(--fhcs-s1); padding-right: var(--fhcs-s2); }
+.fhcs-sheet .fhcs-group-panels .fhcs-origin-head { min-height: var(--fhcs-control); }
+.fhcs-sheet .fhcs-group-pace { display: flex; flex: none; align-items: center; }
+.fhcs-sheet .fhcs-group-pace-name { flex: none; min-width: 56px; text-align: center; white-space: nowrap; }
+/* Slowed by a member: dnd5e lowers the pace itself; the pace's tip says why (no colour: §5.1 has none for it). */
+.fhcs-sheet .fhcs-group-speeds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--fhcs-s1); margin: 0; }
+.fhcs-sheet .fhcs-group-speed { display: flex; flex-direction: column; min-width: 0; }
+.fhcs-sheet .fhcs-group-speed > dd { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fhcs-sheet .fhcs-group-panels .fhcs-group-award { flex: none; width: auto; }
+.fhcs-sheet .fhcs-group-xp { display: flex; flex-direction: column; align-items: flex-start; min-width: 0; }
+.fhcs-sheet .fhcs-group-xp-input { width: 96px; height: var(--fhcs-control); }
+/* The pool's value keeps the field's height in play, so edit mode moves nothing (§5.2 rule 6). */
+.fhcs-sheet .fhcs-group-xp > span.fhcs-body { display: flex; align-items: center; min-height: var(--fhcs-control); }
+
 /* ---------- Biography tab (SCOPE §4.8) ---------- */
 
 .fhcs-sheet .fhcs-biography.active { display: flex; flex-direction: column; gap: var(--fhcs-s2); }

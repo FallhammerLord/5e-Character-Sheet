@@ -15,6 +15,7 @@ import { featuresView } from '../src/sheet/features.js';
 import { effectsView } from '../src/sheet/effects.js';
 import { biographyView } from '../src/sheet/biography.js';
 import { limitedView } from '../src/sheet/limited.js';
+import { groupHeaderView } from '../src/sheet/group.js';
 import { THEMES } from '../src/constants.js';
 import { format, localize, template } from './templates.mjs';
 
@@ -1075,6 +1076,25 @@ CASES.push({ name: 'container-columns', frame: 'container', open: ['inventory-co
 CASES.push({ name: 'container-reader', frame: 'container', html: containerSheet({ editing: false }) });
 CASES.push({ name: 'container-empty', frame: 'container', html: containerSheet({ sections: [], encumbrance: null }) });
 CASES.push({ name: 'theme-forge-container', frame: 'container', look: 'forge', html: containerSheet() });
+// The group sheet (SCOPE §4.13, 2026-11-10): its header (the name with the group's chips, the member line, Travel and
+// Advancement) over our tab row, in play and edit mode, with a long name, a slowed pace and no XP.
+const GROUP_TABS = Object.fromEntries(['members', 'inventory', 'effects', 'biography']
+   .map((id, i) => [id, { id, label: ['Members', 'Inventory', 'Effects', 'Biography'][i], active: id === 'members' }]));
+const groupFacts = (over = {}) => ({ name: 'The Lantern Company', img: ICON('#c9a227'), editing: false, members: 4, level: 6,
+   rests: [{ key: 'short', label: 'Short Rest' }, { key: 'long', label: 'Long Rest' }],
+   travel: { pace: 'Normal', available: true, slowed: false, speeds: { land: 24 }, units: 'mi/d' }, xp: { show: true, value: 1250, text: '1,250' }, ...over });
+const groupHeader = (over = {}) =>
+{
+   const editing = !!over.editing;
+   return template('group/header')({ fhcsGroup: groupHeaderView(groupFacts(over), { format, localize }) })
+      + template('sheet/tabs')({ fhcsTabs: tabRow(GROUP_TABS, { canEdit: true, editing }, localize, {}, []) });
+};
+CASES.push({ name: 'group-header', html: groupHeader(), rows: '.fhcs-header-row, .fhcs-group-panels, .fhcs-tabs' });
+CASES.push({ name: 'group-header-editing', html: groupHeader({ editing: true }), rows: '.fhcs-header-row, .fhcs-group-panels, .fhcs-tabs', sameRowsAs: 'group-header' });
+CASES.push({ name: 'group-header-long', html: groupHeader({ name: 'The Lantern Company and Friends of the Long Road, Sworn at the Ember Gate', members: 6,
+   travel: { pace: 'Slow', available: true, slowed: true, speeds: { land: 18, water: 12, air: 48 }, units: 'mi/d' } }) });
+CASES.push({ name: 'group-header-noxp', html: groupHeader({ members: 1, level: null, xp: { show: false }, travel: { pace: 'Normal', available: false, speeds: {}, units: '' } }) });
+CASES.push({ name: 'theme-forge-group-header-editing', look: 'forge', html: groupHeader({ editing: true }) });
 CASES.push({ name: 'item-long-name', frame: 'item', html: itemSheet('weapon', { name: 'Sun Blade of the Dawnwarden, Twice-Forged in the Ember Halls' }) });
 
 // Chat cards in the world's theme (SCOPE §5.3 rule 10): every card case again in Forge.
