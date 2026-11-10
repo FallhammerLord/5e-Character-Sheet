@@ -208,15 +208,15 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
 - [x] Item sheet mocked up (canvas row "Phase 6.7 · the item sheet": a weapon light, a spell dark, a feature in Forge, 500px edit mode), waits on the user's review
 - [x] NPC research: dnd5e 6.0.6's NPC sheet and Tidy Classic's, against our code (research note, "The NPC sheet, closer", 2026-11-09)
 - [x] NPC design questions answered (SCOPE §4.13, 2026-11-09): one everything tab, the character's header with CR and legendary panels, the player's chips with inspiration, the biography's NPC fields
-- [x] NPC mocked up (canvas row "Phase 6.7 · the NPC sheet": a Bandit Captain light, a lich in its lair dark, the lich at 644px in edit mode), waits on the user's review
+- [x] NPC mocked up (canvas row "Phase 6.7 · the NPC sheet": a Bandit Captain light, a lich in its lair dark, the lich at 644px in edit mode), approved 2026-11-09
 - [ ] Mockups for the rest
 - [x] Chat cards in the world theme (world setting "Themed chat cards", on by default); Forge's card: a riveted iron plate, Grenze title and totals, iron-edged bands that heat on hover; every card case checked in Forge; Quench test added
 - [x] Item sheet (every type, spells included): header, our tab row and lock, Description with the properties column and Category; dnd5e's forms for the rest; layout cases (500–740px, Forge), unit and load checks, a Quench test (built 2026-10-28; waits on Quench and play)
-- [ ] NPC sheet, in slices:
-  - [x] Header and tab row (2026-11-09; offline checks pass; waits on Quench and play): registered beside dnd5e's NPC sheet, not the default; CR, XP, size · type · alignment; the legendary row (pips, lair switch, edit-mode fields); the player's chips; inspiration of its own; tab row with Abilities first and Special Traits' gear. The tab bodies are still dnd5e's, unstyled
-  - [x] Abilities tab (2026-11-09; offline checks pass; waits on Quench and play): skills, traits (gear, treasure, habitat), features by dnd5e's activation sections with NPC pins; shared Skills, Traits and Features-list partials with the character's tabs
-  - [x] Inventory, Spellbook, Effects on ours; Biography with the NPC's fields (2026-11-09; offline checks pass; waits on Quench and play)
-  - [ ] Quench and play (the user's world), then the BUILT entry
+- [x] NPC sheet, in slices (verified 2026-11-10: Quench and play):
+  - [x] Header and tab row (2026-11-09): registered beside dnd5e's NPC sheet, not the default; CR, XP, size · type · alignment; the legendary row (pips, lair switch, edit-mode fields); the player's chips; inspiration of its own; tab row with Abilities first and Special Traits' gear. The tab bodies followed in the next slices
+  - [x] Abilities tab (2026-11-09): skills, traits (gear, treasure, habitat), features by dnd5e's activation sections with NPC pins; shared Skills, Traits and Features-list partials with the character's tabs
+  - [x] Inventory, Spellbook, Effects on ours; Biography with the NPC's fields (2026-11-09)
+  - [x] Quench and play (user, 2026-11-10: "quench passes and styling is fine"), BUILT entry
 - [ ] Container, group, encounter, vehicle
 - [ ] The smaller windows: a skin
 - [ ] Quench and play

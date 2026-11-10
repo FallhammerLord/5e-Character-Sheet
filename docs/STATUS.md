@@ -4,14 +4,13 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6.7, every sheet** (ROADMAP; SCOPE §4.13, §5.4): the NPC sheet first. Research done (research note `dnd5e-6.0-other-sheets.md`, "The NPC sheet, closer"); design questions answered (SCOPE §4.13, 2026-11-09); every tab built (waits on Quench and play, below); after it, BUILT and container, group, encounter, vehicle. Chosen over Phase 7 so the NPC sheet gets the ADHD layer with the rest. Its plates carry `fhcs-plate`, so every theme dresses it (SCOPE §5.3 rule 11). The play round's ask 12 waits on a session of play.
+1. **Phase 6.7, the rest of every sheet** (ROADMAP; SCOPE §4.13, §5.4): container, group, encounter and vehicle, reusing our Inventory tab and parts; the container first (an item sheet holding our Inventory list). Start with dnd5e's source (research note `dnd5e-6.0-other-sheets.md`), then the design questions and boards. Then the smaller windows' skin. The play round's ask 12 waits on a session of play.
 2. **`#postNotification` TypeError** seen in the chat card runs: in Foundry's own code, cause not yet known; no test fails on it.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
 
 ## Waiting on the user
 
-- **NPC sheet** (built 2026-11-09, offline checks pass): choose "Fallhammer NPC sheet" on an NPC (sheet settings), run Quench core (new group "Fallhammer NPC sheet", seven tests; the first run, 2026-11-10, failed its setup on a real bug, fixed: dnd5e's NPC `_renderCreateInventory` threw on our Inventory, stopping each render before our steps), and play a real NPC in play and edit mode: the header (CR, XP, legendary pips, lair switch, inspiration); Abilities (skills, traits, features by action type; at 644px Recovery drops); Inventory, Spellbook (the caster level; with no class, its ability and level in edit mode), Effects, Biography (Public, then Details).
 - **Chat cards in play** (from a player's client): another player's attack and damage show once rolled; an effect applied from a card leaves a line; the hit line holds when targets change; each damage type its own total; a new card scrolls fully into view, down to Apply.
 - **Token sizes on Wildcard swaps** (ROADMAP play round ask 12; after a session of play, user 2026-11-08): swap a resized token's image to an untagged file (size stays), then to a tagged one like `_scale1.5` (scale applies). Not testable offline beyond the unit cases; no Quench test (it needs a scene token).
 - **Player sheet lock-up** (ROADMAP "Player-side bugs" 2): the F12 console output the next time it happens, and what "locked" looks like.
@@ -21,6 +20,7 @@ Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a p
 
 In Foundry, by the user:
 
+- **NPC sheet** (2026-11-10, Quench and play: "quench passes and styling is fine"): header with CR and the legendary row, Abilities, Inventory, Spellbook, Effects, Biography. The first Quench run found a real bug, fixed (dnd5e's `_renderCreateInventory`). How it works: BUILT.
 - **Theme kit** (2026-11-09, play: "working properly"): plates through `fhcs-plate`, the particle registry, one emblem place, the starter file and its load check. The class themes (SCOPE §7) may start. How it works: BUILT.
 - **Mechanical parity** (2026-11-09, Quench core and chat, play): tools from Traits, coins and carried weight, the Limited and Observer views, favorites drag, Infuse Item's tray; the rest of the list needed no change. How it works: BUILT.
 - **Effects test's moving failure** (2026-11-09, Quench passes): a test bug, the level-up test's dnd5e wizard finishing late and writing back the actor (CLAUDE.md trap).
