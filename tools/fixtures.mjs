@@ -1115,6 +1115,28 @@ CASES.push({ name: 'group-members', html: groupMembers(), rows: '.fhcs-member-ro
 CASES.push({ name: 'group-members-editing', html: groupMembers({ editing: true }) });
 CASES.push({ name: 'group-members-empty', html: groupMembers({ sections: [] }) });
 CASES.push({ name: 'theme-forge-group-members', look: 'forge', html: groupMembers() });
+// The group's Inventory (the board, 2026-11-10): its members above the list (a hidden one without numbers), the
+// container's columns, the switch to the primary vehicle; its Biography, Summary then Description, one column.
+const groupStash = (over = {}) => ({ tab: { id: 'inventory', group: 'primary', cssClass: 'active' }, rollableClass: 'rollable',
+   fhcsInventory: inventoryView(inventoryFacts({ group: true, attunement: null, encumbrance: null, columns: null, openContainers: [],
+      carriers: [['Brannoc Ironhand', '#a0703a', 62, '118', '190', '24 gp'], ['Ysolde Marrowind', '#7fb0ec', 31, '37', '120', '8 gp 15 sp'],
+         ['Sister Aldwen of the Ninth Bell, Keeper of the Lantern Road', '#e2c278', 70, '126', '180', '3 gp']]
+         .map(([name, fill, p, value, max, coins]) => ({ uuid: `Actor.${name.length}`, name, img: ICON(fill), coins, carried: { pct: p, value, max, units: 'lb' } }))
+         .concat([{ uuid: 'Actor.hidden', name: 'Hooded Stranger', img: ICON('#333333'), hidden: true, coins: '', carried: { pct: 0, value: '0', max: '0', units: 'lb' } }]),
+      sources: { onVehicle: false, vehicle: 'Covered Wagon' }, ...over }), { format, localize })
+});
+CASES.push({ name: 'group-inventory', html: groupHeader() + `<div class="tab-body">${template('sheet/inventory')(groupStash())}</div>`, rows: '.fhcs-carrier, .fhcs-list-bar, .fhcs-item-row' });
+CASES.push({ name: 'group-inventory-editing', html: groupHeader({ editing: true }) + `<div class="tab-body">${template('sheet/inventory')(groupStash({ editing: true }))}</div>` });
+CASES.push({ name: 'group-inventory-vehicle', html: groupHeader() + `<div class="tab-body">${template('sheet/inventory')(groupStash({ sources: { onVehicle: true, vehicle: 'Covered Wagon' },
+   currencyElsewhere: true, encumbrance: { value: '412', max: '2000', pct: 21, stops: {}, units: 'lb' } }))}</div>` });
+CASES.push({ name: 'theme-forge-group-inventory', look: 'forge', html: groupHeader() + `<div class="tab-body">${template('sheet/inventory')(groupStash())}</div>` });
+const groupBio = (editable) => groupHeader() + `<div class="tab-body">${template('sheet/biography')({ tab: { id: 'biography', group: 'primary', cssClass: 'active' },
+   fhcsBiography: biographyView({ characteristics: [], boxes: [], editable, uuid: 'Actor.g',
+      stories: [{ name: 'system.description.summary', label: 'Summary', enriched: '<p>Lantern-bearers for hire on the Long Road.</p>', source: '' },
+         { name: 'system.description.full', label: 'Description', enriched: '<p>Founded after the fall of the Ember Gate, the Company guides caravans through the Greyfens.</p>', source: '' }] },
+   { format, localize }) })}</div>`;
+CASES.push({ name: 'group-biography', html: groupBio(true) });
+CASES.push({ name: 'group-biography-viewer', html: groupBio(false) });
 CASES.push({ name: 'item-long-name', frame: 'item', html: itemSheet('weapon', { name: 'Sun Blade of the Dawnwarden, Twice-Forged in the Ember Halls' }) });
 
 // Chat cards in the world's theme (SCOPE §5.3 rule 10): every card case again in Forge.

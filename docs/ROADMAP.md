@@ -224,10 +224,11 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
   - [ ] Container: Quench and play, BUILT entry
   - [x] Group research (research note "The group sheet, closer", 2026-11-10) and decisions (SCOPE §4.13, user 2026-11-10)
   - [x] Group mocked up (canvas row "Phase 6.7 · the group sheet": a party of four light, its Inventory, allies and a wagon dark, 644px edit mode), waits on the user's review
-  - [ ] Group sheet built, in slices:
+  - [x] Group sheet built, in slices:
     - [x] Header and tab row (2026-11-10): registered beside dnd5e's group sheet, not the default; portrait, name, Place members and the rests, the member line, Travel (pace arrows, gear in edit mode, three speeds) and Advancement (Award, the XP pool)
     - [x] Members (2026-11-10): rows in Characters, NPCs, Vehicles; portrait, name (opens the member), HP and hit dice, AC, speed, Perception, Stealth and Survival rolling with their passives; a vehicle's travel and DT; edit mode's remove; dnd5e's `.member[data-uuid]` kept for its context menu and drops
-    - [ ] Inventory, Effects, Biography; Quench test
+    - [x] Inventory, Effects, Biography; Quench test (2026-11-10): the members above the list (carried, coins; drop an item on a line to give it), the container's columns, the Group / vehicle switch with the coins written to whichever shows; our Effects; Summary then Description in one column
+  - [ ] Group: Quench and play, BUILT entry
 - [ ] The smaller windows: a skin
 - [ ] Quench and play
 

@@ -527,13 +527,16 @@
       "Section": {
         "character": "Characters",
         "npc": "NPCs",
-        "vehicle": "Vehicles"
+        "vehicle": "Vehicles",
+        "members": "Members"
       },
       "Skill": {
         "prc": "Perception",
         "ste": "Stealth",
         "sur": "Survival"
-      }
+      },
+      "Inventory": "Group",
+      "Whose": "Whose inventory"
     }
   }
 }

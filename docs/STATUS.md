@@ -4,13 +4,14 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6.7, the container sheet** (ROADMAP; SCOPE §4.13 "The container sheet"): built 2026-11-10, waits on the user (below). **The group sheet:** research and decisions done (SCOPE §4.13 "The group sheet"), boards on the canvas (row "Phase 6.7 · the group sheet") waiting on the user's review; once approved, build it in slices (ROADMAP). Then encounter, vehicle, and the smaller windows' skin. The play round's ask 12 waits on a session of play.
+1. **Phase 6.7, encounter and vehicle sheets** (ROADMAP; SCOPE §4.13): the container and group sheets are built and wait on the user (below). Next: the encounter sheet (research, design questions, boards), then the vehicle, then the smaller windows' skin. The play round's ask 12 waits on a session of play.
 2. **`#postNotification` TypeError** seen in the chat card runs: in Foundry's own code, cause not yet known; no test fails on it.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
 
 ## Waiting on the user
 
+- **Group sheet** (Quench core and play): the new test "opens a group in our group sheet". In play: choose "Fallhammer group sheet" for a party (⋮, Sheet); step the pace; roll a member's Perception from their row; open a member from their name; remove one in edit mode; on Inventory drop an item onto a member's line, and with a primary vehicle switch to its inventory and edit its coins; write the Summary; Award and Place members.
 - **Container sheet** (Quench core and play): the new test "opens a container in our container sheet". In play: choose "Fallhammer container sheet" for a bag (its ⋮ menu, Sheet), then drop items in and out, nest a pouch, search inside it, use the Columns menu, edit the coins, and add the first effect from Effects.
 - **Chat cards in play** (from a player's client): another player's attack and damage show once rolled; an effect applied from a card leaves a line; the hit line holds when targets change; each damage type its own total; a new card scrolls fully into view, down to Apply.
 - **Token sizes on Wildcard swaps** (ROADMAP play round ask 12; after a session of play, user 2026-11-08): swap a resized token's image to an untagged file (size stays), then to a tagged one like `_scale1.5` (scale applies). Not testable offline beyond the unit cases; no Quench test (it needs a scene token).

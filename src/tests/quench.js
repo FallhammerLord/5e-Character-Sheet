@@ -1150,6 +1150,60 @@ export function registerQuenchTests(quench)
             }
          });
 
+         it('opens a group in our group sheet: header, pace, a member row that rolls, members above the Inventory, both descriptions', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 12);
+            const group = await Actor.implementation.create({ name: 'FHCS test company', type: 'group',
+               flags: { core: { sheetClass: `${MODULE_ID}.FHCSGroupSheet` } }, system: { attributes: { travel: { pace: 'normal' } } } });
+            const groupSheet = group.sheet;
+            const inSheet = (selector) => groupSheet.element?.querySelector(selector);
+            const all = (selector) => [...(groupSheet.element?.querySelectorAll(selector) ?? [])];
+            /** Clicks once the group sheet has drawn again, finding the element fresh (the redraw rule, CLAUDE.md). */
+            const press = async (selector, why) =>
+            {
+               await new Promise((resolve) => { setTimeout(resolve, REDRAW_START_MS); });
+               await groupSheet.render();
+               const target = inSheet(selector);
+               assert.ok(target, `no element matches ${selector}${why ? `; ${why()}` : ''}`);
+               target.click(); // redraw-safe: after the render settled, found fresh
+            };
+            try
+            {
+               await group.system.addMember(actor);
+               await groupSheet.render({ force: true });
+               await until(() => inSheet('.fhcs-group-header') && inSheet('.fhcs-tabs [data-tab="members"]'),
+                  () => `our header and tab row draw; the sheet is ${groupSheet.constructor.name}, tabs ${all('.fhcs-tabs [data-tab]').map((t) => t.dataset.tab).join(', ')}`);
+               await until(() => inSheet('.fhcs-group-header .fhcs-line')?.textContent.includes('1'),
+                  () => `the member line counts one member; it reads "${inSheet('.fhcs-group-header .fhcs-line')?.textContent ?? 'nothing'}"`);
+               // The pace steps with dnd5e's own action.
+               await press('.fhcs-group-pace [data-increment="1"]', () => `pace controls ${all('[data-action="changePace"]').length}`);
+               await until(() => group.system._source.attributes.travel.pace !== 'normal',
+                  () => `the faster arrow changes the pace; it holds ${group.system._source.attributes.travel.pace}`);
+               const row = `.fhcs-group-members .member[data-uuid="${actor.uuid}"]`;
+               await until(() => inSheet(row), () => `the test character has a member row; rows ${all('.fhcs-group-members .member').map((r) => r.dataset.uuid).join(', ') || 'none'}`);
+               const skills = () => all(`${row} [data-action="roll"][data-type="skill"]`).map((b) => b.dataset.key).join(',');
+               await until(() => skills() === 'prc,ste,sur', () => `the row rolls Perception, Stealth and Survival; it has ${skills() || 'none'}`);
+               await until(() => inSheet(`${row} [data-action="showDocument"]`), () => 'the member\'s name opens their sheet');
+               // Inventory: the member's line above the list, a place a dropped item goes.
+               groupSheet.changeTab('inventory', 'primary');
+               await until(() => inSheet(`.fhcs-inventory .fhcs-carrier[data-uuid="${actor.uuid}"]`),
+                  () => `the Inventory lists the member above the list; lines ${all('.fhcs-carrier').map((c) => c.dataset.uuid).join(', ') || 'none'}`);
+               await until(() => !inSheet('.fhcs-inventory .fhcs-col-toggle'),
+                  () => `a group's Inventory has no equipped, attuned or favorite columns; it has ${all('.fhcs-inventory .fhcs-col-toggle').length} toggle cells`);
+               groupSheet.changeTab('effects', 'primary');
+               await until(() => inSheet('.fhcs-effects'), () => `the Effects tab is ours; it holds ${inSheet('[data-tab="effects"].tab')?.className}`);
+               groupSheet.changeTab('biography', 'primary');
+               const stories = () => all('.fhcs-biography prose-mirror').map((p) => p.getAttribute('name')).join(', ');
+               await until(() => stories() === 'system.description.summary, system.description.full',
+                  () => `Biography holds Summary then Description; it holds ${stories() || 'none'}`);
+            }
+            finally
+            {
+               await groupSheet.close();
+               await group.delete();
+            }
+         });
+
          it('keeps dnd5e\'s item fields and adds: rarity, units and the other descriptions; the add button on Advancement', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 8);

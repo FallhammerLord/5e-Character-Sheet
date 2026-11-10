@@ -442,7 +442,7 @@ function isFavorite(actor, item)
  * from the container itself, so a world or compendium container works too.
  */
 const ACTOR_ROWS = {
-   contents: (sheet, item) => sheet.actor.items.filter((i) => i.system.container === item.id && (sheet._isItemVisible?.(i) ?? true))
+   contents: (sheet, item) => (sheet.inventorySource ?? sheet.actor).items.filter((i) => i.system.container === item.id && (sheet._isItemVisible?.(i) ?? true))
       .sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0)),
    context: containedContext,
    favorite: (sheet, item) => isFavorite(sheet.actor, item)
@@ -620,6 +620,42 @@ export async function containerFacts(sheet, context, { columns, openContainers }
          name: game.i18n.localize(config.currencies?.[key]?.label ?? key)
       })),
       encumbrance: capacity
+   };
+}
+
+/**
+ * Plain facts for a group's Inventory (SCOPE §4.13, the group sheet): the character's facts on dnd5e's inventory source
+ * (the group, or its primary vehicle), the container's columns, and above the list one line per member (dnd5e's
+ * `context.members`: carried, coins), where a dropped item goes to that member. With a primary vehicle, the switch
+ * between the two inventories (dnd5e's `toggleInventory`), and the coins write to whichever is shown.
+ */
+export async function groupInventoryFacts(sheet, context, options)
+{
+   const facts = await inventoryFacts(sheet, context, options);
+   const group = sheet.actor;
+   const source = sheet.inventorySource ?? group;
+   const onVehicle = source !== group;
+   const vehicle = group.system.primaryVehicle;
+   const carriers = (context.members ?? []).map((m) =>
+   {
+      const enc = m.encumbrance ?? {};
+      const units = weightUnit(CONFIG.DND5E.encumbrance?.baseUnits?.default?.[game.settings.get('dnd5e', 'metricWeightUnits') ? 'metric' : 'imperial']);
+      const coins = Object.entries(m.system?.currency ?? {}).filter(([, v]) => v)
+         .map(([key, v]) => `${v} ${game.i18n.localize(CONFIG.DND5E.currencies?.[key]?.abbreviation ?? key)}`);
+      return { uuid: m.uuid, name: m.name, img: m.img, hidden: !!m.hiddenStats,
+         carried: { pct: enc.pct ?? 0, value: tenths(enc.value), max: Number.isFinite(enc.max) ? tenths(enc.max) : '\u221e', units }, coins: coins.join(' ') };
+   });
+   // A vehicle's cargo is its capacity; a group itself carries nothing it can be weighed down by.
+   const cargo = onVehicle && context.encumbrance ? { value: tenths(context.encumbrance.value), pct: context.encumbrance.pct ?? 0, stops: {},
+      max: Number.isFinite(context.encumbrance.max) ? tenths(context.encumbrance.max) : '\u221e', units: weightUnit(context.encumbrance.units) } : null;
+   return {
+      ...facts,
+      group: true,
+      attunement: null,
+      encumbrance: cargo,
+      carriers,
+      currencyElsewhere: onVehicle,
+      sources: group.isOwner && vehicle?.isOwner ? { onVehicle, vehicle: vehicle.name } : null
    };
 }
 
@@ -1532,6 +1568,15 @@ export function biographyFacts(sheet, context)
    const details = sheet.actor.system.details ?? {};
    // An NPC (SCOPE §4.13, 2026-11-09): its public biography first (players see it), then dnd5e's details, beside its
    // ideals, bonds and flaws (npc-biography.hbs); no characteristics or appearance.
+   // A group (SCOPE §4.13, 2026-11-10): dnd5e's two fields, Summary then Description, each its own editor.
+   if (sheet.actor.type === 'group')
+   {
+      const description = sheet.actor.system.description ?? {};
+      const story = (key, label) => ({ name: `system.description.${key}`, label: game.i18n.localize(label),
+         enriched: context.enriched?.[key] ?? '', source: description[key] ?? '' });
+      return { characteristics: [], boxes: [], stories: [story('summary', 'DND5E.Summary'), story('full', 'DND5E.Description')],
+         uuid: sheet.actor.uuid, editable: sheet.isEditable };
+   }
    if (sheet.actor.type === 'npc')
    {
       const story = (key, label) => ({ name: `system.details.biography.${key}`, label: game.i18n.localize(label),

@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES, VIEW_ACTIONS } from '../constants.js';
-import { attributesFacts, biographyFacts, groupHeaderFacts, groupMembersFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, groupHeaderFacts, groupInventoryFacts, groupMembersFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, renderTemplate, setLairInside, setSpellcastingAbility, spellbookFacts, toggleInspired, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, containerColumnChoice, inventoryView } from '../sheet/inventory.js';
@@ -1198,7 +1198,10 @@ export function makeNpcSheet(Base)
 const GROUP_PARTS = {
    header: { template: `${MODULE_PATH}/templates/group/header.hbs`, templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`] },
    tabs: { template: SHEET_PARTS.tabs, ...PART_OPTIONS.tabs },
-   members: { template: `${MODULE_PATH}/templates/group/members.hbs`, scrollable: [''] }
+   members: { template: `${MODULE_PATH}/templates/group/members.hbs`, scrollable: [''] },
+   inventory: { template: SHEET_PARTS.inventory, ...PART_OPTIONS.inventory },
+   effects: { template: SHEET_PARTS.effects, ...PART_OPTIONS.effects },
+   biography: { template: SHEET_PARTS.biography, ...PART_OPTIONS.biography }
 };
 
 /** dnd5e's group parts with ours swapped in, keeping its part settings (container, scrolling) but not its classes. */
@@ -1246,6 +1249,16 @@ export function makeGroupSheet(Base)
          if (partId === 'members')
          {
             context.fhcsMembers = groupMembersView(groupMembersFacts(this, context), i18n);
+            return context;
+         }
+         if (partId === 'inventory')
+         {
+            // The container's columns and their setting (SCOPE §4.13): a group wears nothing.
+            const columns = containerColumnChoice(game.settings.get(MODULE_ID, 'containerColumns'));
+            const openContainers = game.user.getFlag(MODULE_ID, PREFS.openContainers) ?? [];
+            const folded = game.user.getFlag(MODULE_ID, PREFS.folded) ?? [];
+            context.fhcsInventory = inventoryView({ ...await groupInventoryFacts(this, context, { columns, openContainers }), folded,
+               order: sectionOrder(this.actor, 'inventory') }, i18n);
             return context;
          }
          if (partId === 'tabs')

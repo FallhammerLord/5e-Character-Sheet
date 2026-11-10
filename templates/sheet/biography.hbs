@@ -25,14 +25,17 @@
 
    {{#if empty}}<p class="fhcs-body fhcs-muted fhcs-empty fhcs-plate">{{ text.empty }}</p>{{/if}}
 
-   <div class="fhcs-bio-columns">
+   {{!-- A group has no short boxes (SCOPE §4.13): its Summary and Description take the whole width. --}}
+   <div class="fhcs-bio-columns{{#unless boxed}} fhcs-bio-one{{/unless}}">
+      {{#if boxed}}
       <div class="fhcs-bio-column fhcs-plate">
          {{#each left}}{{> "modules/fhcs/templates/sheet/bio-box.hbs" editable=../editable }}{{/each}}
       </div>
+      {{/if}}
       <div class="fhcs-bio-column fhcs-bio-wide fhcs-plate">
          {{#each right}}{{> "modules/fhcs/templates/sheet/bio-box.hbs" editable=../editable }}{{/each}}
          {{#each stories}}
-         {{!-- The biography; an NPC's public biography, then its details (SCOPE §4.13). --}}
+         {{!-- The biography; an NPC's public biography, then its details; a group's summary, then its description (SCOPE §4.13). --}}
          <section class="fhcs-bio-box fhcs-bio-story">
             <h3 class="fhcs-label">{{ label }}</h3>
             {{#if ../editable}}

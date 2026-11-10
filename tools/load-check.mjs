@@ -282,7 +282,7 @@ else
       if (!existsSync(new URL(`../${part.template.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`group part template ${part.template} is missing`); }
       for (const path of part.templates ?? []) { if (!existsSync(new URL(`../${path.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`group ${id} partial ${path} is missing`); } }
    }
-   for (const id of ['header', 'tabs', 'members'])
+   for (const id of ['header', 'tabs', 'members', 'inventory', 'effects', 'biography'])
    {
       if (!parts[id]?.template?.startsWith('modules/fhcs/')) { problems.push(`the group sheet's ${id} part is still dnd5e's`); }
    }

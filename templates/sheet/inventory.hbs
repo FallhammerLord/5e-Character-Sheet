@@ -5,6 +5,30 @@
 <section class="tab fhcs-list-tab fhcs-inventory {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
    {{#with fhcsInventory}}
    <dnd5e-inventory class="inventory-element fhcs-list-element">
+      {{#with carriers}}
+      {{!-- A group's members above its list (SCOPE §4.13, 2026-11-10): each line a [data-uuid] that dnd5e's group sheet
+            gives a dropped item to (group-sheet.mjs `_onDropItem`); folds like a section. --}}
+      <div class="fhcs-section fhcs-carriers fhcs-plate{{#unless fold.open}} fhcs-folded{{/unless}}" data-fhcs-fold="{{ fold.key }}">
+         <div class="fhcs-item-head">
+            <span class="fhcs-col-name"><button type="button" class="fhcs-section-toggle" data-action="fhcsToggleSection" aria-expanded="{{#if fold.open}}true{{else}}false{{/if}}"><span class="fhcs-section-caret" aria-hidden="true"><svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span><span class="fhcs-label">{{ ../text.members }}</span> <span class="fhcs-label fhcs-muted">{{ count }}</span></button></span>
+         </div>
+         <ol class="fhcs-item-list">
+            {{#each lines}}
+            <li class="fhcs-carrier fhcs-item-row" data-uuid="{{ uuid }}">
+               <span class="fhcs-col-img"><img src="{{ img }}" alt=""></span>
+               <button type="button" class="fhcs-carrier-name fhcs-body" data-action="showDocument" data-uuid="{{ uuid }}" aria-label="{{ openLabel }}">{{ name }}</button>
+               {{#if carried}}
+               <span class="fhcs-carrier-load">
+                  <span class="fhcs-carried-bar" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ carried.pct }}" aria-label="{{ carried.label }}"><span class="fhcs-carried-fill" style="width: {{ carried.pct }}%"></span></span>
+                  <span class="fhcs-body">{{ carried.text }}</span>
+               </span>
+               <span class="fhcs-body fhcs-muted fhcs-carrier-coins">{{ coins }}</span>
+               {{/if}}
+            </li>
+            {{/each}}
+         </ol>
+      </div>
+      {{/with}}
       {{> "modules/fhcs/templates/sheet/list-bar.hbs" list="inventory" }}
 
       <section class="items-list inventory-list fhcs-items" data-item-list="inventory">
@@ -32,6 +56,13 @@
 
       <div class="fhcs-inventory-foot fhcs-plate">
          <div class="fhcs-inventory-money">
+            {{#with sources}}
+            {{!-- The group's inventory or its primary vehicle's (dnd5e's toggleInventory). --}}
+            <span class="fhcs-sources" role="group" aria-label="{{ label }}">
+               <button type="button" class="fhcs-button fhcs-body fhcs-pin" data-action="toggleInventory" data-inventory="group" aria-pressed="{{#if onVehicle}}false{{else}}true{{/if}}">{{ group }}</button>
+               <button type="button" class="fhcs-button fhcs-body fhcs-pin" data-action="toggleInventory" data-inventory="vehicle" aria-pressed="{{#if onVehicle}}true{{else}}false{{/if}}">{{ vehicle }}</button>
+            </span>
+            {{/with}}
             {{#if attunement}}
             <span class="fhcs-attunement{{#if attunement.over}} fhcs-over{{/if}}" role="group" aria-label="{{ attunement.label }}">
                <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.4 6.1L21 12l-6.6 2.9L12 21l-2.4-6.1L3 12l6.6-2.9z"/></svg>
@@ -49,7 +80,8 @@
                {{#each currency}}
                <label class="fhcs-coin">
                   <span class="fhcs-label">{{ abbr }}</span>
-                  <input type="text" class="fhcs-input fhcs-body" name="{{ prop }}" value="{{ value }}" data-dtype="Number"
+                  {{!-- On a vehicle's inventory the coins are the vehicle's: dnd5e's group sheet writes data-name ones there. --}}
+                  <input type="text" class="fhcs-input fhcs-body" {{#if ../currencyElsewhere}}data-name{{else}}name{{/if}}="{{ prop }}" value="{{ value }}" data-dtype="Number"
                          inputmode="numeric" pattern="^[+=\-]?\d*" aria-label="{{ label }}">
                </label>
                {{/each}}

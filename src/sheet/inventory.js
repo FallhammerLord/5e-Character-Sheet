@@ -46,16 +46,20 @@ const pct = (n) => Math.max(0, Math.min(100, Number(n) || 0));
 export function inventoryView(facts, { format, localize })
 {
    // A container (facts.container) has its own columns, no section arrows and no attunement; its bar is its capacity.
+   // A group's stash (facts.group, SCOPE §4.13) takes the container's columns too, but has a lock, so its arrows and
+   // Columns menu are edit mode's, as the character's.
    const isContainer = !!facts.container;
-   const columns = isContainer ? containerColumnChoice(facts.columns) : columnChoice(facts.columns);
-   const columnKeys = isContainer ? CONTAINER_COLUMNS : INVENTORY_COLUMNS;
+   const stash = isContainer || !!facts.group;
+   const columns = stash ? containerColumnChoice(facts.columns) : columnChoice(facts.columns);
+   const columnKeys = stash ? CONTAINER_COLUMNS : INVENTORY_COLUMNS;
    const menu = isContainer ? !!facts.canEdit : !!facts.editing;
    const open = new Set(facts.openContainers ?? []);
 
    /** One row, and for a container its contents, at any depth. */
    const row = (item) =>
    {
-      const equipped = !!item.equip?.on;
+      // Packed away or in a group's stash, nothing is worn, attuned or at hand (SCOPE §4.13).
+      const equipped = !stash && !!item.equip?.on;
       const contents = item.contents ? item.contents.map(row) : null;
       return {
          id: item.id,
@@ -75,13 +79,13 @@ export function inventoryView(facts, { format, localize })
          quantity: item.quantity ?? null,
          quantityLabel: format('FHCS.Inventory.QuantityLabel', { name: item.name }),
          equipped,
-         equip: item.equip ? {
+         equip: !stash && item.equip ? {
             pressed: equipped,
             disabled: !!item.equip.disabled,
             label: localize(equipped ? 'FHCS.Inventory.Equipped' : 'FHCS.Inventory.NotEquipped')
          } : null,
          // Three states (user, 2026-10-26): attuned, needs attuning (click to attune), or no attunement at all.
-         attune: item.attune ? {
+         attune: !stash && item.attune ? {
             pressed: !!item.attune.on,
             disabled: !!item.attune.disabled,
             label: item.attune.on ? localize('FHCS.Inventory.Attuned') : item.attune.need || localize('FHCS.Inventory.NotAttuned')
@@ -93,7 +97,7 @@ export function inventoryView(facts, { format, localize })
             label: format('FHCS.Inventory.ContentsLabel', { name: item.name, count: contents.length }),
             contents
          } : null,
-         favorite: !!item.favorite,
+         favorite: !stash && !!item.favorite,
          favoriteLabel: localize(item.favorite ? 'FHCS.Favorite.On' : 'FHCS.Favorite.Off'),
          editLabel: format('FHCS.Inventory.EditLabel', { name: item.name }),
          deleteLabel: format('FHCS.Inventory.DeleteLabel', { name: item.name })
@@ -112,7 +116,7 @@ export function inventoryView(facts, { format, localize })
       low: pct(enc.stops?.encumbered),
       high: pct(enc.stops?.heavilyEncumbered),
       text: `${enc.value} / ${enc.max} ${enc.units}`.trim(),
-      label: format(isContainer ? 'FHCS.Container.CapacityLabel' : 'FHCS.Inventory.CarriedLabel', { value: enc.value, max: enc.max, units: enc.units })
+      label: format(stash ? 'FHCS.Container.CapacityLabel' : 'FHCS.Inventory.CarriedLabel', { value: enc.value, max: enc.max, units: enc.units })
    } : null;
 
    return {
@@ -122,7 +126,7 @@ export function inventoryView(facts, { format, localize })
       filters: facts.filters ?? [],
       sorting: facts.sorting ?? [],
       // A container pins no filters (the board, 2026-11-10): dnd5e's menu holds them.
-      pins: isContainer ? [] : pinView(INVENTORY_PINS, facts.activeFilters, localize),
+      pins: stash ? [] : pinView(INVENTORY_PINS, facts.activeFilters, localize),
       // The column menu is a setting, so it shows only in edit mode, like dnd5e's gear icons (user, 2026-10-26).
       // The Columns menu is edit mode's; play mode keeps its place, so the search field keeps one width (SCOPE §5.2 rule 6).
       hasColumns: true,
@@ -130,9 +134,9 @@ export function inventoryView(facts, { format, localize })
       columnToggles: menu ? columnKeys.map((key) => ({
          key, pressed: columns[key], label: localize(`FHCS.Inventory.Column.${key}`)
       })) : [],
-      columnsList: isContainer ? 'container' : '',
+      columnsList: stash ? 'container' : '',
       currency: facts.currency.map((c) => ({ ...c, label: format('FHCS.Inventory.CurrencyLabel', { name: c.name }) })),
-      attunement: !isContainer && (facts.attunement?.max || facts.editing) ? {
+      attunement: !stash && (facts.attunement?.max || facts.editing) ? {
          text: `${facts.attunement.value} / ${facts.attunement.max}`,
          value: facts.attunement.value,
          sourceMax: facts.attunement.sourceMax ?? facts.attunement.max,
@@ -141,13 +145,30 @@ export function inventoryView(facts, { format, localize })
          over: facts.attunement.value > facts.attunement.max
       } : null,
       encumbrance,
+      // A group's members above its list, each with what they carry and their coins; a member this user can't observe
+      // shows its name only (dnd5e's rule). Dropping an item on a line gives it to that member (dnd5e's own).
+      carriers: facts.carriers?.length ? {
+         count: facts.carriers.length,
+         fold: sectionFold('inventory', 'members', facts.folded),
+         lines: facts.carriers.map((m) => ({
+            uuid: m.uuid, name: m.name, img: m.img, hidden: !!m.hidden, coins: m.hidden ? '' : m.coins,
+            carried: m.hidden ? null : { pct: pct(m.carried.pct), text: `${m.carried.value} / ${m.carried.max} ${m.carried.units}`.trim(),
+               label: format('FHCS.Inventory.CarriedLabel', { value: m.carried.value, max: m.carried.max, units: m.carried.units }) },
+            openLabel: format('FHCS.Group.OpenLabel', { name: m.name })
+         }))
+      } : null,
+      // Whose inventory shows: the group's or its primary vehicle's (dnd5e's toggleInventory); the coins write there.
+      sources: facts.sources ? { onVehicle: !!facts.sources.onVehicle, vehicle: facts.sources.vehicle, group: localize('FHCS.Group.Inventory'),
+         label: localize('FHCS.Group.Whose') } : null,
+      currencyElsewhere: !!facts.currencyElsewhere,
       empty: !sections.length,
       text: {
          search: localize('FHCS.Inventory.Search'),
          columns: localize('FHCS.Inventory.Columns'),
          attuned: localize('FHCS.Inventory.Attuned'),
-         carried: localize(isContainer ? 'FHCS.Container.Capacity' : 'FHCS.Inventory.Carried'),
+         carried: localize(stash ? 'FHCS.Container.Capacity' : 'FHCS.Inventory.Carried'),
          empty: localize(isContainer ? 'FHCS.Container.Empty' : 'FHCS.Inventory.Empty'),
+         members: localize('FHCS.Group.Section.members'),
          head: Object.fromEntries(INVENTORY_COLUMNS.map((key) => [key, localize(`FHCS.Inventory.Column.${key}`)]))
       }
    };

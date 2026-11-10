@@ -3544,6 +3544,20 @@
 .fhcs-sheet[data-fhcs-narrow] .fhcs-editing .fhcs-member-row { grid-template-columns: 40px minmax(96px, 1fr) 32px 56px repeat(3, 84px) 24px; }
 .fhcs-sheet[data-fhcs-narrow] .fhcs-member-hd { display: none; }
 
+/* ---------- The group's Inventory (SCOPE §4.13, 2026-11-10) ---------- */
+
+/* Members above the list: portrait, name, their carried bar and coins; a line is where a dropped item goes. */
+.fhcs-sheet .fhcs-carriers { flex: none; }
+.fhcs-sheet .fhcs-carriers .fhcs-col-img > img { display: block; width: 24px; height: 24px; border: 0; border-radius: 4px; object-fit: cover; object-position: top; }
+.fhcs-sheet .fhcs-carrier-name { flex: 0 1 160px; min-width: 96px; justify-content: flex-start; min-height: 0; height: auto; padding: 0; overflow: hidden;
+   border: 0; background: none; color: inherit; text-align: left; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+.fhcs-sheet .fhcs-carrier-load { display: flex; flex: 1; align-items: center; gap: var(--fhcs-s1); min-width: 48px; white-space: nowrap; }
+.fhcs-sheet .fhcs-carrier-load > .fhcs-carried-bar { min-width: 32px; height: 8px; }
+.fhcs-sheet .fhcs-carrier-coins { flex: none; white-space: nowrap; }
+.fhcs-sheet .fhcs-sources { display: inline-flex; gap: var(--fhcs-s1); }
+/* Narrower than 700px a member's coins give way; their own sheet has them. */
+.fhcs-sheet[data-fhcs-narrow] .fhcs-carrier-coins { display: none; }
+
 /* ---------- Biography tab (SCOPE §4.8) ---------- */
 
 .fhcs-sheet .fhcs-biography.active { display: flex; flex-direction: column; gap: var(--fhcs-s2); }
@@ -3562,6 +3576,9 @@
 .fhcs-sheet .fhcs-limited-header > .fhcs-portrait { display: block; flex: none; height: 160px; }
 .fhcs-sheet .fhcs-limited-top { display: flex; flex: 1; flex-direction: column; gap: var(--fhcs-s1); min-width: 0; }
 .fhcs-sheet .fhcs-limited-top > .fhcs-name { flex: none; white-space: normal; overflow-wrap: anywhere; }
+
+/* A group's Summary and Description: one column, the whole width (SCOPE §4.13). */
+.fhcs-sheet .fhcs-bio-columns.fhcs-bio-one { grid-template-columns: minmax(0, 1fr); }
 
 /* Characteristics: a label beside each value, in as many columns as fit. */
 .fhcs-sheet .fhcs-characteristics

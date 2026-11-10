@@ -34,6 +34,8 @@ export function biographyView(facts, { localize })
       editable,
       uuid: facts.uuid ?? '',
       characteristics,
+      // Whether the short boxes have a column: a group has none (SCOPE §4.13).
+      boxed: (facts.boxes ?? []).length > 0,
       left: boxes.filter((b) => LEFT.includes(b.key)),
       right: boxes.filter((b) => !LEFT.includes(b.key)),
       stories,

@@ -625,6 +625,18 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    try { deepStrictEqual(shape, ['character,npc,vehicle', '+5/15/true \u22121/9/true +0/10/false', '6 / 6', '—', null, true, 5, 0, 'DT', true]); }
    catch { problems.push(`group members: ${JSON.stringify(shape)}`); }
    if (!groupMembersView({ sections: [] }, { format, localize }).empty) { problems.push('a group with no members says nothing'); }
+
+   // The group's Inventory: the container's columns, but edit mode's arrows and Columns menu (it has a lock); members
+   // above it, a hidden one without numbers; the switch to the vehicle, its coins written there.
+   const stash = inventoryView({ group: true, editing: true, columns: null, currency: [{ key: 'gp', value: 3, prop: 'system.currency.gp', abbr: 'GP', name: 'Gold' }],
+      sections: [{ id: 'loot', label: 'Loot', items: [{ id: 'r', uuid: 'r', name: 'Rope', img: '' }] }, { id: 'tool', label: 'Tools', items: [{ id: 't', uuid: 't', name: 'Kit', img: '' }] }],
+      carriers: [{ uuid: 'a', name: 'Quill', img: '', coins: '3 gp', carried: { pct: 40, value: '48', max: '120', units: 'lb' } },
+         { uuid: 'b', name: 'Stranger', img: '', hidden: true, coins: '9 gp', carried: { pct: 0, value: '0', max: '0', units: 'lb' } }],
+      sources: { onVehicle: true, vehicle: 'Wagon' }, currencyElsewhere: true, encumbrance: null }, { format, localize });
+   const stashShape = [stash.columnToggles.map((t) => t.key).join(), !!stash.sections[0].move, stash.attunement, stash.pins.length, stash.carriers.count,
+      stash.carriers.lines[0].carried.text, stash.carriers.lines[1].carried, stash.carriers.lines[1].coins, stash.sources.onVehicle, stash.currencyElsewhere];
+   try { deepStrictEqual(stashShape, ['weight,uses,quantity', true, null, 0, 2, '48 / 120 lb', null, '', true, true]); }
+   catch { problems.push(`group inventory: ${JSON.stringify(stashShape)}`); }
 }
 
 // Spellbook (SCOPE §4.7): preparation states and kinds, Can cast, section order, slot pips, the concentration mark.
