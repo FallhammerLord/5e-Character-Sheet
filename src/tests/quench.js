@@ -1204,6 +1204,59 @@ export function registerQuenchTests(quench)
             }
          });
 
+         it('opens an encounter in our encounter sheet: a creature row, its count typed in edit mode, Loot and Description', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 12);
+            const goblin = await Actor.implementation.create({ name: 'FHCS test goblin', type: 'npc', system: { details: { cr: 0.25 } } });
+            const ambush = await Actor.implementation.create({ name: 'FHCS test ambush', type: 'encounter',
+               flags: { core: { sheetClass: `${MODULE_ID}.FHCSEncounterSheet` } } });
+            const encounterSheet = ambush.sheet;
+            const inSheet = (selector) => encounterSheet.element?.querySelector(selector);
+            const all = (selector) => [...(encounterSheet.element?.querySelectorAll(selector) ?? [])];
+            /** Waits for the encounter sheet to draw again, then finds an element fresh (the redraw rule, CLAUDE.md). */
+            const fresh = async (selector, why) =>
+            {
+               await new Promise((resolve) => { setTimeout(resolve, REDRAW_START_MS); });
+               await encounterSheet.render();
+               const found = inSheet(selector);
+               assert.ok(found, `no element matches ${selector}${why ? `; ${why()}` : ''}`);
+               return found;
+            };
+            const counts = () => ambush.system.toObject().members.map((m) => m.quantity?.value).join(', ');
+            try
+            {
+               await ambush.system.addMember(goblin);
+               await encounterSheet.render({ force: true });
+               await until(() => inSheet('.fhcs-encounter-header') && inSheet('.fhcs-tabs [data-tab="members"]'),
+                  () => `our header and tab row draw; the sheet is ${encounterSheet.constructor.name}`);
+               const row = `.fhcs-encounter-members .member[data-uuid="${goblin.uuid}"]`;
+               await until(() => inSheet(row)?.dataset.index === '0',
+                  () => `the goblin has a row with its index; rows ${all('.fhcs-encounter-members .member').map((r) => `${r.dataset.uuid}#${r.dataset.index}`).join(', ') || 'none'}`);
+               (await fresh('.fhcs-tabs [data-action="changeMode"]')).click(); // redraw-safe: found after the render settled
+               await until(() => encounterSheet.isEditMode, 'the lock switches to edit mode');
+               const field = await fresh(`${row} input[data-name="quantity.value"]`, () => `edit mode ${encounterSheet.isEditMode}`);
+               field.value = '3';
+               field.dispatchEvent(new Event('change', { bubbles: true })); // redraw-safe: found after the render settled, used at once
+               await until(() => ambush.system.toObject().members[0]?.quantity?.value === 3,
+                  () => `typing 3 sets the goblin's count through dnd5e's own handler; the counts are ${counts()}`);
+               (await fresh(`${row} [data-action="increase"]`)).click(); // redraw-safe: found after the render settled
+               await until(() => ambush.system.toObject().members[0]?.quantity?.value === 4,
+                  () => `+ adds one; the counts are ${counts()}`);
+               encounterSheet.changeTab('inventory', 'primary');
+               await until(() => inSheet('.fhcs-inventory'), () => 'Loot is our Inventory list');
+               encounterSheet.changeTab('description', 'primary');
+               const stories = () => all('.fhcs-biography prose-mirror').map((e) => e.getAttribute('name')).join(', ');
+               await until(() => stories() === 'system.description.summary, system.description.full',
+                  () => `Description holds Summary then Description; it holds ${stories() || 'none'}`);
+            }
+            finally
+            {
+               await encounterSheet.close();
+               await ambush.delete();
+               await goblin.delete();
+            }
+         });
+
          it('keeps dnd5e\'s item fields and adds: rarity, units and the other descriptions; the add button on Advancement', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 8);

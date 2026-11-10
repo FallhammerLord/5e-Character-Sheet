@@ -20,7 +20,7 @@ mkdirSync(out, { recursive: true });
 // Classic Tidy opens at 740 wide (SCOPE §4); dnd5e's own sheet at 800. Foundry's chat sidebar is about 300 wide;
 // players drag it narrower or wider, and pop messages out.
 // The sheet never goes narrower than its ability row needs (headerMinWidth).
-const WIDTHS = { sheet: [headerMinWidth(6), 740, 900], chat: [240, 300, 380], item: [500, 560, 740], container: [500, 560, 740] };
+const WIDTHS = { sheet: [headerMinWidth(6), 740, 900], chat: [240, 300, 380], item: [500, 560, 740], container: [500, 560, 740], encounter: [500, 560, 740] };
 const HEIGHT = 810;
 // Every stylesheet module.json loads, in its order.
 const css = JSON.parse(readFileSync(`${root}module.json`, 'utf8')).styles
@@ -36,6 +36,8 @@ const FRAMES = {
    item: { classes: 'sheet item fhcs-sheet fhcs-item-sheet', wrap: (body) => body },
    // The container sheet (SCOPE §4.13, the container sheet): the item sheet's header and tab row over Contents.
    container: { classes: 'sheet item fhcs-sheet fhcs-item-sheet fhcs-container-sheet', wrap: (body) => body },
+   // The encounter sheet (SCOPE §4.13): an actor sheet that opens at 560 and may narrow to dnd5e's 500.
+   encounter: { classes: 'sheet actor encounter fhcs-sheet fhcs-group fhcs-encounter', wrap: (body) => body },
    // A card's theme sits on its message, as `themeCard` puts it (the world's theme, SCOPE §5.3 rule 10).
    chat: {
       classes: 'chat-sidebar',
@@ -54,7 +56,7 @@ const NARROW_WIDTH = 700;
 /** A window like Foundry's, with the classes dnd5e, Foundry's theme and our code put on it. */
 // The window sits in an interface of the other mode: Foundry sets the interface's mode on the page and each window's own
 // on the window (user, 2026-10-29: the sheet kept the dark interface's colours with windows set to light).
-const frame = (kind, width, theme, body, { look = '', hp = null, titleBar = '', titleTray = '' } = {}) => `<div class="theme-${theme === 'light' ? 'dark' : 'light'}"><section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"${look ? ` data-fhcs-theme="${look}"` : ''}${kind === 'sheet' && width < NARROW_WIDTH ? ' data-fhcs-narrow' : ''}${hp === null ? '' : ` data-fhcs-hp="${hp <= 0 ? 'down' : hp <= 0.5 ? 'bloodied' : 'full'}"`}
+const frame = (kind, width, theme, body, { look = '', hp = null, titleBar = '', titleTray = '' } = {}) => `<div class="theme-${theme === 'light' ? 'dark' : 'light'}"><section class="application ${FRAMES[kind].classes} themed theme-${theme} fhcs-theme-${theme}"${look ? ` data-fhcs-theme="${look}"` : ''}${['sheet', 'encounter'].includes(kind) && width < NARROW_WIDTH ? ' data-fhcs-narrow' : ''}${hp === null ? '' : ` data-fhcs-hp="${hp <= 0 ? 'down' : hp <= 0.5 ? 'bloodied' : 'full'}"`}
    style="${hp === null ? '' : `--fhcs-hp:${hp};`}position:relative;width:${width}px;height:${HEIGHT}px;display:flex;flex-direction:column;border:1px solid #000;margin:8px;
    ${THEMES[theme]}">
    ${kind !== 'chat'

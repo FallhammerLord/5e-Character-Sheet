@@ -1,9 +1,9 @@
 import { MODULE_ID } from './constants.js';
-import { extendChatModel, keepTokenSizes, preloadTemplates, quietPosts, recordLevelOrder, recordTempTop, registerCharacterSheet, registerContainerSheet, registerGroupSheet, registerItemSheet, registerNpcSheet, systemContainerSheet, systemGroupSheet,
+import { extendChatModel, keepTokenSizes, preloadTemplates, quietPosts, recordLevelOrder, recordTempTop, registerCharacterSheet, registerContainerSheet, registerEncounterSheet, registerGroupSheet, registerItemSheet, registerNpcSheet, systemContainerSheet, systemEncounterSheet, systemGroupSheet,
    systemItemSheet, systemCharacterSheet, systemNpcSheet, watchApplications, watchItemCategories } from './compat.js';
 import { levelOrder } from './sheet/header.js';
 import { keepStable } from './sheet/death.js';
-import { makeCharacterSheet, makeGroupSheet, makeNpcSheet } from './apps/CharacterSheet.js';
+import { makeCharacterSheet, makeEncounterSheet, makeGroupSheet, makeNpcSheet } from './apps/CharacterSheet.js';
 import { makeContainerSheet, makeItemSheet } from './apps/ItemSheet.js';
 import { registerQuenchTests } from './tests/quench.js';
 import { registerSettings } from './settings.js';
@@ -40,6 +40,10 @@ Hooks.once('init', () =>
    const GroupBase = systemGroupSheet();
    if (GroupBase) { registerGroupSheet(makeGroupSheet(GroupBase), 'FHCS.Group.SheetLabel'); }
    else { console.error(`${MODULE_ID} | dnd5e's group sheet was not found; the group sheet is not registered.`); }
+   // The encounter sheet (SCOPE §4.13, user 2026-11-10): offered beside dnd5e's own.
+   const EncounterBase = systemEncounterSheet();
+   if (EncounterBase) { registerEncounterSheet(makeEncounterSheet(EncounterBase), 'FHCS.Encounter.SheetLabel'); }
+   else { console.error(`${MODULE_ID} | dnd5e's encounter sheet was not found; the encounter sheet is not registered.`); }
    // The item sheet (SCOPE §4.13): every item type but containers, offered beside dnd5e's own.
    const ItemBase = systemItemSheet();
    if (ItemBase) { registerItemSheet(makeItemSheet(ItemBase), 'FHCS.Item.SheetLabel'); }

@@ -1,0 +1,91 @@
+{{!-- The encounter's Members tab (SCOPE §4.13, user 2026-11-10): one row per creature, Add creature, the difficulty bar.
+      dnd5e's hooks kept: each row is `.member[data-uuid][data-index]` (its context menu; dnd5e writes a field's
+      `data-name` into that member, encounter-sheet.mjs `_onChangeForm`, `_onChangeInputDelta`); decrease and increase act
+      on `.member .adjustment-button`; showDocument, rollQuantity, removeMember, browse. Takes dnd5e's "members" part ID. --}}
+<section class="tab fhcs-group-members fhcs-encounter-members{{#if fhcsEncounterMembers.editing}} fhcs-editing{{/if}} {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
+   {{#with fhcsEncounterMembers}}
+   {{!-- The creatures and Add creature on one plate (text never sits on the ground's texture, §5.3); it grows, so the
+         difficulty bar keeps to the tab's foot. --}}
+   <div class="fhcs-encounter-list">
+   <div class="fhcs-member-section fhcs-plate">
+      {{#if members.length}}
+      <div class="fhcs-encounter-row fhcs-member-head">
+         <span></span>
+         <span class="fhcs-label">{{ text.creatures }} <span class="fhcs-muted">{{ members.length }}</span></span>
+         <span class="fhcs-label fhcs-muted fhcs-member-skill">{{ text.cr }}</span>
+         <span class="fhcs-label fhcs-muted fhcs-member-skill">{{ text.xpEach }}</span>
+         <span class="fhcs-label fhcs-muted fhcs-member-skill">{{ text.count }}</span>
+         <span></span>
+      </div>
+      <ol class="fhcs-member-list">
+         {{#each members}}
+         <li class="member fhcs-encounter-row" data-uuid="{{ uuid }}" data-index="{{ index }}">
+            <span class="fhcs-member-portrait">
+               {{#if isVideo}}
+               <video src="{{ img }}" autoplay muted playsinline disablepictureinpicture loop aria-hidden="true"></video>
+               {{else}}
+               <img src="{{ img }}" alt="">
+               {{/if}}
+            </span>
+            <span class="fhcs-member-name-col">
+               <button type="button" class="fhcs-member-name fhcs-body" data-action="showDocument" data-uuid="{{ uuid }}" aria-label="{{ openLabel }}">{{ name }}</button>
+               {{#if ../editing}}
+               <label class="fhcs-encounter-formula"><span class="fhcs-label fhcs-muted">λ</span>
+                  <input type="text" class="fhcs-input fhcs-body" data-name="quantity.formula" value="{{ formula }}" aria-label="{{ formulaLabel }}"></label>
+               {{else}}
+               <span class="fhcs-body fhcs-muted fhcs-member-name">{{ sub }}</span>
+               {{/if}}
+            </span>
+            <span class="fhcs-body fhcs-member-skill" role="img" aria-label="{{ crLabel }}">{{ cr }}</span>
+            <span class="fhcs-body fhcs-member-skill">{{ xp }}</span>
+            <span class="fhcs-encounter-count">
+               {{#if ../editing}}
+               <button type="button" class="fhcs-toggle adjustment-button" data-action="decrease" aria-label="{{ fewerLabel }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+               <input type="text" class="fhcs-input fhcs-body" inputmode="numeric" pattern="^[+=\-]?\d*" placeholder="—" data-dtype="Number"
+                      data-name="quantity.value" value="{{ count }}" min="0" aria-label="{{ countLabel }}">
+               <button type="button" class="fhcs-toggle adjustment-button" data-action="increase" aria-label="{{ moreLabel }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+               {{else}}
+               {{#if rollFormula}}
+               <button type="button" class="fhcs-button fhcs-body fhcs-encounter-roll" data-action="rollQuantity" aria-label="{{ rollFormula.label }}" data-fhcs-tip="{{ rollFormula.label }}">
+                  <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l9 5v10l-9 5-9-5V7zM12 2v20M3 7l9 5 9-5"/></svg>{{ rollFormula.formula }}
+               </button>
+               {{else}}
+               <span class="fhcs-display">{{ count }}</span>
+               {{/if}}
+               {{/if}}
+            </span>
+            {{#if ../editing}}
+            <button type="button" class="fhcs-toggle fhcs-member-remove" data-action="removeMember" aria-label="{{ removeLabel }}" data-fhcs-tip="{{ removeLabel }}">
+               <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+            {{else}}
+            <span></span>
+            {{/if}}
+         </li>
+         {{/each}}
+      </ol>
+      {{/if}}
+      {{#if add}}
+      <div class="fhcs-encounter-add-row">
+         <button type="button" class="fhcs-button fhcs-body fhcs-encounter-add" data-action="browse">
+            <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>{{ text.add }}
+         </button>
+      </div>
+      {{/if}}
+   </div>
+   </div>
+   {{#with difficulty}}
+   <div class="fhcs-carried fhcs-encounter-difficulty fhcs-plate">
+      <span class="fhcs-label">{{ ../text.difficulty }}</span>
+      {{#if bar}}
+      <span class="fhcs-carried-bar" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ pct }}" aria-label="{{ label }}">
+         <span class="fhcs-carried-fill" style="width: {{ pct }}%"></span>
+         {{#if low}}<span class="fhcs-carried-stop" style="left: {{ low }}%"></span>{{/if}}
+         {{#if high}}<span class="fhcs-carried-stop" style="left: {{ high }}%"></span>{{/if}}
+      </span>
+      {{/if}}
+      <span class="fhcs-body fhcs-carried-text">{{ text }}{{#if word}} · {{ word }}{{/if}}</span>
+   </div>
+   {{/with}}
+   {{/with}}
+</section>

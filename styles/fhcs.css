@@ -3558,6 +3558,42 @@
 /* Narrower than 700px a member's coins give way; their own sheet has them. */
 .fhcs-sheet[data-fhcs-narrow] .fhcs-carrier-coins { display: none; }
 
+/* ---------- The encounter sheet (SCOPE §4.13, user 2026-11-10) ---------- */
+
+/* The group's header without its panels: the name row and the line. The tab: the list grows, the difficulty at its foot. */
+.fhcs-sheet .fhcs-encounter-members.active { min-height: 100%; box-sizing: border-box; }
+.fhcs-sheet .fhcs-encounter-header { min-height: 0; }
+.fhcs-sheet .fhcs-encounter-header .fhcs-group-portrait { width: 64px; height: 64px; }
+.fhcs-sheet .fhcs-encounter-header { grid-template-columns: 64px minmax(0, 1fr); }
+
+/* A creature: portrait, name over "size · type" (edit mode: its formula), CR, XP each, the count, remove. */
+.fhcs-sheet .fhcs-encounter-row
+{
+   display: grid;
+   grid-template-columns: 40px minmax(96px, 1fr) 40px 64px 104px 24px;
+   align-items: center;
+   gap: var(--fhcs-s2);
+   min-height: 48px;
+   padding: var(--fhcs-s1) var(--fhcs-s2);
+   border-bottom: 1px solid var(--fhcs-line-soft);
+}
+.fhcs-sheet .fhcs-encounter-row:last-child { border-bottom: 0; }
+.fhcs-sheet .fhcs-encounter-row.fhcs-member-head { min-height: var(--fhcs-control); padding-top: 0; padding-bottom: 0; border-bottom: 1px solid var(--fhcs-line); }
+.fhcs-sheet .fhcs-encounter-formula { display: flex; align-items: center; gap: var(--fhcs-s1); min-width: 0; }
+.fhcs-sheet .fhcs-encounter-formula > .fhcs-input { flex: 1; min-width: 0; height: 24px; }
+/* The count: a number in play (or its formula's d20 until rolled); − field + in edit mode, one height in both. */
+.fhcs-sheet .fhcs-encounter-count { display: flex; align-items: center; justify-content: center; gap: var(--fhcs-s1); min-height: var(--fhcs-control); }
+.fhcs-sheet .fhcs-encounter-count > .fhcs-toggle { flex: none; width: 24px; height: 24px; }
+.fhcs-sheet .fhcs-encounter-count > .fhcs-input { width: 40px; height: 24px; text-align: center; }
+.fhcs-sheet .fhcs-encounter-roll { justify-content: center; gap: var(--fhcs-s1); width: 100%; min-width: 0; padding: 0 var(--fhcs-s1); white-space: nowrap; }
+.fhcs-sheet .fhcs-encounter-list { display: flex; flex: 1; flex-direction: column; min-height: 0; }
+.fhcs-sheet .fhcs-encounter-add-row { padding: var(--fhcs-s2); }
+.fhcs-sheet .fhcs-member-list + .fhcs-encounter-add-row { border-top: 1px solid var(--fhcs-line-soft); }
+.fhcs-sheet .fhcs-encounter-add { gap: var(--fhcs-s1); width: auto; padding: 0 var(--fhcs-s2); }
+/* The difficulty: the XP against the party's thresholds, at the tab's foot (the Carried bar's look). */
+.fhcs-sheet .fhcs-encounter-difficulty { flex: none; padding: var(--fhcs-s2); border: 1px solid var(--fhcs-line); border-radius: var(--fhcs-radius); }
+.fhcs-sheet .fhcs-encounter-difficulty > .fhcs-carried-text { white-space: nowrap; }
+
 /* ---------- Biography tab (SCOPE §4.8) ---------- */
 
 .fhcs-sheet .fhcs-biography.active { display: flex; flex-direction: column; gap: var(--fhcs-s2); }

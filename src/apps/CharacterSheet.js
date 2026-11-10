@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES, VIEW_ACTIONS } from '../constants.js';
-import { attributesFacts, biographyFacts, groupHeaderFacts, groupInventoryFacts, groupMembersFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, encounterHeaderFacts, encounterMembersFacts, groupHeaderFacts, groupInventoryFacts, groupMembersFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, renderTemplate, setLairInside, setSpellcastingAbility, spellbookFacts, toggleInspired, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, containerColumnChoice, inventoryView } from '../sheet/inventory.js';
@@ -9,6 +9,7 @@ import { effectsView } from '../sheet/effects.js';
 import { biographyView } from '../sheet/biography.js';
 import { limitedView } from '../sheet/limited.js';
 import { groupHeaderView, groupMembersView } from '../sheet/group.js';
+import { encounterHeaderView, encounterMembersView } from '../sheet/encounter.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
 import { NPC_TAB_NAMES, NPC_TAB_ORDER, TEMP_TOP_FLAG, comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, tabRow, themePicker } from '../sheet/header.js';
 import { themeMoment } from './sparks.js';
@@ -1047,7 +1048,8 @@ export function makeCharacterSheet(Base)
        */
       _updatePosition(position)
       {
-         const min = headerMinWidth(Object.keys(CONFIG.DND5E?.abilities ?? {}).length || 6);
+         // An encounter has no ability row and opens narrower (SCOPE §4.13): its own least width.
+         const min = this.fhcsMinWidth ?? headerMinWidth(Object.keys(CONFIG.DND5E?.abilities ?? {}).length || 6);
          if (typeof position.width === 'number') { position.width = comfortWidth(position.width, min); }
          // Narrow (under 700px, the 644 minimum's band): lesser columns give way where a width container can't be used
          // (no container-type around text fields, CLAUDE.md). The layout check marks its narrow frames the same way.
@@ -1265,6 +1267,75 @@ export function makeGroupSheet(Base)
          {
             // dnd5e's tab names; no inspiration (a group has none).
             context.fhcsTabs = tabRow(context.tabs, { canEdit: this.isEditable, editing: this.isEditMode }, i18n.localize, {}, []);
+            return context;
+         }
+         return super.fhcsPartContext(partId, context);
+      }
+   };
+}
+
+/* ---------- The encounter sheet (SCOPE §4.13, user 2026-11-10) ---------- */
+
+/** dnd5e's encounter parts we draw: all of them; Loot is our Inventory, Description our Biography. */
+const ENCOUNTER_PARTS = {
+   header: { template: `${MODULE_PATH}/templates/encounter/header.hbs` },
+   tabs: GROUP_PARTS.tabs,
+   members: { template: `${MODULE_PATH}/templates/encounter/members.hbs`, scrollable: [''] },
+   inventory: GROUP_PARTS.inventory,
+   description: { template: SHEET_PARTS.biography, ...PART_OPTIONS.biography }
+};
+
+/** dnd5e's least width for an encounter (encounter-sheet.mjs: 500), which ours keeps. */
+const ENCOUNTER_MIN_WIDTH = 500;
+
+/**
+ * Our encounter sheet: dnd5e's encounter sheet with the group sheet's layer on top (the same base, MultiActorSheet):
+ * the group's header pattern, the Members rows with counts, Loot and Description. Resizable (§5.4 rule 4), which
+ * dnd5e's isn't.
+ */
+export function makeEncounterSheet(Base)
+{
+   const parts = Object.fromEntries(Object.entries(Base.PARTS ?? {}).map(([id, part]) =>
+   {
+      if (!ENCOUNTER_PARTS[id]) { return [id, part]; }
+      const kept = { ...part };
+      delete kept.classes;
+      delete kept.templates;
+      return [id, { ...kept, ...ENCOUNTER_PARTS[id] }];
+   }));
+   return class FHCSEncounterSheet extends makeGroupSheet(Base)
+   {
+      static DEFAULT_OPTIONS = {
+         classes: ['fhcs-encounter'],
+         position: { width: 560, height: 640 },
+         window: { resizable: true }
+      };
+
+      static PARTS = parts;
+
+      /** @inheritDoc */
+      get fhcsMinWidth()
+      {
+         return ENCOUNTER_MIN_WIDTH;
+      }
+
+      /** The encounter's header, Members and Description; the tab row and Loot as the group draws them. */
+      async fhcsPartContext(partId, context)
+      {
+         const i18n = { localize: (key) => game.i18n.localize(key), format: (key, data) => game.i18n.format(key, data) };
+         if (partId === 'header')
+         {
+            context.fhcsEncounter = encounterHeaderView(await encounterHeaderFacts(this), i18n);
+            return context;
+         }
+         if (partId === 'members')
+         {
+            context.fhcsEncounterMembers = encounterMembersView(await encounterMembersFacts(this, context), i18n);
+            return context;
+         }
+         if (partId === 'description')
+         {
+            context.fhcsBiography = biographyView(biographyFacts(this, context), i18n);
             return context;
          }
          return super.fhcsPartContext(partId, context);

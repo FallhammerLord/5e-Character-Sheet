@@ -1,4 +1,4 @@
-import { CONTAINER_SHEET_CLASS_NAME, GROUP_SHEET_CLASS_NAME, MODULE_ID, SHEET_CLASS_NAMES, THEMES } from './constants.js';
+import { CONTAINER_SHEET_CLASS_NAME, ENCOUNTER_SHEET_CLASS_NAME, GROUP_SHEET_CLASS_NAME, MODULE_ID, SHEET_CLASS_NAMES, THEMES } from './constants.js';
 import { rerenderSheets } from './compat.js';
 import { rethemeCards } from './chat/card.js';
 import { DEFAULT_COLUMNS } from './sheet/inventory.js';
@@ -87,7 +87,7 @@ export function registerSettings()
       type: Object,
       default: { weight: true, uses: true, quantity: true },
       // A group's Inventory takes the container's columns too (SCOPE §4.13).
-      onChange: () => rerenderSheets([CONTAINER_SHEET_CLASS_NAME, GROUP_SHEET_CLASS_NAME])
+      onChange: () => rerenderSheets([CONTAINER_SHEET_CLASS_NAME, GROUP_SHEET_CLASS_NAME, ENCOUNTER_SHEET_CLASS_NAME])
    });
 
    // Which Spellbook columns show (SCOPE §4.7), chosen the same way.

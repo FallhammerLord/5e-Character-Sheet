@@ -11,6 +11,7 @@ import { attributesView } from '../src/sheet/attributes.js';
 import { keepStable } from '../src/sheet/death.js';
 import { columnChoice, containerColumnChoice, inventoryView } from '../src/sheet/inventory.js';
 import { groupHeaderView, groupMembersView } from '../src/sheet/group.js';
+import { encounterHeaderView, encounterMembersView } from '../src/sheet/encounter.js';
 import { canCast, prepState, spellbookView, spellColumnChoice, spellKind } from '../src/sheet/spellbook.js';
 import { featureColumnChoice, featuresView, groupingOf } from '../src/sheet/features.js';
 import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js';
@@ -637,6 +638,22 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
       stash.carriers.lines[0].carried.text, stash.carriers.lines[1].carried, stash.carriers.lines[1].coins, stash.sources.onVehicle, stash.currencyElsewhere];
    try { deepStrictEqual(stashShape, ['weight,uses,quantity', true, null, 0, 2, '48 / 120 lb', null, '', true, true]); }
    catch { problems.push(`group inventory: ${JSON.stringify(stashShape)}`); }
+}
+
+// The encounter (SCOPE §4.13, 2026-11-10): the header's line; in play a formula shows its d20 only until a count is
+// rolled; edit mode always has Add creature; without a party the difficulty has no bar.
+{
+   const top = encounterHeaderView({ name: 'Ambush', creatures: 8, xp: '1,800', difficulty: 'high' }, { format, localize });
+   const one = encounterHeaderView({ name: 'Ambush', creatures: 1, xp: '', difficulty: null }, { format, localize });
+   const m = (over) => ({ uuid: 'u', index: 0, name: 'Goblin', cr: '1/4', xp: '50', quantity: { value: 4, formula: '' }, ...over });
+   const play = encounterMembersView({ editing: false, members: [m(), m({ index: 1, quantity: { value: null, formula: '1d4' } }), m({ index: 2, quantity: { value: 2, formula: '1d4' } })],
+      difficulty: { value: 300, xpText: '300', max: 0, pct: 0, stops: {}, word: '' } }, { format, localize });
+   const shape = [top.summary, one.summary, play.members.map((x) => `${x.count}|${x.rollFormula?.formula ?? ''}`).join(' '), play.add, play.difficulty.bar, play.difficulty.text];
+   try { deepStrictEqual(shape, ['8 creatures · 1,800 XP · High', '1 creature', '4| |1d4 2|', false, false, '300 XP']); }
+   catch { problems.push(`encounter: ${JSON.stringify(shape)}`); }
+   const edit = encounterMembersView({ editing: true, members: [m({ quantity: { value: null, formula: '1d4' } })] }, { format, localize });
+   if (!edit.add || edit.members[0].rollFormula || edit.difficulty) { problems.push(`encounter in edit mode: add ${edit.add}, roll ${!!edit.members[0].rollFormula}`); }
+   if (!encounterMembersView({ members: [] }, { format, localize }).add) { problems.push('an empty encounter has no Add creature'); }
 }
 
 // Spellbook (SCOPE §4.7): preparation states and kinds, Can cast, section order, slot pips, the concentration mark.

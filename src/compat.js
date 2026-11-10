@@ -134,6 +134,79 @@ export function groupMembersFacts(sheet, context)
    };
 }
 
+/** dnd5e's encounter sheet, which ours extends (SCOPE §4.13, the encounter sheet). */
+export function systemEncounterSheet()
+{
+   return globalThis.dnd5e?.applications?.actor?.EncounterActorSheet;
+}
+
+/** Registers a sheet for encounter actors, offered beside dnd5e's own (not the default). */
+export function registerEncounterSheet(sheetClass, label)
+{
+   foundry.applications.apps.DocumentSheetConfig.registerSheet(Actor, 'fhcs', sheetClass, { types: ['encounter'], makeDefault: false, label });
+}
+
+/** @returns {string} A challenge rating as dnd5e writes it: ⅛, ¼ and ½ as fractions. */
+function crText(cr)
+{
+   if (cr === null || cr === undefined || cr === '') { return '—'; }
+   return { 0.125: '1/8', 0.25: '1/4', 0.5: '1/2' }[cr] ?? String(cr);
+}
+
+/**
+ * Plain facts for the encounter's header (src/sheet/encounter.js): its creatures counted, the XP they're worth, and
+ * dnd5e's difficulty word against the world's primary party (`getDifficulty`; null without a party).
+ */
+export async function encounterHeaderFacts(sheet)
+{
+   const actor = sheet.actor;
+   const members = await actor.system.getMembers?.() ?? [];
+   const xp = await actor.system.getXPValue?.() ?? 0;
+   return {
+      name: actor.name,
+      nameSource: actor._source?.name ?? actor.name,
+      img: actor.img,
+      editing: !!sheet.isEditMode && !!sheet.isEditable,
+      creatures: members.reduce((n, m) => n + (m.quantity?.value ?? 0), 0),
+      xp: xp ? xp.toLocaleString(game.i18n.lang) : '',
+      difficulty: await actor.system.getDifficulty?.() ?? null
+   };
+}
+
+/**
+ * Plain facts for the encounter's Members tab: dnd5e's members (NPCs only, by name, each with its index in
+ * `system.members`, which its form handlers write to), and the difficulty dnd5e's `_prepareMembersContext` measured.
+ */
+export async function encounterMembersFacts(sheet, context)
+{
+   const config = CONFIG.DND5E;
+   const members = (await sheet.actor.system.getMembers?.() ?? [])
+      .map((m, index) => ({ ...m, index }))
+      .filter(({ actor }) => actor?.system?.isNPC);
+   const facts = await Promise.all(members.map(async ({ actor, quantity, index }) =>
+   {
+      const portrait = {};
+      await sheet._prepareMemberPortrait?.(actor, portrait);
+      const details = actor.system.details ?? {};
+      return {
+         uuid: actor.uuid, index, name: actor.name,
+         img: portrait.portrait?.src ?? actor.img, isVideo: !!portrait.portrait?.isVideo,
+         sub: [game.i18n.localize(config.actorSizes?.[actor.system.traits?.size]?.label ?? ''), details.type?.label ?? ''].filter(Boolean).join(' · '),
+         cr: crText(details.cr),
+         xp: (details.xp?.value ?? 0).toLocaleString(game.i18n.lang),
+         quantity: { value: quantity?.value ?? null, formula: quantity?.formula ?? '' }
+      };
+   }));
+   facts.sort((a, b) => a.name.localeCompare(b.name, game.i18n.lang));
+   const d = context.difficulty;
+   return {
+      editing: !!sheet.isEditMode && !!sheet.isEditable,
+      members: facts,
+      difficulty: d ? { value: d.value, xpText: (d.value ?? 0).toLocaleString(game.i18n.lang), max: Number.isFinite(d.max) ? d.max : 0,
+         pct: d.pct, stops: d.stops, word: await sheet.actor.system.getDifficulty?.() ?? '' } : null
+   };
+}
+
 /**
  * Swaps dnd5e's data model for one chat message type with our subclass of it. Runs at init, after dnd5e's init set
  * CONFIG.ChatMessage.dataModels and before the world's messages are built.
@@ -1568,8 +1641,8 @@ export function biographyFacts(sheet, context)
    const details = sheet.actor.system.details ?? {};
    // An NPC (SCOPE §4.13, 2026-11-09): its public biography first (players see it), then dnd5e's details, beside its
    // ideals, bonds and flaws (npc-biography.hbs); no characteristics or appearance.
-   // A group (SCOPE §4.13, 2026-11-10): dnd5e's two fields, Summary then Description, each its own editor.
-   if (sheet.actor.type === 'group')
+   // A group or encounter (SCOPE §4.13, 2026-11-10): dnd5e's two fields, Summary then Description, each its own editor.
+   if (['group', 'encounter'].includes(sheet.actor.type))
    {
       const description = sheet.actor.system.description ?? {};
       const story = (key, label) => ({ name: `system.description.${key}`, label: game.i18n.localize(label),

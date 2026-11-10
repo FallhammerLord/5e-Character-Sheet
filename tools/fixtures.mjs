@@ -16,6 +16,7 @@ import { effectsView } from '../src/sheet/effects.js';
 import { biographyView } from '../src/sheet/biography.js';
 import { limitedView } from '../src/sheet/limited.js';
 import { groupHeaderView, groupMembersView } from '../src/sheet/group.js';
+import { encounterHeaderView, encounterMembersView } from '../src/sheet/encounter.js';
 import { THEMES } from '../src/constants.js';
 import { format, localize, template } from './templates.mjs';
 
@@ -1137,6 +1138,26 @@ const groupBio = (editable) => groupHeader() + `<div class="tab-body">${template
    { format, localize }) })}</div>`;
 CASES.push({ name: 'group-biography', html: groupBio(true) });
 CASES.push({ name: 'group-biography-viewer', html: groupBio(false) });
+// The encounter sheet (SCOPE §4.13, user 2026-11-10): its header, Members with counts and formulas, the difficulty bar;
+// Loot (our list, no members panel) and Description; at 500–740px, in play and edit mode.
+const ENCOUNTER_TABS = Object.fromEntries(['members', 'inventory', 'description']
+   .map((id, i) => [id, { id, label: ['Members', 'Loot', 'Description'][i], active: id === 'members' }]));
+const creature = (name, fill, index, over = {}) => ({ uuid: `Actor.${name.replace(/\W/g, '')}`, index, name, img: ICON(fill), sub: 'Small · Goblinoid',
+   cr: '1/4', xp: '50', quantity: { value: 4, formula: '' }, ...over });
+const encounterTop = ({ editing = false, ...over } = {}) => template('encounter/header')({ fhcsEncounter: encounterHeaderView({ name: 'Goblin Ambush at the Fording',
+   img: ICON('#6a8a3a'), editing, creatures: 8, xp: '1,800', difficulty: 'high', ...over }, { format, localize }) })
+   + template('sheet/tabs')({ fhcsTabs: tabRow(ENCOUNTER_TABS, { canEdit: true, editing }, localize, {}, []) });
+const encounterMembers = ({ editing = false, ...over } = {}) => encounterTop({ editing }) + `<div class="tab-body">${template('encounter/members')({
+   tab: { id: 'members', group: 'primary', cssClass: 'active' }, fhcsEncounterMembers: encounterMembersView({ editing, members: [
+      creature('Goblin', '#6a8a3a', 0),
+      creature('Goblin Boss', '#8a6a3a', 1, { cr: '1', xp: '200', quantity: { value: 1, formula: '' } }),
+      creature('Worg, the Hungry Shadow of the Greyfen Marshes', '#4a4a5a', 2, { sub: 'Large · Monstrosity', cr: '1/2', xp: '100', quantity: { value: null, formula: '1d4' } })],
+   difficulty: { value: 1800, xpText: '1,800', max: 2200, pct: 82, stops: { low: 45, high: 68 }, word: 'high' }, ...over }, { format, localize }) })}</div>`;
+CASES.push({ name: 'encounter-members', frame: 'encounter', html: encounterMembers(), rows: '.fhcs-header-row, .fhcs-tabs, .fhcs-encounter-row' });
+CASES.push({ name: 'encounter-members-editing', frame: 'encounter', html: encounterMembers({ editing: true }) });
+CASES.push({ name: 'encounter-members-empty', frame: 'encounter', html: encounterMembers({ members: [], difficulty: { value: 0, xpText: '0', max: 0, pct: 0, stops: {}, word: '' } }) });
+CASES.push({ name: 'theme-forge-encounter-members-editing', frame: 'encounter', look: 'forge', html: encounterMembers({ editing: true }) });
+CASES.push({ name: 'encounter-loot', frame: 'encounter', html: encounterTop() + `<div class="tab-body">${template('sheet/inventory')(groupStash({ carriers: [], sources: null }))}</div>` });
 CASES.push({ name: 'item-long-name', frame: 'item', html: itemSheet('weapon', { name: 'Sun Blade of the Dawnwarden, Twice-Forged in the Ember Halls' }) });
 
 // Chat cards in the world's theme (SCOPE §5.3 rule 10): every card case again in Forge.

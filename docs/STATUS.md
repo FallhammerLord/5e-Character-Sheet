@@ -4,13 +4,14 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6.7, encounter and vehicle sheets** (ROADMAP; SCOPE §4.13): the container and group sheets are built and wait on the user (below). Next: the encounter sheet (research, design questions, boards), then the vehicle, then the smaller windows' skin. The play round's ask 12 waits on a session of play.
+1. **Phase 6.7, the vehicle sheet** (ROADMAP; SCOPE §4.13): the container, group and encounter sheets are built and wait on the user (below). Next: the vehicle (research, design questions, boards), then the smaller windows' skin. The play round's ask 12 waits on a session of play.
 2. **`#postNotification` TypeError** seen in the chat card runs: in Foundry's own code, cause not yet known; no test fails on it.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
 
 ## Waiting on the user
 
+- **Encounter sheet** (Quench core and play): the new test "opens an encounter in our encounter sheet". In play: choose "Fallhammer encounter sheet" (⋮, Sheet); add creatures (edit mode, Add creature); type a formula like 1d4 and roll it from the row in play; Roll every count; − and +; with a primary party set, the difficulty bar and its word; Award and Place members; Loot's coins.
 - **Group sheet** (Quench core and play): the new test "opens a group in our group sheet". In play: choose "Fallhammer group sheet" for a party (⋮, Sheet); step the pace; roll a member's Perception from their row; open a member from their name; remove one in edit mode; on Inventory drop an item onto a member's line, and with a primary vehicle switch to its inventory and edit its coins; write the Summary; Award and Place members.
 - **Container sheet** (Quench core and play): the new test "opens a container in our container sheet". In play: choose "Fallhammer container sheet" for a bag (its ⋮ menu, Sheet), then drop items in and out, nest a pouch, search inside it, use the Columns menu, edit the coins, and add the first effect from Effects.
 - **Chat cards in play** (from a player's client): another player's attack and damage show once rolled; an effect applied from a card leaves a line; the hit line holds when targets change; each damage type its own total; a new card scrolls fully into view, down to Apply.

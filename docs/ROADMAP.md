@@ -229,6 +229,9 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
     - [x] Members (2026-11-10): rows in Characters, NPCs, Vehicles; portrait, name (opens the member), HP and hit dice, AC, speed, Perception, Stealth and Survival rolling with their passives; a vehicle's travel and DT; edit mode's remove; dnd5e's `.member[data-uuid]` kept for its context menu and drops
     - [x] Inventory, Effects, Biography; Quench test (2026-11-10): the members above the list (carried, coins; drop an item on a line to give it), the container's columns, the Group / vehicle switch with the coins written to whichever shows; our Effects; Summary then Description in one column
   - [ ] Group: Quench and play, BUILT entry
+  - [x] Encounter research (research note "The encounter sheet, closer") and decisions (SCOPE §4.13, user 2026-11-10); no boards, at the user's word
+  - [x] Encounter sheet built (2026-11-10): header, Members with counts and formulas, the difficulty bar, Loot, Description; resizable from 500px; unit, load and layout cases (`encounter*`, 500–740px, Forge), a Quench test
+  - [ ] Encounter: Quench and play, BUILT entry
 - [ ] The smaller windows: a skin
 - [ ] Quench and play
 

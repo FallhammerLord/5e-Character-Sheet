@@ -12,11 +12,14 @@ export const NPC_SHEET_ID = `${MODULE_ID}.${NPC_SHEET_CLASS_NAME}`;
 /** Our group sheet's class name (SCOPE §4.13, the group sheet). */
 export const GROUP_SHEET_CLASS_NAME = 'FHCSGroupSheet';
 
+/** Our encounter sheet's class name (SCOPE §4.13, the encounter sheet). */
+export const ENCOUNTER_SHEET_CLASS_NAME = 'FHCSEncounterSheet';
+
 /** Our container sheet's class name (SCOPE §4.13, the container sheet), for the settings that redraw it. */
 export const CONTAINER_SHEET_CLASS_NAME = 'FHCSContainerSheet';
 
 /** Our sheets' class names, for settings that redraw every open sheet. */
-export const SHEET_CLASS_NAMES = [SHEET_CLASS_NAME, NPC_SHEET_CLASS_NAME, GROUP_SHEET_CLASS_NAME];
+export const SHEET_CLASS_NAMES = [SHEET_CLASS_NAME, NPC_SHEET_CLASS_NAME, GROUP_SHEET_CLASS_NAME, ENCOUNTER_SHEET_CLASS_NAME];
 
 /**
  * Controls that only change what this viewer sees: folds, details, opening a document to read, filters and grouping.

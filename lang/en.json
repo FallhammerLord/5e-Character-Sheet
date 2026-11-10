@@ -537,6 +537,33 @@
       },
       "Inventory": "Group",
       "Whose": "Whose inventory"
+    },
+    "Encounter": {
+      "SheetLabel": "Fallhammer encounter sheet",
+      "Name": "Encounter name",
+      "CreatureOne": "{count} creature",
+      "CreatureMany": "{count} creatures",
+      "Xp": "{xp} XP",
+      "Difficulty": {
+        "low": "Low",
+        "moderate": "Moderate",
+        "high": "High"
+      },
+      "RollAll": "Roll every count",
+      "Award": "Award XP and coins",
+      "CrLabel": "Challenge rating {cr}",
+      "RollOne": "Roll {formula} for {name}",
+      "CountLabel": "How many {name}",
+      "FormulaLabel": "Count formula for {name}",
+      "Fewer": "One fewer {name}",
+      "More": "One more {name}",
+      "Cr": "CR",
+      "XpEach": "XP each",
+      "Count": "Count",
+      "Creatures": "Creatures",
+      "Add": "Add creature",
+      "DifficultyHead": "Difficulty",
+      "DifficultyLabel": "{xp} XP against the party"
     }
   }
 }
