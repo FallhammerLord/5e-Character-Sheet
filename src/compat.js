@@ -85,6 +85,55 @@ export function groupHeaderFacts(sheet, context)
    };
 }
 
+/** @returns {string} A movement or travel unit's short name, from dnd5e's config. */
+function unitAbbr(config, key, field = 'abbreviation')
+{
+   const unit = config?.[key];
+   return unit ? game.i18n.localize(unit[field] ?? unit.abbreviation ?? unit.label ?? key) : (key ?? '');
+}
+
+/**
+ * Plain facts for the group's Members tab (src/sheet/group.js), from what dnd5e's `_prepareMembersContext` puts on the
+ * context (group-sheet.mjs): its sections (character, npc, vehicle) of members, each with its portrait, whether this
+ * user may open it (`canView`) or see its numbers (`hiddenStats`), its skills, and a vehicle's primary mark.
+ */
+export function groupMembersFacts(sheet, context)
+{
+   const config = CONFIG.DND5E;
+   const member = (m, id) =>
+   {
+      const attrs = m.system?.attributes ?? {};
+      const fact = {
+         uuid: m.uuid, name: m.name, img: m.portrait?.src ?? m.img, isVideo: !!m.portrait?.isVideo,
+         canView: !!m.canView, hidden: !!m.hiddenStats, primary: !!m.isPrimaryVehicle,
+         hp: attrs.hp?.max ? { value: attrs.hp.value ?? 0, max: attrs.hp.max } : null,
+         ac: attrs.ac?.value ?? null
+      };
+      if (id === 'vehicle')
+      {
+         const travel = attrs.travel ?? {};
+         const max = travel.paces?.max;
+         fact.speed = Number.isFinite(max) && max ? `${max} ${unitAbbr(config.travelUnits, travel.units, 'abbreviationDay')}`.trim() : '';
+         fact.dt = attrs.hp?.dt ?? '';
+         return fact;
+      }
+      const move = attrs.movement ?? {};
+      fact.speed = move.walk ? `${move.walk} ${unitAbbr(config.movementUnits, move.units)}`.trim() : '';
+      fact.slowed = !!move.slowed;
+      fact.hd = attrs.hd?.max ? { value: attrs.hd.value ?? 0, max: attrs.hd.max } : null;
+      fact.skills = Object.fromEntries(['prc', 'ste', 'sur'].filter((key) => m.skills?.[key]).map((key) =>
+      {
+         const skill = m.skills[key];
+         return [key, { total: skill.total ?? 0, passive: skill.passive ?? 10, rollable: String(skill.css ?? '').includes('rollable') }];
+      }));
+      return fact;
+   };
+   return {
+      editing: !!sheet.isEditMode && !!sheet.isEditable,
+      sections: Object.entries(context.sections ?? {}).map(([id, section]) => ({ id, members: (section.members ?? []).map((m) => member(m, id)) }))
+   };
+}
+
 /**
  * Swaps dnd5e's data model for one chat message type with our subclass of it. Runs at init, after dnd5e's init set
  * CONFIG.ChatMessage.dataModels and before the world's messages are built.

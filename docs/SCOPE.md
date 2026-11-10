@@ -278,7 +278,9 @@ Check here before choosing a mark, and add new ones. Every tint has an icon, mar
 | Small ringed dot | Exhaustion 0; rest on it to show the chip | The status group's first segment (user, 2026-10-28) |
 | "+N" in a small box | N more classes, in the class tray | The end of the last class card's last line (user, 2026-10-27; moved 2026-10-28) |
 | Number in a ring | The class's level | Each class card's top right (user, 2026-10-28); a class's item sheet header (2026-10-29) |
-| Light green fill inside the HP bar | HP left, with the numbers written over it | The portrait card's band (user, 2026-10-27) |
+| Light green fill inside the HP bar | HP left, with the numbers written over it | The portrait card's band (user, 2026-10-27); a group's member rows, a thin bar with the numbers beside it (2026-11-10) |
+| Triangle with an exclamation mark | Slowed: a member's speed is reduced (dnd5e's own mark) | A group's member rows, after the speed (2026-11-10) |
+| Star on the portrait's corner | The group's primary vehicle (dnd5e's own mark) | A group's Vehicles section (2026-11-10) |
 | Heart with a crack; heart with a plus; shield with a plus | Damage; heal; temporary HP | The HP tray, each with its word; Damage solid as the main action (user, 2026-10-27) |
 | Gear | Settings: opens one of dnd5e's settings windows, or a tray of settings | Edit mode only: beside AC, Init, each ability, speed, HP, skills and traits; on the HD chip; alone in a chip at the portrait's top left (its options tray) (user, 2026-10-27); each resource panel's name line, the item to show (2026-10-28); the inspiration bar's left, the item that banks it (2026-10-28) |
 | Two opposed arrows; solid when on, outline when off | Show the token in place of the portrait | Edit mode, the portrait's options tray (dnd5e's own switch) |

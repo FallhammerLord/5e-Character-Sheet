@@ -3492,6 +3492,58 @@
 /* The pool's value keeps the field's height in play, so edit mode moves nothing (§5.2 rule 6). */
 .fhcs-sheet .fhcs-group-xp > span.fhcs-body { display: flex; align-items: center; min-height: var(--fhcs-control); }
 
+/* ---------- The group's Members tab (SCOPE §4.13, the group sheet; the board, 2026-11-10) ---------- */
+
+/* Sections stacked; the tab scrolls, keeping its scrollbar's room so rows never narrow. */
+.fhcs-sheet .fhcs-group-members.active { display: flex; flex-direction: column; gap: var(--fhcs-s2); scrollbar-gutter: stable; }
+.fhcs-sheet .fhcs-member-list { margin: 0; padding: 0; list-style: none; }
+.fhcs-sheet .fhcs-member-section { border: 1px solid var(--fhcs-line); border-radius: var(--fhcs-radius); background: var(--fhcs-surface); }
+
+/* One grid for the heading and every row: portrait, name, AC, speed, three skills, and edit mode's remove. */
+.fhcs-sheet .fhcs-member-row
+{
+   display: grid;
+   grid-template-columns: 40px minmax(96px, 1fr) 40px 56px repeat(3, 88px);
+   align-items: center;
+   gap: var(--fhcs-s2);
+   min-height: 48px;
+   padding: var(--fhcs-s1) var(--fhcs-s2);
+   border-bottom: 1px solid var(--fhcs-line-soft);
+}
+.fhcs-sheet .fhcs-editing .fhcs-member-row { grid-template-columns: 40px minmax(96px, 1fr) 40px 56px repeat(3, 88px) 24px; }
+.fhcs-sheet .fhcs-member-row:last-child { border-bottom: 0; }
+.fhcs-sheet .fhcs-member-head { min-height: var(--fhcs-control); padding-top: 0; padding-bottom: 0; border-bottom: 1px solid var(--fhcs-line); }
+.fhcs-sheet :is(.fhcs-member-ac, .fhcs-member-speed, .fhcs-member-skill) { text-align: center; white-space: nowrap; }
+.fhcs-sheet .fhcs-member-head > .fhcs-member-skill { overflow: hidden; text-overflow: ellipsis; }
+
+.fhcs-sheet .fhcs-member-portrait { position: relative; width: 40px; height: 40px; overflow: hidden; border-radius: var(--fhcs-radius); }
+.fhcs-sheet .fhcs-member-portrait > :is(img, video) { display: block; width: 100%; height: 100%; border: 0; object-fit: cover; object-position: top; }
+/* The primary vehicle: dnd5e's star, on the portrait's corner. */
+.fhcs-sheet .fhcs-member-primary { position: absolute; top: 0; right: 0; display: grid; place-items: center; width: 16px; height: 16px; border-radius: 0 0 0 var(--fhcs-radius); background: var(--fhcs-surface); }
+.fhcs-sheet .fhcs-member-primary > .fhcs-icon { width: 12px; height: 12px; fill: currentColor; }
+
+.fhcs-sheet .fhcs-member-name-col { display: flex; flex-direction: column; gap: var(--fhcs-s1); min-width: 0; }
+.fhcs-sheet .fhcs-member-head > .fhcs-member-name-col { flex-direction: row; align-items: center; }
+.fhcs-sheet .fhcs-member-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fhcs-sheet button.fhcs-member-name { justify-content: flex-start; min-height: 0; height: auto; padding: 0; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; }
+
+/* HP: the light green fill (§5.1), its numbers beside it; hit dice after. */
+.fhcs-sheet .fhcs-member-vitals { display: flex; align-items: center; gap: var(--fhcs-s1); min-width: 0; white-space: nowrap; }
+.fhcs-sheet .fhcs-member-bar { position: relative; flex: 1; min-width: 32px; height: 8px; overflow: hidden; border: 1px solid var(--fhcs-line); border-radius: 4px; }
+.fhcs-sheet .fhcs-member-bar > span { position: absolute; inset: 0 auto 0 0; background: color-mix(in srgb, var(--fhcs-success) 60%, var(--fhcs-surface)); }
+.fhcs-sheet .fhcs-member-hd { flex: none; padding-left: var(--fhcs-s1); }
+.fhcs-sheet .fhcs-member-slowed > .fhcs-icon { width: 14px; height: 14px; vertical-align: -2px; }
+
+/* A skill: its roll and, muted, its passive; one click rolls at the group's pace. */
+.fhcs-sheet button.fhcs-member-skill { justify-content: center; gap: var(--fhcs-s1); width: 100%; min-width: 0; padding: 0 var(--fhcs-s1); }
+.fhcs-sheet .fhcs-member-remove { width: 24px; height: 24px; }
+
+/* Narrower than 700px (the 644 minimum's band) a member's hit dice give way, AC and speed narrow, so the skills keep
+   their names (the board, 2026-11-10). */
+.fhcs-sheet[data-fhcs-narrow] .fhcs-member-row { grid-template-columns: 40px minmax(96px, 1fr) 32px 56px repeat(3, 84px); }
+.fhcs-sheet[data-fhcs-narrow] .fhcs-editing .fhcs-member-row { grid-template-columns: 40px minmax(96px, 1fr) 32px 56px repeat(3, 84px) 24px; }
+.fhcs-sheet[data-fhcs-narrow] .fhcs-member-hd { display: none; }
+
 /* ---------- Biography tab (SCOPE §4.8) ---------- */
 
 .fhcs-sheet .fhcs-biography.active { display: flex; flex-direction: column; gap: var(--fhcs-s2); }

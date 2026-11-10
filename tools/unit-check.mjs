@@ -10,7 +10,7 @@ import { diceMath } from '../src/chat/math.js';
 import { attributesView } from '../src/sheet/attributes.js';
 import { keepStable } from '../src/sheet/death.js';
 import { columnChoice, containerColumnChoice, inventoryView } from '../src/sheet/inventory.js';
-import { groupHeaderView } from '../src/sheet/group.js';
+import { groupHeaderView, groupMembersView } from '../src/sheet/group.js';
 import { canCast, prepState, spellbookView, spellColumnChoice, spellKind } from '../src/sheet/spellbook.js';
 import { featureColumnChoice, featuresView, groupingOf } from '../src/sheet/features.js';
 import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js';
@@ -607,6 +607,24 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    try { deepStrictEqual(editShape, ['1 member', false, true, null]); }
    catch { problems.push(`group header in edit mode: ${JSON.stringify(editShape)}`); }
    if (groupHeaderView({ ...facts, travel: { ...facts.travel, available: false } }, { format, localize }).travel.arrows) { problems.push('a ship\'s pace shows arrows the group can\'t use'); }
+}
+
+// The group's Members (SCOPE §4.13, 2026-11-10): empty sections drop; a member this user can't observe shows no
+// numbers or skills; a vehicle has its threshold, no skills; signed skill totals; a skill this user can't roll is off.
+{
+   const sk = (total, passive, rollable = true) => ({ total, passive, rollable });
+   const view = groupMembersView({ editing: false, sections: [
+      { id: 'character', members: [{ uuid: 'a', name: 'Quill', hp: { value: 39, max: 39 }, hd: { value: 6, max: 6 }, ac: 15, speed: '35 ft',
+         skills: { prc: sk(5, 15), ste: sk(-1, 9), sur: sk(0, 10, false) } }] },
+      { id: 'npc', members: [{ uuid: 'b', name: 'Stranger', hidden: true, ac: 12, skills: { prc: sk(2, 12) } }] },
+      { id: 'vehicle', members: [{ uuid: 'c', name: 'Wagon', hp: { value: 80, max: 100 }, ac: 11, speed: '24 mi/d', dt: 5, primary: true }] },
+      { id: 'other', members: [] }] }, { format, localize });
+   const [pc, npc, cart] = view.sections;
+   const shape = [view.sections.map((x) => x.id).join(), pc.members[0].skills.map((k) => `${k.total}/${k.passive}/${k.rollable}`).join(' '), pc.members[0].hd?.text,
+      npc.members[0].ac, npc.members[0].hp, npc.members[0].skills.every((k) => k.dash), cart.members[0].dt, cart.members[0].skills.length, cart.heads.join(), cart.members[0].primary];
+   try { deepStrictEqual(shape, ['character,npc,vehicle', '+5/15/true \u22121/9/true +0/10/false', '6 / 6', '—', null, true, 5, 0, 'DT', true]); }
+   catch { problems.push(`group members: ${JSON.stringify(shape)}`); }
+   if (!groupMembersView({ sections: [] }, { format, localize }).empty) { problems.push('a group with no members says nothing'); }
 }
 
 // Spellbook (SCOPE §4.7): preparation states and kinds, Can cast, section order, slot pips, the concentration mark.

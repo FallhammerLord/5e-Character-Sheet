@@ -1,0 +1,74 @@
+{{!-- The group's Members tab (SCOPE §4.13, the group sheet; the board, 2026-11-10): one row per member, in sections
+      Characters, NPCs, Vehicles. dnd5e's hooks kept: each row is `.member[data-uuid]` (its context menu: View, Remove,
+      the primary vehicle; an item dropped on it goes to that member); showDocument opens the member, roll with
+      data-type="skill" rolls at the group's pace, removeMember in edit mode. Takes dnd5e's "members" part ID. --}}
+<section class="tab fhcs-group-members{{#if fhcsMembers.editing}} fhcs-editing{{/if}} {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
+   {{#with fhcsMembers}}
+   {{#each sections}}
+   <div class="fhcs-member-section fhcs-plate{{#if vehicle}} fhcs-vehicles{{/if}}" data-fhcs-section="{{ id }}">
+      <div class="fhcs-member-row fhcs-member-head">
+         <span></span>
+         <span class="fhcs-member-name-col"><span class="fhcs-label">{{ label }}</span> <span class="fhcs-label fhcs-muted">{{ count }}</span></span>
+         <span class="fhcs-label fhcs-muted fhcs-member-ac">{{ ../text.ac }}</span>
+         <span class="fhcs-label fhcs-muted fhcs-member-speed">{{ speedHead }}</span>
+         {{#each heads}}<span class="fhcs-label fhcs-muted fhcs-member-skill">{{ this }}</span>{{/each}}
+         {{#if vehicle}}<span></span><span></span>{{/if}}
+         {{#if ../editing}}<span></span>{{/if}}
+      </div>
+      <ol class="fhcs-member-list">
+         {{#each members}}
+         <li class="member fhcs-member-row{{#if hidden}} fhcs-member-hidden{{/if}}" data-uuid="{{ uuid }}">
+            <span class="fhcs-member-portrait">
+               {{#if isVideo}}
+               <video src="{{ img }}" autoplay muted playsinline disablepictureinpicture loop aria-hidden="true"></video>
+               {{else}}
+               <img src="{{ img }}" alt="">
+               {{/if}}
+               {{#if primary}}<span class="fhcs-member-primary" role="img" aria-label="{{ ../../text.primary }}" data-fhcs-tip="{{ ../../text.primary }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg></span>{{/if}}
+            </span>
+            <span class="fhcs-member-name-col">
+               {{#if canView}}
+               <button type="button" class="fhcs-member-name fhcs-body" data-action="showDocument" data-uuid="{{ uuid }}" aria-label="{{ openLabel }}">{{ name }}</button>
+               {{else}}
+               <span class="fhcs-member-name fhcs-body">{{ name }}</span>
+               {{/if}}
+               {{#if hidden}}
+               <span class="fhcs-body fhcs-muted">{{ ../../text.hidden }}</span>
+               {{else}}
+               {{#if hp}}
+               <span class="fhcs-member-vitals">
+                  <span class="fhcs-label fhcs-muted">{{ ../../text.hp }}</span>
+                  <span class="fhcs-member-bar" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ hp.pct }}" aria-label="{{ hp.label }}"><span style="width: {{ hp.pct }}%"></span></span>
+                  <span class="fhcs-body">{{ hp.text }}</span>
+                  {{#if hd}}<span class="fhcs-member-hd"><span class="fhcs-label fhcs-muted">{{ ../../text.hd }}</span> <span class="fhcs-body">{{ hd.text }}</span></span>{{/if}}
+               </span>
+               {{/if}}
+               {{/if}}
+            </span>
+            <span class="fhcs-display fhcs-member-ac">{{ ac }}</span>
+            <span class="fhcs-body fhcs-member-speed">{{ speed }}{{#if slowed}} <span class="fhcs-member-slowed" role="img" aria-label="{{ ../../text.slowed }}" data-fhcs-tip="{{ ../../text.slowed }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l9 16H3zM12 10v4M12 17h.01"/></svg></span>{{/if}}</span>
+            {{#if dt}}
+            <span class="fhcs-body fhcs-member-skill">{{ dt }}</span><span></span><span></span>
+            {{else}}
+            {{#each skills}}
+            {{#if dash}}
+            <span class="fhcs-body fhcs-muted fhcs-member-skill">—</span>
+            {{else}}
+            <button type="button" class="fhcs-button fhcs-body fhcs-member-skill {{#if rollable}}rollable{{/if}}" data-action="roll" data-type="skill" data-key="{{ key }}"
+                    aria-label="{{ label }}"{{#unless rollable}} disabled{{/unless}}>{{ total }} <span class="fhcs-muted">({{ passive }})</span></button>
+            {{/if}}
+            {{/each}}
+            {{/if}}
+            {{#if ../../editing}}
+            <button type="button" class="fhcs-toggle fhcs-member-remove" data-action="removeMember" aria-label="{{ removeLabel }}" data-fhcs-tip="{{ removeLabel }}">
+               <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+            {{/if}}
+         </li>
+         {{/each}}
+      </ol>
+   </div>
+   {{/each}}
+   {{#if empty}}<p class="fhcs-body fhcs-muted fhcs-empty fhcs-plate">{{ text.empty }}</p>{{/if}}
+   {{/with}}
+</section>

@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES, VIEW_ACTIONS } from '../constants.js';
-import { attributesFacts, biographyFacts, groupHeaderFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, groupHeaderFacts, groupMembersFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, renderTemplate, setLairInside, setSpellcastingAbility, spellbookFacts, toggleInspired, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, containerColumnChoice, inventoryView } from '../sheet/inventory.js';
@@ -8,7 +8,7 @@ import { featureColumnChoice, featuresView } from '../sheet/features.js';
 import { effectsView } from '../sheet/effects.js';
 import { biographyView } from '../sheet/biography.js';
 import { limitedView } from '../sheet/limited.js';
-import { groupHeaderView } from '../sheet/group.js';
+import { groupHeaderView, groupMembersView } from '../sheet/group.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
 import { NPC_TAB_NAMES, NPC_TAB_ORDER, TEMP_TOP_FLAG, comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, tabRow, themePicker } from '../sheet/header.js';
 import { themeMoment } from './sparks.js';
@@ -1197,7 +1197,8 @@ export function makeNpcSheet(Base)
 /** dnd5e's group parts we draw, with their templates and part settings. The tab bodies follow in their slices. */
 const GROUP_PARTS = {
    header: { template: `${MODULE_PATH}/templates/group/header.hbs`, templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`] },
-   tabs: { template: SHEET_PARTS.tabs, ...PART_OPTIONS.tabs }
+   tabs: { template: SHEET_PARTS.tabs, ...PART_OPTIONS.tabs },
+   members: { template: `${MODULE_PATH}/templates/group/members.hbs`, scrollable: [''] }
 };
 
 /** dnd5e's group parts with ours swapped in, keeping its part settings (container, scrolling) but not its classes. */
@@ -1240,6 +1241,11 @@ export function makeGroupSheet(Base)
          if (partId === 'header')
          {
             context.fhcsGroup = groupHeaderView(groupHeaderFacts(this, context), i18n);
+            return context;
+         }
+         if (partId === 'members')
+         {
+            context.fhcsMembers = groupMembersView(groupMembersFacts(this, context), i18n);
             return context;
          }
          if (partId === 'tabs')

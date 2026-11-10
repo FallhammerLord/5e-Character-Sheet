@@ -510,7 +510,30 @@
       },
       "Advancement": "Advancement",
       "Award": "Award",
-      "XpPool": "XP pool"
+      "XpPool": "XP pool",
+      "Speed": "Speed",
+      "Dt": "DT",
+      "Ac": "AC",
+      "Hp": "HP",
+      "Hd": "HD",
+      "Hidden": "Details hidden",
+      "Primary": "Primary vehicle",
+      "MemberSlowed": "Slowed",
+      "Empty": "No members yet. Drop characters, NPCs or vehicles here.",
+      "HpLabel": "{name}: {value} of {max} hit points",
+      "SkillLabel": "Roll {skill} for {name}; passive {passive}",
+      "OpenLabel": "Open {name}'s sheet",
+      "RemoveLabel": "Remove {name} from the group",
+      "Section": {
+        "character": "Characters",
+        "npc": "NPCs",
+        "vehicle": "Vehicles"
+      },
+      "Skill": {
+        "prc": "Perception",
+        "ste": "Stealth",
+        "sur": "Survival"
+      }
     }
   }
 }

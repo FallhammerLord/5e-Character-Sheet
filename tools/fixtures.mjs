@@ -15,7 +15,7 @@ import { featuresView } from '../src/sheet/features.js';
 import { effectsView } from '../src/sheet/effects.js';
 import { biographyView } from '../src/sheet/biography.js';
 import { limitedView } from '../src/sheet/limited.js';
-import { groupHeaderView } from '../src/sheet/group.js';
+import { groupHeaderView, groupMembersView } from '../src/sheet/group.js';
 import { THEMES } from '../src/constants.js';
 import { format, localize, template } from './templates.mjs';
 
@@ -1095,6 +1095,26 @@ CASES.push({ name: 'group-header-long', html: groupHeader({ name: 'The Lantern C
    travel: { pace: 'Slow', available: true, slowed: true, speeds: { land: 18, water: 12, air: 48 }, units: 'mi/d' } }) });
 CASES.push({ name: 'group-header-noxp', html: groupHeader({ members: 1, level: null, xp: { show: false }, travel: { pace: 'Normal', available: false, speeds: {}, units: '' } }) });
 CASES.push({ name: 'theme-forge-group-header-editing', look: 'forge', html: groupHeader({ editing: true }) });
+// The Members tab (the board, 2026-11-10): characters with HP, hit dice and their three skills; an NPC ally, a stranger
+// this user can't observe, a wagon as the primary vehicle; edit mode's remove buttons.
+const member = (name, fill, over = {}) => ({ uuid: `Actor.${name.replace(/\W/g, '')}`, name, img: ICON(fill), canView: true, hidden: false,
+   hp: { value: 40, max: 44 }, hd: { value: 5, max: 6 }, ac: 15, speed: '30 ft',
+   skills: { prc: { total: 3, passive: 13, rollable: true }, ste: { total: -1, passive: 9, rollable: true }, sur: { total: 5, passive: 15, rollable: true } }, ...over });
+const membersFacts = (over = {}) => ({ editing: false, sections: [
+   { id: 'character', members: [member('Brannoc Ironhand', '#a0703a', { hp: { value: 58, max: 64 }, ac: 18, speed: '25 ft' }),
+      member('Ysolde Marrowind', '#7fb0ec', { hp: { value: 21, max: 44 }, hd: { value: 2, max: 6 }, ac: 13 }),
+      member('Sister Aldwen of the Ninth Bell, Keeper of the Lantern Road', '#e2c278', { ac: 20, slowed: true, speed: '20 ft' })] },
+   { id: 'npc', members: [member('Captain Orsa Vell', '#8a3a3a', { hd: null, skills: { prc: { total: 4, passive: 14, rollable: false } } }),
+      member('Hooded Stranger', '#333333', { hidden: true, canView: false })] },
+   { id: 'vehicle', members: [{ uuid: 'Actor.wagon', name: 'Covered Wagon', img: ICON('#9a7a4a'), canView: true, primary: true,
+      hp: { value: 80, max: 100 }, ac: 11, speed: '24 mi/d', dt: 5 }] }
+], ...over });
+const groupMembers = (over = {}) => groupHeader({ editing: over.editing }) + `<div class="tab-body">${template('group/members')({ tab: { id: 'members', group: 'primary', cssClass: 'active' },
+   fhcsMembers: groupMembersView(membersFacts(over), { format, localize }) })}</div>`;
+CASES.push({ name: 'group-members', html: groupMembers(), rows: '.fhcs-member-row' });
+CASES.push({ name: 'group-members-editing', html: groupMembers({ editing: true }) });
+CASES.push({ name: 'group-members-empty', html: groupMembers({ sections: [] }) });
+CASES.push({ name: 'theme-forge-group-members', look: 'forge', html: groupMembers() });
 CASES.push({ name: 'item-long-name', frame: 'item', html: itemSheet('weapon', { name: 'Sun Blade of the Dawnwarden, Twice-Forged in the Ember Halls' }) });
 
 // Chat cards in the world's theme (SCOPE §5.3 rule 10): every card case again in Forge.
