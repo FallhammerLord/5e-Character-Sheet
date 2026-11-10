@@ -140,3 +140,38 @@ in edit mode), rests, loyalty; the name row with XP and a CR badge; the origin l
 alignment • source" and proficiency; movement and special saves; the stats row (AC, Init, abilities). Tabs: Actions
 (optional), Abilities (skills and traits beside legendary actions, then features by activation with Uses and Usage
 columns), Spellbook, Effects, Biography, Journal, Inventory, Special Traits.
+
+## The container sheet, closer (2026-11-10)
+
+dnd5e 6.0.6 `module/applications/item/container-sheet.mjs`; Tidy Classic v13.0.0 `item/ContainerSheet.svelte`,
+`item/tabs/ItemContainerContentsTab.svelte`.
+
+- **Class:** `ContainerSheet extends ItemSheet5e`, so our `makeItemSheet` can wrap it as it wraps the item sheet
+  (`dnd5e.applications.item.ContainerSheet`). Same header, description, details, effects parts; one more part,
+  `contents` (`templates/items/contents.hbs`: one `dnd5e-inventory` around dnd5e's inventory partial).
+- **Tabs:** Contents first (`DND5E.ITEM.SECTIONS.Contents`), only when `item.system.canViewContents` (GM, identified,
+  or no `unidentifiedContents` property); then the item's tabs. `tabGroups.primary = "contents"`.
+- **Context (`_prepareContentsContext`):** `items` from `await item.system.contents` (a Collection; a promise in a
+  compendium); per item `itemContext[id]` with `totalWeight`, `isStack`, `expanded`, and for a nested container its
+  `capacity` and `clickAction: "view"`. Sections: every item type's `inventorySection` (columns price, weight,
+  quantity, controls; a container's capacity, controls), plus dnd5e's `contents` section. `encumbrance` is
+  `await item.system.computeCapacity()` (`value`, `max` Infinity when unset, `units` "Items" when by count, `pct`,
+  `hidden` when the user can't view contents). `currency` is the container's own `system.currency`; `listControls`
+  is the inventory's (search, filters, sort).
+- **The inventory element in an item sheet:** `document` is the container (`app.inventorySource ?? app.document`),
+  `actor` its owner or null; `getItem(id)` goes through `container.system.getContainedItem(id)`. `canUse` needs an
+  owning actor: a world or compendium container's rows can be opened, not used.
+- **Drag and drop:** the sheet's own `_onDragStart` / `_onDrop` (items and folders; recursion refused; a spell
+  becomes a scroll; consumables stack through the owner's sheet; `_onSortItem` sorts by the rows' DOM order inside
+  `[data-item-id]`'s parent). `_onRender` sets `data-item-id` on the `dnd5e-inventory` element to the container's id.
+- **Filters and sort:** `_filters.inventory`, `_filterChildren('items')` over the cached `_items`, `_sortChildren`.
+  Our rows keep `[data-item-id]` and the list keeps `[data-item-list="inventory"]`, so these carry over.
+- **No equip, attune or favorite** columns: an item in a container is neither worn nor at hand. dnd5e shows price,
+  weight and quantity.
+- **Tidy Classic:** the item header (picture, name, type, rarity, source, toggles), then Contents, Description,
+  Details, Effects. Contents: the utility bar (search, filters, sort), sections by type, nested containers inline,
+  then the capacity bar and the currency.
+- **Our Inventory tab and the container:** `compat.inventoryFacts` reads the actor's items, attunement and
+  encumbrance. A container needs its own facts: rows from `item.system.contents` (nested through
+  `getContainedItem`/`contents`, which works off an actor too), capacity in Carried's place, the container's coins.
+  `src/sheet/inventory.js` and `item-row.hbs` can serve unchanged with equip, attune and favorite off.
