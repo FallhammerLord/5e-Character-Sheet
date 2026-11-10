@@ -216,3 +216,31 @@ Tidy Classic v13.0.0 `group/GroupSheet.svelte`, `group/tabs/*`, `group/parts/*`.
 - **Tidy Classic:** the header shows a summary line (members, level), movement and XP, and GM buttons (rests, award,
   place); Members has a search bar, a GM panel of the group's languages and skills, and rows of portrait with HP,
   name, AC shield, senses, condition immunities, Perception and the top skills; Inventory and Description follow.
+
+## The encounter sheet, closer (2026-11-10)
+
+dnd5e 6.0.6 `module/applications/actor/encounter-sheet.mjs`, `templates/actors/encounter/*.hbs`,
+`module/data/actor/encounter.mjs`; Tidy Classic v13.0.0 `encounter/EncounterSheet.svelte`, `encounter/tabs/*`.
+
+- **Class:** `EncounterActorSheet extends MultiActorSheet` (the group's base, so the character's base too: lock, edit
+  mode, inventory helpers). `dnd5e.applications.actor.EncounterActorSheet`. **500 wide, height auto, not
+  resizable**, its position never saved (`_saveSheetPosition` is empty). Tabs `members` (first), `inventory` (labelled
+  Loot), `description`; parts `header`, `tabs`, the three bodies.
+- **Header (`encounter/header.hbs`):** portrait (`editImage` in edit mode), name (a field in edit mode), subtitles: the
+  difficulty word (`system.getDifficulty()` against the world's primary party; Low, Moderate, High), and buttons
+  `rollQuantities` (roll every formula), `placeMembers` (always interactive), `award` (the encounter's XP and coins to
+  the party).
+- **Members (`_prepareMembersContext`):** NPCs only, sorted by name. Each `.member[data-uuid][data-index]`: portrait,
+  name (`showDocument`), subtitle "size • type • N XP", the CR badge in play; the quantity formula (λ, a field
+  `data-name="quantity.formula"` in edit mode, shown in play only while no count is rolled); the count (edit mode:
+  − and + `data-action="decrease"/"increase"` on `.member .adjustment-button`, a field `data-name="quantity.value"`
+  between; play: the number); edit mode `removeMember`; play `rollQuantity` (one formula). Edit mode or no members:
+  "Add creature" (`browse`, dnd5e's compendium browser on NPCs). The foot: the XP total as a meter against the party's
+  thresholds (`difficulty`: `value`, `max` the High threshold, `pct`, `stops.low`, `stops.high`).
+- **Writing a member:** `_onChangeForm` and `_onChangeInputDelta` read the field's `data-name` and its row's
+  `data-index`, then write the whole `system.members` array; the row needs both attributes.
+- **Loot (`inventory`):** the actor-inventory part with the container's columns (price, weight, quantity); `_prepareItem`
+  drops activities, `_prepareItemPhysical` drops equip and attunement. Coins are the encounter's own.
+- **Description:** the group's biography template (Summary, Description).
+- **Tidy Classic:** header with name, a summary, the XP, and GM buttons (Roll quantities, Award, Place members);
+  Members, Inventory, Description tabs.
