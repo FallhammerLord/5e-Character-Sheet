@@ -52,12 +52,15 @@ Play notes come as one message with many asks (seven to twelve). Learned 2026-10
 
 ## How a theme goes
 
-Learned building Fire and Forge (2026-10-28):
+Learned building Fire and Forge (2026-10-28) and Sand and Sanctuary (2026-11-12):
 
 1. **Look up the real thing before drawing it** (forging heat, temper colours, Damascus patterns) and write it into the theme's research note. Drawn from memory, the first Damascus came out as wood grain.
 2. **Preview a texture alone,** at 4× and on its bar, before the layout check: the check can judge contrast, not whether it reads as steel.
 3. **Keep to SCOPE §5.3:** one look in both of Foundry's modes, no texture inside panels, effects that answer events where they happen, one CSS file plus its texture script.
 4. **Start from the kit:** copy `styles/themes/_starter.css` and follow BUILT's "How a theme plugs in". A theme styles the hooks the sheet marks (`fhcs-plate`, `fhcs-frame`, `--fhcs-theme-emblem`, `registerMoments`); a need it can't meet that way is plumbing, added to the kit for every theme.
+5. **Mock up on the actual sheet** (user, 2026-11-12): write the theme's CSS on the kit and render our templates with it (`tools/theme-mockup.mjs`: the real tab row, a short tab such as Effects so the ground shows, full, bloodied and down, 644px); the canvas boards are screenshots of that, with close-ups of the moments. Never a hand-drawn component: Sand's first pass, drawn by hand, "doesn't really look like our sheet". The rest of a phase's mockups can stay hand-drawn; a theme has a sheet to wear.
+6. **Use the whole brief:** each material or colour the user names gets its place on the sheet (Sand: oxide sand the ground, glass the plates, ruin stone the bars, silver the frames). One material carrying everything read as one note.
+7. **Check every theme rule before handing over:** SCOPE §5.3, the decisions in §4.11 and §4.12 that say "every theme" (the portrait's glint, each theme's marks and moments, Temp's bar, tooltips, chat cards), and Forge's cases in the layout check (`FURTHER` in `tools/fixtures.mjs` copies them to a theme taken further).
 
 ## Commands
 

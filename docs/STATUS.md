@@ -4,9 +4,9 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Sand and Sanctuary, the Argent Sands** (ROADMAP): built on the theme kit, `styles/themes/sand.css`, with particles, chat cards and every Forge layout case again in Sand; offline checks pass (lint, load, unit; the layout check, 576 Sand layouts across 368 cases, other sheets, chat cards and play and edit parity included). Waiting on the user: Quench (core and chat cards, for regressions) and play in their world (canvas row "Themes · Sand and Sanctuary" shows what to expect). Then its BUILT entry, and `main` when the user is satisfied.
-2. **Phase 6.7's play round, then Phase 8** (ROADMAP): every sheet and the skin are built, pass Quench, and have BUILT entries; `main` holds them (2026-11-12). Waiting on the user: play for the container, group, encounter, vehicle and the skin (below); their notes come as one polish round (CLAUDE.md "How a polish round goes"). Phase 7 closed with nothing to build (user, 2026-11-12). Then Phase 8: themes shared with the quest log, then release (no compatibility work until a module is in use, user 2026-11-12). The play round's ask 12 waits on a session of play.
-3. **`#postNotification` TypeError** seen in the chat card runs: in Foundry's own code, cause not yet known; no test fails on it.
+1. **Phase 6.7's play round, then Phase 8** (ROADMAP): every sheet and the skin are built, pass Quench, and have BUILT entries; `main` holds them (2026-11-12). Waiting on the user: play for the container, group, encounter, vehicle and the skin (below); their notes come as one polish round (CLAUDE.md "How a polish round goes"). Phase 7 closed with nothing to build (user, 2026-11-12). Then Phase 8: themes shared with the quest log, then release (no compatibility work until a module is in use, user 2026-11-12). The play round's ask 12 waits on a session of play.
+2. **`#postNotification` TypeError** seen in the chat card runs: in Foundry's own code, cause not yet known; no test fails on it.
+3. **The other themes as regions** (SCOPE §4.11): Wind and Wrath and Valley and Valor are still first-pass tokens; each waits on the user's lore for its region, then follows CLAUDE.md "How a theme goes" (mocked up on the actual sheet).
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
 
@@ -26,6 +26,7 @@ Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a p
 
 In Foundry, by the user:
 
+- **Sand and Sanctuary, the Argent Sands** (2026-11-12, play: "works well"; Quench runs not reported, and it adds no test of its own): the theme, its particles, chat cards and the other sheets in it. How it works: BUILT.
 - **NPC sheet** (2026-11-10, Quench and play: "quench passes and styling is fine"): header with CR and the legendary row, Abilities, Inventory, Spellbook, Effects, Biography. The first Quench run found a real bug, fixed (dnd5e's `_renderCreateInventory`). How it works: BUILT.
 - **Theme kit** (2026-11-09, play: "working properly"): plates through `fhcs-plate`, the particle registry, one emblem place, the starter file and its load check. The class themes (SCOPE §7) may start. How it works: BUILT.
 - **Mechanical parity** (2026-11-09, Quench core and chat, play): tools from Traits, coins and carried weight, the Limited and Observer views, favorites drag, Infuse Item's tray; the rest of the list needed no change. How it works: BUILT.

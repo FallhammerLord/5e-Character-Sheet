@@ -15,7 +15,7 @@ A new theme should be textures, marks and motion, not new plumbing. Before the k
 - [x] Extended (Claude): one emblem place for every theme, in `styles/fhcs.css`; Wind, Sand and Valley's emblems had sat under the inspiration star
 - [x] BUILT entry, "how a theme plugs in", with the recipe; CLAUDE.md's "How a theme goes" points to it
 
-## Sand and Sanctuary: the Argent Sands (user, 2026-11-12; SCOPE §4.11, §5.3 rules 12–13)
+## Sand and Sanctuary: the Argent Sands (user, 2026-11-12; SCOPE §4.11, §5.3 rules 12–14; done; play verified 2026-11-12)
 
 The four themes are regions of the user's setting; Sand is the first taken further on the kit, as Forge was before it.
 
@@ -32,7 +32,8 @@ The four themes are regions of the user's setting; Sand is the first taken furth
 - [x] Particles (`registerMoments('sand', …)`): gained, silver sand pours into the hourglass, then a breath of lapis; spent, it runs out below; hit, glass slivers and sand from the crack. Every click twirls the glass (user, 2026-11-12), spent too. Watched in Chromium mid-flight
 - [x] Answered (user, 2026-11-12): the portrait's rim 2px, as Forge's ("keep the frames consistent"); the banked glow lapis with a play of colour, replacing the silver glint that sat near Night's moon
 - [x] Layout check `ONLY='theme-sand'`: all 42 layouts pass (fixed on the way: dark meaning colours carried into Foundry's light mode, the stone's darkest stroke, the glass tab's ground and its glow, El Messiri's width at 644px, failure's red a step lighter on concentration's tint)
-- [ ] Quench: no new test (the theme picker's test already chooses Sand; no Quench test draws particles or styles, which the layout check and Chromium cover); rerun core and chat cards for regressions. Play
+- [x] Play (user, 2026-11-12: "works well"); Quench, no new test (the theme picker's already chooses Sand), runs not reported
+- [x] The rule this taught (user, 2026-11-12): theme mockups use the actual sheet (SCOPE §5.3 rule 14; CLAUDE.md "How a theme goes" 5–7)
 
 ## Phase 0: Foundations (done; Quench verified 2026-10-24)
 
