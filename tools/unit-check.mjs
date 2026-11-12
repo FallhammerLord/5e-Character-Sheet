@@ -13,7 +13,7 @@ import { columnChoice, containerColumnChoice, inventoryView } from '../src/sheet
 import { groupHeaderView, groupMembersView } from '../src/sheet/group.js';
 import { encounterHeaderView, encounterMembersView } from '../src/sheet/encounter.js';
 import { vehicleCrewView, vehicleHeaderView, vehicleStationsView } from '../src/sheet/vehicle.js';
-import { skinsWindow } from '../src/apps/skin.js';
+import { skinWindow, skinsWindow } from '../src/apps/skin.js';
 import { canCast, prepState, spellbookView, spellColumnChoice, spellKind } from '../src/sheet/spellbook.js';
 import { featureColumnChoice, featuresView, groupingOf } from '../src/sheet/features.js';
 import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js';
@@ -711,6 +711,17 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
       [['dnd5e2', 'roll-configuration', 'rest'], undefined, false], [['config-sheet'], undefined, false], [['dnd5e2', 'journal-entry'], 'JournalEntry', false]];
    const wrong = cases.filter(([classes, doc, want]) => skinsWindow(classes, doc) !== want).map(([classes]) => classes.join('.'));
    if (wrong.length) { problems.push(`skin chooses wrongly for ${wrong.join(', ')}`); }
+   // A window the skin never takes keeps its own theme mark: our sheets set theirs before the hook runs (Quench,
+   // 2026-11-12: the hook cleared it, and every sheet drew plain).
+   const element = (classes, theme) => ({ classList: Object.assign(new Set(classes), { toggle(c, on) { if (on) { this.add(c); } else { this.delete(c); } }, contains(c) { return this.has(c); } }),
+      dataset: { fhcsTheme: theme } });
+   const sheetWindow = element(['application', 'sheet', 'fhcs-sheet'], 'forge');
+   const itemWindow = element(['application', 'dnd5e2', 'sheet', 'fhcs-sheet', 'fhcs-item-sheet'], 'sand');
+   skinWindow({ element: sheetWindow, document: { documentName: 'Actor' } });
+   skinWindow({ element: itemWindow, document: { documentName: 'Item' } });
+   if (sheetWindow.dataset.fhcsTheme !== 'forge' || itemWindow.dataset.fhcsTheme !== 'sand' || sheetWindow.classList.has('fhcs-skin')) {
+      problems.push(`the skin's hook changed a window it never takes: themes ${sheetWindow.dataset.fhcsTheme}, ${itemWindow.dataset.fhcsTheme}`);
+   }
 }
 
 // Spellbook (SCOPE §4.7): preparation states and kinds, Can cast, section order, slot pips, the concentration mark.

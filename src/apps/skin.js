@@ -36,9 +36,11 @@ export function skinWindow(app, element)
 {
    const root = app?.element ?? element;
    if (!root?.classList) { return; }
+   // Every window passes through here, our own sheets too: one the skin never takes is left exactly as it is (Quench,
+   // 2026-11-12: clearing the theme here stripped our sheets' own after each render).
+   if (!skinsWindow([...root.classList], app.document?.documentName ?? app.options?.document?.documentName)) { return; }
    const { actor, item } = skinOwner(app);
-   const ours = skinsWindow([...root.classList], app.document?.documentName ?? app.options?.document?.documentName)
-      && (actor ? onOurSheet(actor) : onOurSheet(item));
+   const ours = actor ? onOurSheet(actor) : onOurSheet(item);
    root.classList.toggle('fhcs-skin', ours);
    if (!ours) { delete root.dataset.fhcsTheme; return; }
    const theme = actor?.getFlag?.(MODULE_ID, THEME_FLAG) || game.settings.get(MODULE_ID, 'theme');
