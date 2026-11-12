@@ -211,7 +211,8 @@
 
 .fhcs-sheet[data-fhcs-theme="sand"] .fhcs-portrait:not(.fhcs-shape-round)
 {
-   border: 3px solid transparent;
+   /* 2px, as Forge's (user, 2026-11-12: "keep the frames consistent"; it was 3px). */
+   border: 2px solid transparent;
    border-radius: 0;
    background:
       var(--fhcs-theme-fox, none) border-box,
@@ -244,8 +245,12 @@
 {
    --fhcs-mark: var(--fhcs-theme-glass-mark);
    --fhcs-mark-on: var(--fhcs-theme-glass-mark-on);
-   --fhcs-inspire-glow: #f4f7ff;
-   --fhcs-inspire-breath: fhcs-sand-glint 5.2s ease-in-out infinite;
+   /* Banked, the hourglass glows lapis with a play of colour (user, 2026-11-12, replacing a cold silver glint that sat
+      too near Night's silver moon): deep ultramarine shifting toward indigo and back, kept deep and saturated so it
+      reads apart from prepared's light sky blue, and never reaching always-prepared's teal or Pact's violet; no gold
+      pyrite flecks (gold is concentration's). The glow only adorns; the filled hourglass says banked. */
+   --fhcs-inspire-glow: #3f63ff;
+   --fhcs-inspire-breath: fhcs-sand-lapis 6s ease-in-out infinite;
    /* Banked: the glass turned over, as you start one. Spent: the sand runs out and the light with it. */
    --fhcs-inspire-on: fhcs-sand-turn 600ms ease-out;
    --fhcs-inspire-on-glow: fhcs-sand-turn-glow 600ms ease-out;
@@ -253,15 +258,17 @@
    --fhcs-inspire-off-glow: fhcs-sand-run-glow 600ms ease-in;
 }
 
-@keyframes fhcs-sand-glint
+/* The play of colour: an inner light and an outer glow, each moving through the lapis band out of step. */
+@keyframes fhcs-sand-lapis
 {
-   0%, 100% { filter: drop-shadow(0 0 1px var(--fhcs-inspire-glow)); }
-   50% { filter: drop-shadow(0 0 3px var(--fhcs-inspire-glow)); }
+   0%, 100% { filter: drop-shadow(0 0 1px #7f9bff) drop-shadow(0 0 3px #2f55ff); }
+   33% { filter: drop-shadow(0 0 1px #8f8bff) drop-shadow(0 0 4px #4b44f0); }
+   66% { filter: drop-shadow(0 0 1px #79a6ff) drop-shadow(0 0 3px #2a6bff); }
 }
 @keyframes fhcs-sand-turn { from { transform: rotate(-180deg); } to { transform: none; } }
-@keyframes fhcs-sand-turn-glow { 0% { filter: none; } 70% { filter: drop-shadow(0 0 5px var(--fhcs-inspire-glow)); } 100% { filter: drop-shadow(0 0 1px var(--fhcs-inspire-glow)); } }
+@keyframes fhcs-sand-turn-glow { 0% { filter: none; } 70% { filter: drop-shadow(0 0 1px #a9b8ff) drop-shadow(0 0 6px #4b44f0); } 100% { filter: drop-shadow(0 0 1px #7f9bff) drop-shadow(0 0 3px #2f55ff); } }
 @keyframes fhcs-sand-run { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
-@keyframes fhcs-sand-run-glow { from { filter: drop-shadow(0 0 3px var(--fhcs-inspire-glow)); } to { filter: none; } }
+@keyframes fhcs-sand-run-glow { from { filter: drop-shadow(0 0 1px #7f9bff) drop-shadow(0 0 3px #2f55ff); } to { filter: none; } }
 
 /* ---------- Trays, fields, buttons ---------- */
 

@@ -30,7 +30,7 @@ The four themes are regions of the user's setting; Sand is the first taken furth
 - [ ] Other sheets: the layout cases for the item, container, group, encounter, vehicle and NPC sheets are Forge's only; Sand's styles reach them unchecked
 - [ ] Preview the other textures alone at 4× (grains, dunes, the sphinx, the stone's cracks; CLAUDE.md "How a theme goes" 2)
 - [ ] Particles: `registerMoments('sand', …)`, sand pouring on gained, running out on spent
-- [ ] Ask the user: the portrait's rim is 3px (Plain 1px, Forge 2px; rule 3, "never reshapes"); and in play, whether the banked hourglass's cold glint reads apart from Night's silver moon (rule 13)
+- [x] Answered (user, 2026-11-12): the portrait's rim 2px, as Forge's ("keep the frames consistent"); the banked glow lapis with a play of colour, replacing the silver glint that sat near Night's moon
 - [x] Layout check `ONLY='theme-sand'`: all 42 layouts pass (fixed on the way: dark meaning colours carried into Foundry's light mode, the stone's darkest stroke, the glass tab's ground and its glow, El Messiri's width at 644px, failure's red a step lighter on concentration's tint)
 - [ ] Quench; play
 

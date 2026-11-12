@@ -64,6 +64,7 @@ glass (the surface #1d1915 at 88% with a blur), pale desert glass (#e7dfbf, the 
 | Libyan desert glass's yellow-green | Equipped green | Glass smoke, or pale straw for the open tab, never green |
 | Pale straw desert glass (the open tab) | Concentration gold | Paler and greyer than concentration's saturated gold, and only on the open tab; watch in play |
 | Rose-red ruin stone | Failure red | Not used |
+| Lapis, the banked hourglass's glow (user, 2026-11-12) | Prepared blue (spell rows, slot pips) | Deep ultramarine to indigo, darker and more saturated than prepared's light sky blue; only as a glow on the tab row, never a tint or edge; its play of colour stops short of teal and violet; lapis's gold pyrite left out |
 
 ## Sources
 
