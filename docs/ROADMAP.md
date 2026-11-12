@@ -209,7 +209,7 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
 - [x] NPC research: dnd5e 6.0.6's NPC sheet and Tidy Classic's, against our code (research note, "The NPC sheet, closer", 2026-11-09)
 - [x] NPC design questions answered (SCOPE §4.13, 2026-11-09): one everything tab, the character's header with CR and legendary panels, the player's chips with inspiration, the biography's NPC fields
 - [x] NPC mocked up (canvas row "Phase 6.7 · the NPC sheet": a Bandit Captain light, a lich in its lair dark, the lich at 644px in edit mode), approved 2026-11-09
-- [ ] Mockups for the rest
+- [x] Mockups for the rest (container, group and vehicle boards; the encounter and the skin built without, at the user's word)
 - [x] Chat cards in the world theme (world setting "Themed chat cards", on by default); Forge's card: a riveted iron plate, Grenze title and totals, iron-edged bands that heat on hover; every card case checked in Forge; Quench test added
 - [x] Item sheet (every type, spells included): header, our tab row and lock, Description with the properties column and Category; dnd5e's forms for the rest; layout cases (500–740px, Forge), unit and load checks, a Quench test (built 2026-10-28; waits on Quench and play)
 - [x] NPC sheet, in slices (verified 2026-11-10: Quench and play):
@@ -221,28 +221,28 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
   - [x] Container research (research note "The container sheet, closer", 2026-11-10) and decisions (SCOPE §4.13, user 2026-11-10)
   - [x] Container mocked up (canvas row "Phase 6.7 · the container sheet": a backpack light, a Bag of Holding with a pouch open dark, 500px with long names), waits on the user's review
   - [x] Container sheet built (2026-11-10): our item sheet around dnd5e's `ContainerSheet`, Contents on our Inventory rows, capacity and coins, Effects always for an editor; layout cases (`container*`, 500–740px, Forge), unit, load and a Quench test
-  - [ ] Container: Quench and play, BUILT entry
+  - [ ] Container: Quench passed (2026-11-10 to 11-12); play and BUILT entry wait
   - [x] Group research (research note "The group sheet, closer", 2026-11-10) and decisions (SCOPE §4.13, user 2026-11-10)
   - [x] Group mocked up (canvas row "Phase 6.7 · the group sheet": a party of four light, its Inventory, allies and a wagon dark, 644px edit mode), waits on the user's review
   - [x] Group sheet built, in slices:
     - [x] Header and tab row (2026-11-10): registered beside dnd5e's group sheet, not the default; portrait, name, Place members and the rests, the member line, Travel (pace arrows, gear in edit mode, three speeds) and Advancement (Award, the XP pool)
     - [x] Members (2026-11-10): rows in Characters, NPCs, Vehicles; portrait, name (opens the member), HP and hit dice, AC, speed, Perception, Stealth and Survival rolling with their passives; a vehicle's travel and DT; edit mode's remove; dnd5e's `.member[data-uuid]` kept for its context menu and drops
     - [x] Inventory, Effects, Biography; Quench test (2026-11-10): the members above the list (carried, coins; drop an item on a line to give it), the container's columns, the Group / vehicle switch with the coins written to whichever shows; our Effects; Summary then Description in one column
-  - [ ] Group: Quench and play, BUILT entry
+  - [ ] Group: Quench passed (2026-11-10 to 11-12); play and BUILT entry wait
   - [x] Encounter research (research note "The encounter sheet, closer") and decisions (SCOPE §4.13, user 2026-11-10); no boards, at the user's word
   - [x] Encounter sheet built (2026-11-10): header, Members with counts and formulas, the difficulty bar, Loot, Description; resizable from 500px; unit, load and layout cases (`encounter*`, 500–740px, Forge), a Quench test
-  - [ ] Encounter: Quench and play, BUILT entry
+  - [ ] Encounter: Quench passed (2026-11-10 to 11-12); play and BUILT entry wait
   - [x] Vehicle research (research note "The vehicle sheet, closer") and decisions (SCOPE §4.13, user 2026-11-10)
   - [x] Vehicle mocked up (canvas row "Phase 6.7 · the vehicle sheet": a ship light, a siege wagon dark, 644px edit mode, Crew & Passengers), waits on the user's review
   - [x] Vehicle sheet built, in slices:
     - [x] Header and tab row (2026-11-12): registered beside dnd5e's, not the default, its sidebar gone; portrait, name, action pips, the line; Hull (HP field, DT, mishap), AC, Speed, Initiative and Quality when shown; the character's ability row when shown (now a shared partial); edit mode's gears and display-options tray
     - [x] Stations as the first tab (2026-11-12): Traits beside the action stations (cover, AC, DT, a weapon's rolls, HP and uses fields, crew places), the features as Inventory rows, draft animals, the add buttons
     - [x] Cargo, Crew & Passengers, Effects, Description; Quench test (2026-11-12): Cargo on our list with the cargo bar; crew and passengers as rows with counts (− field + in edit mode, dnd5e's adjustCrew), dragged between areas; our Effects; dnd5e's one description
-  - [ ] Vehicle: Quench and play, BUILT entry
+  - [ ] Vehicle: Quench passed (2026-11-10 to 11-12); play and BUILT entry wait
 - [ ] The smaller windows: a skin
   - [x] Research (research note "The smaller windows, closer") and decisions (SCOPE §4.13, user 2026-11-12)
   - [x] Built (2026-11-12): `fhcs-skin` on dnd5e's windows for documents on our sheets (`src/apps/skin.js`), the token blocks widened to it, dnd5e's and Foundry's variables re-pointed; the item sheet's dnd5e tabs too; four copied windows in the layout check (`skin-*`), unit and load checks, a Quench test
-  - [ ] Quench and play
+  - [ ] Quench passed (2026-11-12); play waits
 - [ ] Quench and play
 
 ## Phase 7: The ADHD layer
