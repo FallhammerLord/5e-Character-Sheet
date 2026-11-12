@@ -13,6 +13,7 @@ import { columnChoice, containerColumnChoice, inventoryView } from '../src/sheet
 import { groupHeaderView, groupMembersView } from '../src/sheet/group.js';
 import { encounterHeaderView, encounterMembersView } from '../src/sheet/encounter.js';
 import { vehicleCrewView, vehicleHeaderView, vehicleStationsView } from '../src/sheet/vehicle.js';
+import { skinsWindow } from '../src/apps/skin.js';
 import { canCast, prepState, spellbookView, spellColumnChoice, spellKind } from '../src/sheet/spellbook.js';
 import { featureColumnChoice, featuresView, groupingOf } from '../src/sheet/features.js';
 import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js';
@@ -698,6 +699,18 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const crewShape = [crewPlay.areas.map((a) => `${a.key}:${a.adjustable}:${a.draggable}:${!!a.hint}`).join(' '), crewEdit.areas.map((a) => a.adjustable).join()];
    try { deepStrictEqual(crewShape, ['unassigned:false:true:false assigned:false:false:false passengers:false:true:true', 'true,false,true']); }
    catch { problems.push(`vehicle crew: ${JSON.stringify(crewShape)}`); }
+}
+
+// The skin (SCOPE §4.13, 2026-11-12): dnd5e's settings, rest, activity, advancement, award and currency windows and an
+// active effect's sheet; never our own sheets, the compendium browser, roll dialogs, or a window that isn't dnd5e's.
+{
+   const cases = [[['dnd5e2', 'config-sheet', 'hit-points'], undefined, true], [['dnd5e2', 'rest', 'long-rest'], undefined, true],
+      [['dnd5e2', 'activity', 'attack-activity'], undefined, true], [['dnd5e2', 'standard-form', 'titlebar'], 'ActiveEffect', true],
+      [['dnd5e2', 'advancement', 'manager'], undefined, true], [['dnd5e2', 'award', 'standard-form'], undefined, true],
+      [['dnd5e2', 'sheet', 'fhcs-sheet', 'activity'], undefined, false], [['dnd5e2', 'compendium-browser'], undefined, false],
+      [['dnd5e2', 'roll-configuration', 'rest'], undefined, false], [['config-sheet'], undefined, false], [['dnd5e2', 'journal-entry'], 'JournalEntry', false]];
+   const wrong = cases.filter(([classes, doc, want]) => skinsWindow(classes, doc) !== want).map(([classes]) => classes.join('.'));
+   if (wrong.length) { problems.push(`skin chooses wrongly for ${wrong.join(', ')}`); }
 }
 
 // Spellbook (SCOPE §4.7): preparation states and kinds, Can cast, section order, slot pips, the concentration mark.

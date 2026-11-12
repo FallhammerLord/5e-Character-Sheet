@@ -4,13 +4,14 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6.7, the smaller windows' skin** (ROADMAP; SCOPE §4.13, §5.4 rule 2): every Phase 6.7 sheet is built; the container, group and encounter pass Quench, the vehicle waits on it (below). Next: the skin for dnd5e's smaller windows (active effects, activities, advancement, the config windows our gears open, rests, award, currency): research which windows and their markup, then the design questions. The play round's ask 12 waits on a session of play.
+1. **Phase 6.7, finishing** (ROADMAP): every sheet and the smaller windows' skin are built. Waiting on the user (below): Quench for the vehicle and the skin, and play for the container, group, encounter, vehicle and skin. Then the BUILT entries and Phase 6.7's close. The play round's ask 12 waits on a session of play.
 2. **`#postNotification` TypeError** seen in the chat card runs: in Foundry's own code, cause not yet known; no test fails on it.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
 
 ## Waiting on the user
 
+- **The smaller windows' skin** (Quench core and play): the new test "skins dnd5e's settings window for a character on our sheet". In play: open each kind from a sheet of ours (a gear's settings, a rest, an item's activity and its Details tab, an effect, Level up's wizard, a group's Award, the coins' window) in light, dark and Forge; the same windows from an actor on dnd5e's sheet should keep dnd5e's look.
 - **Vehicle sheet** (Quench core and play): the new test "opens a vehicle in our vehicle sheet". In play: choose "Fallhammer vehicle sheet" (⋮, Sheet); spend action pips; type HP into the Hull; in edit mode the display-options gear (show abilities, initiative, quality; actions from stations) and each trait's input; add a weapon and a draft animal; drop a creature onto a station to crew it, and take them off from their face; on Crew & Passengers drag a row between areas and step a count; Cargo's bar against the cargo capacity.
 - **Encounter sheet** (play; Quench core passed 2026-11-10): the new test "opens an encounter in our encounter sheet". In play: choose "Fallhammer encounter sheet" (⋮, Sheet); add creatures (edit mode, Add creature); type a formula like 1d4 and roll it from the row in play; Roll every count; − and +; with a primary party set, the difficulty bar and its word; Award and Place members; Loot's coins.
 - **Group sheet** (play; Quench core passed 2026-11-10): the new test "opens a group in our group sheet". In play: choose "Fallhammer group sheet" for a party (⋮, Sheet); step the pace; roll a member's Perception from their row; open a member from their name; remove one in edit mode; on Inventory drop an item onto a member's line, and with a primary vehicle switch to its inventory and edit its coins; write the Summary; Award and Place members.

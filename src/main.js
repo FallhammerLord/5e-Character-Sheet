@@ -5,6 +5,7 @@ import { levelOrder } from './sheet/header.js';
 import { keepStable } from './sheet/death.js';
 import { makeCharacterSheet, makeEncounterSheet, makeGroupSheet, makeNpcSheet, makeVehicleSheet } from './apps/CharacterSheet.js';
 import { makeContainerSheet, makeItemSheet } from './apps/ItemSheet.js';
+import { watchWindows } from './apps/skin.js';
 import { registerQuenchTests } from './tests/quench.js';
 import { registerSettings } from './settings.js';
 import { CARD_PARTS, isStale, makeUsageMessageData } from './chat/card.js';
@@ -68,6 +69,8 @@ Hooks.once('ready', () =>
    watchApplications();
    // "Category…" on dnd5e's item context menu (SCOPE §4.13).
    watchItemCategories();
+   // dnd5e's smaller windows for documents on our sheets wear our skin (SCOPE §4.13, §5.4 rule 2).
+   watchWindows();
 });
 Hooks.on('updateChatMessage', refreshOnRollChange);
 // Roll on use and no roll dialogs (world settings).

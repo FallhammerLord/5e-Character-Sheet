@@ -2,7 +2,8 @@
    on the tab row; a hover runs a gleam along a heading, a press gives a shield-bash pulse. Green means equipped and
    red means failure (§5.1): the meadow green stays in the ground's tint, the crimson on the pennant and the tab line. */
 
-.fhcs-sheet[data-fhcs-theme="valley"]
+.fhcs-sheet[data-fhcs-theme="valley"],
+.fhcs-skin[data-fhcs-theme="valley"]
 {
    --fhcs-surface: #eeeee0;
    --fhcs-ink: #1b2017;
@@ -15,7 +16,9 @@
 }
 
 .theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="valley"],
-.fhcs-sheet.theme-dark[data-fhcs-theme="valley"]
+.fhcs-sheet.theme-dark[data-fhcs-theme="valley"],
+.theme-dark .fhcs-skin:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="valley"],
+.fhcs-skin.theme-dark[data-fhcs-theme="valley"]
 {
    --fhcs-surface: #1a211b;
    --fhcs-ink: #e7ece2;

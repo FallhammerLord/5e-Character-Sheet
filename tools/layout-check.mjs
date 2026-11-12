@@ -20,7 +20,7 @@ mkdirSync(out, { recursive: true });
 // Classic Tidy opens at 740 wide (SCOPE §4); dnd5e's own sheet at 800. Foundry's chat sidebar is about 300 wide;
 // players drag it narrower or wider, and pop messages out.
 // The sheet never goes narrower than its ability row needs (headerMinWidth).
-const WIDTHS = { sheet: [headerMinWidth(6), 740, 900], chat: [240, 300, 380], item: [500, 560, 740], container: [500, 560, 740], encounter: [500, 560, 740] };
+const WIDTHS = { sheet: [headerMinWidth(6), 740, 900], chat: [240, 300, 380], item: [500, 560, 740], container: [500, 560, 740], encounter: [500, 560, 740], skin: [400, 480, 560] };
 const HEIGHT = 810;
 // Every stylesheet module.json loads, in its order.
 const css = JSON.parse(readFileSync(`${root}module.json`, 'utf8')).styles
@@ -38,6 +38,8 @@ const FRAMES = {
    container: { classes: 'sheet item fhcs-sheet fhcs-item-sheet fhcs-container-sheet', wrap: (body) => body },
    // The encounter sheet (SCOPE §4.13): an actor sheet that opens at 560 and may narrow to dnd5e's 500.
    encounter: { classes: 'sheet actor encounter fhcs-sheet fhcs-group fhcs-encounter', wrap: (body) => body },
+   // dnd5e's smaller windows under our skin (SCOPE §4.13, §5.4 rule 2): dnd5e's own markup, copied, in a dnd5e window.
+   skin: { classes: 'dnd5e2 fhcs-skin', wrap: (body) => body },
    // A card's theme sits on its message, as `themeCard` puts it (the world's theme, SCOPE §5.3 rule 10).
    chat: {
       classes: 'chat-sidebar',
@@ -451,8 +453,9 @@ function findProblems()
       const cs = getComputedStyle(tab);
       if (cs.textShadow !== 'none' || cs.boxShadow !== 'none') { issues.push(`tab ${tab.dataset.tab ?? 'lock'} glows: ${cs.textShadow !== 'none' ? cs.textShadow : cs.boxShadow}`); }
    }
-   // The title bar holds only ⋮ and × (rule 14, user 2026-10-28); any other button waits in the ⋮ menu.
-   for (const control of app.querySelectorAll(':scope > .window-header > .header-control'))
+   // The title bar holds only ⋮ and × (rule 14, user 2026-10-28); any other button waits in the ⋮ menu. Our sheets only:
+   // a skinned dnd5e window keeps Foundry's own bar (SCOPE §5.4 rule 2).
+   for (const control of app.matches('.fhcs-sheet') ? app.querySelectorAll(':scope > .window-header > .header-control') : [])
    {
       const kept = control.matches('[data-action="toggleControls"], [data-action="close"], .preparation-warnings, .fhcs-theme-chip');
       if (kept !== !!control.getClientRects().length) { issues.push(`title bar: ${control.dataset.action} ${kept ? 'hidden' : 'shows'}`); }

@@ -2,7 +2,8 @@
    streak down their left edge, a bolt on the tab row; a hover sends a gust across a heading, a press is shoved
    sideways. The accent is a pale storm-light, kept off the pact violet and the prepared blue; frames only. */
 
-.fhcs-sheet[data-fhcs-theme="wind"]
+.fhcs-sheet[data-fhcs-theme="wind"],
+.fhcs-skin[data-fhcs-theme="wind"]
 {
    --fhcs-surface: #edf0f3;
    --fhcs-ink: #151a21;
@@ -15,7 +16,9 @@
 }
 
 .theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="wind"],
-.fhcs-sheet.theme-dark[data-fhcs-theme="wind"]
+.fhcs-sheet.theme-dark[data-fhcs-theme="wind"],
+.theme-dark .fhcs-skin:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="wind"],
+.fhcs-skin.theme-dark[data-fhcs-theme="wind"]
 {
    --fhcs-surface: #1c2129;
    --fhcs-ink: #e4e9ef;

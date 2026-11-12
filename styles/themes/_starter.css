@@ -13,7 +13,8 @@
    One look in both of Foundry's modes (rule 5): the dark block sets every token the light one does, or the light
    value shows in dark mode. Meaning colours keep their hue (rule 2; SCOPE §5.1); text 4.5:1 on its plate. */
 
-.fhcs-sheet[data-fhcs-theme="starter"]
+.fhcs-sheet[data-fhcs-theme="starter"],
+.fhcs-skin[data-fhcs-theme="starter"]
 {
    --fhcs-surface: #f4f1ea;            /* plates and panels */
    --fhcs-ink: #191813;                /* body text */
@@ -26,7 +27,9 @@
 }
 
 .theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="starter"],
-.fhcs-sheet.theme-dark[data-fhcs-theme="starter"]
+.fhcs-sheet.theme-dark[data-fhcs-theme="starter"],
+.theme-dark .fhcs-skin:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="starter"],
+.fhcs-skin.theme-dark[data-fhcs-theme="starter"]
 {
    --fhcs-surface: #26252b;
    --fhcs-ink: #e8e6e3;

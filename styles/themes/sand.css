@@ -3,7 +3,8 @@
    settles like stone. Turquoise is the theme's natural color but teal means always prepared, and lapis sits on the
    prepared blue: the inlay is terracotta and sandstone. Frames only. */
 
-.fhcs-sheet[data-fhcs-theme="sand"]
+.fhcs-sheet[data-fhcs-theme="sand"],
+.fhcs-skin[data-fhcs-theme="sand"]
 {
    --fhcs-surface: #f2e6cf;
    --fhcs-ink: #2a1d10;
@@ -16,7 +17,9 @@
 }
 
 .theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="sand"],
-.fhcs-sheet.theme-dark[data-fhcs-theme="sand"]
+.fhcs-sheet.theme-dark[data-fhcs-theme="sand"],
+.theme-dark .fhcs-skin:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="sand"],
+.fhcs-skin.theme-dark[data-fhcs-theme="sand"]
 {
    --fhcs-surface: #272017;
    --fhcs-ink: #f1e5cf;

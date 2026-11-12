@@ -16,7 +16,8 @@
 }
 
 .fhcs-sheet[data-fhcs-theme="forge"],
-.fhcs-chat[data-fhcs-theme="forge"]
+.fhcs-chat[data-fhcs-theme="forge"],
+.fhcs-skin[data-fhcs-theme="forge"]
 {
    --fhcs-surface: #eee4d4;
    /* The sheet's success green, a step darker (same hue): on this warmer surface it fell to 4.46:1. */
@@ -88,7 +89,10 @@
 .theme-dark .fhcs-chat:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="forge"],
 .fhcs-chat.theme-dark[data-fhcs-theme="forge"],
 .fhcs-sheet[data-fhcs-theme="forge"],
-.fhcs-chat[data-fhcs-theme="forge"]
+.fhcs-chat[data-fhcs-theme="forge"],
+.theme-dark .fhcs-skin:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="forge"],
+.fhcs-skin.theme-dark[data-fhcs-theme="forge"],
+.fhcs-skin[data-fhcs-theme="forge"]
 {
    --fhcs-surface: #221b18;
    --fhcs-success: #7ed08a;

@@ -269,6 +269,21 @@ export function vehicleHeaderFacts(sheet, context)
 }
 
 /**
+ * Who a dnd5e window belongs to, for the skin (src/apps/skin.js): its document, or the actor or item it names (a rest's
+ * `actor`, an activity's `item`, an effect's parent, a currency window's `options.document`, an award's `origin`). An
+ * item's actor is its owner when it has one.
+ * @returns {{actor: Actor|null, item: Item|null}}
+ */
+export function skinOwner(app)
+{
+   const doc = app.document ?? app.options?.document ?? app.actor ?? app.item ?? app.activity?.item ?? app.options?.award?.origin ?? app.options?.origin ?? null;
+   const docs = [doc, doc?.parent, doc?.parent?.parent, doc?.item, doc?.actor].filter(Boolean);
+   const actor = docs.find((d) => d.documentName === 'Actor') ?? null;
+   const item = docs.find((d) => d.documentName === 'Item') ?? null;
+   return { actor: actor ?? item?.actor ?? null, item };
+}
+
+/**
  * Swaps dnd5e's data model for one chat message type with our subclass of it. Runs at init, after dnd5e's init set
  * CONFIG.ChatMessage.dataModels and before the world's messages are built.
  *

@@ -1308,6 +1308,36 @@ export function registerQuenchTests(quench)
             }
          });
 
+         it('skins dnd5e\'s settings window for a character on our sheet, and not for an actor on dnd5e\'s', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 6);
+            const HitPointsConfig = globalThis.dnd5e.applications.actor.HitPointsConfig;
+            // An actor left on dnd5e's own sheet (no sheet chosen, so the world's default; dnd5e's unless the GM made ours it).
+            const stranger = await Actor.implementation.create({ name: 'FHCS test stranger', type: 'npc' });
+            const ours = new HitPointsConfig({ document: actor });
+            const theirs = new HitPointsConfig({ document: stranger });
+            const classes = (app) => [...(app.element?.classList ?? [])].join(' ') || 'not drawn';
+            try
+            {
+               await ours.render({ force: true });
+               await until(() => ours.element?.classList.contains('fhcs-skin'),
+                  () => `the HP settings of a character on our sheet wear the skin; the window's classes are ${classes(ours)}, the character's sheet ${actor.sheet?.constructor.name}`);
+               const theme = actor.getFlag(MODULE_ID, 'theme') || game.settings.get(MODULE_ID, 'theme');
+               if (theme && theme !== 'plain') { assert.equal(ours.element.dataset.fhcsTheme, theme, `the window wears the character's theme ${theme}`); }
+               await theirs.render({ force: true });
+               await until(() => theirs.rendered, 'the stranger\'s window draws');
+               const strangerOurs = String(stranger.sheet?.constructor.name ?? '').startsWith('FHCS');
+               assert.equal(theirs.element.classList.contains('fhcs-skin'), strangerOurs,
+                  `an actor on ${stranger.sheet?.constructor.name} gets the skin only on ours; the window's classes are ${classes(theirs)}`);
+            }
+            finally
+            {
+               await ours.close();
+               await theirs.close();
+               await stranger.delete();
+            }
+         });
+
          it('keeps dnd5e\'s item fields and adds: rarity, units and the other descriptions; the add button on Advancement', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 8);

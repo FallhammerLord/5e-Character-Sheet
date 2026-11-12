@@ -546,6 +546,8 @@ else
 // Three successes stay shown; dnd5e clears death saves itself on healing (preUpdateHP), so only the roll is hooked.
 if (typeof hooks['dnd5e.rollDeathSaveV2'] !== 'function') { problems.push('death saves are not hooked to dnd5e.rollDeathSaveV2'); }
 if (typeof hooks['dnd5e.advancementManagerComplete'] !== 'function') { problems.push('level order is not hooked to dnd5e.advancementManagerComplete'); }
+// The skin over dnd5e's smaller windows (SCOPE §4.13): every AppV2 window passes through it as it draws (after ready).
+if (typeof hooks.renderApplicationV2 !== 'function') { problems.push('dnd5e\'s smaller windows are not hooked for the skin (renderApplicationV2)'); }
 
 // The redraw rule (CLAUDE.md): in the sheet's Quench batch, every click or input waits for the sheet to settle first.
 // A bare `.click()` or `dispatchEvent(` there must go through the batch's helpers, which carry a `redraw-safe` note.

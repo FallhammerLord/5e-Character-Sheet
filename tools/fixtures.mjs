@@ -1225,6 +1225,36 @@ CASES.push({ name: 'vehicle-cargo', html: vehicleTop() + `<div class="tab-body">
 CASES.push({ name: 'vehicle-description', html: vehicleTop() + `<div class="tab-body">${template('sheet/biography')({ tab: { id: 'description', group: 'primary', cssClass: 'active' },
    fhcsBiography: biographyView({ characteristics: [], boxes: [], editable: true, uuid: 'Actor.v',
       stories: [{ name: 'system.details.biography.value', label: 'Description', enriched: '<p>A three-masted carrack, gilded at the prow.</p>', source: '' }] }, { format, localize }) })}</div>` });
+// The skin over dnd5e's smaller windows (SCOPE §4.13, 2026-11-12): dnd5e 6.0.6's own markup for four windows, copied
+// from its templates with values filled (its helpers don't run here): the HP settings, an attack activity's Identity,
+// the long rest dialog, an active effect's Details. Our skin's colours, fields and spacing are what's checked.
+const formGroup = (label, control, hint = '') => `<div class="form-group"><label>${label}</label><div class="form-fields">${control}</div>${hint ? `<p class="hint">${hint}</p>` : ''}</div>`;
+const SKIN_WINDOWS = {
+   'hit-points': `<form class="config-sheet hit-points standard-form"><fieldset><legend>Hit Points</legend>
+      ${formGroup('Maximum', '<input type="number" name="system.attributes.hp.max" value="87">', 'Leave blank to calculate from the class levels.')}
+      ${formGroup('Temporary Maximum', '<input type="number" name="system.attributes.hp.tempmax" value="0">')}</fieldset>
+      <fieldset><legend>Bonuses</legend>${formGroup('Per Level', '<input type="text" name="system.attributes.hp.bonuses.level" value="1">')}
+      ${formGroup('Overall', '<input type="text" name="system.attributes.hp.bonuses.overall" value="">', 'A formula added once to the maximum.')}</fieldset></form>`,
+   'activity': `<nav class="tabs sheet-tabs"><a class="item active" data-tab="identity">Identity</a> <a class="item" data-tab="activation">Activation</a> <a class="item" data-tab="effect">Effect</a></nav>
+      <section class="tab active" data-tab="identity"><fieldset><legend>Identity</legend>
+      ${formGroup('Name', '<input type="text" name="name" value="Longsword Attack" placeholder="Attack">')}
+      ${formGroup('Icon', '<input type="text" name="img" value="icons/svg/sword.svg">')}
+      ${formGroup('Chat Flavor', '<input type="text" name="description.chatFlavor" value="">', 'Text shown on the chat card above the rolls.')}</fieldset>
+      <fieldset><legend>Attack Details</legend>${formGroup('Attack Type', '<select name="attack.type.value"><option>Melee</option><option>Ranged</option></select>')}
+      ${formGroup('Classification', '<select name="attack.type.classification"><option>Weapon</option><option>Spell</option></select>')}</fieldset></section>`,
+   'rest': `<form class="rest long-rest standard-form"><p>Take a long rest? On a long rest you recover hit points, hit dice, spell slots and uses.</p>
+      <fieldset>${formGroup('New Day', '<input type="checkbox" name="newDay" checked>', 'Recover limited-use abilities that recharge each day.')}</fieldset>
+      <footer class="form-footer"><button type="submit" name="rest"><i class="fa-solid fa-bed" inert></i> Rest</button></footer></form>`,
+   'effect': `<header class="sheet-header"><img src="${ICON('#c9a227')}" alt="" width="48" height="48"><input type="text" name="name" value="Bless"></header>
+      <fieldset><legend>Details</legend>${formGroup('Tint', '<input type="text" name="tint" value="#ffffff">')}
+      ${formGroup('Suspended', '<input type="checkbox" name="disabled">', 'A suspended effect changes nothing until it is turned back on.')}
+      ${formGroup('Description', '<textarea name="description" rows="3">You bless up to three creatures of your choice within range.</textarea>')}</fieldset>`
+};
+for (const [name, body] of Object.entries(SKIN_WINDOWS))
+{
+   CASES.push({ name: `skin-${name}`, frame: 'skin', html: `<div class="fhcs-skin-sample">${body}</div>` });
+   CASES.push({ name: `theme-forge-skin-${name}`, frame: 'skin', look: 'forge', html: `<div class="fhcs-skin-sample">${body}</div>` });
+}
 CASES.push({ name: 'item-long-name', frame: 'item', html: itemSheet('weapon', { name: 'Sun Blade of the Dawnwarden, Twice-Forged in the Ember Halls' }) });
 
 // Chat cards in the world's theme (SCOPE §5.3 rule 10): every card case again in Forge.

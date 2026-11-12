@@ -240,6 +240,9 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
     - [x] Cargo, Crew & Passengers, Effects, Description; Quench test (2026-11-12): Cargo on our list with the cargo bar; crew and passengers as rows with counts (− field + in edit mode, dnd5e's adjustCrew), dragged between areas; our Effects; dnd5e's one description
   - [ ] Vehicle: Quench and play, BUILT entry
 - [ ] The smaller windows: a skin
+  - [x] Research (research note "The smaller windows, closer") and decisions (SCOPE §4.13, user 2026-11-12)
+  - [x] Built (2026-11-12): `fhcs-skin` on dnd5e's windows for documents on our sheets (`src/apps/skin.js`), the token blocks widened to it, dnd5e's and Foundry's variables re-pointed; the item sheet's dnd5e tabs too; four copied windows in the layout check (`skin-*`), unit and load checks, a Quench test
+  - [ ] Quench and play
 - [ ] Quench and play
 
 ## Phase 7: The ADHD layer
