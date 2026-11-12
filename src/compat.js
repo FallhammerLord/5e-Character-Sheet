@@ -581,7 +581,7 @@ async function containedContext(sheet, item)
 /** @returns {boolean} Whether an item is among the actor's favorites (`system.favorites`, relative UUIDs). */
 function isFavorite(actor, item)
 {
-   const id = item.getRelativeUUID?.(actor) ?? `.Item.${item.id}`;
+   const id = foundry.utils.buildRelativeUuid?.(item, actor) ?? `.Item.${item.id}`;
    return (actor.system.favorites ?? []).some((f) => f.type === 'item' && f.id === id);
 }
 

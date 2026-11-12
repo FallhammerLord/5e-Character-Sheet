@@ -811,7 +811,7 @@ export function registerQuenchTests(quench)
             await settled();
             assert.strictEqual(always.system.prepared, 2, 'a click on always prepared changes nothing');
             // The bookmark in the row favorites the spell, as dnd5e's right-click menu does.
-            const favorite = () => actor.system.favorites.some((f) => f.id === open.getRelativeUUID(actor));
+            const favorite = () => actor.system.favorites.some((f) => f.id === foundry.utils.buildRelativeUuid(open, actor));
             const wasFavorite = favorite();
             await until(() => row(open)?.querySelector('[data-action="toggleFavorite"]'), 'the row has a favorite toggle');
             await click(`.fhcs-spellbook [data-item-id="${open.id}"] [data-action="toggleFavorite"]`);
@@ -1531,14 +1531,14 @@ export function registerQuenchTests(quench)
             this.timeout(HOOK_WAIT_MS * 4);
             const [axe] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test axe', type: 'weapon' }]);
             await axe.createActivity('attack', {}, { renderSheet: false });
-            await actor.system.addFavorite({ type: 'item', id: axe.getRelativeUUID(actor) });
+            await actor.system.addFavorite({ type: 'item', id: foundry.utils.buildRelativeUuid(axe, actor) });
             await settled();
-            const fav = () => sheet.element.querySelector(`.fhcs-attributes [data-favorite-id="${axe.getRelativeUUID(actor)}"]`);
+            const fav = () => sheet.element.querySelector(`.fhcs-attributes [data-favorite-id="${foundry.utils.buildRelativeUuid(axe, actor)}"]`);
             await until(() => fav()?.querySelector('[data-action="fhcsToggleFavoriteDetails"]'), 'the favorite\'s name opens its details');
-            await click(`.fhcs-attributes [data-favorite-id="${axe.getRelativeUUID(actor)}"] [data-action="fhcsToggleFavoriteDetails"]`);
+            await click(`.fhcs-attributes [data-favorite-id="${foundry.utils.buildRelativeUuid(axe, actor)}"] [data-action="fhcsToggleFavoriteDetails"]`);
             await until(() => fav()?.querySelector('.fhcs-favorite-details .item-summary'), 'dnd5e\'s summary opens under the row');
             assert.notOk(axe.sheet?.rendered, 'no item window opened');
-            const [activity] = await clickReaches(`.fhcs-attributes [data-favorite-id="${axe.getRelativeUUID(actor)}"] .fhcs-favorite-pic`,
+            const [activity] = await clickReaches(`.fhcs-attributes [data-favorite-id="${foundry.utils.buildRelativeUuid(axe, actor)}"] .fhcs-favorite-pic`,
                'dnd5e.preUseActivity');
             assert.strictEqual(activity.item.id, axe.id, 'the picture uses the item');
             await axe.delete();
@@ -1550,7 +1550,7 @@ export function registerQuenchTests(quench)
             const [blade] = await actor.createEmbeddedDocuments('Item', [{ name: 'FHCS test blade', type: 'weapon' }]);
             try
             {
-               await actor.system.addFavorite({ type: 'item', id: blade.getRelativeUUID(actor) });
+               await actor.system.addFavorite({ type: 'item', id: foundry.utils.buildRelativeUuid(blade, actor) });
                const row = `.fhcs-attributes .favorites [data-item-id="${blade.id}"]`;
                await until(() => sheet.element.querySelector(row), 'the blade never showed as a favorite');
                await settled();
@@ -1589,7 +1589,7 @@ export function registerQuenchTests(quench)
                'the button names the grouping now in force');
             const [activity] = await clickReaches(`.fhcs-features [data-item-id="${rage.id}"] [data-action="use"]`, 'dnd5e.preUseActivity');
             assert.strictEqual(activity.item.id, rage.id, 'the picture uses the feature');
-            const favorite = () => actor.system.favorites.some((f) => f.id === tough.getRelativeUUID(actor));
+            const favorite = () => actor.system.favorites.some((f) => f.id === foundry.utils.buildRelativeUuid(tough, actor));
             const wasFavorite = favorite();
             await click(`.fhcs-features [data-item-id="${tough.id}"] [data-action="toggleFavorite"]`);
             await until(() => favorite() !== wasFavorite, 'the bookmark toggled the favorite');
