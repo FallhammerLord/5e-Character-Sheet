@@ -441,6 +441,7 @@ The same frame serves every roll: a skill check from the sheet is header plus d2
 
 ## 7. Open questions
 
+Answered (user, 2026-11-12): no Midi-QOL at the table; DAE maybe later, for effect animation integrations, and nothing in the sheet is known to block it. dnd5e's own Active Effects cover the edge cases DAE was wanted for. Compatibility work waits until a module is in use.
+
 - Shared themes with the quest log, or Light and Dark first?
-- Which sheet-changing modules matter at the user's table?
 - **More themes, one per class?** (user, 2026-11-09: "stuff to speculate about later"; nothing decided). The user's names: Blood and Bluster, Angels and Agony, Gold and Guile, Feathers and Fate, Duty and Demand, Mentor and Medium. Claude's sketch: with the four built themes they cover ten of the twelve classes (Barbarian Blood and Bluster, Bard Feathers and Fate, Cleric Angels and Agony, Fighter Fire and Forge, Monk Sand and Sanctuary, Paladin Duty and Demand, Ranger Valley and Valor, Rogue Gold and Guile, Sorcerer Wind and Wrath, Warlock Mentor and Medium); gaps Druid (Root and Ruin?) and Wizard (Candle and Cipher?). Colour traps: blood red is failure's hue, halo and coin gold are concentration's, wax seals red or blue. Open: is Mentor and Medium the warlock's patron through a vessel, or teacher and spirit channel? Take one further first, as with Forge.

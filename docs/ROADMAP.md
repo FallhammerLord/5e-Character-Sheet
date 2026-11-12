@@ -258,7 +258,7 @@ Each item answered by the user, 2026-11-12:
 
 ## Phase 8: Themes, compatibility, release
 
-Themes shared with the quest log. Compatibility with modules that change the sheet (Midi-QOL, DAE). Screenshots, GitHub release.
+Themes shared with the quest log. Compatibility: no Midi-QOL; DAE maybe later, for effect animations, not known to clash with the sheet (user, 2026-11-12), so nothing to build until a module is in use. Screenshots, GitHub release.
 
 ## Track R: Rolls and chat cards (done; verified 2026-10-24)
 

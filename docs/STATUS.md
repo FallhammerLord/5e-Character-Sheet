@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Phase 6.7's play round, then Phase 8** (ROADMAP): every sheet and the skin are built, pass Quench, and have BUILT entries; `main` holds them (2026-11-12). Waiting on the user: play for the container, group, encounter, vehicle and the skin (below); their notes come as one polish round (CLAUDE.md "How a polish round goes"). Phase 7 closed with nothing to build (user, 2026-11-12). Then Phase 8: themes shared with the quest log, compatibility (Midi-QOL, DAE), release. The play round's ask 12 waits on a session of play.
+1. **Phase 6.7's play round, then Phase 8** (ROADMAP): every sheet and the skin are built, pass Quench, and have BUILT entries; `main` holds them (2026-11-12). Waiting on the user: play for the container, group, encounter, vehicle and the skin (below); their notes come as one polish round (CLAUDE.md "How a polish round goes"). Phase 7 closed with nothing to build (user, 2026-11-12). Then Phase 8: themes shared with the quest log, then release (no compatibility work until a module is in use, user 2026-11-12). The play round's ask 12 waits on a session of play.
 2. **`#postNotification` TypeError** seen in the chat card runs: in Foundry's own code, cause not yet known; no test fails on it.
 
 Don't rerun Quench or rework Track R or Phases 0–6 unless the user reports a problem.
