@@ -31,6 +31,23 @@ and is now a husk of itself. A dark theme, playing with silver tarnish and brigh
 - **Kintsugi in silver** (gintsugi): a break mended with metal, the seam left showing. *For us:* the heal moment,
   in silver, since gold is concentration's (§5.1).
 
+## Desilvering up close (2026-11-12, for "closer to true")
+
+Trade and collector guides (appraisers, glaziers, antique dealers), not conservation science; they agree on these:
+- **Silver-backed mirrors** (after about 1835 to 1850; sources disagree): flat grey or black spots, flaking along the
+  edges where damp got behind the frame.
+- **Mercury (tin-amalgam) mirrors**, older: a soft, greyish, sparkly reflection; the loss grainy and sparkling, with
+  speckled spots and cloudy patches.
+- **Real against fake:** genuine foxing is soft, cloudy blooms with irregular edges and varied sizes, organic, often
+  gathered at the edges; a perfectly repeated pattern of uniform dark dots is acid-antiqued modern glass.
+
+*For us* (tools/sand-textures.mjs, `fog`): an edge band from each side, uneven, with wide soft fingers where damp
+reached further, built of ten faint layers so it darkens gradually toward the frame, the corners (two sides
+overlapping) darkest; blooms as wobbly outlines filled with radial gradients (a pale cloudy halo, a dark heart fading
+to nothing), sizes spread wide; a few grains in each bloom, some catching light (the mercury sparkle, and the Argent
+Sands' silver); a milky haze over all at low HP. The first draw, round radial dots, was the fake's look. Previewed alone
+at 4× over a stand-in picture before going on the sheet.
+
 ## The palette (second pass, 2026-11-12)
 
 Oxide sand (#17120e ground, #3a2b1f umber lows), ruin limestone (#d6ccb9 to #bdb19b, dark letters #1f1913), smoked
@@ -49,6 +66,8 @@ glass (the surface #1d1915 at 88% with a blur), pale desert glass (#e7dfbf, the 
 | Rose-red ruin stone | Failure red | Not used |
 
 ## Sources
+
+- appraisily.com/articles/unlocking-the-past-a-beginners-guide-to-identifying-antique-mirrors-and-their-hidden-value; antiqueappraiser.app/guides/antique-mirror-identification-dating-mercury-glass-value-guide; glasstailors.co.uk/blog/antique-mirror-explained-foxed-distressed-and-patinated-glass; historyfacts.com/science-industry/article/old-mirrors-black-spots
 
 - canada.ca/en/conservation-institute/services/preventive-conservation/guidelines-collections/metal-objects/understanding-silver-tarnish
 - assayoffice.co.uk/news/ever-wondered-why-does-silver-tarnish

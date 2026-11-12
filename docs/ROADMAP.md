@@ -24,7 +24,13 @@ The four themes are regions of the user's setting; Sand is the first taken furth
 - [x] Extended (Claude): the theme menu names Plain "Day and Night" (`lang/en.json`; the user's decision, done now as one line)
 - [x] Mockup, first pass (hand-made, silver alone): the user, "doesn't really look like our sheet"; replaced
 - [x] Mockup, second pass: `styles/themes/sand.css` on the kit with all four materials, textures from `tools/sand-textures.mjs`, El Messiri (OFL, `fonts/el-messiri/`); rendered from our templates (`tools/theme-mockup.mjs` writes `tools/out/sand-mockup.html`); canvas row "Themes · Sand and Sanctuary" (full, bloodied, down, 644px light, details); waits on the user's review
+- [x] The mirror fogs the whole portrait (user, 2026-11-12), then drawn closer to true: soft blooms, an uneven edge band, sparkling grains (research note, "Desilvering up close"); previewed alone at 4×
+- [x] Audit against the theme rules (user, 2026-11-12: "are we missing any of our design notes?"). Fixed now: the portrait's hover and its glint (rule 6, user 2026-11-08), Temp's bar answering hits and heals as HP's does (Forge does), tooltips in the theme (`fhcs-tip-sand`, as Forge's)
+- [ ] Chat cards (rule 10): only the surface, ink and a stone header so far; bands, buttons, the card's portrait and its focus as Forge's
+- [ ] Other sheets: the layout cases for the item, container, group, encounter, vehicle and NPC sheets are Forge's only; Sand's styles reach them unchecked
+- [ ] Preview the other textures alone at 4× (grains, dunes, the sphinx, the stone's cracks; CLAUDE.md "How a theme goes" 2)
 - [ ] Particles: `registerMoments('sand', …)`, sand pouring on gained, running out on spent
+- [ ] Ask the user: the portrait's rim is 3px (Plain 1px, Forge 2px; rule 3, "never reshapes"); and in play, whether the banked hourglass's cold glint reads apart from Night's silver moon (rule 13)
 - [x] Layout check `ONLY='theme-sand'`: all 42 layouts pass (fixed on the way: dark meaning colours carried into Foundry's light mode, the stone's darkest stroke, the glass tab's ground and its glow, El Messiri's width at 644px, failure's red a step lighter on concentration's tint)
 - [ ] Quench; play
 

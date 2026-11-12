@@ -127,28 +127,93 @@ function fox(count, grow)
 }
 
 /**
- * The mirror's fog over the whole portrait (user, 2026-11-12: "foxing should fog the whole portrait in the foreground"):
- * a milky haze, darkening that creeps in from the edges, and dark spots that spread inward and grow as HP falls. Drawn
- * over the art, under the stage, so the HP band keeps its own ground.
+ * The mirror's fog over the whole portrait (user, 2026-11-12: "foxing should fog the whole portrait in the foreground";
+ * "closer to true"). How real desilvering looks (docs/research/sand-theme.md, "Desilvering up close"): soft, cloudy
+ * blooms with irregular edges and varied sizes, never a repeated pattern of round dots (that is acid-antiqued modern
+ * glass); gathered at the edges where damp got behind the frame, the silver there flaking away in an uneven band; on
+ * old mercury mirrors, the loss grainy and sparkling. So: an edge band with an uneven inner contour and fingers;
+ * blooms as wobbly outlines in three layers (a pale cloudy halo, a grey body, a dark core); a few bright and dark
+ * grains inside each bloom; a milky haze over the whole. A 160 × 234 drawing (the portrait card's frame) stretched to
+ * the portrait. Over the art, under the stage, so the HP band keeps its own ground.
  */
-function fog(spots, reach, haze, edge)
+function fog({ seed, blooms, size, reach, edge, haze })
 {
-   const rnd = seeded(31);
-   const layers = [];
-   for (let i = 0; i < spots; i++)
+   const W = 160;
+   const H = 234;
+   const rnd = seeded(seed);
+   const shapes = [];
+   // A wobbly closed outline around (cx, cy): the radius bends by a few low harmonics, each bloom its own.
+   const outline = (cx, cy, R) =>
    {
-      // Most spots near an edge, more of them inward as `reach` grows (0–1).
-      const side = Math.floor(rnd() * 4);
-      const depth = Math.pow(rnd(), 1.6) * reach * 50;
-      const along = rnd() * 100;
-      const [x, y] = [[along, depth], [100 - depth, along], [along, 100 - depth], [depth, along]][side];
-      const r = r1(2 + rnd() * 7 * (0.6 + reach));
-      const alpha = r1(0.45 + rnd() * 0.4);
-      layers.push(`radial-gradient(${r}px ${r1(r * (0.7 + rnd() * 0.6))}px at ${r1(x)}% ${r1(y)}%, rgba(12,11,10,${alpha}) 0, rgba(12,11,10,${r1(alpha * 0.5)}) 55%, transparent 100%)`);
+      const waves = [2, 3, 4, 5, 7].map((h) => [h, (rnd() * 0.22) / Math.sqrt(h), rnd() * Math.PI * 2]);
+      const pts = [];
+      for (let i = 0; i < 22; i++)
+      {
+         const t = (i / 22) * Math.PI * 2;
+         const r = R * (1 + waves.reduce((sum, [h, amp, ph]) => sum + amp * Math.sin(h * t + ph), 0));
+         pts.push(`${r1(cx + Math.cos(t) * r)} ${r1(cy + Math.sin(t) * r)}`);
+      }
+      return `M${pts.join('L')}Z`;
+   };
+   // The edge band: depth along each side, uneven, with fingers reaching in; three bands, darker toward the edge.
+   if (edge > 0)
+   {
+      const sides = [[W, (t, d) => [t, d]], [H, (t, d) => [W - d, t]], [W, (t, d) => [W - t, H - d]], [H, (t, d) => [d, H - t]]];
+      // Fingers: where damp reached further in, wide and soft. Many thin bands, each faint, so the band darkens
+      // gradually toward the frame instead of in steps.
+      const fingers = Array.from({ length: 4 }, () => [rnd(), 0.04 + rnd() * 0.06, 0.4 + rnd() * 0.6]);
+      const phases = Array.from({ length: 4 }, () => [rnd() * 6, rnd() * 6]);
+      // Each side its own band, from the frame to its contour: the corners, where two sides overlap, go darkest, as on
+      // real mirrors.
+      const SCALES = [1, 0.88, 0.76, 0.65, 0.55, 0.45, 0.36, 0.28, 0.2, 0.12];
+      for (const scale of SCALES)
+      {
+         for (const [side, [len, at]] of sides.entries())
+         {
+            const ph = phases[side];
+            const contour = [];
+            for (let i = 0; i <= 40; i++)
+            {
+               const u = i / 40;
+               const finger = fingers.reduce((sum, [c, w, k]) => sum + k * Math.exp(-(((u - c) / w) ** 2)), 0);
+               const depth = edge * scale * (0.6 + 0.25 * Math.sin(u * 5 + ph[0]) + 0.12 * Math.sin(u * 11 + ph[1]) + finger);
+               contour.push(at(u * len, Math.max(0, depth)));
+            }
+            const [x0, y0] = at(0, 0);
+            const [x1, y1] = at(len, 0);
+            const back = contour.reverse().map(([x, y]) => `L${r1(x)} ${r1(y)}`).join('');
+            shapes.push(`<path d='M${r1(x0)} ${r1(y0)}L${r1(x1)} ${r1(y1)}${back}Z' fill='%23100e0c' fill-opacity='.09'/>`);
+         }
+      }
    }
-   layers.push(`radial-gradient(ellipse 75% 70% at 50% 45%, transparent ${Math.round(70 - reach * 55)}%, rgba(14,12,11,${edge}) 100%)`);
-   layers.push(`linear-gradient(rgba(196,198,200,${haze}), rgba(196,198,200,${haze}))`);
-   return layers.join(', ');
+   // Blooms: most near the edges, reaching inward as `reach` grows; sizes spread wide, a few large ones.
+   for (let i = 0; i < blooms; i++)
+   {
+      const side = Math.floor(rnd() * 4);
+      const inward = Math.pow(rnd(), 1.4) * reach;
+      const along = rnd();
+      const [x, y] = [[along * W, inward * H / 2], [W - inward * W / 2, along * H], [along * W, H - inward * H / 2], [inward * W / 2, along * H]][side];
+      const R = size * (0.25 + Math.pow(rnd(), 2.2) * 1.6);
+      // A cloudy halo, then the bloom itself: irregular outlines filled with radial gradients, dense at the heart and
+      // fading to nothing at the edge, so a bloom is soft rather than a cut-out.
+      shapes.push(`<path d='${outline(x, y, R * 2.1)}' fill='url(%23h)'/>`);
+      shapes.push(`<path d='${outline(x, y, R * 1.3)}' fill='url(%23c)'/>`);
+      // The grainy loss: a few grains in the bloom, some catching light.
+      for (let g = 0; g < Math.round(2 + R / 3); g++)
+      {
+         const a = rnd() * Math.PI * 2;
+         const rr = R * 1.5 * Math.sqrt(rnd());
+         const bright = rnd() > 0.6;
+         shapes.push(`<circle cx='${r1(x + Math.cos(a) * rr)}' cy='${r1(y + Math.sin(a) * rr)}' r='${bright ? 0.5 : 0.7}' fill='${bright ? '%23f2f4f7' : '%23100e0c'}' fill-opacity='${bright ? 0.7 : 0.6}'/>`);
+      }
+   }
+   const defs = `<defs><radialGradient id='c'><stop offset='0' stop-color='%23100e0c' stop-opacity='.88'/><stop offset='.45' stop-color='%231c1916' stop-opacity='.7'/>`
+      + `<stop offset='.8' stop-color='%23302a25' stop-opacity='.3'/><stop offset='1' stop-color='%23302a25' stop-opacity='0'/></radialGradient>`
+      + `<radialGradient id='h'><stop offset='0' stop-color='%23d6d5cf' stop-opacity='.24'/><stop offset='1' stop-color='%23d6d5cf' stop-opacity='0'/></radialGradient></defs>`;
+   const svg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${W} ${H}' preserveAspectRatio='none'>${defs}`
+      + (haze ? `<rect width='${W}' height='${H}' fill='%23c4c6c8' fill-opacity='${haze}'/>` : '')
+      + `${shapes.join('')}</svg>`;
+   return `url("data:image/svg+xml,${svg.replace(/</g, '%3C').replace(/>/g, '%3E').replace(/"/g, '%22')}") 0 0 / 100% 100% no-repeat`;
 }
 
 const GLASS ='M7 2.5h10M7 21.5h10M8 2.5c0 5 7.5 6 7.5 9.5S8 16.5 8 21.5M16 2.5c0 5-7.5 6-7.5 9.5s7.5 4.5 7.5 9.5';
@@ -164,9 +229,9 @@ const block = [
    `--fhcs-theme-seam: ${uri(crack('#dfe3ea', 2.2))};`,
    `--fhcs-theme-fox-bloodied: ${fox(26, 2)};`,
    `--fhcs-theme-fox-down: ${fox(60, 3.4)};`,
-   `--fhcs-theme-fog-full: ${fog(4, 0.15, 0.03, 0.15)};`,
-   `--fhcs-theme-fog-bloodied: ${fog(28, 0.55, 0.12, 0.5)};`,
-   `--fhcs-theme-fog-down: ${fog(70, 1, 0.3, 0.85)};`,
+   `--fhcs-theme-fog-full: ${fog({ seed: 31, blooms: 3, size: 3, reach: 0.15, edge: 2, haze: 0 })};`,
+   `--fhcs-theme-fog-bloodied: ${fog({ seed: 31, blooms: 16, size: 6, reach: 0.55, edge: 9, haze: 0.07 })};`,
+   `--fhcs-theme-fog-down: ${fog({ seed: 31, blooms: 34, size: 9, reach: 1, edge: 22, haze: 0.22 })};`,
    `--fhcs-theme-glass-mark: ${uri(mark(false))};`,
    `--fhcs-theme-glass-mark-on: ${uri(mark(true))};`
 ].map((line) => `   ${line}`).join('\n');
