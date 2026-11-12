@@ -4,7 +4,7 @@ The current state: what the next session does, what waits on the user, what's ve
 
 ## Next session
 
-1. **Sand and Sanctuary, the Argent Sands** (ROADMAP): the first-pass mockup waits on the user's review (canvas row "Themes · Sand and Sanctuary"). Their notes, then build it on the theme kit (BUILT, "How a theme plugs in"; CLAUDE.md "How a theme goes").
+1. **Sand and Sanctuary, the Argent Sands** (ROADMAP): the second-pass mockup, our real sheet in `styles/themes/sand.css`, waits on the user's review (canvas row "Themes · Sand and Sanctuary"). Their notes, then particles, the layout check and Quench, on the theme kit (BUILT, "How a theme plugs in"; CLAUDE.md "How a theme goes").
 2. **Phase 6.7's play round, then Phase 8** (ROADMAP): every sheet and the skin are built, pass Quench, and have BUILT entries; `main` holds them (2026-11-12). Waiting on the user: play for the container, group, encounter, vehicle and the skin (below); their notes come as one polish round (CLAUDE.md "How a polish round goes"). Phase 7 closed with nothing to build (user, 2026-11-12). Then Phase 8: themes shared with the quest log, then release (no compatibility work until a module is in use, user 2026-11-12). The play round's ask 12 waits on a session of play.
 3. **`#postNotification` TypeError** seen in the chat card runs: in Foundry's own code, cause not yet known; no test fails on it.
 

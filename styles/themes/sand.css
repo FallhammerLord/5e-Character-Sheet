@@ -1,87 +1,302 @@
-/* Sand and Sanctuary (SCOPE §4.11, user 2026-10-28): a desert temple at noon. Carved frames with stepped corners and
-   an inlaid band along the top, a sanctuary arch on the tab row (user, 2026-10-29: the sun went to Day); a hover sends a shaft of light down a frame, a press
-   settles like stone. Turquoise is the theme's natural color but teal means always prepared, and lapis sits on the
-   prepared blue: the inlay is terracotta and sandstone. Frames only. */
+/* Sand and Sanctuary: the Argent Sands (SCOPE §4.11, user 2026-11-12; docs/research/sand-theme.md). A region of the
+   user's setting: desert sand dark with silver oxide, the ruins of a bright scholastic city on a mount, a fallen
+   divinity, glass. Four materials, each with its place:
+   - oxide sand, the ground: brown-black, silver grains catching the light, dunes along the foot that rise as HP falls
+     and bury the fallen sphinx's head in the corner;
+   - glass, the plates: smoked glass with a bright edge; the open tab a pane of pale desert glass;
+   - ruin stone, the bars: the old city's pale limestone, cracked, for heading bars and the tab rail;
+   - silver, the frames: tarnished edges with corners rubbed bright, a sheen under the pointer, the nameplate a silver
+     plaque, the portrait a mirror whose silvering fails from the corners as HP falls (loss of self).
+   One look, dark, in both of Foundry's modes (rule 5). Meaning colours keep their hue (§5.1); no accent colour beyond
+   the materials. Textures and marks are vectors written by tools/sand-textures.mjs. */
 
-.fhcs-sheet[data-fhcs-theme="sand"],
-.fhcs-skin[data-fhcs-theme="sand"]
+@font-face
 {
-   --fhcs-surface: #f2e6cf;
-   --fhcs-ink: #2a1d10;
-   --fhcs-die-ink: #2a1d10;
-   --fhcs-die-on-ink: #f7eedc;
-   --fhcs-theme-edge: #a0835a;
-   --fhcs-theme-accent: #a24f27;
-   --fhcs-theme-light: color-mix(in srgb, #fff3c8 55%, transparent);
-   --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 21V11a7 7 0 0 1 14 0v10M9 21v-7a3 3 0 0 1 6 0v7M3 21h18' fill='none' stroke='%23a24f27' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+   font-family: 'FHCS El Messiri';
+   src: url('../../fonts/el-messiri/el-messiri-latin-600-normal.woff2') format('woff2');
+   font-weight: 600;
+   font-display: swap;
 }
 
 .theme-dark .fhcs-sheet:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="sand"],
 .fhcs-sheet.theme-dark[data-fhcs-theme="sand"],
+.theme-dark .fhcs-chat:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="sand"],
+.fhcs-chat.theme-dark[data-fhcs-theme="sand"],
+.fhcs-sheet[data-fhcs-theme="sand"],
+.fhcs-chat[data-fhcs-theme="sand"],
 .theme-dark .fhcs-skin:not(:where(.theme-dark .theme-light, .theme-dark .theme-light *))[data-fhcs-theme="sand"],
-.fhcs-skin.theme-dark[data-fhcs-theme="sand"]
+.fhcs-skin.theme-dark[data-fhcs-theme="sand"],
+.fhcs-skin[data-fhcs-theme="sand"]
 {
-   --fhcs-surface: #272017;
-   --fhcs-ink: #f1e5cf;
-   --fhcs-die-ink: #f3e8d3;
-   --fhcs-die-on-ink: #272017;
-   --fhcs-theme-edge: #a38a63;
-   --fhcs-theme-accent: #d4794a;
-   --fhcs-theme-light: color-mix(in srgb, #ffe7a8 22%, transparent);
-   --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 21V11a7 7 0 0 1 14 0v10M9 21v-7a3 3 0 0 1 6 0v7M3 21h18' fill='none' stroke='%23d4794a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+   --fhcs-surface: #1d1915;
+   /* The sheet's dark meaning colours in both of Foundry's modes (one look, rule 5): their light values fail on dark glass. */
+   --fhcs-success: #7ed08a;
+   /* Failure's red a step lighter, same hue (rule 2): concentration's End fell to 4.4:1 on the bar's gold tint over glass. */
+   --fhcs-failure: #ffa59c;
+   --fhcs-crit: #e0b45a;
+   --fhcs-adv: #8ab8ff;
+   --fhcs-dis: #ff8a80;
+   --fhcs-kind-prepared: #8ab8ff;
+   --fhcs-kind-always: #6fd0c8;
+   --fhcs-kind-pact: #c9a0ff;
+   --fhcs-kind-innate: #f0a860;
+   --fhcs-kind-atwill: #c8c4bc;
+   --fhcs-fav: #ff8ac0;
+   --fhcs-conc: #e0b84a;
+   --fhcs-slot: #7fb0ec;
+   --fhcs-ink: #ece6dc;
+   --fhcs-die-ink: #efe9df;
+   --fhcs-die-on-ink: #1d1915;
+   /* Oxide sand. */
+   --fhcs-theme-oxide: #17120e;
+   --fhcs-theme-umber: #3a2b1f;
+   /* Silver: tarnished edge, bright where rubbed. */
+   --fhcs-theme-edge: #85837e;
+   --fhcs-theme-tarnish: #3b352e;
+   --fhcs-theme-silver: #eef0f4;
+   /* Ruin stone: the old city's limestone, bleached and cracked; dark letters cut into it. */
+   --fhcs-theme-stone-top: #d6ccb9;
+   --fhcs-theme-stone: #bdb19b;
+   --fhcs-theme-stone-ink: #1f1913;
+   /* Desert glass: pale straw, for the open tab only (decoration; concentration's gold is deeper and warmer). */
+   --fhcs-theme-glass: #e7dfbf;
+   --fhcs-theme-glass-ink: #1c1710;
+   --fhcs-theme-plate: color-mix(in srgb, var(--fhcs-surface) 92%, transparent);
+   --fhcs-theme-sheen: linear-gradient(to right, transparent, color-mix(in srgb, var(--fhcs-theme-silver) 80%, transparent) 50%, transparent);
+   /* How much sand has drifted in: none at full HP, the most at 0. */
+   --fhcs-theme-drift: calc(1 - var(--fhcs-hp, 1));
+   --fhcs-theme-emblem: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 21V11a7 7 0 0 1 5-6.7M14 4.3A7 7 0 0 1 19 11v10M9 21v-6a3 3 0 0 1 6 0v6M3 21h18' fill='none' stroke='%23d6ccb9' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+   /* sand-textures:begin (tools/sand-textures.mjs writes this block) */
+   --fhcs-theme-grains: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27240%27%20height%3D%27240%27%3E%3Ccircle%20cx%3D%270%27%20cy%3D%27221%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27175%27%20cy%3D%27127.9%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27181.2%27%20cy%3D%27130.3%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27196%27%20cy%3D%2758.1%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27167.5%27%20cy%3D%2712.9%27%20r%3D%270.7%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27221.4%27%20cy%3D%27193.8%27%20r%3D%270.9%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27221.6%27%20cy%3D%27165.2%27%20r%3D%270.7%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27218.9%27%20cy%3D%27218%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27200.9%27%20cy%3D%2779.7%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27102.8%27%20cy%3D%2770.8%27%20r%3D%270.7%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%27175%27%20cy%3D%27210.7%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27134.6%27%20cy%3D%27122.1%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27218.2%27%20cy%3D%2713.2%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27159.5%27%20cy%3D%27221.8%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2797.3%27%20cy%3D%2768.1%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2779.8%27%20cy%3D%27127.6%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27217.6%27%20cy%3D%27109.9%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27152.2%27%20cy%3D%27123.9%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27225.5%27%20cy%3D%2795.2%27%20r%3D%270.6%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27140.8%27%20cy%3D%2784.1%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27190.7%27%20cy%3D%27210.6%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2718.7%27%20cy%3D%2797.6%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27239.1%27%20cy%3D%2752.8%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27109.7%27%20cy%3D%27142.3%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27212.3%27%20cy%3D%27213.7%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27182.7%27%20cy%3D%2766.1%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2718.2%27%20cy%3D%270.4%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27177.9%27%20cy%3D%27117.4%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27211.7%27%20cy%3D%2756.4%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2728.4%27%20cy%3D%27117.4%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27152.9%27%20cy%3D%27221.3%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2745.2%27%20cy%3D%27232.5%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2763.9%27%20cy%3D%2753.5%27%20r%3D%270.9%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2712.6%27%20cy%3D%27184.7%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27119.6%27%20cy%3D%277.9%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2731.4%27%20cy%3D%27165.1%27%20r%3D%270.5%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%27212%27%20cy%3D%27206.7%27%20r%3D%270.9%27%20fill%3D%27%23f8fafd%27%20fill-opacity%3D%270.85%27%2F%3E%3Ccircle%20cx%3D%27229%27%20cy%3D%27183.6%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27174.6%27%20cy%3D%27211.7%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2797.2%27%20cy%3D%27212.9%27%20r%3D%270.6%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27149.2%27%20cy%3D%27176.4%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27101.5%27%20cy%3D%2747.7%27%20r%3D%271.2%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27238.6%27%20cy%3D%27151.8%27%20r%3D%271%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2747.9%27%20cy%3D%27154.9%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27133.8%27%20cy%3D%27185.1%27%20r%3D%270.7%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%2744.9%27%20cy%3D%27107.2%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27125.2%27%20cy%3D%27134.8%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2787%27%20cy%3D%27180.2%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27130%27%20cy%3D%2748.7%27%20r%3D%270.6%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2756.6%27%20cy%3D%27158.3%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27185.5%27%20cy%3D%27197.5%27%20r%3D%270.9%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%27163.4%27%20cy%3D%27230.1%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27144.3%27%20cy%3D%27173.8%27%20r%3D%270.5%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%2732.6%27%20cy%3D%2719.3%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%272.3%27%20cy%3D%27145.2%27%20r%3D%270.6%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%2732.1%27%20cy%3D%2748.5%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27109.5%27%20cy%3D%27238.5%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27185.8%27%20cy%3D%2795.3%27%20r%3D%270.5%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2755.2%27%20cy%3D%27193.8%27%20r%3D%270.6%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%27222.1%27%20cy%3D%27122.1%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27144.6%27%20cy%3D%2740.9%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27155.2%27%20cy%3D%27133.5%27%20r%3D%271.2%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2718.1%27%20cy%3D%2799.2%27%20r%3D%270.5%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%271.5%27%20cy%3D%2799.2%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27221.8%27%20cy%3D%27186.6%27%20r%3D%270.7%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27205.2%27%20cy%3D%27231%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27137.3%27%20cy%3D%2783.5%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27118.8%27%20cy%3D%27136.2%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27151.9%27%20cy%3D%27175%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27237.2%27%20cy%3D%27105.1%27%20r%3D%271.2%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27234%27%20cy%3D%2785.9%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27211.8%27%20cy%3D%27170%27%20r%3D%271%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27188.9%27%20cy%3D%2749.7%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2725%27%20cy%3D%27219.7%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27170.8%27%20cy%3D%27128.6%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27135.2%27%20cy%3D%27209.7%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27104.2%27%20cy%3D%2794.8%27%20r%3D%270.9%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2755.5%27%20cy%3D%27215.7%27%20r%3D%270.6%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27163.9%27%20cy%3D%27210.6%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27221%27%20cy%3D%270.3%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%275.2%27%20cy%3D%27166.3%27%20r%3D%270.6%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%2750.9%27%20cy%3D%27227.4%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2728%27%20cy%3D%27150.4%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27142%27%20cy%3D%27180.3%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27171.6%27%20cy%3D%27229.2%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27186.6%27%20cy%3D%27168.6%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2724.1%27%20cy%3D%2710.9%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27139.5%27%20cy%3D%2760.2%27%20r%3D%270.9%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27151.1%27%20cy%3D%27195.1%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2712.7%27%20cy%3D%27165.8%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27158.3%27%20cy%3D%27193.1%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27120.2%27%20cy%3D%27197.5%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27189.7%27%20cy%3D%27174.5%27%20r%3D%270.8%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%2745.7%27%20cy%3D%27172.7%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27227.7%27%20cy%3D%27229.1%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2762.9%27%20cy%3D%27225.8%27%20r%3D%271%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2766.5%27%20cy%3D%2747.6%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27134.3%27%20cy%3D%2734%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2754.4%27%20cy%3D%2713.2%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27151%27%20cy%3D%27112.3%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27122.6%27%20cy%3D%27168.1%27%20r%3D%270.9%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27231.7%27%20cy%3D%27185%27%20r%3D%270.8%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%27144.8%27%20cy%3D%27192.7%27%20r%3D%270.5%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27174.4%27%20cy%3D%27155.2%27%20r%3D%270.9%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2792.9%27%20cy%3D%27118.7%27%20r%3D%270.5%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2719%27%20cy%3D%2785%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27153.6%27%20cy%3D%2730.1%27%20r%3D%270.5%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27200.6%27%20cy%3D%27208.7%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2776.4%27%20cy%3D%2796.6%27%20r%3D%270.8%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%272.8%27%20cy%3D%27238.4%27%20r%3D%270.9%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27102.6%27%20cy%3D%278%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27180.9%27%20cy%3D%2759.8%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2776.3%27%20cy%3D%27110.2%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27211.6%27%20cy%3D%27208.8%27%20r%3D%270.7%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27208%27%20cy%3D%27196.7%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27232.9%27%20cy%3D%27165.9%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2777.8%27%20cy%3D%27207.4%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27158%27%20cy%3D%27195.8%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27198.9%27%20cy%3D%2710.2%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%275.6%27%20cy%3D%27138.6%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27204.8%27%20cy%3D%27207.7%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27135%27%20cy%3D%27110.3%27%20r%3D%270.9%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27180.3%27%20cy%3D%27124.2%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2758.7%27%20cy%3D%27168.8%27%20r%3D%270.6%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2761.1%27%20cy%3D%27147.4%27%20r%3D%271%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27136.4%27%20cy%3D%2775.9%27%20r%3D%270.7%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27152.6%27%20cy%3D%27137.1%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2728.4%27%20cy%3D%2780%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27154.6%27%20cy%3D%2793.4%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2730.1%27%20cy%3D%2737.2%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2790.2%27%20cy%3D%2721.9%27%20r%3D%270.6%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27109.8%27%20cy%3D%2723.9%27%20r%3D%270.6%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2772.8%27%20cy%3D%2729.2%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2747.9%27%20cy%3D%27145.8%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27188.3%27%20cy%3D%27118.2%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2728.9%27%20cy%3D%27149.7%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27139.2%27%20cy%3D%27232.1%27%20r%3D%271.2%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%279%27%20cy%3D%2724.8%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27215.6%27%20cy%3D%27173.6%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27128.3%27%20cy%3D%27186.4%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27163.9%27%20cy%3D%27139.6%27%20r%3D%270.6%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%276.8%27%20cy%3D%27176.3%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27166.1%27%20cy%3D%27163.6%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27235.4%27%20cy%3D%27203%27%20r%3D%270.7%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2752.4%27%20cy%3D%27151.2%27%20r%3D%270.7%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%275.4%27%20cy%3D%27207.1%27%20r%3D%271%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2773.9%27%20cy%3D%27178.6%27%20r%3D%270.7%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%27149.4%27%20cy%3D%2747.5%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27103.8%27%20cy%3D%2711.3%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27201.7%27%20cy%3D%2720.4%27%20r%3D%270.9%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27101.4%27%20cy%3D%2776.2%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2788.7%27%20cy%3D%27103.7%27%20r%3D%270.7%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27130.5%27%20cy%3D%27103.7%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27226.9%27%20cy%3D%27111%27%20r%3D%271%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27155.7%27%20cy%3D%2797.1%27%20r%3D%270.4%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2768.8%27%20cy%3D%276.8%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2757.5%27%20cy%3D%27159.9%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2733.9%27%20cy%3D%27182.5%27%20r%3D%270.9%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27181.4%27%20cy%3D%273.4%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27184.4%27%20cy%3D%27228.9%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%279.3%27%20cy%3D%27236%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27125.6%27%20cy%3D%27200.5%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%272.3%27%20cy%3D%2727.5%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2721.1%27%20cy%3D%2769%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27162.2%27%20cy%3D%27151.5%27%20r%3D%271.2%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27239.6%27%20cy%3D%27148.4%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27213.4%27%20cy%3D%2738.3%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27101.1%27%20cy%3D%27111.4%27%20r%3D%270.9%27%20fill%3D%27%23f8fafd%27%20fill-opacity%3D%270.85%27%2F%3E%3Ccircle%20cx%3D%27107.5%27%20cy%3D%27132.4%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2741.1%27%20cy%3D%2744.3%27%20r%3D%270.6%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27239%27%20cy%3D%27129.9%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27121.9%27%20cy%3D%273.1%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27104.3%27%20cy%3D%2750.8%27%20r%3D%270.9%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27104.6%27%20cy%3D%2731.2%27%20r%3D%270.4%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27219.1%27%20cy%3D%27172.8%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27163.7%27%20cy%3D%27201.9%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27111.8%27%20cy%3D%270.3%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2714%27%20cy%3D%27123.8%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2786.7%27%20cy%3D%27157.1%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27171.8%27%20cy%3D%27180.1%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2743.2%27%20cy%3D%2766.7%27%20r%3D%270.6%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27142.1%27%20cy%3D%2797.6%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27204.7%27%20cy%3D%2797.9%27%20r%3D%271.2%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27177.5%27%20cy%3D%27224.8%27%20r%3D%271.2%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27221.7%27%20cy%3D%27171.2%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27214.7%27%20cy%3D%2743.8%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27184.9%27%20cy%3D%27179.6%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%271.4%27%20cy%3D%2771.2%27%20r%3D%270.7%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%278.1%27%20cy%3D%27132.4%27%20r%3D%270.5%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%27228.6%27%20cy%3D%27160.1%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27219.7%27%20cy%3D%27220.2%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2787.2%27%20cy%3D%27167.8%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2719.1%27%20cy%3D%2772.8%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2793.4%27%20cy%3D%272.9%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27192.3%27%20cy%3D%27196.9%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27137.2%27%20cy%3D%27152.3%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2797%27%20cy%3D%2710.7%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2744.6%27%20cy%3D%27232.5%27%20r%3D%270.7%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2738%27%20cy%3D%27101%27%20r%3D%270.6%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27104.7%27%20cy%3D%2774%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%271.7%27%20cy%3D%2752.8%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%277.5%27%20cy%3D%27225.7%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27173.8%27%20cy%3D%27164%27%20r%3D%270.7%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27225.7%27%20cy%3D%2714.2%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2788%27%20cy%3D%2778.4%27%20r%3D%270.5%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2737%27%20cy%3D%27122.4%27%20r%3D%270.6%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%27123.8%27%20cy%3D%27151%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27162%27%20cy%3D%27173.5%27%20r%3D%270.8%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%2735.4%27%20cy%3D%2792.5%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2735.7%27%20cy%3D%2797.3%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27162.8%27%20cy%3D%27195.1%27%20r%3D%270.7%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%270.7%27%20cy%3D%2782.4%27%20r%3D%270.8%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%27176.8%27%20cy%3D%27199.5%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2786.6%27%20cy%3D%27128.8%27%20r%3D%270.9%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%270.5%27%20cy%3D%27123.5%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2737.2%27%20cy%3D%27119.4%27%20r%3D%270.9%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2724.2%27%20cy%3D%275.6%27%20r%3D%270.7%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27193.8%27%20cy%3D%27205.7%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27200.2%27%20cy%3D%2792.8%27%20r%3D%270.6%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%2789.7%27%20cy%3D%277.1%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%277.2%27%20cy%3D%27138.6%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%271.5%27%20cy%3D%2710%27%20r%3D%271%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27212.8%27%20cy%3D%27196.6%27%20r%3D%270.8%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%27132.9%27%20cy%3D%27148.7%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27113.6%27%20cy%3D%27126.1%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27154%27%20cy%3D%27120.9%27%20r%3D%270.6%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27205.2%27%20cy%3D%273.4%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27235.3%27%20cy%3D%2748.7%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%279.4%27%20cy%3D%27107%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2798.7%27%20cy%3D%27203.7%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27209%27%20cy%3D%27106.2%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27153.1%27%20cy%3D%2721.9%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2719.4%27%20cy%3D%27135.4%27%20r%3D%270.5%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%27218.1%27%20cy%3D%2758.6%27%20r%3D%270.4%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27214.6%27%20cy%3D%27149.6%27%20r%3D%270.9%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2784.1%27%20cy%3D%27124.1%27%20r%3D%271.2%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27197%27%20cy%3D%27229.9%27%20r%3D%270.4%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2764.4%27%20cy%3D%27120.6%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27140%27%20cy%3D%2757.9%27%20r%3D%270.9%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27201.7%27%20cy%3D%2784.8%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2757.2%27%20cy%3D%2711.8%27%20r%3D%270.8%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%27157.7%27%20cy%3D%27200.1%27%20r%3D%270.9%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27209.8%27%20cy%3D%2731.8%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27185.8%27%20cy%3D%27158.8%27%20r%3D%270.5%27%20fill%3D%27%23ced2d9%27%20fill-opacity%3D%270.45%27%2F%3E%3Ccircle%20cx%3D%2732%27%20cy%3D%27206.3%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2727.2%27%20cy%3D%27120.3%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27155.8%27%20cy%3D%2763.4%27%20r%3D%270.6%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27102.2%27%20cy%3D%27224.8%27%20r%3D%270.9%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27218.9%27%20cy%3D%27205.1%27%20r%3D%270.6%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27164%27%20cy%3D%27180.4%27%20r%3D%270.7%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27153.7%27%20cy%3D%27168.6%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27211.7%27%20cy%3D%27174.9%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2733.8%27%20cy%3D%27204.5%27%20r%3D%270.8%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27209%27%20cy%3D%27168.4%27%20r%3D%270.5%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27161.1%27%20cy%3D%27194.2%27%20r%3D%271%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2796.3%27%20cy%3D%2743.6%27%20r%3D%270.7%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27110.3%27%20cy%3D%27236.5%27%20r%3D%270.8%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%278.4%27%20cy%3D%27100.7%27%20r%3D%271.2%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%2723.6%27%20cy%3D%2756.4%27%20r%3D%270.6%27%20fill%3D%27%237a6c5e%27%20fill-opacity%3D%270.4%27%2F%3E%3Ccircle%20cx%3D%27227.3%27%20cy%3D%2738.2%27%20r%3D%271.1%27%20fill%3D%27%234a3d33%27%20fill-opacity%3D%270.4%27%2F%3E%3C%2Fsvg%3E");
+   --fhcs-theme-dune: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%201000%20200%27%20preserveAspectRatio%3D%27none%27%3E%3Cdefs%3E%3ClinearGradient%20id%3D%27f%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%270%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%234a3727%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%2321180f%27%2F%3E%3C%2FlinearGradient%3E%3ClinearGradient%20id%3D%27n%27%20x1%3D%270%27%20y1%3D%270%27%20x2%3D%270%27%20y2%3D%271%27%3E%3Cstop%20offset%3D%270%27%20stop-color%3D%27%2333261b%27%2F%3E%3Cstop%20offset%3D%271%27%20stop-color%3D%27%23120d09%27%2F%3E%3C%2FlinearGradient%3E%3C%2Fdefs%3E%3Cpath%20d%3D%27M0%2090%20C140%2040%20300%2060%20420%2080%20S700%2030%201000%2070%20V200%20H0%20Z%27%20fill%3D%27url(%23f)%27%2F%3E%3Cpath%20d%3D%27M0%2090%20C140%2040%20300%2060%20420%2080%20S700%2030%201000%2070%27%20fill%3D%27none%27%20stroke%3D%27%23dfe3ea%27%20stroke-opacity%3D%27.35%27%20stroke-width%3D%271.2%27%20vector-effect%3D%27non-scaling-stroke%27%2F%3E%3Cpath%20d%3D%27M0%20140%20C180%20100%20380%20150%20560%20120%20S840%2090%201000%20130%20V200%20H0%20Z%27%20fill%3D%27url(%23n)%27%2F%3E%3Cpath%20d%3D%27M0%20140%20C180%20100%20380%20150%20560%20120%20S840%2090%201000%20130%27%20fill%3D%27none%27%20stroke%3D%27%23dfe3ea%27%20stroke-opacity%3D%27.25%27%20stroke-width%3D%271%27%20vector-effect%3D%27non-scaling-stroke%27%2F%3E%3C%2Fsvg%3E");
+   --fhcs-theme-sphinx: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%20180%20150%27%3E%3Cg%20transform%3D%27rotate(-14%2090%2090)%27%3E%3Cpath%20d%3D%27M44%2040%20Q90%206%20136%2040%20L156%20132%20H24%20Z%27%20fill%3D%27%232c241c%27%20stroke%3D%27%238f846f%27%20stroke-opacity%3D%27.55%27%20stroke-width%3D%271.5%27%2F%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%238f846f%27%20stroke-opacity%3D%27.35%27%20stroke-width%3D%271.4%27%3E%3Cpath%20d%3D%27M38%2064%20Q48%2060%2058%2064M34%2082%20Q46%2078%2058%2082M30%20100%20Q44%2096%2058%20100M27%20118%20Q42%20114%2058%20118%27%2F%3E%3Cpath%20d%3D%27M142%2064%20Q132%2060%20122%2064M146%2082%20Q134%2078%20122%2082M150%20100%20Q136%2096%20122%20100M153%20118%20Q138%20114%20122%20118%27%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%27M62%2046%20Q90%2032%20118%2046%20L122%20104%20Q90%20136%2058%20104%20Z%27%20fill%3D%27%233a3026%27%20stroke%3D%27%238f846f%27%20stroke-opacity%3D%27.6%27%20stroke-width%3D%271.5%27%2F%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%238f846f%27%20stroke-opacity%3D%27.6%27%20stroke-width%3D%271.6%27%20stroke-linecap%3D%27round%27%3E%3Cpath%20d%3D%27M70%2066%20Q78%2062%2086%2066M94%2066%20Q102%2062%20110%2066%27%2F%3E%3Cpath%20d%3D%27M72%2074%20Q78%2072%2084%2074M96%2074%20Q102%2072%20108%2074%27%2F%3E%3Cpath%20d%3D%27M90%2070%20V86%20L86%2090%20M94%2088%20L90%2086%27%2F%3E%3Cpath%20d%3D%27M81%20101%20Q90%2099%2099%20101%27%2F%3E%3C%2Fg%3E%3Cpath%20d%3D%27M62%2046%20Q90%2032%20118%2046%27%20fill%3D%27none%27%20stroke%3D%27%23eef1f5%27%20stroke-opacity%3D%27.55%27%20stroke-width%3D%271.4%27%2F%3E%3Cpath%20d%3D%27M44%2040%20Q60%2026%2078%2022%27%20fill%3D%27none%27%20stroke%3D%27%23eef1f5%27%20stroke-opacity%3D%27.5%27%20stroke-width%3D%271.4%27%2F%3E%3Cpath%20d%3D%27M104%2040%20L112%2058%20L106%2070%20L116%2092%27%20fill%3D%27none%27%20stroke%3D%27%23120d09%27%20stroke-opacity%3D%27.8%27%20stroke-width%3D%271.2%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+   --fhcs-theme-cracks: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20width%3D%27320%27%20height%3D%2728%27%3E%3Cg%20fill%3D%27none%27%20stroke%3D%27%232e241a%27%20stroke-opacity%3D%27.28%27%20stroke-width%3D%27.8%27%20stroke-linejoin%3D%27miter%27%3E%3Cpath%20d%3D%27M40%2028%20L46.4%2024.9%20L60.1%2022.1%20L66.6%2019.9%20L81.2%2016%20L94.2%2011.5%27%2F%3E%3Cpath%20d%3D%27M190%200%20L197.6%204.4%20L206.8%206.9%20L218.9%209.4%20L236.4%2013%20L250.8%2017.4%27%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");
+   --fhcs-theme-crack: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2036%2032%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M2%200%20L10%204%20L14%209%20M10%204%20L20%203%20L28%208%20M20%203%20L24%200%20M8%2032%20L16%2027%20L18%2023%20M16%2027%20L28%2029%20L34%2025%20M28%2029%20L32%2032%27%20fill%3D%27none%27%20stroke%3D%27%23f4f7fb%27%20stroke-width%3D%271.3%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20vector-effect%3D%27non-scaling-stroke%27%2F%3E%3C%2Fsvg%3E");
+   --fhcs-theme-seam: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2036%2032%27%20preserveAspectRatio%3D%27none%27%3E%3Cpath%20d%3D%27M2%200%20L10%204%20L14%209%20M10%204%20L20%203%20L28%208%20M20%203%20L24%200%20M8%2032%20L16%2027%20L18%2023%20M16%2027%20L28%2029%20L34%2025%20M28%2029%20L32%2032%27%20fill%3D%27none%27%20stroke%3D%27%23dfe3ea%27%20stroke-width%3D%272.2%27%20stroke-linecap%3D%27round%27%20stroke-linejoin%3D%27round%27%20vector-effect%3D%27non-scaling-stroke%27%2F%3E%3C%2Fsvg%3E");
+   --fhcs-theme-fox-bloodied: radial-gradient(6.9px 6.9px at 1% 100%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(10.3px 10.3px at 1% 0.2%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(9.7px 29px at 99% 99.1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(6.1px 6.1px at 100% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(22.7px 7.6px at 97.5% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(7.8px 7.8px at 100% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(8.8px 26.4px at 1% 99.8%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(28px 9.3px at 99.8% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(3.9px 3.9px at 99.9% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(9.6px 9.6px at 94% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(5.7px 17.2px at 1% 97.4%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(8.3px 8.3px at 99% 98.8%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(5.2px 5.2px at 99.9% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(10.7px 10.7px at 99% 7.5%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(10.3px 10.3px at 99% 2.1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(8.2px 8.2px at 94.4% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(10.9px 10.9px at 0.5% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(7.5px 7.5px at 0% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(10.7px 10.7px at 3.1% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(7.1px 7.1px at 99% 3.6%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(9.4px 28.2px at 1% 3.2%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(3.9px 3.9px at 99% 98.5%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(10.1px 3.4px at 8.5% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(7.2px 7.2px at 93.9% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(3.1px 9.4px at 1% 95.9%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(4px 4px at 99% 90.8%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%);
+   --fhcs-theme-fox-down: radial-gradient(11.7px 11.7px at 1% 100%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(17.6px 17.6px at 1% 0.2%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(16.4px 49.3px at 99% 99.1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(10.4px 10.4px at 100% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(38.5px 12.8px at 97.5% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(13.2px 13.2px at 100% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(15px 44.9px at 1% 99.8%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(47.5px 15.8px at 99.8% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(6.6px 6.6px at 99.9% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(16.3px 16.3px at 94% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(9.7px 29.2px at 1% 97.4%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(14.1px 14.1px at 99% 98.8%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(8.8px 8.8px at 99.9% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(18.2px 18.2px at 99% 7.5%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(17.6px 17.6px at 99% 2.1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(13.9px 13.9px at 94.4% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(18.5px 18.5px at 0.5% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(12.7px 12.7px at 0% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(18.3px 18.3px at 3.1% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(12px 12px at 99% 3.6%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(16px 47.9px at 1% 3.2%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(6.7px 6.7px at 99% 98.5%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(17.1px 5.7px at 8.5% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(12.2px 12.2px at 93.9% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(5.4px 16.1px at 1% 95.9%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(6.8px 6.8px at 99% 90.8%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(8px 24px at 1% 89.3%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(10.3px 10.3px at 99% 9.6%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(8.9px 8.9px at 9.4% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(8.7px 8.7px at 10.6% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(12px 36.1px at 1% 86.6%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(15.1px 15.1px at 90.6% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(6.5px 6.5px at 82.4% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(8.2px 8.2px at 1% 89.9%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(11.8px 35.4px at 99% 81.3%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(9.1px 9.1px at 99% 88.8%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(15.2px 15.2px at 99% 11.5%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(15.7px 15.7px at 1% 77.9%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(7.8px 7.8px at 14.6% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(12.6px 12.6px at 74.6% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(15.7px 47.2px at 1% 19.7%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(5.5px 5.5px at 99% 81.1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(10.2px 10.2px at 75.9% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(8.6px 8.6px at 1% 30.6%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(5.3px 5.3px at 68.1% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(17px 17px at 33.8% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(8px 23.9px at 1% 28.3%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(7.7px 7.7px at 99% 30.3%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(11.5px 11.5px at 99% 31.8%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(15.9px 15.9px at 36% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(17px 17px at 1% 33.3%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(9.8px 29.5px at 99% 42.1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(17.4px 17.4px at 1% 38%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(27.1px 9px at 54.1% 1%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(55.3px 18.4px at 42.1% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(8.5px 8.5px at 1% 52.7%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(16.1px 16.1px at 1% 49.8%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(45.3px 15.1px at 44.2% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(11.5px 11.5px at 99% 50.2%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%), radial-gradient(6.3px 6.3px at 49.3% 99%, rgba(8,7,6,.95) 0, rgba(8,7,6,.85) 60%, transparent 100%);
+   --fhcs-theme-glass-mark: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cpath%20d%3D%27M7%202.5h10M7%2021.5h10M8%202.5c0%205%207.5%206%207.5%209.5S8%2016.5%208%2021.5M16%202.5c0%205-7.5%206-7.5%209.5s7.5%204.5%207.5%209.5%27%20fill%3D%27none%27%20stroke%3D%27%23000%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%2F%3E%3C%2Fsvg%3E");
+   --fhcs-theme-glass-mark-on: url("data:image/svg+xml,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2024%2024%27%3E%3Cpath%20d%3D%27M7%202.5h10M7%2021.5h10M8%202.5c0%205%207.5%206%207.5%209.5S8%2016.5%208%2021.5M16%202.5c0%205-7.5%206-7.5%209.5s7.5%204.5%207.5%209.5%27%20fill%3D%27none%27%20stroke%3D%27%23000%27%20stroke-width%3D%271.8%27%20stroke-linecap%3D%27round%27%2F%3E%3Cpath%20d%3D%27M8.6%2020.8c.8-2.9%203.4-3.9%203.4-6%200%202.1%202.6%203.1%203.4%206zM10.4%206.2h3.2c-.4.9-1%201.5-1.6%201.9-.6-.4-1.2-1-1.6-1.9z%27%20fill%3D%27%23000%27%2F%3E%3C%2Fsvg%3E");   /* sand-textures:end */
 }
 
-/* The ground: a faint tile lattice. */
+/* ---------- The ground: oxide sand ---------- */
+
+/* Grains across the whole window, thinning toward the top as if settled; a warm low along the foot; dunes in front of the fallen sphinx, rising as HP falls
+   until, at 0, only the crown of its head shows. Crisp in the gutters, faint through the glass. */
 .fhcs-sheet[data-fhcs-theme="sand"] .window-content
 {
+   --fhcs-art: 1;
+   position: relative;
+   isolation: isolate;
+   background-color: var(--fhcs-theme-oxide);
    background-image:
-      linear-gradient(45deg, color-mix(in srgb, currentColor 3%, transparent) 1px, transparent 1px),
-      linear-gradient(-45deg, color-mix(in srgb, currentColor 3%, transparent) 1px, transparent 1px);
-   background-size: 18px 18px;
+      var(--fhcs-theme-dune),
+      var(--fhcs-theme-sphinx),
+      radial-gradient(ellipse 120% 45% at 30% 105%, color-mix(in srgb, var(--fhcs-theme-umber) 85%, transparent), transparent 70%),
+      linear-gradient(to bottom, color-mix(in srgb, #0f0c0a 75%, transparent), transparent 70%),
+      var(--fhcs-theme-grains),
+      linear-gradient(to bottom, #0f0c0a, var(--fhcs-theme-oxide) 40%);
+   background-position: 0 100%, right 24px bottom 4px, 0 0, 0 0, 0 0, 0 0;
+   background-size: 100% calc(36px + var(--fhcs-theme-drift) * 64px), 132px 110px, 100% 100%, 100% 100%, 240px 240px, 100% 100%;
+   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat, no-repeat;
 }
 
-/* Carved frames: square, stepped corners (a notch of ground in each), an inlaid terracotta band along the top. */
-.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-frame
+/* ---------- Plates: smoked glass ---------- */
+
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-plate
+{
+   background-color: var(--fhcs-theme-plate);
+   backdrop-filter: blur(3px);
+}
+
+/* The blur makes each plate its own layer: the plate holding an open tray rises (rule 8). */
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-plate:has(details[open] > .fhcs-tray)
+{
+   position: relative;
+   z-index: 5;
+}
+
+/* ---------- Frames: tarnished silver, corners rubbed bright, the glass's edge catching light ---------- */
+
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-frame:not(.fhcs-portrait)
 {
    border-color: var(--fhcs-theme-edge);
    border-radius: 0;
-   box-shadow: inset 0 3px 0 var(--fhcs-theme-accent);
+   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--fhcs-theme-silver) 30%, transparent), 0 2px 6px color-mix(in srgb, #000 45%, transparent);
    background-image:
-      linear-gradient(var(--fhcs-theme-edge), var(--fhcs-theme-edge)),
-      linear-gradient(var(--fhcs-theme-edge), var(--fhcs-theme-edge)),
-      linear-gradient(var(--fhcs-theme-edge), var(--fhcs-theme-edge)),
-      linear-gradient(var(--fhcs-theme-edge), var(--fhcs-theme-edge));
-   background-position: 0 0, 100% 0, 0 100%, 100% 100%;
-   background-size: 4px 4px;
+      var(--fhcs-theme-sheen),
+      linear-gradient(var(--fhcs-theme-silver), var(--fhcs-theme-silver)),
+      linear-gradient(var(--fhcs-theme-silver), var(--fhcs-theme-silver)),
+      linear-gradient(var(--fhcs-theme-silver), var(--fhcs-theme-silver)),
+      linear-gradient(var(--fhcs-theme-silver), var(--fhcs-theme-silver));
+   background-position: calc(var(--fhcs-gleam-x, 100%) - 50%) 0, 0 0, 0 0, 100% 0, 100% 0;
+   background-size: 0 1px, 6px 1px, 1px 6px, 6px 1px, 1px 6px;
    background-repeat: no-repeat;
 }
 
-.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-frame:hover { border-color: var(--fhcs-theme-accent); }
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-frame:not(.fhcs-portrait):hover { background-size: 50% 1px, 6px 1px, 1px 6px, 6px 1px, 1px 6px; }
 
-.fhcs-sheet[data-fhcs-theme="sand"] :is(.fhcs-panel-head, .fhcs-group-head) { border-bottom: 1px double var(--fhcs-theme-edge); border-bottom-width: 3px; }
-.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-tab.active { border-bottom-color: var(--fhcs-theme-accent); }
+/* ---------- Type: El Messiri for the display style (names, numbers, item titles); labels keep the sheet's face:
+   at 12px in capitals El Messiri thinned out on the stone. ---------- */
 
+.fhcs-sheet[data-fhcs-theme="sand"] :is(.fhcs-display, .fhcs-item-text :is(h1, h2, h3))
+{
+   font-family: 'FHCS El Messiri', var(--font-body, serif);
+   /* El Messiri runs wider than the sheet's face: "Dragonborn" came within 3px of its card's side at 644px. */
+   letter-spacing: -0.02em;
+}
+
+/* ---------- Ruin stone: heading bars and the tab rail ---------- */
+
+.fhcs-sheet[data-fhcs-theme="sand"] :is(.fhcs-panel-head, .fhcs-group-head, .fhcs-item-head)
+{
+   border-bottom: 1px solid var(--fhcs-theme-tarnish);
+   color: var(--fhcs-theme-stone-ink);
+   --fhcs-texture-hi: var(--fhcs-theme-stone-top);
+   /* The cracks' stroke over the stone (tools/sand-textures.mjs: #2e241a at 28%). */
+   --fhcs-texture-lo: color-mix(in srgb, #2e241a 28%, var(--fhcs-theme-stone));
+   background:
+      var(--fhcs-theme-cracks) 0 50% / 320px 28px repeat-x,
+      linear-gradient(to bottom, var(--fhcs-theme-stone-top), var(--fhcs-theme-stone)) var(--fhcs-theme-stone);
+   box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 40%, transparent), inset 0 -2px 3px -2px color-mix(in srgb, #000 35%, transparent);
+}
+
+.fhcs-sheet[data-fhcs-theme="sand"] :is(.fhcs-panel-head, .fhcs-group-head, .fhcs-item-head) .fhcs-muted
+{
+   /* Full ink: 92% fell to 4.4:1 over the cracks. */
+   color: var(--fhcs-theme-stone-ink);
+}
+
+/* The tab row stays glass; its rail along the foot is a course of stone. The open tab is a pane of pale desert glass,
+   no glow (rule 3). */
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-tabs
+{
+   border-bottom: 3px solid var(--fhcs-theme-stone);
+   box-shadow: inset 0 -1px 0 var(--fhcs-theme-stone-top);
+}
+
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-tab.active
+{
+   border-bottom-color: var(--fhcs-theme-silver);
+   color: var(--fhcs-theme-glass-ink);
+   background: linear-gradient(160deg, color-mix(in srgb, #fff 55%, var(--fhcs-theme-glass)), var(--fhcs-theme-glass) 45%, color-mix(in srgb, #9a8a5a 30%, var(--fhcs-theme-glass))) var(--fhcs-theme-glass);
+}
+
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-tabs .fhcs-lock[aria-pressed="true"] { border-color: var(--fhcs-theme-silver); background: var(--fhcs-theme-silver); color: var(--fhcs-theme-oxide); }
+
+/* ---------- The nameplate: a silver plaque, tarnished at its edges ---------- */
+
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-name
+{
+   box-sizing: border-box;
+   height: var(--fhcs-control);
+   min-height: 0;
+   line-height: calc(var(--fhcs-control) - 2px);
+   padding: 0 var(--fhcs-s2);
+   border: 1px solid var(--fhcs-theme-tarnish);
+   color: #1b1713;
+   background: linear-gradient(to bottom, #f6f7f9, #d9dce1 50%, #c3c6cc) #d9dce1;
+   box-shadow: inset 0 0 6px 1px color-mix(in srgb, #3b2a1a 55%, transparent), 0 1px 2px color-mix(in srgb, #000 50%, transparent);
+}
+
+/* ---------- The portrait: a mirror (rule 7: its rim says HP, beside the bar that says it) ----------
+   The rim is silvered; desilvering creeps in from the corners as HP falls, spots and streaks (tools/sand-textures.mjs),
+   never over the face. A round portrait keeps no frame. */
+
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-portrait:not(.fhcs-shape-round)
+{
+   border: 3px solid transparent;
+   border-radius: 0;
+   background:
+      var(--fhcs-theme-fox, none) border-box,
+      linear-gradient(135deg, #ffffff 0%, #c3c7ce 18%, #7b7f86 38%, #e9ecf1 55%, #8c9097 75%, #f4f6f9 100%) border-box;
+   box-shadow: 0 0 0 1px #000, 0 2px 8px color-mix(in srgb, #000 60%, transparent);
+}
+
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-portrait:not(.fhcs-shape-round) > .fhcs-portrait-clip { border-radius: 0; box-shadow: inset 0 0 0 1px color-mix(in srgb, #000 60%, transparent); }
+.fhcs-sheet[data-fhcs-theme="sand"][data-fhcs-hp="bloodied"] .fhcs-portrait { --fhcs-theme-fox: var(--fhcs-theme-fox-bloodied); }
+.fhcs-sheet[data-fhcs-theme="sand"][data-fhcs-hp="down"] .fhcs-portrait { --fhcs-theme-fox: var(--fhcs-theme-fox-down); }
+
+/* Down: the frames' bright corners tarnish too. */
+.fhcs-sheet[data-fhcs-theme="sand"][data-fhcs-hp="down"] { --fhcs-theme-silver: #8d8a84; }
+
+/* ---------- Inspiration: hourglasses ---------- */
+
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-inspiration
+{
+   --fhcs-mark: var(--fhcs-theme-glass-mark);
+   --fhcs-mark-on: var(--fhcs-theme-glass-mark-on);
+   --fhcs-inspire-glow: #f4f7ff;
+   --fhcs-inspire-breath: fhcs-sand-glint 5.2s ease-in-out infinite;
+   /* Banked: the glass turned over, as you start one. Spent: the sand runs out and the light with it. */
+   --fhcs-inspire-on: fhcs-sand-turn 600ms ease-out;
+   --fhcs-inspire-on-glow: fhcs-sand-turn-glow 600ms ease-out;
+   --fhcs-inspire-off: fhcs-sand-run 600ms ease-in;
+   --fhcs-inspire-off-glow: fhcs-sand-run-glow 600ms ease-in;
+}
+
+@keyframes fhcs-sand-glint
+{
+   0%, 100% { filter: drop-shadow(0 0 1px var(--fhcs-inspire-glow)); }
+   50% { filter: drop-shadow(0 0 3px var(--fhcs-inspire-glow)); }
+}
+@keyframes fhcs-sand-turn { from { transform: rotate(-180deg); } to { transform: none; } }
+@keyframes fhcs-sand-turn-glow { 0% { filter: none; } 70% { filter: drop-shadow(0 0 5px var(--fhcs-inspire-glow)); } 100% { filter: drop-shadow(0 0 1px var(--fhcs-inspire-glow)); } }
+@keyframes fhcs-sand-run { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+@keyframes fhcs-sand-run-glow { from { filter: drop-shadow(0 0 3px var(--fhcs-inspire-glow)); } to { filter: none; } }
+
+/* ---------- Trays, fields, buttons ---------- */
+
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-tray
+{
+   border-color: var(--fhcs-theme-edge);
+   border-radius: 0;
+   background: var(--fhcs-surface);
+   color: var(--fhcs-ink);
+   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--fhcs-theme-silver) 30%, transparent), 0 6px 16px -4px color-mix(in srgb, #000 70%, transparent);
+}
+
+.fhcs-sheet[data-fhcs-theme="sand"] .fhcs-input:focus { border-color: var(--fhcs-theme-silver); }
+.fhcs-sheet[data-fhcs-theme="sand"] { scrollbar-color: var(--fhcs-theme-edge) transparent; }
+
+/* ---------- Moments ---------- */
 
 @media (prefers-reduced-motion: no-preference)
 {
-   .fhcs-sheet[data-fhcs-theme="sand"]:not([data-fhcs-motion="off"]) .fhcs-frame { transition: border-color 0.2s; }
-   /* A shaft of light passes down the portrait, once, on hover. */
-   .fhcs-sheet[data-fhcs-theme="sand"]:not([data-fhcs-motion="off"]) .fhcs-portrait:hover .fhcs-portrait-stage
+   .fhcs-sheet[data-fhcs-theme="sand"]:not([data-fhcs-motion="off"]) .fhcs-frame:not(.fhcs-portrait) { transition: background-size 0.2s; }
+   /* A press settles, as a stone into sand. */
+   .fhcs-sheet[data-fhcs-theme="sand"]:not([data-fhcs-motion="off"]) :is(.fhcs-button, .fhcs-toggle, .fhcs-chip, .fhcs-tab):active { transform: translateY(1px); }
+   /* A hit: a branching crack runs through the glass over the HP bar and fades. A heal: the crack mended in silver. */
+   .fhcs-sheet[data-fhcs-theme="sand"]:is(.fhcs-moment-hit, .fhcs-moment-heal):not([data-fhcs-motion="off"]) .fhcs-hp-meter::after
    {
-      background: linear-gradient(to bottom, transparent, var(--fhcs-theme-light), transparent) no-repeat;
-      background-size: 100% 40%;
-      animation: fhcs-sand-shaft 0.3s ease-out forwards;
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: var(--fhcs-theme-crack) calc(var(--fhcs-hp, 1) * 100% - 16px) 50% / 36px 100% no-repeat;
+      animation: fhcs-sand-crack 0.65s ease-out forwards;
    }
-   /* A press settles like stone. */
-   .fhcs-sheet[data-fhcs-theme="sand"]:not([data-fhcs-motion="off"]) :is(.fhcs-button, .fhcs-toggle, .fhcs-chip, .fhcs-tab):active
+   .fhcs-sheet[data-fhcs-theme="sand"].fhcs-moment-heal:not([data-fhcs-motion="off"]) .fhcs-hp-meter::after
    {
-      transform: scale(0.97);
-      transition: transform 0.1s;
+      background-image: var(--fhcs-theme-seam);
+      filter: drop-shadow(0 0 2px #fff);
    }
 }
 
-@keyframes fhcs-sand-shaft
+@keyframes fhcs-sand-crack { 0% { opacity: 0; } 15% { opacity: 1; } 60% { opacity: 1; } 100% { opacity: 0; } }
+
+/* ---------- The chat card: glass on oxide, a stone heading ---------- */
+
+.fhcs-chat[data-fhcs-theme="sand"]
 {
-   from { background-position: 0 -60%; }
-   to { background-position: 0 160%; }
+   border-color: var(--fhcs-theme-edge);
+   background: var(--fhcs-surface);
+   color: var(--fhcs-ink);
+}
+
+.fhcs-chat[data-fhcs-theme="sand"] :is(.fhcs-card-title, .fhcs-band-total, .fhcs-row-total) { font-family: 'FHCS El Messiri', var(--font-body, serif); }
+.fhcs-chat[data-fhcs-theme="sand"] .fhcs-card-header
+{
+   color: var(--fhcs-theme-stone-ink);
+   background: linear-gradient(to bottom, var(--fhcs-theme-stone-top), var(--fhcs-theme-stone));
 }

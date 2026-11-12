@@ -17,20 +17,23 @@ const css = JSON.parse(readFileSync(`${root}module.json`, 'utf8')).styles
    .join('\n');
 const NAMES = { forge: 'Fire and Forge', wind: 'Wind and Wrath', sand: 'Sand and Sanctuary', valley: 'Valley and Valor' };
 const MODES = { light: 'background:#f4f1ea;color:#191813', dark: 'background:#26252b;color:#e8e6e3' };
-const draw = (name) => { const c = CASES.find((x) => x.name === name); return template(c.template)(c.context); };
+// A theme's own case where it has one, else the base case (the window carries the theme either way).
+const draw = (name) => { const c = CASES.find((x) => x.name === name) ?? CASES.find((x) => x.name === name.replace(/^theme-[a-z]+-/, '')); return c.html ?? template(c.template)(c.context); };
 const LOCK = '<svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
 const TABS = `<nav class="fhcs-tabs">${['Attributes', 'Inventory', 'Spellbook', 'Features', 'Effects', 'Biography']
    .map((t, i) => `<button type="button" class="fhcs-tab${i ? '' : ' active'}">${t}</button>`).join('')}<button type="button" class="fhcs-toggle fhcs-lock" aria-label="Lock">${LOCK}</button></nav>`;
 
 /** One sheet window: header, tab row and the Attributes tab, in a theme, a mode, at an HP ratio and a width. */
-const sheet = (look, mode, { hp = 1, width = 740, height = 760 } = {}) =>
+// `realTabs` draws the theme's own tab-row case (with inspiration's marks) in place of the plain stand-in; `tab` picks
+// the tab body (a short one leaves room to see the ground).
+const sheet = (look, mode, { hp = 1, width = 740, height = 760, tab = 'attributes', realTabs = false } = {}) =>
 {
    const state = hp <= 0 ? 'down' : hp <= 0.5 ? 'bloodied' : 'full';
    return `<section class="application sheet actor character fhcs-sheet themed theme-${mode}" data-fhcs-theme="${look}"
       data-fhcs-hp="${state}" style="--fhcs-hp:${hp};width:${width}px;height:${height}px;display:flex;flex-direction:column;flex:none;${MODES[mode]}">
       <div class="window-content" style="flex:1;min-height:0;overflow:hidden">
-         ${draw(`theme-${look}-header`)}${TABS}
-         <div class="tab-body">${draw(`theme-${look}-attributes`)}</div>
+         ${draw(`theme-${look}-header`)}${realTabs ? draw(`theme-${look}-tabs`) : TABS}
+         <div class="tab-body">${draw(`theme-${look}-${tab}`)}</div>
       </div></section>`;
 };
 
@@ -70,7 +73,28 @@ writeFileSync(`${root}tools/out/forge-mockup.html`, page('Fire and Forge',
    }
    </script>`));
 
-console.log('Wrote tools/out/theme-mockup.html and tools/out/forge-mockup.html');
+writeFileSync(`${root}tools/out/sand-mockup.html`, page('Sand and Sanctuary',
+   'The Argent Sands (SCOPE §4.11): the mirror rim and the dunes follow HP: full, bloodied, down. Hover frames, press buttons, or play a moment.',
+   `<div class="moments"><button type="button" data-moment="fhcs-moment-hit">Play: a hit</button><button type="button" data-moment="fhcs-moment-heal">Play: a heal</button></div>
+   <div class="row">${figure('Full HP', sheet('sand', 'dark', { height: 1000, realTabs: true, tab: 'effects' }))}${figure('Bloodied (40%)', sheet('sand', 'dark', { hp: 0.4, height: 1000, realTabs: true, tab: 'spellbook' }))}${figure('Down (0 HP)', sheet('sand', 'dark', { hp: 0, height: 1000, realTabs: true, tab: 'effects' }))}</div>
+   <h2>644px, the narrowest; light mode looks the same</h2><div class="row">${figure('Light mode, bloodied', sheet('sand', 'light', { hp: 0.4, width: 644, height: 1000, realTabs: true, tab: 'inventory' }))}</div>`,
+   `<script>
+   for (const button of document.querySelectorAll('[data-moment]'))
+   {
+      button.addEventListener('click', () =>
+      {
+         for (const sheet of document.querySelectorAll('.fhcs-sheet'))
+         {
+            sheet.classList.remove(button.dataset.moment);
+            void sheet.offsetWidth;
+            sheet.classList.add(button.dataset.moment);
+            setTimeout(() => sheet.classList.remove(button.dataset.moment), 650);
+         }
+      });
+   }
+   </script>`));
+
+console.log('Wrote tools/out/theme-mockup.html, forge-mockup.html and sand-mockup.html');
 
 /* ---------- The viewer: one large sheet with controls (user, 2026-10-28: the side-by-side pages were hard to use
    and their animations hard to see). Written without a document skeleton, for publishing as an artifact page; the

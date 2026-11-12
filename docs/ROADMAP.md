@@ -22,9 +22,11 @@ The four themes are regions of the user's setting; Sand is the first taken furth
 - [x] Brief and research: the user's lore; silver tarnish, desilvered mirrors, fulgurites, gintsugi; colour collisions (docs/research/sand-theme.md)
 - [x] Decisions recorded: dark, the label kept, every theme a region, Day and Night checked against; §7's class sketch closed
 - [x] Extended (Claude): the theme menu names Plain "Day and Night" (`lang/en.json`; the user's decision, done now as one line)
-- [x] Mockup: canvas row "Themes · Sand and Sanctuary" (full, 644px edit bloodied with a long name, down, the component; marks and the HP bar play their moments); waits on the user's review
-- [ ] Build on the kit: `styles/themes/sand.css` rewritten (one look, the ground's grains from a script as Forge's textures, the mirror rim on `--fhcs-hp`, El Messiri), the hourglass marks, `registerMoments('sand', …)` for gained, spent, hit, heal
-- [ ] Layout check `ONLY='theme-sand'`, screenshots looked at; Quench; play
+- [x] Mockup, first pass (hand-made, silver alone): the user, "doesn't really look like our sheet"; replaced
+- [x] Mockup, second pass: `styles/themes/sand.css` on the kit with all four materials, textures from `tools/sand-textures.mjs`, El Messiri (OFL, `fonts/el-messiri/`); rendered from our templates (`tools/theme-mockup.mjs` writes `tools/out/sand-mockup.html`); canvas row "Themes · Sand and Sanctuary" (full, bloodied, down, 644px light, details); waits on the user's review
+- [ ] Particles: `registerMoments('sand', …)`, sand pouring on gained, running out on spent
+- [x] Layout check `ONLY='theme-sand'`: all 42 layouts pass (fixed on the way: dark meaning colours carried into Foundry's light mode, the stone's darkest stroke, the glass tab's ground and its glow, El Messiri's width at 644px, failure's red a step lighter on concentration's tint)
+- [ ] Quench; play
 
 ## Phase 0: Foundations (done; Quench verified 2026-10-24)
 

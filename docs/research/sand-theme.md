@@ -32,6 +32,12 @@ and is now a husk of itself. A dark theme, playing with silver tarnish and brigh
 - **Kintsugi in silver** (gintsugi): a break mended with metal, the seam left showing. *For us:* the heal moment,
   in silver, since gold is concentration's (§5.1).
 
+## The palette (second pass, 2026-11-12)
+
+Oxide sand (#17120e ground, #3a2b1f umber lows), ruin limestone (#d6ccb9 to #bdb19b, dark letters #1f1913), smoked
+glass (the surface #1d1915 at 88% with a blur), pale desert glass (#e7dfbf, the open tab), silver (#eef0f4 bright,
+#85837e tarnished edge). Silver alone read as one note (user, 2026-11-12); the four materials each take one place.
+
 ## Colour collisions (§5.1, Day and Night)
 
 | From the source | Collides with | Answer |
@@ -39,7 +45,8 @@ and is now a husk of itself. A dark theme, playing with silver tarnish and brigh
 | Tarnish interference blue, violet | Prepared blue, Pact Magic violet | Left out; tarnish only brown to black |
 | Silver-grey | At-will grey tint; Night's silver moon | Silver only as bright points and edges, colder and harder than Night's soft halo |
 | Gold seams | Concentration gold | Silver seams |
-| Libyan desert glass's yellow-green | Equipped green | Glass clear or smoke, never green |
+| Libyan desert glass's yellow-green | Equipped green | Glass smoke, or pale straw for the open tab, never green |
+| Pale straw desert glass (the open tab) | Concentration gold | Paler and greyer than concentration's saturated gold, and only on the open tab; watch in play |
 | Rose-red ruin stone | Failure red | Not used |
 
 ## Sources
