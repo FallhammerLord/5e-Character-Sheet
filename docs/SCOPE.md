@@ -43,7 +43,7 @@ Header decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrdDsbn
 - ~~Ability emphasis, a per-player choice~~ retired (user, 2026-10-27): score and modifier now sit side by side in one style, so there is nothing to emphasise.
 - **Leveling follows dnd5e's `levelingMode` world setting** (the GM's choice; we add no setting of our own). XP modes show the usual XP bar. Milestone mode (`noxp`) puts a Level button where the bar was; it folds out a tray of 20 pips (4 rows of 5). Each class level fills the next pip with that class's icon, in the order the levels were gained; empty pips show levels not reached. A pip fills when the player levels up through dnd5e, after its advancement finishes. Nothing to add by hand.
   - dnd5e stores levels per class, not their order, so we record the order in an actor flag after each advancement (`dnd5e.advancementManagerComplete`); characters from before that fill class by class, original class first. Icons: the class item's own image, so any source's classes work.
-- **Pinned strip** when scrolled (§4.5): portrait thumbnail, name, HP and bar, AC, conditions, inspiration. Built in Phase 7 (user, 2026-11-08: an ADHD-layer feature, not parity).
+- **Pinned strip:** none needed; the header already stays in place while the tab body scrolls (user, 2026-11-12, replacing the 2026-11-08 plan of a strip built in Phase 7).
 - **The stats row never wraps** (user, 2026-10-24; panels 2026-10-27): the combat panel (125px) and the abilities panel stay in one row; ability columns are 48px at the least, and the sheet stops shrinking at the width the row and the cards need (644px with six abilities; `headerMinWidth`). Text sizes stay the three styles; only the columns scale.
 - **Class, species and background cards under the abilities** (user, 2026-10-26; mockup row "Phase 5 · origin cards in the header"): moved from the Features tab into the blank space under the ability row, on that row's columns (the combat panel's, then one per ability) so their outer edges meet the panels'. Species and background span 2 ability columns each; one class takes the rest (the combat panel's and two abilities'); two split them, the first on the combat panel's column (user, 2026-10-27). The header's class line goes, and the small line keeps only size and speed (user, 2026-10-27: type was redundant, alignment lives on the Biography). At 644px with two classes a subclass drops to its own line. Card details: §4.8.
 - **Level up in the level pill's tray** (user, 2026-10-26), in XP and milestone mode: one button per class (dnd5e's level-up wizard) and New class (dnd5e's class browser; adding the class runs its wizard). In XP mode the pill turns solid with an up arrow once the XP is reached.
@@ -53,7 +53,7 @@ Header decisions (user, 2026-10-24; mockup https://claude.ai/artifact/PfrTrdDsbn
 
 A tab row across the top, under the header, in Classic's order: Attributes, Inventory, Spellbook, Features, Effects, Biography (Bastion when the character has one; no Journal, §4.8). Special Traits, dnd5e's settings page, is off the row: in edit mode a gear at the right end of the Traits panel's heading opens it (after its arrows; user, 2026-11-08); the page opens with a bar of its name and that gear, pressed, which closes it back to Attributes (user, 2026-11-08: it could be left only by locking); locking the sheet leaves it for Attributes too (user, 2026-10-28: the row's room went to five inspiration marks at 644px; before, a tab in edit mode). The sheet lock (play and edit) sits at the far right of the row. The open tab is marked by its underline alone: no glow, and no box left on a tab after a click; keyboard focus shows as an outline (user, 2026-10-28). *check*
 
-Planned, not built: the Actions tab (§4.4, backburner); players choosing and ordering their tabs (Classic's tab selection window); the Attributes skills column kept beside every tab, as Tidy's current sheet does with its sidebar (user, 2026-10-26; Phase 7, where tab bodies narrow by about 240px and the list tabs need a recheck at 644).
+Planned, not built: the Actions tab (§4.4, backburner); players choosing and ordering their tabs (Classic's tab selection window). Dropped: the Attributes skills column beside every tab (user, 2026-11-12: "unnecessary"; planned 2026-10-26).
 
 ### 4.3 Attributes tab
 
@@ -80,7 +80,7 @@ Keep the layout players know; fix what costs attention:
 
 - **Gear and pencil icons only in edit mode.** Classic shows about 30 of them in play; each is a target under 24px.
 - **Equipped and prepared** get an icon or label as well as their row color (color alone fails the colorblind player; §5.1).
-- **The "Now" home** (Phase 7): was to be the Actions tab, now backburnered (user, 2026-10-26); where turn economy lives is open again (§7).
+- **No "Now" strip** (user, 2026-11-12: "unnecessary"; replaces the open question of where turn economy lives). Favorites stay uncapped (user, 2026-11-12: a cap of five unwanted).
 - **Targets at least 24px**, three text sizes, tooltips two to four words. On chat cards, our tooltips wait 1.5 s, open above the button and clear on a click (user, 2026-10-24).
 - **Pinned header:** HP, AC and conditions never scroll away.
 
@@ -104,7 +104,7 @@ Built on dnd5e's `spells` part and `dnd5e-inventory`, like Inventory (research n
 
 - **Spell states are two things in dnd5e:** how it's cast (`method`: Spellcasting, Pact Magic, Innate, At will, Ritual, or granted by an item) and its preparation (unprepared, prepared, always prepared). Only Spellcasting and Pact Magic spells prepare (2024 warlocks prepare).
 - **Top of the tab:** one card per casting class (ability, attack, save DC, prepared / max), the class name on its own line so two cards fit side by side at 644px. Preparation follows dnd5e's class math: we show its counts and compute nothing; a class without a preparation formula shows a count only.
-- **Concentration bar,** under the cards, always in the same place: the held spell's icon and name (opens the spell), End (dnd5e's `endConcentration`), and a Con save button that stays when not concentrating. One entry per concentration when the limit is above 1. A save after damage is dnd5e's own chat prompt, not the sheet's job. Phase 7 may mirror the bar in the header.
+- **Concentration bar,** under the cards, always in the same place: the held spell's icon and name (opens the spell), End (dnd5e's `endConcentration`), and a Con save button that stays when not concentrating. One entry per concentration when the limit is above 1. A save after damage is dnd5e's own chat prompt, not the sheet's job.
 - **Sections:** cantrips, spell levels, Pact Magic, then innate, at will, ritual and item spells. Slot sections carry their pips in the heading (§5.1) and, in edit mode, a gear for dnd5e's slot settings. A section with limited-use spells adds a Uses column.
 - **Rows:** the picture casts; the name (with fold caret) opens dnd5e's summary in place. Columns: components, concentration mark, time in words ("1 Bonus Action", not dnd5e's "1BA"), range; school and target off by default; then the book and the favorite bookmark. Players choose columns from the Columns menu in edit mode (client setting).
 - **The book** has three states, like attunement: filled (prepared; click to unprepare), outline (unprepared; click to prepare), locked (always prepared; no click). Cantrips (they never count), innate, at-will, ritual-only and item spells have none.
@@ -151,7 +151,7 @@ From the user's screenshot after Phase 6's play check. Mockups: the layout check
 
 ### 4.11 Themes (user, 2026-10-28)
 
-Four themes for players who want them, ahead of the rest of Phase 7: **Fire and Forge**, **Wind and Wrath**, **Sand and Sanctuary**, **Valley and Valor**. Plain (today's look) stays the default. The rules every theme follows are §5.3; this section holds the choosing and each theme's look.
+Four themes for players who want them, ahead of Phase 8: **Fire and Forge**, **Wind and Wrath**, **Sand and Sanctuary**, **Valley and Valor**. Plain (today's look) stays the default. The rules every theme follows are §5.3; this section holds the choosing and each theme's look.
 
 - **Per character, with a world default:** a character's theme is stored on the actor (`flags.fhcs.theme`); without one, the GM's world setting ("Sheet theme", Plain by default) applies. Everyone who opens the sheet sees the same theme. A palette chip on the title bar, before dnd5e's ⋮, opens a tray: World default (named), Plain and the four themes, the one worn marked with the radio dot. It shows in both modes to anyone who can edit the sheet (user, 2026-10-28, moved off the tab row: in edit mode it crowded the Forge emblem); a choice, or a click elsewhere, closes the tray. The chip is a button and its tray hangs from the window, not the title bar (user, 2026-10-28: "change theme button is broken"; Foundry drags the window from any press in the bar but a button's). Each player's "Sheet motion" setting (on by default; "Theme motion" until Plain moved too, 2026-10-29) keeps the sheet still when off, in every theme.
 - **Chat cards follow the world theme,** not the speaker's; a world setting switches themed cards off (plain cards). A later slice than the sheet.
@@ -437,11 +437,10 @@ The same frame serves every roll: a skill check from the sheet is header plus d2
 - **Each damage type its own total:** the damage band splits a roll as dnd5e's Apply does (`aggregateDamageRolls`): radiant dice in a slashing roll read "9 Slashing · 6 Radiant" under the total, not all as slashing.
 - **What Apply did stays on the card:** one line per target and click under an "Applied" heading, open, whatever is selected or targeted next: "Dire Wolf takes 9 slashing", "Dire Wolf takes 15: 9 slashing, 6 radiant", "Kira heals 7", "Bless on Kira". Saved on the usage card (`flags.fhcs.applied`), so only the card's author or the GM leaves a line; our HP tray leaves none. No undo.
 - **Hits against targets** come from the targets dnd5e recorded at the attack roll, which don't follow later targeting; a report of the hit line changing waits on a before-and-after screenshot.
-- **Later (Phase 7 list):** an effect that turns every incoming damage type into one (dnd5e's `preCalculateDamage` hook, an actor flag set by the effect).
+- **Damage turned into one type:** not the sheet's job; Active Effects and dnd5e's Enchant activity handle it (user, 2026-11-12, replacing the 2026-10-28 Phase 7 plan).
 
 ## 7. Open questions
 
 - Shared themes with the quest log, or Light and Dark first?
 - Which sheet-changing modules matter at the user's table?
-- Does the "Now" strip live in the header, a tab, or both?
 - **More themes, one per class?** (user, 2026-11-09: "stuff to speculate about later"; nothing decided). The user's names: Blood and Bluster, Angels and Agony, Gold and Guile, Feathers and Fate, Duty and Demand, Mentor and Medium. Claude's sketch: with the four built themes they cover ten of the twelve classes (Barbarian Blood and Bluster, Bard Feathers and Fate, Cleric Angels and Agony, Fighter Fire and Forge, Monk Sand and Sanctuary, Paladin Duty and Demand, Ranger Valley and Valor, Rogue Gold and Guile, Sorcerer Wind and Wrath, Warlock Mentor and Medium); gaps Druid (Root and Ruin?) and Wizard (Candle and Cipher?). Colour traps: blood red is failure's hue, halo and coin gold are concentration's, wax seals red or blue. Open: is Mentor and Medium the warlock's patron through a vessel, or teacher and spirit channel? Take one further first, as with Forge.

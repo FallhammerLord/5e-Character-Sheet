@@ -34,7 +34,7 @@ Portrait, name, class and level, HP and temp HP, AC, initiative, speed, proficie
 - [x] Header part: portrait 160 × up to 240 with corner chips (exhaustion, inspiration, rest, hit dice); HP with dnd5e's click-to-edit meter, Temp; name, XP or the milestone track, level; class, origin, speed, proficiency; AC, Init and abilities in one row (verified 2026-10-24)
 - ~~Ability emphasis, a client setting~~ retired (user, 2026-10-27; SCOPE §4.1): score and modifier share one style
 - [x] Milestone track (dnd5e's leveling mode "no XP"): 20 pips filled with class images in the order gained, recorded after advancement (played 2026-11-08)
-- Pinned strip on scroll: moved to Phase 7 (user, 2026-11-08)
+- Pinned strip on scroll: moved to Phase 7 (user, 2026-11-08), then found to be the sheet's behaviour already (user, 2026-11-12)
 
 ## Phase 2: Attributes tab
 
@@ -245,9 +245,16 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
   - [ ] Quench passed (2026-11-12); play waits
 - [ ] Quench and play
 
-## Phase 7: The ADHD layer
+## Phase 7: The ADHD layer (closed, nothing to build; user, 2026-11-12)
 
-Skills column on every tab (user, 2026-10-26): the Attributes skills column stays beside every tab, as in Tidy's current sheet (its sidebar; Classic showed skills on Attributes only, checked in Tidy v13.0.0 source). Tab bodies then lose about 240px; recheck Inventory and Spellbook rows at 644px. Optional "Now" strip: action, bonus action, reaction and movement, with spent ones dimmed until the next turn. Favorites capped at five. Panels fold; HP, AC and conditions stay pinned: the pinned strip on scroll (SCOPE §4.1, §4.5; moved here from Phase 1, user 2026-11-08). An effect that turns all incoming damage into one type (user, 2026-10-28; SCOPE §6.7).
+Each item answered by the user, 2026-11-12:
+
+1. Pinned strip on scroll: already the sheet's behaviour (the header stays in place while the tab body scrolls).
+2. Skills column beside every tab: unnecessary.
+3. "Now" strip (action, bonus, reaction, movement): unnecessary.
+4. Favorites capped at five: unwanted.
+5. Panels fold, HP, AC and conditions pinned: already the sheet's behaviour.
+6. An effect that turns all incoming damage into one type: handled by Active Effects and dnd5e's Enchant activity; nothing for the sheet.
 
 ## Phase 8: Themes, compatibility, release
 
