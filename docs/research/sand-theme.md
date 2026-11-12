@@ -23,9 +23,8 @@ and is now a husk of itself. A dark theme, playing with silver tarnish and brigh
   polished bright; the bright points few and sharp.
 - **Desilvered mirrors** (mirror makers' and glaziers' notes): moisture reaches the silver behind the glass and it
   corrodes. It starts at the edges as dark spots and streaks and works its way in; it can't be cleaned off, being
-  under the glass. Pre-1900 mirrors may be mercury-backed. *For us:* the portrait as a mirror whose silvering
-  darkens from the edges as HP falls: loss of self, drawn. The darkness keeps to the rim, never over the face
-  (§5.3 rule 7).
+  under the glass. Pre-1900 mirrors may be mercury-backed. *For us:* the portrait as a mirror that fogs as HP falls, rim and picture both, spots spreading in from the edges
+  over the whole reflection (user, 2026-11-12): loss of self, drawn.
 - **Fulgurites** (geology and museum notes): sand fused by lightning into tubes, glassy and bubble-pitted inside,
   rough with half-melted grains outside, sometimes branching like roots; tan, brown, black, white or translucent,
   by the soil. *For us:* glass as the scar of the fall; the crack of a hit branches as a fulgurite does.

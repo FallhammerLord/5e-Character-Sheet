@@ -8,7 +8,8 @@
  * - sphinx: the fallen head of the scholastic's guardian, tilted in the sand, its nose broken;
  * - cracks: hairline cracks in the ruin stone of heading bars (a 320 × 28 tile);
  * - crack, seam: a hit's branching glass crack, and the same line mended in silver for a heal (fulgurite branching);
- * - fox-bloodied, fox-down: the mirror's desilvering, spots and streaks gathered at the corners;
+ * - fox-bloodied, fox-down: the mirror rim's desilvering, spots and streaks gathered at the corners;
+ * - fog-full, -bloodied, -down: the same desilvering over the whole portrait, haze, edges and spots;
  * - glass-mark, glass-mark-on: inspiration's hourglass, empty and holding sand.
  */
 
@@ -125,7 +126,32 @@ function fox(count, grow)
    }).join(', ');
 }
 
-const GLASS = 'M7 2.5h10M7 21.5h10M8 2.5c0 5 7.5 6 7.5 9.5S8 16.5 8 21.5M16 2.5c0 5-7.5 6-7.5 9.5s7.5 4.5 7.5 9.5';
+/**
+ * The mirror's fog over the whole portrait (user, 2026-11-12: "foxing should fog the whole portrait in the foreground"):
+ * a milky haze, darkening that creeps in from the edges, and dark spots that spread inward and grow as HP falls. Drawn
+ * over the art, under the stage, so the HP band keeps its own ground.
+ */
+function fog(spots, reach, haze, edge)
+{
+   const rnd = seeded(31);
+   const layers = [];
+   for (let i = 0; i < spots; i++)
+   {
+      // Most spots near an edge, more of them inward as `reach` grows (0–1).
+      const side = Math.floor(rnd() * 4);
+      const depth = Math.pow(rnd(), 1.6) * reach * 50;
+      const along = rnd() * 100;
+      const [x, y] = [[along, depth], [100 - depth, along], [along, 100 - depth], [depth, along]][side];
+      const r = r1(2 + rnd() * 7 * (0.6 + reach));
+      const alpha = r1(0.45 + rnd() * 0.4);
+      layers.push(`radial-gradient(${r}px ${r1(r * (0.7 + rnd() * 0.6))}px at ${r1(x)}% ${r1(y)}%, rgba(12,11,10,${alpha}) 0, rgba(12,11,10,${r1(alpha * 0.5)}) 55%, transparent 100%)`);
+   }
+   layers.push(`radial-gradient(ellipse 75% 70% at 50% 45%, transparent ${Math.round(70 - reach * 55)}%, rgba(14,12,11,${edge}) 100%)`);
+   layers.push(`linear-gradient(rgba(196,198,200,${haze}), rgba(196,198,200,${haze}))`);
+   return layers.join(', ');
+}
+
+const GLASS ='M7 2.5h10M7 21.5h10M8 2.5c0 5 7.5 6 7.5 9.5S8 16.5 8 21.5M16 2.5c0 5-7.5 6-7.5 9.5s7.5 4.5 7.5 9.5';
 const SAND = 'M8.6 20.8c.8-2.9 3.4-3.9 3.4-6 0 2.1 2.6 3.1 3.4 6zM10.4 6.2h3.2c-.4.9-1 1.5-1.6 1.9-.6-.4-1.2-1-1.6-1.9z';
 const mark = (filled) => `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='${GLASS}' fill='none' stroke='%23000' stroke-width='1.8' stroke-linecap='round'/>${filled ? `<path d='${SAND}' fill='%23000'/>` : ''}</svg>`.replace(/%23/g, '#');
 
@@ -138,6 +164,9 @@ const block = [
    `--fhcs-theme-seam: ${uri(crack('#dfe3ea', 2.2))};`,
    `--fhcs-theme-fox-bloodied: ${fox(26, 2)};`,
    `--fhcs-theme-fox-down: ${fox(60, 3.4)};`,
+   `--fhcs-theme-fog-full: ${fog(4, 0.15, 0.03, 0.15)};`,
+   `--fhcs-theme-fog-bloodied: ${fog(28, 0.55, 0.12, 0.5)};`,
+   `--fhcs-theme-fog-down: ${fog(70, 1, 0.3, 0.85)};`,
    `--fhcs-theme-glass-mark: ${uri(mark(false))};`,
    `--fhcs-theme-glass-mark-on: ${uri(mark(true))};`
 ].map((line) => `   ${line}`).join('\n');
