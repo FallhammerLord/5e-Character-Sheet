@@ -278,3 +278,24 @@ dnd5e 6.0.6 `module/applications/actor/vehicle-sheet.mjs`, `templates/actors/veh
 - **Description:** one editor, `system.details.biography.value`.
 - **Tidy Classic:** a header with profile, HP, AC, movement and the damage and mishap thresholds; tabs Attributes
   (stations and features), Cargo, Crew & Passengers, Description.
+
+## The smaller windows, closer (2026-11-12)
+
+dnd5e 6.0.6 `module/applications/`. Every one is an AppV2 through `ApplicationV2Mixin` (`api/application-v2-mixin.mjs`),
+so each window carries the `dnd5e2` class and dnd5e's look; most draw Foundry's form rows (`.form-group` with a label,
+`.form-fields`, a `.hint`) inside `fieldset`s, as the Special Traits tab does (already skinned on our sheets).
+
+| Kind | Classes (window) | Where | Opened from our sheets by |
+|---|---|---|---|
+| Actor settings | `config-sheet` (`BaseConfigSheet`), one per setting: ability, armor-class, concentration, damages, death, habitat, hit-dice, hit-points, initiative, languages, movement and senses, skills, skill-tool, spell-slots, tools, traits, treasure, weapons | `actor/config/*` | every gear (`showConfiguration`, `data-config` or `data-trait`) |
+| Rests | `rest` (short, long) | `actor/rest/*` | the rest chips |
+| Activities | `activity` (one sheet per type: attack, cast, check, damage, enchant, forward, heal, save, summon, teleport, transform, utility) and the usage dialogs | `activity/*` | the item sheet's Activities tab; using an item |
+| Active effects | `ActiveEffectSheet5e` (Foundry's `ActiveEffectConfig` with dnd5e's mixin) | `active-effect/*` | Effects rows |
+| Advancement | `advancement grid-columns` (its config windows), `advancement manager` (the level-up wizard) and its flows | `advancement/*` | the item sheet's Advancement tab; Level up |
+| Award, currency | `award standard-form`, `currency-manager standard-form` | `award.mjs`, `currency-manager.mjs` | a group's or encounter's Award; the coins |
+| Not ours to skin | the compendium browser, chat log, roll dialogs (our roll setting skips them), token and sheet config, journal, region and calendar windows | | |
+
+- **Telling them apart:** Foundry calls `render<ClassName>` for each class in a window's chain, `renderApplicationV2` for
+  all; the window's `document` (or `actor`, `item`, an activity's `item`, an effect's `parent`) names who it belongs to.
+- **Item sheet tabs:** Details, Activities, Effects and Advancement on our item sheet are dnd5e's forms too, still in
+  dnd5e's look (SCOPE §4.13 left them for this skin).
