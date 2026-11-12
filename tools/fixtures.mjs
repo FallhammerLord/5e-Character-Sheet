@@ -1269,3 +1269,18 @@ for (const [state, hp] of [['bloodied', 0.4], ['down', 0]])
    const base = CASES.find((c) => c.name === 'attributes');
    CASES.push({ ...base, name: `theme-forge-attributes-${state}`, look: 'forge', hp, sameRowsAs: undefined });
 }
+
+// Sand and Sanctuary, taken as far as Forge (SCOPE §4.11, user 2026-11-12: "let's build the rest out"): every case
+// Forge has beyond the kit's own (the whole sheet, edit mode and trays, the other sheets, the skin, chat cards, the HP
+// states, and play and edit parity), again in Sand. A theme taken further joins this list.
+const FURTHER = ['sand'];
+for (const look of FURTHER)
+{
+   for (const base of CASES.filter((c) => c.look === 'forge'))
+   {
+      const name = base.name.replace(/^theme-forge-/, `theme-${look}-`).replace(/^forge-parity-/, `${look}-parity-`);
+      if (name === base.name || CASES.some((c) => c.name === name)) { continue; }
+      const sameRowsAs = base.sameRowsAs?.replace(/^forge-parity-/, `${look}-parity-`);
+      CASES.push({ ...base, name, look, sameRowsAs });
+   }
+}

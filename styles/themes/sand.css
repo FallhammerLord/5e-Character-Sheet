@@ -251,7 +251,8 @@
       pyrite flecks (gold is concentration's). The glow only adorns; the filled hourglass says banked. */
    --fhcs-inspire-glow: #3f63ff;
    --fhcs-inspire-breath: fhcs-sand-lapis 6s ease-in-out infinite;
-   /* Banked: the glass turned over, as you start one. Spent: the sand runs out and the light with it. */
+   /* Every click twirls the glass (user, 2026-11-12): banked, it turns over as you start one, sand pouring in (src/apps/
+      sparks.js); spent, it turns over again as the sand runs out, and the light goes with it. */
    --fhcs-inspire-on: fhcs-sand-turn 600ms ease-out;
    --fhcs-inspire-on-glow: fhcs-sand-turn-glow 600ms ease-out;
    --fhcs-inspire-off: fhcs-sand-run 600ms ease-in;
@@ -267,7 +268,8 @@
 }
 @keyframes fhcs-sand-turn { from { transform: rotate(-180deg); } to { transform: none; } }
 @keyframes fhcs-sand-turn-glow { 0% { filter: none; } 70% { filter: drop-shadow(0 0 1px #a9b8ff) drop-shadow(0 0 6px #4b44f0); } 100% { filter: drop-shadow(0 0 1px #7f9bff) drop-shadow(0 0 3px #2f55ff); } }
-@keyframes fhcs-sand-run { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+/* Turned on, empty: the outline is the same either way up, so it ends where it rests. */
+@keyframes fhcs-sand-run { from { transform: none; } to { transform: rotate(180deg); } }
 @keyframes fhcs-sand-run-glow { from { filter: drop-shadow(0 0 1px #7f9bff) drop-shadow(0 0 3px #2f55ff); } to { filter: none; } }
 
 /* ---------- Trays, fields, buttons ---------- */
@@ -361,18 +363,58 @@
 
 @keyframes fhcs-sand-crack { 0% { opacity: 0; } 15% { opacity: 1; } 60% { opacity: 1; } 100% { opacity: 0; } }
 
-/* ---------- The chat card: glass on oxide, a stone heading ---------- */
-
+/* ---------- Chat cards in Sand (the world's theme, SCOPE §5.3 rule 10) ----------
+   The message a pane of smoked glass in a tarnished silver frame, its top corners rubbed bright and a silver hairline
+   along its top; the header underlined in silver; the card's portrait in the mirror's silver rim; the title and totals
+   in El Messiri; bands and buttons glass with silver edges that brighten on hover, a press settling. Sizes stay Plain's. */
 .fhcs-chat[data-fhcs-theme="sand"]
 {
-   border-color: var(--fhcs-theme-edge);
-   background: var(--fhcs-surface);
    color: var(--fhcs-ink);
+   border: 1px solid var(--fhcs-theme-edge);
+   border-radius: 0;
+   background-color: var(--fhcs-surface);
+   background-image:
+      linear-gradient(to right, transparent, color-mix(in srgb, var(--fhcs-theme-silver) 45%, transparent) 50%, transparent),
+      linear-gradient(var(--fhcs-theme-silver), var(--fhcs-theme-silver)),
+      linear-gradient(var(--fhcs-theme-silver), var(--fhcs-theme-silver)),
+      linear-gradient(var(--fhcs-theme-silver), var(--fhcs-theme-silver)),
+      linear-gradient(var(--fhcs-theme-silver), var(--fhcs-theme-silver)),
+      linear-gradient(to top, color-mix(in srgb, var(--fhcs-theme-umber) 40%, transparent), transparent 35%);
+   background-position: 50% 0, 0 0, 0 0, 100% 0, 100% 0, 0 0;
+   background-size: 60% 1px, 6px 1px, 1px 6px, 6px 1px, 1px 6px, 100% 100%;
+   background-repeat: no-repeat;
+   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--fhcs-theme-silver) 20%, transparent);
 }
-
-.fhcs-chat[data-fhcs-theme="sand"] :is(.fhcs-card-title, .fhcs-band-total, .fhcs-row-total) { font-family: 'FHCS El Messiri', var(--font-body, serif); }
+.fhcs-chat[data-fhcs-theme="sand"] :is(.fhcs-card-title, .fhcs-band-total, .fhcs-row-total)
+{
+   font-family: 'FHCS El Messiri', var(--font-body, serif);
+   letter-spacing: -0.02em;
+}
+/* The header underlined in silver, drawn, so it takes no room. */
 .fhcs-chat[data-fhcs-theme="sand"] .fhcs-card-header
 {
-   color: var(--fhcs-theme-stone-ink);
-   background: linear-gradient(to bottom, var(--fhcs-theme-stone-top), var(--fhcs-theme-stone));
+   background: linear-gradient(to right, var(--fhcs-theme-edge), transparent) left bottom / 100% 1px no-repeat;
+}
+.fhcs-chat[data-fhcs-theme="sand"] .fhcs-card-portrait
+{
+   border-color: transparent;
+   border-radius: 0;
+   box-shadow: 0 0 0 2px #c3c7ce, 0 0 0 3px #000;
+}
+.fhcs-chat[data-fhcs-theme="sand"] :is(.fhcs-band, .fhcs-button)
+{
+   border-color: var(--fhcs-theme-edge);
+   border-radius: 0;
+   background-color: color-mix(in srgb, var(--fhcs-surface) 92%, var(--fhcs-theme-edge));
+}
+.fhcs-chat[data-fhcs-theme="sand"] :is(.fhcs-band, .fhcs-button):hover
+{
+   border-color: var(--fhcs-theme-silver);
+   box-shadow: inset 0 1px 0 color-mix(in srgb, var(--fhcs-theme-silver) 40%, transparent);
+}
+.fhcs-chat[data-fhcs-theme="sand"] .fhcs-bonus-input:focus { border-color: var(--fhcs-theme-silver); }
+@media (prefers-reduced-motion: no-preference)
+{
+   .fhcs-chat[data-fhcs-theme="sand"] :is(.fhcs-band, .fhcs-button) { transition: border-color 0.2s, box-shadow 0.2s; }
+   .fhcs-chat[data-fhcs-theme="sand"] :is(.fhcs-band, .fhcs-button):active { transform: translateY(1px); }
 }

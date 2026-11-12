@@ -26,13 +26,13 @@ The four themes are regions of the user's setting; Sand is the first taken furth
 - [x] Mockup, second pass: `styles/themes/sand.css` on the kit with all four materials, textures from `tools/sand-textures.mjs`, El Messiri (OFL, `fonts/el-messiri/`); rendered from our templates (`tools/theme-mockup.mjs` writes `tools/out/sand-mockup.html`); canvas row "Themes · Sand and Sanctuary" (full, bloodied, down, 644px light, details); waits on the user's review
 - [x] The mirror fogs the whole portrait (user, 2026-11-12), then drawn closer to true: soft blooms, an uneven edge band, sparkling grains (research note, "Desilvering up close"); previewed alone at 4×
 - [x] Audit against the theme rules (user, 2026-11-12: "are we missing any of our design notes?"). Fixed now: the portrait's hover and its glint (rule 6, user 2026-11-08), Temp's bar answering hits and heals as HP's does (Forge does), tooltips in the theme (`fhcs-tip-sand`, as Forge's)
-- [ ] Chat cards (rule 10): only the surface, ink and a stone header so far; bands, buttons, the card's portrait and its focus as Forge's
-- [ ] Other sheets: the layout cases for the item, container, group, encounter, vehicle and NPC sheets are Forge's only; Sand's styles reach them unchecked
-- [ ] Preview the other textures alone at 4× (grains, dunes, the sphinx, the stone's cracks; CLAUDE.md "How a theme goes" 2)
-- [ ] Particles: `registerMoments('sand', …)`, sand pouring on gained, running out on spent
+- [x] Chat cards (rule 10): smoked glass in a tarnished silver frame, a silver-underlined header, the portrait in the mirror's rim, glass bands and buttons with silver edges (the stone header dropped: its muted text risked contrast)
+- [x] Other sheets: every case Forge has beyond the kit's (the whole sheet, edit mode and trays, the item, container, group, encounter, vehicle and NPC sheets, the skin, chat cards, play and edit parity) again in Sand, from one list in `tools/fixtures.mjs` (`FURTHER`)
+- [x] The other textures previewed alone at 4× (grains, dunes, the sphinx, the stone's cracks on a heading bar): each reads as its material; no change
+- [x] Particles (`registerMoments('sand', …)`): gained, silver sand pours into the hourglass, then a breath of lapis; spent, it runs out below; hit, glass slivers and sand from the crack. Every click twirls the glass (user, 2026-11-12), spent too. Watched in Chromium mid-flight
 - [x] Answered (user, 2026-11-12): the portrait's rim 2px, as Forge's ("keep the frames consistent"); the banked glow lapis with a play of colour, replacing the silver glint that sat near Night's moon
 - [x] Layout check `ONLY='theme-sand'`: all 42 layouts pass (fixed on the way: dark meaning colours carried into Foundry's light mode, the stone's darkest stroke, the glass tab's ground and its glow, El Messiri's width at 644px, failure's red a step lighter on concentration's tint)
-- [ ] Quench; play
+- [ ] Quench: no new test (the theme picker's test already chooses Sand; no Quench test draws particles or styles, which the layout check and Chromium cover); rerun core and chat cards for regressions. Play
 
 ## Phase 0: Foundations (done; Quench verified 2026-10-24)
 

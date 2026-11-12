@@ -12,6 +12,9 @@
  * - Night (Plain in dark mode): a moonbeam, moonlight only (user, 2026-10-29: "not stars or falling sparks"), slanting
  *   down from the upper right onto the mark, brightening, then fading, with a pool of light where it lands; it burns
  *   the mark into a full moon (styles/themes/plain.css). Spent, a cloud drifts across the mark and wipes it away.
+ * - Sand and Sanctuary (SCOPE §4.11, user 2026-11-12): silver sand pours into the hourglass as it turns over, then a
+ *   breath of lapis; spent, the sand runs out of it as it turns again; a hit flicks glass slivers and sand from the
+ *   crack at the HP bar.
  *
  * Nothing moves while the player's Motion setting or the system's reduced motion says keep still, or at 0 HP. The
  * canvas places itself and leaves when its last effect ends (user, 2026-10-29: left behind after a theme change, it
@@ -422,6 +425,161 @@ export function sunNova(element, mark = null)
    });
 }
 
+/** Sand's grains: dark silver, a few catching the light, a few the lapis of the banked glow (SCOPE §4.11). */
+const SAND_GRAINS = ['rgba(201, 205, 212, A)', 'rgba(150, 145, 136, A)', 'rgba(244, 246, 250, A)', 'rgba(96, 124, 255, A)'];
+const grainColour = (k, alpha) => SAND_GRAINS[k < 0.55 ? 0 : k < 0.8 ? 1 : k < 0.92 ? 2 : 3].replace('A', alpha.toFixed(3));
+
+/**
+ * Sand and Sanctuary, gained: a thin stream of silver sand pours into the hourglass from above, as the glass turns over
+ * (the styles' turn), each grain falling faster as it goes and vanishing into the glass; then a breath of lapis light
+ * where it settles. Fewer grains as HP falls.
+ * @param {HTMLElement} element  The sheet's window element.
+ * @param {HTMLElement} [mark]   The hourglass struck.
+ */
+export function sandPour(element, mark = null)
+{
+   if (!mayMove(element)) { return; }
+   const surface = particleCanvas(element);
+   if (!surface) { return; }
+   const at = originOf(mark, surface.box);
+   if (!at) { surface.done(); return; }
+   const strength = 0.5 + 0.5 * hpOf(element);
+   const FALL = 34;
+   const grains = Array.from({ length: Math.round(22 + 18 * strength) }, () => ({
+      x: at.x + random(-1.2, 1.2), born: random(0, 0.36), size: random(0.6, 1.3), k: Math.random(), speed: random(0.85, 1.15)
+   }));
+   run(surface, element, (ctx, age) =>
+   {
+      let alive = 0;
+      for (const g of grains)
+      {
+         // Each grain falls the stream's height in about 0.22s, quickening (gravity), and is gone at the glass's waist.
+         const t = ((age - g.born) / 0.22) * g.speed;
+         if (t < 0) { alive++; continue; }
+         if (t >= 1) { continue; }
+         alive++;
+         const y = at.y - FALL + FALL * t * t;
+         ctx.fillStyle = grainColour(g.k, (0.5 + 0.5 * strength) * Math.min(1, t * 5));
+         ctx.fillRect(g.x - g.size / 2, y - g.size / 2, g.size, g.size * 1.6);
+      }
+      // The lapis breath where the sand settles, after the stream.
+      const b = (age - 0.4) / 0.35;
+      if (b > 0 && b < 1)
+      {
+         alive++;
+         const glow = ctx.createRadialGradient(at.x, at.y, 0, at.x, at.y, 14);
+         glow.addColorStop(0, `rgba(120, 140, 255, ${0.45 * strength * Math.sin(Math.PI * b)})`);
+         glow.addColorStop(1, 'rgba(60, 80, 255, 0)');
+         ctx.fillStyle = glow;
+         ctx.beginPath();
+         ctx.arc(at.x, at.y, 14, 0, Math.PI * 2);
+         ctx.fill();
+      }
+      return alive || age < 0.8;
+   });
+}
+
+/**
+ * Sand and Sanctuary, spent: the sand runs out of the bottom of the glass as it turns over again (the styles' turn),
+ * a little stream that spreads as it falls and scatters on the rail, fading.
+ * @param {HTMLElement} element  The sheet's window element.
+ * @param {HTMLElement} [mark]   The hourglass spent.
+ */
+export function sandRun(element, mark = null)
+{
+   if (!mayMove(element)) { return; }
+   const surface = particleCanvas(element);
+   if (!surface) { return; }
+   const at = originOf(mark, surface.box);
+   if (!at) { surface.done(); return; }
+   const GRAVITY = 420;
+   const grains = Array.from({ length: 30 }, () => ({
+      x: at.x + random(-1.5, 1.5), y: at.y + 7, vx: random(-22, 22), vy: random(10, 50),
+      born: random(0, 0.3), life: random(0.45, 0.7), size: random(0.6, 1.3), k: Math.random()
+   }));
+   run(surface, element, (ctx, age, dt) =>
+   {
+      let alive = 0;
+      for (const g of grains)
+      {
+         const t = (age - g.born) / g.life;
+         if (t < 0) { alive++; continue; }
+         if (t >= 1) { continue; }
+         alive++;
+         g.vy += GRAVITY * dt;
+         g.x += g.vx * dt;
+         g.y += g.vy * dt;
+         ctx.fillStyle = grainColour(g.k, 0.9 * (1 - t));
+         ctx.fillRect(g.x - g.size / 2, g.y - g.size / 2, g.size, g.size);
+      }
+      return alive;
+   });
+}
+
+/**
+ * Sand and Sanctuary, a hit: from the crack at the HP bar's edge (where the fill now ends; the styles draw the crack),
+ * a few slivers of glass catch the light as they flick out and fall, with a puff of sand.
+ * @param {HTMLElement} element  The sheet's window element.
+ * @param {HTMLElement} [bar]    The HP bar shown.
+ */
+export function glassShards(element, bar = null)
+{
+   if (!mayMove(element)) { return; }
+   const surface = particleCanvas(element);
+   if (!surface) { return; }
+   const rect = bar?.getBoundingClientRect();
+   if (!rect) { surface.done(); return; }
+   const at = { x: rect.left + rect.width * hpOf(element) - surface.box.left, y: rect.top + rect.height / 2 - surface.box.top };
+   const GRAVITY = 380;
+   // Bold enough to read at the sheet's size (2026-11-12: at 2.5–4.5px and six slivers they went unseen).
+   const bits = Array.from({ length: 34 }, (_, i) =>
+   {
+      const shard = i < 10;
+      const angle = random(200, 340) * Math.PI / 180;
+      const speed = shard ? random(70, 160) : random(30, 110);
+      return { shard, x: at.x + random(-3, 3), y: at.y + random(-8, 8), vx: Math.cos(angle) * speed, vy: Math.sin(angle) * speed, spin: random(-10, 10), turn: random(0, Math.PI), life: random(0.5, 0.8), size: shard ? random(4, 7) : random(0.9, 1.6), k: Math.random() };
+   });
+   run(surface, element, (ctx, age, dt) =>
+   {
+      let alive = 0;
+      for (const b of bits)
+      {
+         const t = age / b.life;
+         if (t >= 1) { continue; }
+         alive++;
+         b.vy += GRAVITY * dt;
+         b.x += b.vx * dt;
+         b.y += b.vy * dt;
+         b.turn += b.spin * dt;
+         if (b.shard)
+         {
+            // A sliver: a thin triangle that flashes as it turns to the light (about twice in its life, rule 6).
+            const flash = 0.45 + 0.55 * Math.abs(Math.cos(b.turn));
+            ctx.save();
+            ctx.translate(b.x, b.y);
+            ctx.rotate(b.turn);
+            ctx.fillStyle = `rgba(244, 247, 252, ${Math.min(1, 1.2 * (1 - t) * flash)})`;
+            ctx.strokeStyle = `rgba(120, 128, 140, ${0.6 * (1 - t)})`;
+            ctx.lineWidth = 0.5;
+            ctx.beginPath();
+            ctx.moveTo(0, -b.size);
+            ctx.lineTo(b.size * 0.35, b.size * 0.6);
+            ctx.lineTo(-b.size * 0.3, b.size * 0.4);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+            ctx.restore();
+         }
+         else
+         {
+            ctx.fillStyle = grainColour(b.k, 0.95 * (1 - t * t));
+            ctx.fillRect(b.x, b.y, b.size, b.size);
+         }
+      }
+      return alive;
+   });
+}
+
 /* ---------- The themes' answers ---------- */
 
 // Plain as Day and Night (Phase 6.55): Day's sun motes and nova, Night's moonbeam and cloud.
@@ -431,3 +589,6 @@ registerMoments('plain', {
 });
 // Fire and Forge (SCOPE §4.11): sparks when inspiration is gained; the rune's cooling is its styles' alone.
 registerMoments('forge', { gained: sparkBurst });
+// Sand and Sanctuary (SCOPE §4.11): sand pours into the hourglass and runs out of it; glass flies from a hit. A heal is
+// the styles' silver seam alone.
+registerMoments('sand', { gained: sandPour, spent: sandRun, hit: glassShards });
