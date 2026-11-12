@@ -17,7 +17,7 @@ import { biographyView } from '../src/sheet/biography.js';
 import { limitedView } from '../src/sheet/limited.js';
 import { groupHeaderView, groupMembersView } from '../src/sheet/group.js';
 import { encounterHeaderView, encounterMembersView } from '../src/sheet/encounter.js';
-import { vehicleHeaderView } from '../src/sheet/vehicle.js';
+import { vehicleHeaderView, vehicleStationsView } from '../src/sheet/vehicle.js';
 import { THEMES } from '../src/constants.js';
 import { format, localize, template } from './templates.mjs';
 
@@ -1180,6 +1180,36 @@ CASES.push({ name: 'vehicle-header-everything', html: vehicleTop({ name: 'Siege 
 CASES.push({ name: 'vehicle-header-everything-editing', html: vehicleTop({ editing: true, name: 'Siege Wagon of the Iron Legion, Third Battery',
    actions: { byStations: true }, options: { abilities: true, initiative: true, quality: true } }) });
 CASES.push({ name: 'theme-forge-vehicle-header', look: 'forge', html: vehicleTop() });
+// Stations (the board): Traits beside two ballistae (one crewed, one with empty places), a helm, features, draft animals.
+const INPUT = (name, value) => `<input type="number" name="${name}" value="${value}">`;
+const stationsFacts = ({ editing = false, ...over } = {}) => ({ editing, hasFeatures: true,
+   traits: [['size', 'Size', 'Huge', SELECT('system.traits.size', ['Huge', 'Gargantuan'])], ['weight', 'Weight', '4 tons', INPUT('system.traits.weight.value', 4) + SELECT('system.traits.weight.units', ['tn', 'lb'])],
+      ['keel', 'Keel', '', INPUT('system.traits.keel.value', '') + SELECT('system.traits.keel.units', ['ft', 'm'])], ['cargo', 'Cargo', '2 tons', INPUT('system.attributes.capacity.cargo.value', 2) + SELECT('system.attributes.capacity.cargo.units', ['tn', 'lb'])],
+      ['crew', 'Crew', '6', INPUT('system.crew.max', 6)]].map(([key, title, text, input]) => ({ key, title, text, input }))
+      .concat([{ key: 'dr', title: 'Resists', text: 'Piercing', trait: 'dr' }, { key: 'di', title: 'Immune', text: 'Poison, Psychic', trait: 'di' }, { key: 'ci', title: 'Cond. immune', text: 'Charmed, Frightened', trait: 'ci' }]),
+   stations: [
+      { id: 'ballistaL', uuid: 'Actor.v.Item.ballistaL', name: 'Ballista, Left Battery of the Third Wagon', img: ICON('#5a5a66'), sub: 'Half Cover · AC 15',
+         attack: '<a class="roll-link">+6</a>', damage: '<a class="roll-link">3d10 Piercing</a>', hp: { value: 50, max: 50 },
+         crew: [{ uuid: 'Actor.g1', name: 'Gunner', img: ICON('#8a3a3a') }, { uuid: 'Actor.g2', name: 'Gunner', img: ICON('#8a3a3a') }, { uuid: 'Actor.l', name: 'Loader', img: ICON('#6a8a3a') }] },
+      { id: 'ballistaR', uuid: 'Actor.v.Item.ballistaR', name: 'Ballista, Right Battery', img: ICON('#5a5a66'), sub: 'Half Cover · AC 15',
+         attack: '<a class="roll-link">+6</a>', damage: '<a class="roll-link">3d10 Piercing</a>', hp: { value: 18, max: 50 }, uses: { value: 3, max: 10, prop: 'system.uses.value' },
+         crew: [{ uuid: 'Actor.g1', name: 'Gunner', img: ICON('#8a3a3a') }, null, null] },
+      { id: 'helm', uuid: 'Actor.v.Item.helm', name: 'Helm', img: ICON('#8a6a3a'), sub: 'Three-Quarters Cover · AC 16 · DT 10', hp: { value: 50, max: 50 }, speed: '30 ft', crew: [null] }
+   ],
+   draft: [{ uuid: 'Actor.h1', name: 'Draft Horse', img: ICON('#8a5a3a'), sub: 'Large · Beast · 1,080 lb' }], ...over });
+const vehicleStations = (over = {}) =>
+{
+   const facts = stationsFacts(over);
+   return vehicleTop({ editing: over.editing }) + `<div class="tab-body">${template('vehicle/stations')({ tab: { id: 'stations', group: 'primary', cssClass: 'active' }, rollableClass: 'rollable',
+      fhcsStations: vehicleStationsView(facts, { format, localize }),
+      fhcsInventory: inventoryView({ group: true, editing: false, columns: { weight: false, uses: true, quantity: false }, currency: [], encumbrance: null, folded: [],
+         sections: [{ id: 'features', label: 'Features', items: [gear('Armoured Sides', '#77705f')] },
+            { id: 'reaction', label: 'Reactions', items: [gear('Brace for Impact', '#8a3a3a', { uses: { value: 1, max: 1, prop: 'system.uses.value' } })] }] }, { format, localize }) })}</div>`;
+};
+CASES.push({ name: 'vehicle-stations', html: vehicleStations(), rows: '.fhcs-trait-row, .fhcs-station-top' });
+CASES.push({ name: 'vehicle-stations-editing', html: vehicleStations({ editing: true }) });
+CASES.push({ name: 'vehicle-stations-empty', html: vehicleStations({ traits: [], stations: [], draft: [], hasFeatures: false }).replace(/<dnd5e-inventory[\s\S]*<\/dnd5e-inventory>/, '') });
+CASES.push({ name: 'theme-forge-vehicle-stations-editing', look: 'forge', html: vehicleStations({ editing: true }) });
 CASES.push({ name: 'item-long-name', frame: 'item', html: itemSheet('weapon', { name: 'Sun Blade of the Dawnwarden, Twice-Forged in the Ember Halls' }) });
 
 // Chat cards in the world's theme (SCOPE §5.3 rule 10): every card case again in Forge.

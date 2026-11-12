@@ -758,6 +758,90 @@ export async function containerFacts(sheet, context, { columns, openContainers }
 }
 
 /**
+ * Plain facts for the vehicle's Stations tab (src/sheet/vehicle.js), from the vehicle's data and what dnd5e's
+ * `_prepareStationsContext` and `_prepareItemPhysical` put on the context (vehicle-sheet.mjs): its traits (each with
+ * dnd5e's own input for edit mode, as its sidebar draws them), the action stations (the mountable items, with their
+ * cover, AC and DT, a weapon's attack and damage enriched, HP, uses, speed and crew places), the features by
+ * activation as Inventory rows, and the draft animals.
+ */
+export async function vehicleStationsFacts(sheet, context)
+{
+   const actor = sheet.actor;
+   const system = actor.system;
+   const source = system._source ?? {};
+   const config = CONFIG.DND5E;
+   const editing = !!sheet.isEditMode && !!sheet.isEditable;
+   const fieldOf = (path) => system.schema?.getField?.(path);
+   const label = (key) => game.i18n.localize(`FHCS.Vehicle.Trait.${key}`);
+   const number = (n) => (Number(n) || 0).toLocaleString(game.i18n.lang);
+   const measure = (data, units) => (data?.value ? `${number(data.value)} ${unitAbbr(units, data.units)}`.trim() : '');
+   const valueAndUnit = (path, units, unitsConfig) => editing
+      ? fieldInput(fieldOf(`${path}.value`), { value: foundry.utils.getProperty(source, `${path}.value`), placeholder: '—' })
+         + fieldInput(fieldOf(`${path}.units`), { value: foundry.utils.getProperty(source, `${path}.units`), choices: unitsConfig, labelAttr: 'abbreviation', localize: true })
+      : '';
+   const price = system.attributes?.price ?? {};
+   const traits = [
+      { key: 'size', title: label('size'), text: game.i18n.localize(config.actorSizes?.[system.traits?.size]?.label ?? ''),
+         input: editing ? fieldInput(fieldOf('traits.size'), { value: source.traits?.size, choices: config.actorSizes, labelAttr: 'label', localize: true }) : '' },
+      { key: 'weight', title: label('weight'), text: measure(system.traits?.weight, config.weightUnits), input: valueAndUnit('traits.weight', null, config.weightUnits) },
+      { key: 'keel', title: label('keel'), text: measure(system.traits?.keel, config.movementUnits), input: valueAndUnit('traits.keel', null, config.movementUnits) },
+      { key: 'beam', title: label('beam'), text: measure(system.traits?.beam, config.movementUnits), input: valueAndUnit('traits.beam', null, config.movementUnits) },
+      { key: 'cargo', title: label('cargo'), text: measure(system.attributes?.capacity?.cargo, config.weightUnits), input: valueAndUnit('attributes.capacity.cargo', null, config.weightUnits) },
+      { key: 'crew', title: label('crew'), text: system.crew?.max ? number(system.crew.max) : '',
+         input: editing ? fieldInput(fieldOf('crew.max'), { value: source.crew?.max, placeholder: '—' }) : '' },
+      { key: 'passengers', title: label('passengers'), text: system.passengers?.max ? number(system.passengers.max) : '',
+         input: editing ? fieldInput(fieldOf('passengers.max'), { value: source.passengers?.max, placeholder: '—' }) : '' }
+   ];
+   // The cost shows on the header's line; edit mode sets it here.
+   if (editing)
+   {
+      traits.push({ key: 'cost', title: label('cost'), text: price.value ? number(price.value) : '',
+         input: fieldInput(fieldOf('attributes.price.value'), { value: source.attributes?.price?.value, placeholder: '—' })
+            + fieldInput(fieldOf('attributes.price.denomination'), { value: source.attributes?.price?.denomination, choices: config.currencies, labelAttr: 'abbreviation', localize: true }) });
+   }
+   const prepared = sheet._prepareTraits?.(context) ?? {};
+   for (const key of ['dr', 'di', 'ci', 'dv'])
+   {
+      traits.push({ key, title: label(key), trait: key,
+         text: (prepared[key] ?? []).map((v) => v.label).join(', ') });
+   }
+
+   const ctxs = context.itemContext ?? {};
+   const stations = (context.itemCategories?.stations ?? []).map((item) =>
+   {
+      const ctx = ctxs[item.id] ?? {};
+      const speed = item.system.speed ?? {};
+      return {
+         id: item.id, uuid: item.uuid, name: item.name, img: item.img, sub: ctx.subtitle ?? '',
+         attack: ctx.enriched?.attack ?? '', damage: ctx.enriched?.damage ?? '',
+         hp: item.system.hp?.max ? { value: item.system.hp.value ?? 0, max: item.system.hp.max } : null,
+         uses: ctx.uses?.max ? { value: ctx.uses.value ?? 0, max: ctx.uses.max, prop: ctx.uses.prop } : null,
+         speed: speed.value ? [speed.value, speed.units, speed.conditions ? `(${speed.conditions})` : ''].filter(Boolean).join(' ') : '',
+         crew: (ctx.crew ?? []).map((c) => (c?.actor ? { uuid: c.actor.uuid, name: c.actor.name, img: c.actor.img } : null))
+      };
+   });
+
+   // Features by activation, as dnd5e's stations part sorts them: Features, Bonus, Reaction.
+   const groups = ['features', 'bonus', 'reaction'].map((id) => ({ id, type: null, items: [],
+      label: game.i18n.localize(id === 'features' ? 'DND5E.Features' : config.activityActivationTypes?.[id]?.header ?? id) }));
+   for (const item of context.itemCategories?.features ?? [])
+   {
+      let group = item.system.activities?.contents?.[0]?.activation?.type;
+      if (group !== 'bonus' && group !== 'reaction') { group = 'features'; }
+      groups.find((g) => g.id === group).items.push(await rowFacts(sheet, item, ctxs[item.id] ?? {}));
+   }
+
+   return {
+      editing,
+      traits,
+      stations,
+      features: groups,
+      hasFeatures: groups.some((g) => g.items.length),
+      draft: (context.drafted ?? []).map((d) => ({ uuid: d.uuid, name: d.actor?.name ?? '', img: d.actor?.img ?? '', sub: plainSubtitle(d.subtitle).replace(/\s*\u2022\s*/g, ' \u00b7 ') }))
+   };
+}
+
+/**
  * Plain facts for a group's Inventory (SCOPE §4.13, the group sheet): the character's facts on dnd5e's inventory source
  * (the group, or its primary vehicle), the container's columns, and above the list one line per member (dnd5e's
  * `context.members`: carried, coins), where a dropped item goes to that member. With a primary vehicle, the switch

@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES, VIEW_ACTIONS } from '../constants.js';
-import { attributesFacts, biographyFacts, vehicleHeaderFacts, encounterHeaderFacts, encounterMembersFacts, groupHeaderFacts, groupInventoryFacts, groupMembersFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, vehicleHeaderFacts, vehicleStationsFacts, encounterHeaderFacts, encounterMembersFacts, groupHeaderFacts, groupInventoryFacts, groupMembersFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, renderTemplate, setLairInside, setSpellcastingAbility, spellbookFacts, toggleInspired, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, containerColumnChoice, inventoryView } from '../sheet/inventory.js';
@@ -10,7 +10,7 @@ import { biographyView } from '../sheet/biography.js';
 import { limitedView } from '../sheet/limited.js';
 import { groupHeaderView, groupMembersView } from '../sheet/group.js';
 import { encounterHeaderView, encounterMembersView } from '../sheet/encounter.js';
-import { vehicleHeaderView } from '../sheet/vehicle.js';
+import { vehicleHeaderView, vehicleStationsView } from '../sheet/vehicle.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
 import { NPC_TAB_NAMES, NPC_TAB_ORDER, TEMP_TOP_FLAG, comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, tabRow, themePicker } from '../sheet/header.js';
 import { themeMoment } from './sparks.js';
@@ -1352,8 +1352,17 @@ const VEHICLE_DROPPED_PARTS = ['sidebarCollapser', 'sidebar'];
 /** Our vehicle parts. dnd5e's vehicle has no header part; ours leads, then the tab row. The bodies follow in slices. */
 const VEHICLE_PARTS = {
    header: { template: `${MODULE_PATH}/templates/vehicle/header.hbs`, templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`, `${MODULE_PATH}/templates/sheet/abilities.hbs`] },
-   tabs: GROUP_PARTS.tabs
+   tabs: GROUP_PARTS.tabs,
+   // dnd5e draws its stations beside every tab; ours are the first tab (SCOPE §4.13, user 2026-11-10).
+   stations: { template: `${MODULE_PATH}/templates/vehicle/stations.hbs`, container: { classes: ['tab-body'], id: 'tabs' }, scrollable: [''],
+      templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`, `${MODULE_PATH}/templates/sheet/item-row.hbs`] }
 };
+
+/** The vehicle's tabs: Stations first, then dnd5e's own with their conditions (Crew & Passengers only with crew). */
+function vehicleTabs(baseTabs)
+{
+   return [{ tab: 'stations', label: 'FHCS.Vehicle.StationsTab' }, ...(baseTabs ?? []).filter((t) => t.tab !== 'stations')];
+}
 
 /** dnd5e's vehicle parts with ours swapped in, its sidebar gone, the header and tab row first. */
 function vehicleParts(baseParts)
@@ -1387,10 +1396,15 @@ export function makeVehicleSheet(Base)
 
       static PARTS = vehicleParts(Base.PARTS);
 
+      static TABS = vehicleTabs(Base.TABS);
+
+      /** Stations open first. */
+      tabGroups = { primary: 'stations' };
+
       /** @inheritDoc */
       get fhcsHomeTab()
       {
-         return this.constructor.TABS?.[0]?.tab ?? 'inventory';
+         return 'stations';
       }
 
       /** The vehicle's header and tab row; the rest as the character sheet draws them. */
@@ -1400,6 +1414,16 @@ export function makeVehicleSheet(Base)
          if (partId === 'header')
          {
             context.fhcsVehicle = vehicleHeaderView(vehicleHeaderFacts(this, context), i18n);
+            return context;
+         }
+         if (partId === 'stations')
+         {
+            const facts = await vehicleStationsFacts(this, context);
+            context.fhcsStations = vehicleStationsView(facts, i18n);
+            // The features are Inventory rows (dnd5e's inventory element binds them), with one column: Uses.
+            const folded = game.user.getFlag(MODULE_ID, PREFS.folded) ?? [];
+            context.fhcsInventory = inventoryView({ group: true, editing: false, columns: { weight: false, uses: true, quantity: false },
+               sections: facts.features, currency: [], encumbrance: null, folded }, i18n);
             return context;
          }
          if (partId === 'tabs')

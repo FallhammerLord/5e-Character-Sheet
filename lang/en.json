@@ -598,7 +598,41 @@
       "HpConfig": "Configure hit points",
       "AcConfig": "Configure armor class",
       "SpeedConfig": "Configure movement",
-      "InitConfig": "Configure initiative"
+      "InitConfig": "Configure initiative",
+      "Traits": "Traits",
+      "Stations": "Action stations",
+      "StationsTab": "Stations",
+      "Draft": "Draft animals",
+      "Uses": "Uses",
+      "Crew": "Crew",
+      "EmptyStations": "No stations, features or draft animals yet. Unlock to add them.",
+      "EmptySlot": "An empty crew place",
+      "TraitConfig": "Configure {trait}",
+      "UseStation": "Use {name}",
+      "StationHp": "{name}: {value} of {max} hit points",
+      "StationUses": "Uses of {name}",
+      "Uncrew": "Take {name} off this station",
+      "CrewOf": "Crew of {name}",
+      "Add": {
+        "feat": "Add feature",
+        "equipment": "Add equipment",
+        "weapon": "Add weapon",
+        "draft": "Add draft animal"
+      },
+      "Trait": {
+        "size": "Size",
+        "weight": "Weight",
+        "keel": "Keel",
+        "beam": "Beam",
+        "cargo": "Cargo",
+        "crew": "Crew",
+        "passengers": "Passengers",
+        "cost": "Cost",
+        "dr": "Resists",
+        "di": "Immune",
+        "ci": "Cond. immune",
+        "dv": "Vulnerable"
+      }
     }
   }
 }

@@ -82,3 +82,67 @@ export function vehicleHeaderView(facts, { format, localize })
       }
    };
 }
+
+/**
+ * Everything the Stations tab shows (SCOPE §4.13): the Traits panel beside the action stations, the features (as rows
+ * of the Inventory list, drawn by the caller with `inventoryView`), the draft animals, and edit mode's add buttons.
+ * @param {object} facts  From compat.vehicleStationsFacts (or a fixture).
+ * @param {{format: Function, localize: Function}} i18n
+ */
+export function vehicleStationsView(facts, { format, localize })
+{
+   const editing = !!facts.editing;
+   // A reader sees only what's set (dnd5e's sidebar rule); edit mode every row, with its field or gear.
+   const traits = (facts.traits ?? []).filter((t) => editing || t.text).map((t) => ({
+      key: t.key,
+      title: t.title,
+      text: t.text || '—',
+      empty: !t.text,
+      input: editing ? t.input ?? '' : '',
+      trait: editing ? t.trait ?? '' : '',
+      configLabel: t.trait ? format('FHCS.Vehicle.TraitConfig', { trait: t.title }) : ''
+   }));
+   const stations = (facts.stations ?? []).map((s) => ({
+      id: s.id,
+      uuid: s.uuid,
+      name: s.name,
+      img: s.img,
+      sub: s.sub ?? '',
+      useLabel: format('FHCS.Vehicle.UseStation', { name: s.name }),
+      attack: s.attack ?? '',
+      damage: s.damage ?? '',
+      hp: s.hp?.max ? { value: s.hp.value ?? 0, max: s.hp.max, pct: pct(s.hp.value, s.hp.max),
+         label: format('FHCS.Vehicle.StationHp', { name: s.name, value: s.hp.value ?? 0, max: s.hp.max }) } : null,
+      uses: s.uses?.max ? { value: s.uses.value ?? 0, max: s.uses.max, prop: s.uses.prop ?? 'system.uses.value',
+         label: format('FHCS.Vehicle.StationUses', { name: s.name }) } : null,
+      speed: s.speed ?? '',
+      crew: (s.crew ?? []).map((c, index) => (c ? { index, uuid: c.uuid, name: c.name, img: c.img,
+         removeLabel: format('FHCS.Vehicle.Uncrew', { name: c.name }) } : { index, empty: true })),
+      crewLabel: format('FHCS.Vehicle.CrewOf', { name: s.name })
+   }));
+   const draft = (facts.draft ?? []).map((d) => ({ uuid: d.uuid, name: d.name, img: d.img, sub: d.sub ?? '',
+      openLabel: format('FHCS.Group.OpenLabel', { name: d.name }), removeLabel: format('FHCS.Group.RemoveLabel', { name: d.name }) }));
+   return {
+      editing,
+      traits,
+      stations,
+      draft,
+      adds: editing ? [
+         { action: 'createItem', type: 'feat', label: localize('FHCS.Vehicle.Add.feat') },
+         { action: 'createItem', type: 'equipment', label: localize('FHCS.Vehicle.Add.equipment') },
+         { action: 'createItem', type: 'weapon', label: localize('FHCS.Vehicle.Add.weapon') },
+         { action: 'browseActors', type: '', label: localize('FHCS.Vehicle.Add.draft') }
+      ] : [],
+      empty: !editing && !stations.length && !draft.length && !facts.hasFeatures,
+      text: {
+         traits: localize('FHCS.Vehicle.Traits'),
+         stations: localize('FHCS.Vehicle.Stations'),
+         draft: localize('FHCS.Vehicle.Draft'),
+         hp: localize('FHCS.Group.Hp'),
+         uses: localize('FHCS.Vehicle.Uses'),
+         crew: localize('FHCS.Vehicle.Crew'),
+         empty: localize('FHCS.Vehicle.EmptyStations'),
+         emptySlot: localize('FHCS.Vehicle.EmptySlot')
+      }
+   };
+}

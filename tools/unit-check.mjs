@@ -12,7 +12,7 @@ import { keepStable } from '../src/sheet/death.js';
 import { columnChoice, containerColumnChoice, inventoryView } from '../src/sheet/inventory.js';
 import { groupHeaderView, groupMembersView } from '../src/sheet/group.js';
 import { encounterHeaderView, encounterMembersView } from '../src/sheet/encounter.js';
-import { vehicleHeaderView } from '../src/sheet/vehicle.js';
+import { vehicleHeaderView, vehicleStationsView } from '../src/sheet/vehicle.js';
 import { canCast, prepState, spellbookView, spellColumnChoice, spellKind } from '../src/sheet/spellbook.js';
 import { featureColumnChoice, featuresView, groupingOf } from '../src/sheet/features.js';
 import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js';
@@ -674,6 +674,20 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    try { deepStrictEqual(editShape, [0, 'true,false,false,true', null, '+5', '4 mph|96 mi/d']); }
    catch { problems.push(`vehicle header in edit mode: ${JSON.stringify(editShape)}`); }
    if (vehicleHeaderView({ ...facts, speeds: [] }, { format, localize }).speeds[0] !== '—') { problems.push('a vehicle with no speed shows nothing in Speed'); }
+
+   // Stations: a reader sees only set traits; edit mode every one with its input or gear; empty crew places stay
+   // places; the add buttons only in edit mode; an empty vehicle says so to a reader only.
+   const st = { editing: false, traits: [{ key: 'size', title: 'Size', text: 'Huge', input: '<select></select>' }, { key: 'keel', title: 'Keel', text: '' },
+      { key: 'dr', title: 'Resistances', text: 'Piercing', trait: 'dr' }],
+      stations: [{ id: 'b', uuid: 'u', name: 'Ballista', hp: { value: 18, max: 50 }, crew: [{ uuid: 'a', name: 'Gunner', img: '' }, null, null] }],
+      draft: [], hasFeatures: false };
+   const play = vehicleStationsView(st, { format, localize });
+   const edit = vehicleStationsView({ ...st, editing: true }, { format, localize });
+   const stShape = [play.traits.map((t) => t.key).join(), play.traits[0].input, edit.traits.map((t) => `${t.key}:${!!t.input}:${t.trait}`).join(' '),
+      play.stations[0].crew.map((c) => (c.empty ? 'empty' : c.name)).join(), play.stations[0].hp.pct, play.adds.length, edit.adds.map((a) => a.type || a.action).join(), play.empty];
+   try { deepStrictEqual(stShape, ['size,dr', '', 'size:true: keel:false: dr:false:dr', 'Gunner,empty,empty', 36, 0, 'feat,equipment,weapon,browseActors', false]); }
+   catch { problems.push(`vehicle stations: ${JSON.stringify(stShape)}`); }
+   if (!vehicleStationsView({ traits: [], stations: [], draft: [] }, { format, localize }).empty) { problems.push('an empty vehicle says nothing to a reader'); }
 }
 
 // Spellbook (SCOPE §4.7): preparation states and kinds, Can cast, section order, slot pips, the concentration mark.

@@ -1,0 +1,142 @@
+{{!-- The vehicle's Stations tab (SCOPE §4.13, the vehicle sheet; the board, 2026-11-10): the Traits panel beside the
+      action stations, the features and the draft animals. dnd5e's hooks kept: the tab is `data-area="draft"` (an
+      actor dropped on a station crews it, vehicle-sheet.mjs `_onDropActor`); each station is
+      `.station[data-item-id][data-uuid]` (its context menu; useItem; HP and uses fields by `data-name`); a crew place
+      is `[data-uuid][data-index]` (showDocument, uncrew); a draft animal `[data-uuid]` (removeMember); the add buttons
+      are createItem with `data-type`, and browseActors. The features sit in dnd5e's inventory element, as Inventory rows.
+      Takes the "stations" part ID, made a tab. --}}
+<section class="tab fhcs-vehicle-stations {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}" data-area="draft">
+   {{#with fhcsStations}}
+   <div class="fhcs-group fhcs-frame fhcs-traits-panel fhcs-plate fhcs-vehicle-traits">
+      <div class="fhcs-group-head"><span class="fhcs-label">{{ text.traits }}</span></div>
+      <dl class="fhcs-traits">
+         {{#each traits}}
+         <div class="fhcs-trait-row" data-fhcs-trait="{{ key }}">
+            <dt class="fhcs-label fhcs-muted">{{ title }}</dt>
+            {{#if input}}
+            <dd class="fhcs-body fhcs-vehicle-trait-input">{{{ input }}}</dd>
+            {{else}}
+            <dd class="fhcs-body{{#if empty}} fhcs-muted{{/if}}">{{ text }}</dd>
+            {{/if}}
+            <dd class="fhcs-trait-gear">{{#if trait}}<button type="button" class="fhcs-toggle fhcs-gear-button fhcs-muted" data-action="showConfiguration"
+                    data-trait="{{ trait }}" aria-label="{{ configLabel }}" data-fhcs-tip="{{ configLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</dd>
+         </div>
+         {{/each}}
+      </dl>
+   </div>
+
+   <div class="fhcs-vehicle-main">
+      {{#if stations.length}}
+      <div class="fhcs-member-section fhcs-plate fhcs-vehicle-stations-list">
+         <div class="fhcs-item-head"><span class="fhcs-label">{{ text.stations }}</span> <span class="fhcs-label fhcs-muted">{{ stations.length }}</span></div>
+         <ol class="fhcs-member-list">
+            {{#each stations}}
+            <li class="station fhcs-station" data-item-id="{{ id }}" data-uuid="{{ uuid }}">
+               <div class="fhcs-station-top">
+                  <img class="fhcs-station-img" src="{{ img }}" alt="">
+                  <span class="fhcs-member-name-col">
+                     <button type="button" class="fhcs-member-name fhcs-body {{ @root.rollableClass }}" data-action="useItem" aria-label="{{ useLabel }}">{{ name }}</button>
+                     {{#if sub}}<span class="fhcs-body fhcs-muted fhcs-member-name">{{ sub }}</span>{{/if}}
+                  </span>
+                  {{#if attack}}<span class="fhcs-body fhcs-station-roll">{{{ attack }}}</span>{{/if}}
+                  {{#if damage}}<span class="fhcs-body fhcs-station-roll">{{{ damage }}}</span>{{/if}}
+               </div>
+               <div class="fhcs-station-line">
+                  {{#if hp}}
+                  <span class="fhcs-station-hp">
+                     <span class="fhcs-label fhcs-muted">{{ ../text.hp }}</span>
+                     <span class="fhcs-member-bar" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ hp.pct }}" aria-label="{{ hp.label }}"><span style="width: {{ hp.pct }}%"></span></span>
+                     <input type="text" class="fhcs-input fhcs-body" data-name="system.hp.value" data-dtype="Number" inputmode="numeric" pattern="^[+=\-]?\d*"
+                            value="{{ hp.value }}" placeholder="0" aria-label="{{ hp.label }}">
+                     <span class="fhcs-body">/ {{ hp.max }}</span>
+                  </span>
+                  {{/if}}
+                  {{#if uses}}
+                  <span class="fhcs-station-uses">
+                     <span class="fhcs-label fhcs-muted">{{ ../text.uses }}</span>
+                     <input type="text" class="fhcs-input fhcs-body" data-name="{{ uses.prop }}" data-dtype="Number" inputmode="numeric" pattern="^[+=\-]?\d*"
+                            value="{{ uses.value }}" placeholder="0" aria-label="{{ uses.label }}">
+                     <span class="fhcs-body fhcs-muted">/ {{ uses.max }}</span>
+                  </span>
+                  {{/if}}
+                  {{#if speed}}<span class="fhcs-body fhcs-muted">{{ speed }}</span>{{/if}}
+                  {{#if crew.length}}
+                  <span class="fhcs-station-crew" role="group" aria-label="{{ crewLabel }}">
+                     <span class="fhcs-label fhcs-muted">{{ ../text.crew }}</span>
+                     {{#each crew}}
+                     {{#if empty}}
+                     <span class="fhcs-crew-slot fhcs-crew-empty" data-index="{{ index }}" role="img" aria-label="{{ ../../text.emptySlot }}"></span>
+                     {{else}}
+                     {{!-- A crew member's face opens them; in edit mode the whole face takes them off (a corner × would sit
+                           within 24px of the next face, §5.2 rule 20), marked with an ×. --}}
+                     <span class="fhcs-crew-slot" data-uuid="{{ uuid }}" data-index="{{ index }}">
+                        {{#if ../../editing}}
+                        <button type="button" class="fhcs-crew-face fhcs-crew-uncrew" data-action="uncrew" aria-label="{{ removeLabel }}" data-fhcs-tip="{{ removeLabel }}"><img src="{{ img }}" alt=""><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7l10 10M17 7L7 17"/></svg></button>
+                        {{else}}
+                        <button type="button" class="fhcs-crew-face" data-action="showDocument" data-uuid="{{ uuid }}" aria-label="{{ name }}" data-fhcs-tip="{{ name }}"><img src="{{ img }}" alt=""></button>
+                        {{/if}}
+                     </span>
+                     {{/if}}
+                     {{/each}}
+                  </span>
+                  {{/if}}
+               </div>
+            </li>
+            {{/each}}
+         </ol>
+      </div>
+      {{/if}}
+
+      {{#with @root.fhcsInventory}}
+      {{#if sections.length}}
+      <dnd5e-inventory class="inventory-element fhcs-vehicle-features">
+         <section class="items-list fhcs-items" data-item-list="features">
+            {{#each sections}}
+            <div class="items-section fhcs-section{{#unless fold.open}} fhcs-folded{{/unless}} fhcs-plate" data-fhcs-fold="{{ fold.key }}" data-fhcs-section="{{ id }}">
+               <div class="items-header fhcs-item-head">
+                  <span class="fhcs-col-name"><button type="button" class="fhcs-section-toggle" data-action="fhcsToggleSection" aria-expanded="{{#if fold.open}}true{{else}}false{{/if}}"><span class="fhcs-section-caret" aria-hidden="true"><svg class="fhcs-icon fhcs-caret" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></span><span class="fhcs-label">{{ label }}</span> <span class="fhcs-label fhcs-muted">{{ count }}</span></button></span>
+                  <span class="fhcs-label fhcs-muted fhcs-col-uses">{{ ../text.head.uses }}</span>
+               </div>
+               <ol class="item-list fhcs-item-list">
+                  {{#each items}}{{> "modules/fhcs/templates/sheet/item-row.hbs" }}{{/each}}
+               </ol>
+            </div>
+            {{/each}}
+         </section>
+      </dnd5e-inventory>
+      {{/if}}
+      {{/with}}
+
+      {{#if draft.length}}
+      <div class="fhcs-member-section fhcs-plate fhcs-vehicle-draft">
+         <div class="fhcs-item-head"><span class="fhcs-label">{{ text.draft }}</span> <span class="fhcs-label fhcs-muted">{{ draft.length }}</span></div>
+         <ol class="fhcs-member-list">
+            {{#each draft}}
+            <li class="station drafted fhcs-station fhcs-draft" data-uuid="{{ uuid }}">
+               <div class="fhcs-station-top">
+                  <img class="fhcs-station-img" src="{{ img }}" alt="">
+                  <span class="fhcs-member-name-col">
+                     <button type="button" class="fhcs-member-name fhcs-body" data-action="showDocument" data-uuid="{{ uuid }}" aria-label="{{ openLabel }}">{{ name }}</button>
+                     {{#if sub}}<span class="fhcs-body fhcs-muted fhcs-member-name">{{ sub }}</span>{{/if}}
+                  </span>
+                  {{#if ../editing}}<button type="button" class="fhcs-toggle fhcs-member-remove" data-action="removeMember" aria-label="{{ removeLabel }}" data-fhcs-tip="{{ removeLabel }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>{{/if}}
+               </div>
+            </li>
+            {{/each}}
+         </ol>
+      </div>
+      {{/if}}
+
+      {{#if adds.length}}
+      <div class="fhcs-vehicle-adds fhcs-plate">
+         {{#each adds}}
+         <button type="button" class="fhcs-button fhcs-body" data-action="{{ action }}"{{#if type}} data-type="{{ type }}"{{/if}}>
+            <svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>{{ label }}
+         </button>
+         {{/each}}
+      </div>
+      {{/if}}
+      {{#if empty}}<p class="fhcs-body fhcs-muted fhcs-empty fhcs-plate">{{ text.empty }}</p>{{/if}}
+   </div>
+   {{/with}}
+</section>
