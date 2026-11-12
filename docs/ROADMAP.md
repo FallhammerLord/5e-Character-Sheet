@@ -15,6 +15,17 @@ A new theme should be textures, marks and motion, not new plumbing. Before the k
 - [x] Extended (Claude): one emblem place for every theme, in `styles/fhcs.css`; Wind, Sand and Valley's emblems had sat under the inspiration star
 - [x] BUILT entry, "how a theme plugs in", with the recipe; CLAUDE.md's "How a theme goes" points to it
 
+## Sand and Sanctuary: the Argent Sands (user, 2026-11-12; SCOPE §4.11, §5.3 rules 12–13)
+
+The four themes are regions of the user's setting; Sand is the first taken further on the kit, as Forge was before it.
+
+- [x] Brief and research: the user's lore; silver tarnish, desilvered mirrors, fulgurites, gintsugi; colour collisions (docs/research/sand-theme.md)
+- [x] Decisions recorded: dark, the label kept, every theme a region, Day and Night checked against; §7's class sketch closed
+- [x] Extended (Claude): the theme menu names Plain "Day and Night" (`lang/en.json`; the user's decision, done now as one line)
+- [x] Mockup: canvas row "Themes · Sand and Sanctuary" (full, 644px edit bloodied with a long name, down, the component; marks and the HP bar play their moments); waits on the user's review
+- [ ] Build on the kit: `styles/themes/sand.css` rewritten (one look, the ground's grains from a script as Forge's textures, the mirror rim on `--fhcs-hp`, El Messiri), the hourglass marks, `registerMoments('sand', …)` for gained, spent, hit, heal
+- [ ] Layout check `ONLY='theme-sand'`, screenshots looked at; Quench; play
+
 ## Phase 0: Foundations (done; Quench verified 2026-10-24)
 
 - [x] Module scaffold: manifest, sheet registered beside dnd5e's (not the default), `compat.js`, load check with dnd5e mocked

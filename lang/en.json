@@ -41,7 +41,7 @@
       },
       "Motion": {
         "Name": "Sheet motion",
-        "Hint": "Off: the sheet keeps still in every theme, Plain's Day and Night too (no particles, glints or moments). Your own choice; your system's reduced-motion setting also turns it off."
+        "Hint": "Off: the sheet keeps still in every theme, Day and Night too (no particles, glints or moments). Your own choice; your system's reduced-motion setting also turns it off."
       },
       "KeepTokenSizes": {
         "Name": "Keep token sizes on image swaps",
@@ -458,7 +458,7 @@
       "Label": "Sheet theme",
       "Title": "Sheet theme",
       "WorldDefault": "World default ({name})",
-      "plain": "Plain",
+      "plain": "Day and Night",
       "forge": "Fire and Forge",
       "wind": "Wind and Wrath",
       "sand": "Sand and Sanctuary",

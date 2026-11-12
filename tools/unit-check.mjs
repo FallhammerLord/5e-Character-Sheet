@@ -246,7 +246,7 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    if (names[0] !== 'Attributes' || names[2] !== 'Spellbook') { problems.push(`tab names: ${names.join()}`); }
    // The theme picker on the title bar (SCOPE §4.11): the world default first, named, then each theme; one pressed.
    const options = themePicker({ chosen: '', world: 'forge', keys: ['plain', 'forge'] }, { localize, format }).options.map((o) => `${o.value || 'world'}:${o.name}:${o.on}`);
-   try { deepStrictEqual(options, ['world:World default (Fire and Forge):true', 'plain:Plain:false', 'forge:Fire and Forge:false']); }
+   try { deepStrictEqual(options, ['world:World default (Fire and Forge):true', 'plain:Day and Night:false', 'forge:Fire and Forge:false']); }
    catch { problems.push(`theme picker: ${JSON.stringify(options)}`); }
 }
 
