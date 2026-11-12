@@ -1257,6 +1257,57 @@ export function registerQuenchTests(quench)
             }
          });
 
+         it('opens a vehicle in our vehicle sheet: header, Stations first with its add buttons, a crew count stepped up, Cargo and Description', async function ()
+         {
+            this.timeout(HOOK_WAIT_MS * 12);
+            const sailor = await Actor.implementation.create({ name: 'FHCS test sailor', type: 'npc' });
+            const ship = await Actor.implementation.create({ name: 'FHCS test ship', type: 'vehicle',
+               flags: { core: { sheetClass: `${MODULE_ID}.FHCSVehicleSheet` } }, system: { crew: { max: 20 }, attributes: { hp: { value: 200, max: 300 } } } });
+            const shipSheet = ship.sheet;
+            const inSheet = (selector) => shipSheet.element?.querySelector(selector);
+            const all = (selector) => [...(shipSheet.element?.querySelectorAll(selector) ?? [])];
+            const tabs = () => all('.fhcs-tabs [data-tab]').map((t) => t.dataset.tab).join(', ');
+            /** Waits for the vehicle sheet to draw again, then finds an element fresh (the redraw rule, CLAUDE.md). */
+            const fresh = async (selector, why) =>
+            {
+               await new Promise((resolve) => { setTimeout(resolve, REDRAW_START_MS); });
+               await shipSheet.render();
+               const found = inSheet(selector);
+               assert.ok(found, `no element matches ${selector}${why ? `; ${why()}` : ''}`);
+               return found;
+            };
+            const crewCount = () => ship.system.crew.value.filter((u) => u === sailor.uuid).length;
+            try
+            {
+               await ship.system.adjustCrew('crew', sailor.uuid, 2);
+               await shipSheet.render({ force: true });
+               await until(() => inSheet('.fhcs-vehicle-header') && tabs().startsWith('stations') && tabs().includes('crew'),
+                  () => `our header draws and Stations leads, Crew & Passengers shown with crew; the sheet is ${shipSheet.constructor.name}, tabs ${tabs()}`);
+               await until(() => inSheet('.fhcs-vehicle-stations.active[data-area="draft"]'),
+                  () => `Stations is open first, keeping dnd5e's drop area; open tab ${shipSheet.tabGroups.primary}`);
+               await until(() => inSheet('.fhcs-vehicle-hp-input')?.value === '200', () => `the Hull shows the HP as a field; it holds ${inSheet('.fhcs-vehicle-hp-input')?.value}`);
+               (await fresh('.fhcs-tabs [data-action="changeMode"]')).click(); // redraw-safe: found after the render settled
+               await until(() => shipSheet.isEditMode, 'the lock switches to edit mode');
+               const adds = () => all('.fhcs-vehicle-adds [data-action]').map((b) => b.dataset.type || b.dataset.action).join(',');
+               await until(() => adds() === 'feat,equipment,weapon,browseActors', () => `edit mode adds dnd5e's four add buttons; it has ${adds() || 'none'}`);
+               shipSheet.changeTab('crew', 'primary');
+               const row = `.fhcs-vehicle-crew [data-area="crew"] .crew[data-uuid="${sailor.uuid}"]`;
+               await until(() => inSheet(row), () => `the sailor has a crew row; rows ${all('.fhcs-vehicle-crew .crew').map((r) => r.dataset.uuid).join(', ') || 'none'}`);
+               (await fresh(`${row} [data-action="adjustCrew"][data-delta="+1"]`)).click(); // redraw-safe: found after the render settled
+               await until(() => crewCount() === 3, () => `+ adds one sailor through dnd5e's adjustCrew; the ship has ${crewCount()}`);
+               shipSheet.changeTab('inventory', 'primary');
+               await until(() => inSheet('.fhcs-inventory'), () => 'Cargo is our Inventory list');
+               shipSheet.changeTab('description', 'primary');
+               await until(() => inSheet('.fhcs-biography prose-mirror[name="system.details.biography.value"]'), () => 'Description is dnd5e\'s one editor in our layout');
+            }
+            finally
+            {
+               await shipSheet.close();
+               await ship.delete();
+               await sailor.delete();
+            }
+         });
+
          it('keeps dnd5e\'s item fields and adds: rarity, units and the other descriptions; the add button on Advancement', async function ()
          {
             this.timeout(HOOK_WAIT_MS * 8);

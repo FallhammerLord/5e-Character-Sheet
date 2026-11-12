@@ -17,7 +17,7 @@ import { biographyView } from '../src/sheet/biography.js';
 import { limitedView } from '../src/sheet/limited.js';
 import { groupHeaderView, groupMembersView } from '../src/sheet/group.js';
 import { encounterHeaderView, encounterMembersView } from '../src/sheet/encounter.js';
-import { vehicleHeaderView, vehicleStationsView } from '../src/sheet/vehicle.js';
+import { vehicleCrewView, vehicleHeaderView, vehicleStationsView } from '../src/sheet/vehicle.js';
 import { THEMES } from '../src/constants.js';
 import { format, localize, template } from './templates.mjs';
 
@@ -1210,6 +1210,21 @@ CASES.push({ name: 'vehicle-stations', html: vehicleStations(), rows: '.fhcs-tra
 CASES.push({ name: 'vehicle-stations-editing', html: vehicleStations({ editing: true }) });
 CASES.push({ name: 'vehicle-stations-empty', html: vehicleStations({ traits: [], stations: [], draft: [], hasFeatures: false }).replace(/<dnd5e-inventory[\s\S]*<\/dnd5e-inventory>/, '') });
 CASES.push({ name: 'theme-forge-vehicle-stations-editing', look: 'forge', html: vehicleStations({ editing: true }) });
+// Crew & Passengers (the board), Cargo (our list, the cargo bar), Description (one editor).
+const crewRow = (name, fill, quantity, sub = 'Medium · Humanoid') => ({ uuid: `Actor.${name.replace(/\W/g, '')}`, name, img: ICON(fill), sub, quantity, diff: 0 });
+const vehicleCrew = (editing, areas) => vehicleTop({ editing }) + `<div class="tab-body">${template('vehicle/crew')({ tab: { id: 'crew', group: 'primary', cssClass: 'active' },
+   fhcsCrew: vehicleCrewView({ editing, areas: areas ?? [
+      { key: 'unassigned', area: 'crew', total: 14, rows: [crewRow('Sailor', '#6a8ab0', 12), crewRow('Veteran of the Long Sea Wars, Retired', '#8a3a3a', 2)] },
+      { key: 'assigned', area: 'crew', total: 2, rows: [crewRow('Captain Orsa Vell', '#a0703a', 1), crewRow('Deckhand', '#7fb0ec', 1)] },
+      { key: 'passengers', area: 'passengers', total: 0, rows: [], hint: true }] }, { format, localize }) })}</div>`;
+CASES.push({ name: 'vehicle-crew', html: vehicleCrew(false), rows: '.fhcs-crew-row' });
+CASES.push({ name: 'vehicle-crew-editing', html: vehicleCrew(true), rows: '.fhcs-crew-row', sameRowsAs: 'vehicle-crew' });
+CASES.push({ name: 'theme-forge-vehicle-crew-editing', look: 'forge', html: vehicleCrew(true) });
+CASES.push({ name: 'vehicle-cargo', html: vehicleTop() + `<div class="tab-body">${template('sheet/inventory')(groupStash({ carriers: [], sources: null,
+   encumbrance: { value: '42', max: '200,000', pct: 1, stops: {}, units: 'lb' } }))}</div>` });
+CASES.push({ name: 'vehicle-description', html: vehicleTop() + `<div class="tab-body">${template('sheet/biography')({ tab: { id: 'description', group: 'primary', cssClass: 'active' },
+   fhcsBiography: biographyView({ characteristics: [], boxes: [], editable: true, uuid: 'Actor.v',
+      stories: [{ name: 'system.details.biography.value', label: 'Description', enriched: '<p>A three-masted carrack, gilded at the prow.</p>', source: '' }] }, { format, localize }) })}</div>` });
 CASES.push({ name: 'item-long-name', frame: 'item', html: itemSheet('weapon', { name: 'Sun Blade of the Dawnwarden, Twice-Forged in the Ember Halls' }) });
 
 // Chat cards in the world's theme (SCOPE §5.3 rule 10): every card case again in Forge.

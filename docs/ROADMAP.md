@@ -234,10 +234,11 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
   - [ ] Encounter: Quench and play, BUILT entry
   - [x] Vehicle research (research note "The vehicle sheet, closer") and decisions (SCOPE §4.13, user 2026-11-10)
   - [x] Vehicle mocked up (canvas row "Phase 6.7 · the vehicle sheet": a ship light, a siege wagon dark, 644px edit mode, Crew & Passengers), waits on the user's review
-  - [ ] Vehicle sheet built, in slices:
+  - [x] Vehicle sheet built, in slices:
     - [x] Header and tab row (2026-11-12): registered beside dnd5e's, not the default, its sidebar gone; portrait, name, action pips, the line; Hull (HP field, DT, mishap), AC, Speed, Initiative and Quality when shown; the character's ability row when shown (now a shared partial); edit mode's gears and display-options tray
     - [x] Stations as the first tab (2026-11-12): Traits beside the action stations (cover, AC, DT, a weapon's rolls, HP and uses fields, crew places), the features as Inventory rows, draft animals, the add buttons
-    - [ ] Cargo, Crew & Passengers, Effects, Description; Quench test
+    - [x] Cargo, Crew & Passengers, Effects, Description; Quench test (2026-11-12): Cargo on our list with the cargo bar; crew and passengers as rows with counts (− field + in edit mode, dnd5e's adjustCrew), dragged between areas; our Effects; dnd5e's one description
+  - [ ] Vehicle: Quench and play, BUILT entry
 - [ ] The smaller windows: a skin
 - [ ] Quench and play
 

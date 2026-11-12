@@ -3673,6 +3673,23 @@
 .fhcs-sheet .fhcs-vehicle-adds { display: flex; flex-wrap: wrap; gap: var(--fhcs-s2); padding: var(--fhcs-s2); border: 1px solid var(--fhcs-line); border-radius: var(--fhcs-radius); }
 .fhcs-sheet .fhcs-vehicle-adds > .fhcs-button { gap: var(--fhcs-s1); width: auto; padding: 0 var(--fhcs-s2); }
 
+/* ---------- The vehicle's Crew & Passengers (SCOPE §4.13, user 2026-11-10) ---------- */
+
+/* A creature: portrait, name over its kind, then its count ("× 4"; edit mode − field +). */
+.fhcs-sheet .fhcs-crew-row
+{
+   display: grid;
+   grid-template-columns: 40px minmax(96px, 1fr) 112px;
+   align-items: center;
+   gap: var(--fhcs-s2);
+   min-height: 48px;
+   padding: var(--fhcs-s1) var(--fhcs-s2);
+   border-bottom: 1px solid var(--fhcs-line-soft);
+}
+.fhcs-sheet .fhcs-crew-row:last-child { border-bottom: 0; }
+.fhcs-sheet .fhcs-crew-row.fhcs-member-head { min-height: var(--fhcs-control); padding-top: 0; padding-bottom: 0; border-bottom: 1px solid var(--fhcs-line); }
+.fhcs-sheet .fhcs-vehicle-crew .fhcs-crew-row.draggable { cursor: grab; }
+
 /* ---------- Biography tab (SCOPE §4.8) ---------- */
 
 .fhcs-sheet .fhcs-biography.active { display: flex; flex-direction: column; gap: var(--fhcs-s2); }

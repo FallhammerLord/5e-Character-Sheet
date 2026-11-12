@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES, VIEW_ACTIONS } from '../constants.js';
-import { attributesFacts, biographyFacts, vehicleHeaderFacts, vehicleStationsFacts, encounterHeaderFacts, encounterMembersFacts, groupHeaderFacts, groupInventoryFacts, groupMembersFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, vehicleCargoFacts, vehicleCrewFacts, vehicleHeaderFacts, vehicleStationsFacts, encounterHeaderFacts, encounterMembersFacts, groupHeaderFacts, groupInventoryFacts, groupMembersFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, renderTemplate, setLairInside, setSpellcastingAbility, spellbookFacts, toggleInspired, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, containerColumnChoice, inventoryView } from '../sheet/inventory.js';
@@ -10,7 +10,7 @@ import { biographyView } from '../sheet/biography.js';
 import { limitedView } from '../sheet/limited.js';
 import { groupHeaderView, groupMembersView } from '../sheet/group.js';
 import { encounterHeaderView, encounterMembersView } from '../sheet/encounter.js';
-import { vehicleHeaderView, vehicleStationsView } from '../sheet/vehicle.js';
+import { vehicleCrewView, vehicleHeaderView, vehicleStationsView } from '../sheet/vehicle.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
 import { NPC_TAB_NAMES, NPC_TAB_ORDER, TEMP_TOP_FLAG, comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, tabRow, themePicker } from '../sheet/header.js';
 import { themeMoment } from './sparks.js';
@@ -1355,7 +1355,11 @@ const VEHICLE_PARTS = {
    tabs: GROUP_PARTS.tabs,
    // dnd5e draws its stations beside every tab; ours are the first tab (SCOPE §4.13, user 2026-11-10).
    stations: { template: `${MODULE_PATH}/templates/vehicle/stations.hbs`, container: { classes: ['tab-body'], id: 'tabs' }, scrollable: [''],
-      templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`, `${MODULE_PATH}/templates/sheet/item-row.hbs`] }
+      templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`, `${MODULE_PATH}/templates/sheet/item-row.hbs`] },
+   inventory: GROUP_PARTS.inventory,
+   crew: { template: `${MODULE_PATH}/templates/vehicle/crew.hbs`, scrollable: [''] },
+   effects: GROUP_PARTS.effects,
+   description: { template: SHEET_PARTS.biography, ...PART_OPTIONS.biography }
 };
 
 /** The vehicle's tabs: Stations first, then dnd5e's own with their conditions (Crew & Passengers only with crew). */
@@ -1424,6 +1428,26 @@ export function makeVehicleSheet(Base)
             const folded = game.user.getFlag(MODULE_ID, PREFS.folded) ?? [];
             context.fhcsInventory = inventoryView({ group: true, editing: false, columns: { weight: false, uses: true, quantity: false },
                sections: facts.features, currency: [], encumbrance: null, folded }, i18n);
+            return context;
+         }
+         if (partId === 'inventory')
+         {
+            // Cargo (SCOPE §4.13): the container's columns and setting, the cargo capacity as the bar.
+            const columns = containerColumnChoice(game.settings.get(MODULE_ID, 'containerColumns'));
+            const openContainers = game.user.getFlag(MODULE_ID, PREFS.openContainers) ?? [];
+            const folded = game.user.getFlag(MODULE_ID, PREFS.folded) ?? [];
+            context.fhcsInventory = inventoryView({ ...await vehicleCargoFacts(this, context, { columns, openContainers }), folded,
+               order: sectionOrder(this.actor, 'inventory') }, i18n);
+            return context;
+         }
+         if (partId === 'crew')
+         {
+            context.fhcsCrew = vehicleCrewView(vehicleCrewFacts(this, context), i18n);
+            return context;
+         }
+         if (partId === 'description')
+         {
+            context.fhcsBiography = biographyView(biographyFacts(this, context), i18n);
             return context;
          }
          if (partId === 'tabs')

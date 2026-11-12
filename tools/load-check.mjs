@@ -363,12 +363,14 @@ else
    const parts = sheet.PARTS ?? {};
    const ids = Object.keys(parts);
    if (ids[0] !== 'header' || ids[1] !== 'tabs' || ids.includes('sidebar') || ids.includes('sidebarCollapser')) { problems.push(`vehicle sheet parts are ${ids.join()}`); }
+   if (sheet.TABS?.[0]?.tab !== 'stations' || !sheet.TABS.some((t) => t.tab === 'crew' && t.condition)) { problems.push(`vehicle tabs are ${sheet.TABS?.map((t) => t.tab).join()}; Stations first, Crew keeping dnd5e's condition`); }
+   if (!parts.stations?.container?.classes?.includes('tab-body')) { problems.push('the vehicle\'s Stations part is not in the tab body'); }
    for (const [id, part] of Object.entries(parts).filter(([, p]) => p.template?.startsWith('modules/fhcs/')))
    {
       if (!existsSync(new URL(`../${part.template.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`vehicle part template ${part.template} is missing`); }
       for (const path of part.templates ?? []) { if (!existsSync(new URL(`../${path.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`vehicle ${id} partial ${path} is missing`); } }
    }
-   for (const id of ['header', 'tabs'])
+   for (const id of ['header', 'tabs', 'stations', 'inventory', 'crew', 'effects', 'description'])
    {
       if (!parts[id]?.template?.startsWith('modules/fhcs/')) { problems.push(`the vehicle sheet's ${id} part is still dnd5e's`); }
    }

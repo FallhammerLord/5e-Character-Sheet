@@ -12,7 +12,7 @@ import { keepStable } from '../src/sheet/death.js';
 import { columnChoice, containerColumnChoice, inventoryView } from '../src/sheet/inventory.js';
 import { groupHeaderView, groupMembersView } from '../src/sheet/group.js';
 import { encounterHeaderView, encounterMembersView } from '../src/sheet/encounter.js';
-import { vehicleHeaderView, vehicleStationsView } from '../src/sheet/vehicle.js';
+import { vehicleCrewView, vehicleHeaderView, vehicleStationsView } from '../src/sheet/vehicle.js';
 import { canCast, prepState, spellbookView, spellColumnChoice, spellKind } from '../src/sheet/spellbook.js';
 import { featureColumnChoice, featuresView, groupingOf } from '../src/sheet/features.js';
 import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js';
@@ -688,6 +688,16 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    try { deepStrictEqual(stShape, ['size,dr', '', 'size:true: keel:false: dr:false:dr', 'Gunner,empty,empty', 36, 0, 'feat,equipment,weapon,browseActors', false]); }
    catch { problems.push(`vehicle stations: ${JSON.stringify(stShape)}`); }
    if (!vehicleStationsView({ traits: [], stations: [], draft: [] }, { format, localize }).empty) { problems.push('an empty vehicle says nothing to a reader'); }
+
+   // Crew & Passengers: assigned crew never take − and +; the rest only in edit mode; an empty area keeps its drop hint.
+   const crewFacts = { areas: [{ key: 'unassigned', area: 'crew', total: 14, rows: [{ uuid: 's', name: 'Sailor', quantity: 12, diff: 0 }] },
+      { key: 'assigned', area: 'crew', total: 1, rows: [{ uuid: 'c', name: 'Captain', quantity: 1 }] },
+      { key: 'passengers', area: 'passengers', total: 0, rows: [], hint: true }, { key: 'crew', area: 'crew', rows: [] }] };
+   const crewPlay = vehicleCrewView(crewFacts, { format, localize });
+   const crewEdit = vehicleCrewView({ ...crewFacts, editing: true }, { format, localize });
+   const crewShape = [crewPlay.areas.map((a) => `${a.key}:${a.adjustable}:${a.draggable}:${!!a.hint}`).join(' '), crewEdit.areas.map((a) => a.adjustable).join()];
+   try { deepStrictEqual(crewShape, ['unassigned:false:true:false assigned:false:false:false passengers:false:true:true', 'true,false,true']); }
+   catch { problems.push(`vehicle crew: ${JSON.stringify(crewShape)}`); }
 }
 
 // Spellbook (SCOPE §4.7): preparation states and kinds, Can cast, section order, slot pips, the concentration mark.

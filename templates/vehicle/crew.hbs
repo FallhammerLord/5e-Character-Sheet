@@ -1,0 +1,43 @@
+{{!-- The vehicle's Crew & Passengers (SCOPE §4.13, the board, 2026-11-10): crew unassigned (or all crew) and assigned to
+      stations, and passengers, each creature with its count. dnd5e's hooks kept: each area is `[data-area]` (crew or
+      passengers: a creature dropped there joins it, dragged between areas it moves, vehicle-sheet.mjs `_onDropActor`);
+      each row `.crew[data-uuid]` (draggable, showDocument); the count is `.crew-quantity` with dnd5e's hidden difference
+      after it, and adjustCrew with `data-delta` around it. Takes dnd5e's "crew" part ID. --}}
+<section class="tab fhcs-group-members fhcs-vehicle-crew{{#if fhcsCrew.editing}} fhcs-editing{{/if}} {{ tab.cssClass }}" data-tab="{{ tab.id }}" data-group="{{ tab.group }}">
+   {{#with fhcsCrew}}
+   {{#each areas}}
+   <section class="fhcs-member-section fhcs-plate" data-area="{{ area }}" data-fhcs-area="{{ key }}">
+      <div class="fhcs-crew-row fhcs-member-head">
+         <span></span>
+         <span><span class="fhcs-label">{{ label }}</span> <span class="fhcs-label fhcs-muted">{{ total }}</span></span>
+         <span class="fhcs-label fhcs-muted fhcs-member-skill">{{ ../text.count }}</span>
+      </div>
+      {{#if rows.length}}
+      <ol class="fhcs-member-list">
+         {{#each rows}}
+         <li class="crew fhcs-crew-row{{#if ../draggable}} draggable{{/if}}" data-uuid="{{ uuid }}">
+            <span class="fhcs-member-portrait"><img src="{{ img }}" alt=""></span>
+            <span class="fhcs-member-name-col">
+               <button type="button" class="fhcs-member-name fhcs-body" data-action="showDocument" data-uuid="{{ uuid }}" aria-label="{{ openLabel }}">{{ name }}</button>
+               {{#if sub}}<span class="fhcs-body fhcs-muted fhcs-member-name">{{ sub }}</span>{{/if}}
+            </span>
+            <span class="fhcs-encounter-count">
+               {{#if ../adjustable}}
+               <button type="button" class="fhcs-toggle" data-action="adjustCrew" data-delta="-1" aria-label="{{ fewerLabel }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"/></svg></button>
+               <input type="text" class="fhcs-input fhcs-body crew-quantity" value="{{ quantity }}" inputmode="numeric" pattern="^[+=\-]?\d*" min="0" aria-label="{{ countLabel }}">
+               <input type="hidden" value="{{ diff }}">
+               <button type="button" class="fhcs-toggle" data-action="adjustCrew" data-delta="+1" aria-label="{{ moreLabel }}"><svg class="fhcs-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+               {{else}}
+               <span class="fhcs-display">× {{ quantity }}</span>
+               {{/if}}
+            </span>
+         </li>
+         {{/each}}
+      </ol>
+      {{else}}
+      <p class="fhcs-body fhcs-muted fhcs-empty">{{ hint }}</p>
+      {{/if}}
+   </section>
+   {{/each}}
+   {{/with}}
+</section>

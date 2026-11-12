@@ -146,3 +146,32 @@ export function vehicleStationsView(facts, { format, localize })
       }
    };
 }
+
+/**
+ * Everything Crew & Passengers shows (SCOPE §4.13): the areas Unassigned crew (or Crew, when none is assigned),
+ * Assigned crew and Passengers, each a list of creatures with their counts, or a drop hint while empty.
+ * @param {object} facts  From compat.vehicleCrewFacts (or a fixture): `areas` of `rows`, `editing`.
+ * @param {{format: Function, localize: Function}} i18n
+ */
+export function vehicleCrewView(facts, { format, localize })
+{
+   const editing = !!facts.editing;
+   const areas = (facts.areas ?? []).filter((a) => a.rows?.length || a.hint).map((a) => ({
+      key: a.key,
+      area: a.area,
+      label: localize(`FHCS.Vehicle.Area.${a.key}`),
+      total: a.total ?? 0,
+      // Assigned crew are counted by their stations; the rest take − count + in edit mode (dnd5e's adjustCrew).
+      adjustable: editing && a.key !== 'assigned',
+      draggable: a.key !== 'assigned',
+      hint: a.rows?.length ? '' : localize(`FHCS.Vehicle.Drop.${a.area}`),
+      rows: (a.rows ?? []).map((r) => ({
+         uuid: r.uuid, name: r.name, img: r.img, sub: r.sub ?? '', quantity: r.quantity ?? 1, diff: r.diff ?? 0,
+         openLabel: format('FHCS.Group.OpenLabel', { name: r.name }),
+         countLabel: format('FHCS.Encounter.CountLabel', { name: r.name }),
+         fewerLabel: format('FHCS.Encounter.Fewer', { name: r.name }),
+         moreLabel: format('FHCS.Encounter.More', { name: r.name })
+      }))
+   }));
+   return { editing, areas, text: { count: localize('FHCS.Encounter.Count') } };
+}

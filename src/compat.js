@@ -842,6 +842,41 @@ export async function vehicleStationsFacts(sheet, context)
 }
 
 /**
+ * Plain facts for the vehicle's Crew & Passengers (src/sheet/vehicle.js), from dnd5e's `_prepareCrewContext`
+ * (vehicle-sheet.mjs): crew unassigned and assigned to stations, and passengers, each creature with its count and the
+ * hidden difference dnd5e's count field adds back (`diff`); an area with room and nobody in it shows its drop hint.
+ */
+export function vehicleCrewFacts(sheet, context)
+{
+   const system = sheet.actor.system;
+   const rows = (group) => (group?.value ?? []).map((m) => ({ uuid: m.uuid, name: m.actor?.name ?? '', img: m.actor?.img ?? '',
+      sub: plainSubtitle(m.actor?.subtitle ?? '').replace(/\s*\u2022\s*/g, ' \u00b7 '), quantity: m.quantity, diff: m.diff ?? 0 }));
+   const crew = context.crew;
+   const assigned = crew?.assigned?.value?.length ? crew.assigned : null;
+   const areas = [];
+   if (crew) { areas.push({ key: assigned ? 'unassigned' : 'crew', area: 'crew', total: crew.unassigned?.total ?? 0, rows: rows(crew.unassigned) }); }
+   else if (system.crew?.max) { areas.push({ key: 'crew', area: 'crew', total: 0, rows: [], hint: true }); }
+   if (assigned) { areas.push({ key: 'assigned', area: 'crew', total: assigned.total ?? 0, rows: rows(assigned) }); }
+   if (context.passengers) { areas.push({ key: 'passengers', area: 'passengers', total: context.passengers.total ?? 0, rows: rows(context.passengers) }); }
+   else if (system.passengers?.max) { areas.push({ key: 'passengers', area: 'passengers', total: 0, rows: [], hint: true }); }
+   return { editing: !!sheet.isEditMode && !!sheet.isEditable, areas };
+}
+
+/** Plain facts for the vehicle's Cargo: the character's Inventory facts on the vehicle, its cargo as the bar. */
+export async function vehicleCargoFacts(sheet, context, options)
+{
+   const facts = await inventoryFacts(sheet, context, options);
+   const enc = context.encumbrance;
+   return {
+      ...facts,
+      group: true,
+      attunement: null,
+      encumbrance: enc && Number.isFinite(enc.max) && enc.max ? { value: tenths(enc.value), max: tenths(enc.max), pct: enc.pct ?? 0, stops: {},
+         units: weightUnit(enc.units ?? CONFIG.DND5E.encumbrance?.baseUnits?.default?.[game.settings.get('dnd5e', 'metricWeightUnits') ? 'metric' : 'imperial']) } : null
+   };
+}
+
+/**
  * Plain facts for a group's Inventory (SCOPE §4.13, the group sheet): the character's facts on dnd5e's inventory source
  * (the group, or its primary vehicle), the container's columns, and above the list one line per member (dnd5e's
  * `context.members`: carried, coins), where a dropped item goes to that member. With a primary vehicle, the switch
@@ -1787,6 +1822,13 @@ export function biographyFacts(sheet, context)
    // An NPC (SCOPE §4.13, 2026-11-09): its public biography first (players see it), then dnd5e's details, beside its
    // ideals, bonds and flaws (npc-biography.hbs); no characteristics or appearance.
    // A group or encounter (SCOPE §4.13, 2026-11-10): dnd5e's two fields, Summary then Description, each its own editor.
+   // A vehicle (SCOPE §4.13, 2026-11-10): dnd5e's one description (vehicle-sheet.mjs `_prepareDescriptionContext`).
+   if (sheet.actor.type === 'vehicle')
+   {
+      return { characteristics: [], boxes: [], uuid: sheet.actor.uuid, editable: sheet.isEditable,
+         stories: [{ name: 'system.details.biography.value', label: game.i18n.localize('DND5E.Description'), enriched: context.description ?? '',
+            source: sheet.actor.system.details?.biography?.value ?? '' }] };
+   }
    if (['group', 'encounter'].includes(sheet.actor.type))
    {
       const description = sheet.actor.system.description ?? {};

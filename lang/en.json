@@ -632,6 +632,16 @@
         "di": "Immune",
         "ci": "Cond. immune",
         "dv": "Vulnerable"
+      },
+      "Area": {
+        "crew": "Crew",
+        "unassigned": "Unassigned crew",
+        "assigned": "Assigned crew",
+        "passengers": "Passengers"
+      },
+      "Drop": {
+        "crew": "Drop creatures here to add crew.",
+        "passengers": "Drop creatures here to add passengers."
       }
     }
   }
