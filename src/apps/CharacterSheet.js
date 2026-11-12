@@ -1,5 +1,5 @@
 import { MODULE_ID, MODULE_PATH, THEME_FLAG, THEMES, VIEW_ACTIONS } from '../constants.js';
-import { attributesFacts, biographyFacts, encounterHeaderFacts, encounterMembersFacts, groupHeaderFacts, groupInventoryFacts, groupMembersFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
+import { attributesFacts, biographyFacts, vehicleHeaderFacts, encounterHeaderFacts, encounterMembersFacts, groupHeaderFacts, groupInventoryFacts, groupMembersFacts, limitedFacts, changeHp, rollHitDie, rowDocument, saveSectionOrder, sectionOrder, stepResource, useResourceItem, inspirationFacts, lastSavedAgo, setInspirationSlot, linkInspiration, linkResource, refreshResource, setResourceUses, cycleListGrouping, extraHeaderControls, savePortraitFrame, savePortraitShape, saveSkillAbility, effectsFacts, endConcentration, featuresFacts, headerFacts, inventoryFacts, levelDownClass, levelUpClass,
    passesExtraFilters, renderTemplate, setLairInside, setSpellcastingAbility, spellbookFacts, toggleInspired, toggleListFilter, watchListFilters } from '../compat.js';
 import { attributesView } from '../sheet/attributes.js';
 import { columnChoice, containerColumnChoice, inventoryView } from '../sheet/inventory.js';
@@ -10,6 +10,7 @@ import { biographyView } from '../sheet/biography.js';
 import { limitedView } from '../sheet/limited.js';
 import { groupHeaderView, groupMembersView } from '../sheet/group.js';
 import { encounterHeaderView, encounterMembersView } from '../sheet/encounter.js';
+import { vehicleHeaderView } from '../sheet/vehicle.js';
 import { FEATURE_PINS, INVENTORY_PINS, SPELL_PINS } from '../sheet/lists.js';
 import { NPC_TAB_NAMES, NPC_TAB_ORDER, TEMP_TOP_FLAG, comfortWidth, headerMinWidth, headerView, hpPreview, inspirationBar, tabRow, themePicker } from '../sheet/header.js';
 import { themeMoment } from './sparks.js';
@@ -48,7 +49,7 @@ const SKILLS = `${MODULE_PATH}/templates/sheet/skills.hbs`;
 const TRAITS = `${MODULE_PATH}/templates/sheet/traits.hbs`;
 const FEATURES_LIST = `${MODULE_PATH}/templates/sheet/features-list.hbs`;
 const PART_OPTIONS = {
-   header: { templates: [`${MODULE_PATH}/templates/sheet/level-up.hbs`, `${MODULE_PATH}/templates/sheet/gear.hbs`] },
+   header: { templates: [`${MODULE_PATH}/templates/sheet/level-up.hbs`, `${MODULE_PATH}/templates/sheet/gear.hbs`, `${MODULE_PATH}/templates/sheet/abilities.hbs`] },
    inventory: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/item-row.hbs`, LIST_BAR, SECTION_MOVE] },
    spells: { scrollable: ['.fhcs-items'], templates: [`${MODULE_PATH}/templates/sheet/spell-row.hbs`, LIST_BAR, `${MODULE_PATH}/templates/sheet/gear.hbs`, `${MODULE_PATH}/templates/sheet/conc-c.hbs`, SECTION_MOVE] },
    features: { scrollable: ['.fhcs-items'], templates: [FEATURES_LIST, `${MODULE_PATH}/templates/sheet/feature-row.hbs`, LIST_BAR, SECTION_MOVE] },
@@ -1336,6 +1337,74 @@ export function makeEncounterSheet(Base)
          if (partId === 'description')
          {
             context.fhcsBiography = biographyView(biographyFacts(this, context), i18n);
+            return context;
+         }
+         return super.fhcsPartContext(partId, context);
+      }
+   };
+}
+
+/* ---------- The vehicle sheet (SCOPE §4.13, user 2026-11-10) ---------- */
+
+/** dnd5e's vehicle sidebar and its collapser go: their stats move to our header, their traits to Stations. */
+const VEHICLE_DROPPED_PARTS = ['sidebarCollapser', 'sidebar'];
+
+/** Our vehicle parts. dnd5e's vehicle has no header part; ours leads, then the tab row. The bodies follow in slices. */
+const VEHICLE_PARTS = {
+   header: { template: `${MODULE_PATH}/templates/vehicle/header.hbs`, templates: [`${MODULE_PATH}/templates/sheet/gear.hbs`, `${MODULE_PATH}/templates/sheet/abilities.hbs`] },
+   tabs: GROUP_PARTS.tabs
+};
+
+/** dnd5e's vehicle parts with ours swapped in, its sidebar gone, the header and tab row first. */
+function vehicleParts(baseParts)
+{
+   const entries = Object.entries(baseParts ?? {})
+      .filter(([id]) => !VEHICLE_DROPPED_PARTS.includes(id))
+      .map(([id, part]) =>
+      {
+         if (!VEHICLE_PARTS[id]) { return [id, part]; }
+         const kept = { ...part };
+         delete kept.classes;
+         delete kept.templates;
+         return [id, { ...kept, ...VEHICLE_PARTS[id] }];
+      });
+   if (!entries.some(([id]) => id === 'header')) { entries.unshift(['header', { ...VEHICLE_PARTS.header }]); }
+   const rank = (id) => (LEADING_PARTS.includes(id) ? LEADING_PARTS.indexOf(id) : LEADING_PARTS.length);
+   return Object.fromEntries(entries.sort(([a], [b]) => rank(a) - rank(b)));
+}
+
+/**
+ * Our vehicle sheet: dnd5e's vehicle sheet with the character sheet's layer on top (the same base, BaseActorSheet): our
+ * lock, theme and title bar; a header of ours where dnd5e has a sidebar.
+ */
+export function makeVehicleSheet(Base)
+{
+   return class FHCSVehicleSheet extends makeCharacterSheet(Base)
+   {
+      static DEFAULT_OPTIONS = {
+         classes: ['fhcs-vehicle']
+      };
+
+      static PARTS = vehicleParts(Base.PARTS);
+
+      /** @inheritDoc */
+      get fhcsHomeTab()
+      {
+         return this.constructor.TABS?.[0]?.tab ?? 'inventory';
+      }
+
+      /** The vehicle's header and tab row; the rest as the character sheet draws them. */
+      async fhcsPartContext(partId, context)
+      {
+         const i18n = { localize: (key) => game.i18n.localize(key), format: (key, data) => game.i18n.format(key, data) };
+         if (partId === 'header')
+         {
+            context.fhcsVehicle = vehicleHeaderView(vehicleHeaderFacts(this, context), i18n);
+            return context;
+         }
+         if (partId === 'tabs')
+         {
+            context.fhcsTabs = tabRow(context.tabs, { canEdit: this.isEditable, editing: this.isEditMode }, i18n.localize, {}, []);
             return context;
          }
          return super.fhcsPartContext(partId, context);

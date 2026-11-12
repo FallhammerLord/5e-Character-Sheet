@@ -1,9 +1,9 @@
 import { MODULE_ID } from './constants.js';
-import { extendChatModel, keepTokenSizes, preloadTemplates, quietPosts, recordLevelOrder, recordTempTop, registerCharacterSheet, registerContainerSheet, registerEncounterSheet, registerGroupSheet, registerItemSheet, registerNpcSheet, systemContainerSheet, systemEncounterSheet, systemGroupSheet,
+import { extendChatModel, keepTokenSizes, preloadTemplates, quietPosts, recordLevelOrder, recordTempTop, registerCharacterSheet, registerContainerSheet, registerEncounterSheet, registerVehicleSheet, registerGroupSheet, registerItemSheet, registerNpcSheet, systemContainerSheet, systemEncounterSheet, systemVehicleSheet, systemGroupSheet,
    systemItemSheet, systemCharacterSheet, systemNpcSheet, watchApplications, watchItemCategories } from './compat.js';
 import { levelOrder } from './sheet/header.js';
 import { keepStable } from './sheet/death.js';
-import { makeCharacterSheet, makeEncounterSheet, makeGroupSheet, makeNpcSheet } from './apps/CharacterSheet.js';
+import { makeCharacterSheet, makeEncounterSheet, makeGroupSheet, makeNpcSheet, makeVehicleSheet } from './apps/CharacterSheet.js';
 import { makeContainerSheet, makeItemSheet } from './apps/ItemSheet.js';
 import { registerQuenchTests } from './tests/quench.js';
 import { registerSettings } from './settings.js';
@@ -44,6 +44,10 @@ Hooks.once('init', () =>
    const EncounterBase = systemEncounterSheet();
    if (EncounterBase) { registerEncounterSheet(makeEncounterSheet(EncounterBase), 'FHCS.Encounter.SheetLabel'); }
    else { console.error(`${MODULE_ID} | dnd5e's encounter sheet was not found; the encounter sheet is not registered.`); }
+   // The vehicle sheet (SCOPE §4.13, user 2026-11-10): offered beside dnd5e's own.
+   const VehicleBase = systemVehicleSheet();
+   if (VehicleBase) { registerVehicleSheet(makeVehicleSheet(VehicleBase), 'FHCS.Vehicle.SheetLabel'); }
+   else { console.error(`${MODULE_ID} | dnd5e's vehicle sheet was not found; the vehicle sheet is not registered.`); }
    // The item sheet (SCOPE §4.13): every item type but containers, offered beside dnd5e's own.
    const ItemBase = systemItemSheet();
    if (ItemBase) { registerItemSheet(makeItemSheet(ItemBase), 'FHCS.Item.SheetLabel'); }

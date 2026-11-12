@@ -252,6 +252,29 @@ export function npcView(npc, columns, { format, localize })
  * @param {object} facts  From compat.headerFacts (or a fixture).
  * @param {{format: Function, localize: Function}} i18n
  */
+/**
+ * One ability on the header's row: score | modifier, the modifier rolling the check, then the save. Shared with the
+ * vehicle's ability row (SCOPE §4.13).
+ */
+export function abilityView(a, format)
+{
+   return {
+      key: a.key,
+      abbr: a.abbr,
+      mod: signed(a.mod),
+      save: signed(a.save),
+      score: a.value,
+      // The score as stored, for edit mode's field (effects may raise the score shown).
+      source: a.source ?? a.value,
+      scoreLabel: format('FHCS.Header.ScoreLabel', { ability: a.label }),
+      configLabel: format('FHCS.Header.AbilityConfig', { ability: a.label }),
+      proficient: a.proficient > 0,
+      checkLabel: format('FHCS.Header.CheckLabel', { ability: a.label, mod: signed(a.mod) }),
+      saveLabel: format(a.proficient > 0 ? 'FHCS.Header.SaveProficient' : 'FHCS.Header.SaveLabel',
+         { ability: a.label, mod: signed(a.save) })
+   };
+}
+
 export function headerView(facts, { format, localize })
 {
    // The cards' grid: the combat panel's column, then one per ability, so the cards line up with the stats row.
@@ -327,21 +350,7 @@ export function headerView(facts, { format, localize })
       },
       // One chip per rest, one click each into dnd5e's rest dialog (user, 2026-10-27, replacing one chip with a tray).
       rests: facts.showRests ? facts.restTypes.map((r) => ({ ...r, short: r.key === 'short' })) : [],
-      abilities: facts.abilities.map((a) => ({
-         key: a.key,
-         abbr: a.abbr,
-         mod: signed(a.mod),
-         save: signed(a.save),
-         score: a.value,
-         // The score as stored, for edit mode's field (effects may raise the score shown).
-         source: a.source ?? a.value,
-         scoreLabel: format('FHCS.Header.ScoreLabel', { ability: a.label }),
-         configLabel: format('FHCS.Header.AbilityConfig', { ability: a.label }),
-         proficient: a.proficient > 0,
-         checkLabel: format('FHCS.Header.CheckLabel', { ability: a.label, mod: signed(a.mod) }),
-         saveLabel: format(a.proficient > 0 ? 'FHCS.Header.SaveProficient' : 'FHCS.Header.SaveLabel',
-            { ability: a.label, mod: signed(a.save) })
-      })),
+      abilities: facts.abilities.map((a) => abilityView(a, format)),
       text: {
          hp: localize('FHCS.Header.HP'), temp: localize('FHCS.Header.Temp'), maxMod: localize('FHCS.Header.MaxMod'),
          maxModLabel: localize('FHCS.Header.MaxModLabel'),

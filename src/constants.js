@@ -15,11 +15,14 @@ export const GROUP_SHEET_CLASS_NAME = 'FHCSGroupSheet';
 /** Our encounter sheet's class name (SCOPE §4.13, the encounter sheet). */
 export const ENCOUNTER_SHEET_CLASS_NAME = 'FHCSEncounterSheet';
 
+/** Our vehicle sheet's class name (SCOPE §4.13, the vehicle sheet). */
+export const VEHICLE_SHEET_CLASS_NAME = 'FHCSVehicleSheet';
+
 /** Our container sheet's class name (SCOPE §4.13, the container sheet), for the settings that redraw it. */
 export const CONTAINER_SHEET_CLASS_NAME = 'FHCSContainerSheet';
 
 /** Our sheets' class names, for settings that redraw every open sheet. */
-export const SHEET_CLASS_NAMES = [SHEET_CLASS_NAME, NPC_SHEET_CLASS_NAME, GROUP_SHEET_CLASS_NAME, ENCOUNTER_SHEET_CLASS_NAME];
+export const SHEET_CLASS_NAMES = [SHEET_CLASS_NAME, NPC_SHEET_CLASS_NAME, GROUP_SHEET_CLASS_NAME, ENCOUNTER_SHEET_CLASS_NAME, VEHICLE_SHEET_CLASS_NAME];
 
 /**
  * Controls that only change what this viewer sees: folds, details, opening a document to read, filters and grouping.

@@ -17,6 +17,7 @@ import { biographyView } from '../src/sheet/biography.js';
 import { limitedView } from '../src/sheet/limited.js';
 import { groupHeaderView, groupMembersView } from '../src/sheet/group.js';
 import { encounterHeaderView, encounterMembersView } from '../src/sheet/encounter.js';
+import { vehicleHeaderView } from '../src/sheet/vehicle.js';
 import { THEMES } from '../src/constants.js';
 import { format, localize, template } from './templates.mjs';
 
@@ -1158,6 +1159,27 @@ CASES.push({ name: 'encounter-members-editing', frame: 'encounter', html: encoun
 CASES.push({ name: 'encounter-members-empty', frame: 'encounter', html: encounterMembers({ members: [], difficulty: { value: 0, xpText: '0', max: 0, pct: 0, stops: {}, word: '' } }) });
 CASES.push({ name: 'theme-forge-encounter-members-editing', frame: 'encounter', look: 'forge', html: encounterMembers({ editing: true }) });
 CASES.push({ name: 'encounter-loot', frame: 'encounter', html: encounterTop() + `<div class="tab-body">${template('sheet/inventory')(groupStash({ carriers: [], sources: null }))}</div>` });
+// The vehicle sheet (SCOPE §4.13, 2026-11-10): its header (pips, Hull, AC, Speed; Initiative, Quality and the ability
+// row when shown; edit mode's gears and tray) over our tab row, Stations first.
+const VEHICLE_TABS = Object.fromEntries(['stations', 'inventory', 'crew', 'effects', 'description']
+   .map((id, i) => [id, { id, label: ['Stations', 'Cargo', 'Crew & Passengers', 'Effects', 'Description'][i], active: id === 'stations' }]));
+const VEHICLE_ABILITIES = [['str', 'Str', 'Strength', 26, 8], ['dex', 'Dex', 'Dexterity', 8, -1], ['con', 'Con', 'Constitution', 20, 5],
+   ['int', 'Int', 'Intelligence', 0, -5], ['wis', 'Wis', 'Wisdom', 0, -5], ['cha', 'Cha', 'Charisma', 0, -5]]
+   .map(([key, abbr, label, value, mod]) => ({ key, abbr, label, value, mod, save: mod, proficient: 0 }));
+const vehicleFacts = (over = {}) => ({ name: 'The Gilded Heron', img: ICON('#6a8ab0'), editing: false, size: 'Gargantuan', type: 'Water vehicle', cost: '10,000 gp',
+   hp: { value: 240, max: 300, dt: 15, mt: 20 }, ac: 15, speeds: ['Sails 45 ft', '4 mph', '96 mi/d'],
+   actions: { byStations: false, max: 3, value: 2, sourceMax: 3, thresholds: [10, 6, 3] },
+   options: { abilities: false, initiative: false, quality: false }, init: '+2', quality: 4, abilities: VEHICLE_ABILITIES, ...over });
+const vehicleTop = (over = {}) => template('vehicle/header')({ editable: !!over.editing, rollableClass: 'rollable',
+   fhcsVehicle: vehicleHeaderView(vehicleFacts(over), { format, localize }) })
+   + template('sheet/tabs')({ fhcsTabs: tabRow(VEHICLE_TABS, { canEdit: true, editing: !!over.editing }, localize, {}, []) });
+CASES.push({ name: 'vehicle-header', html: vehicleTop(), rows: '.fhcs-header-row, .fhcs-vehicle-cards, .fhcs-tabs' });
+CASES.push({ name: 'vehicle-header-editing', html: vehicleTop({ editing: true }) });
+CASES.push({ name: 'vehicle-header-options', html: vehicleTop({ editing: true }), open: ['vehicle-options'] });
+CASES.push({ name: 'vehicle-header-everything', html: vehicleTop({ name: 'Siege Wagon of the Iron Legion, Third Battery', options: { abilities: true, initiative: true, quality: true } }) });
+CASES.push({ name: 'vehicle-header-everything-editing', html: vehicleTop({ editing: true, name: 'Siege Wagon of the Iron Legion, Third Battery',
+   actions: { byStations: true }, options: { abilities: true, initiative: true, quality: true } }) });
+CASES.push({ name: 'theme-forge-vehicle-header', look: 'forge', html: vehicleTop() });
 CASES.push({ name: 'item-long-name', frame: 'item', html: itemSheet('weapon', { name: 'Sun Blade of the Dawnwarden, Twice-Forged in the Ember Halls' }) });
 
 // Chat cards in the world's theme (SCOPE §5.3 rule 10): every card case again in Forge.

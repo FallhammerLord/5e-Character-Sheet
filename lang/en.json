@@ -564,6 +564,41 @@
       "Add": "Add creature",
       "DifficultyHead": "Difficulty",
       "DifficultyLabel": "{xp} XP against the party"
+    },
+    "Vehicle": {
+      "SheetLabel": "Fallhammer vehicle sheet",
+      "Name": "Vehicle name",
+      "Dt": "DT {value}",
+      "Mishap": "Mishap {value}",
+      "Actions": "Actions",
+      "ActionLeft": "Action {n}: left",
+      "ActionSpent": "Action {n}: spent",
+      "Hull": "Hull",
+      "HullLabel": "{value} of {max} hit points",
+      "HpField": "Hit points",
+      "Ac": "AC",
+      "Speed": "Speed",
+      "Init": "Init",
+      "InitLabel": "Roll initiative ({init})",
+      "Quality": "Quality",
+      "OptionsLabel": "Display options",
+      "Count": "Actions per turn",
+      "Thresholds": "Crew needed for each action",
+      "Option": {
+        "abilities": "Show abilities",
+        "initiative": "Show initiative",
+        "quality": "Show quality",
+        "stations": "Actions from crewed stations"
+      },
+      "Threshold": {
+        "0": "Fewest crew",
+        "1": "Middle crew",
+        "2": "Full crew"
+      },
+      "HpConfig": "Configure hit points",
+      "AcConfig": "Configure armor class",
+      "SpeedConfig": "Configure movement",
+      "InitConfig": "Configure initiative"
     }
   }
 }

@@ -1,0 +1,26 @@
+{{!-- The ability row (SCOPE §4.1): each ability's label, score | modifier (the modifier rolls the check), then the save.
+      Included by the character's header and the vehicle's (when its abilities show, SCOPE §4.13); reads `abilities`
+      and `@root.editable`. --}}
+<div class="fhcs-abilities fhcs-frame">
+   {{#each abilities}}
+   <div class="fhcs-ability" data-ability="{{ key }}">
+      <span class="fhcs-label fhcs-muted fhcs-ability-head">{{ abbr }}{{#if @root.editable}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="ability"
+              aria-label="{{ configLabel }}" data-fhcs-tip="{{ configLabel }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}</span>
+      <div class="fhcs-ability-pair">
+         {{#if @root.editable}}
+         {{!-- Edit mode: the score is a field in its half (SCOPE §4.9), outlined inside so nothing moves. --}}
+         <input type="text" class="fhcs-input fhcs-body fhcs-score-input" name="system.abilities.{{ key }}.value" data-dtype="Number"
+                value="{{ source }}" placeholder="10" aria-label="{{ scoreLabel }}">
+         {{else}}
+         <span class="fhcs-body fhcs-ability-score" role="img" aria-label="{{ scoreLabel }}">{{ score }}</span>
+         {{/if}}
+         <button type="button" class="fhcs-body ability-check {{ @root.rollableClass }}" data-action="roll"
+                 data-type="ability" aria-label="{{ checkLabel }}" data-fhcs-tip="{{ checkLabel }}">{{ mod }}</button>
+      </div>
+      <button type="button" class="fhcs-button fhcs-body saving-throw {{ @root.rollableClass }}" data-action="roll"
+              data-type="ability" aria-label="{{ saveLabel }}" data-fhcs-tip="{{ saveLabel }}">
+         <svg class="fhcs-icon fhcs-save-mark{{#if proficient}} fhcs-on{{/if}}" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5z"/></svg>{{ save }}
+      </button>
+   </div>
+   {{/each}}
+</div>

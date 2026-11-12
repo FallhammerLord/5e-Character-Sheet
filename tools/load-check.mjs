@@ -144,7 +144,27 @@ class SystemEncounterSheet
       return { classes: ['dnd5e2', 'sheet', 'actor', 'standard-form', 'encounter', 'fhcs-sheet', 'fhcs-encounter'] };
    }
 }
-globalThis.dnd5e = { applications: { actor: { CharacterActorSheet: SystemCharacterSheet, NPCActorSheet: SystemNpcSheet, GroupActorSheet: SystemGroupSheet, EncounterActorSheet: SystemEncounterSheet }, item: { ItemSheet5e: SystemItemSheet, ContainerSheet: SystemContainerSheet } } };
+// dnd5e's vehicle sheet (vehicle-sheet.mjs:41): a sidebar and its collapser, the stations, sidebar tabs and four bodies.
+class SystemVehicleSheet
+{
+   static PARTS = {
+      sidebarCollapser: { template: 'systems/dnd5e/templates/actors/parts/sidebar-collapser.hbs' },
+      sidebar: { template: 'systems/dnd5e/templates/actors/vehicle/sidebar.hbs', scrollable: [''] },
+      stations: { template: 'systems/dnd5e/templates/actors/vehicle/stations.hbs', scrollable: [''] },
+      tabs: { classes: ['tabs-right'], template: 'systems/dnd5e/templates/shared/sidebar-tabs.hbs' },
+      inventory: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/actor-inventory.hbs', scrollable: [''] },
+      crew: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/vehicle/crew.hbs', scrollable: [''] },
+      effects: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/tabs/actor-effects.hbs', scrollable: [''] },
+      description: { container: { classes: ['tab-body'], id: 'tabs' }, template: 'systems/dnd5e/templates/actors/vehicle/description.hbs', scrollable: [''] }
+   };
+   static TABS = [{ tab: 'inventory' }, { tab: 'crew', condition: () => true }, { tab: 'effects' }, { tab: 'description' }];
+   static LIMITED_PARTS = SystemCharacterSheet.LIMITED_PARTS;
+   _initializeApplicationOptions()
+   {
+      return { classes: ['dnd5e2', 'sheet', 'actor', 'standard-form', 'vehicle', 'vertical-tabs', 'fhcs-sheet', 'fhcs-vehicle'] };
+   }
+}
+globalThis.dnd5e = { applications: { actor: { CharacterActorSheet: SystemCharacterSheet, NPCActorSheet: SystemNpcSheet, GroupActorSheet: SystemGroupSheet, EncounterActorSheet: SystemEncounterSheet, VehicleActorSheet: SystemVehicleSheet }, item: { ItemSheet5e: SystemItemSheet, ContainerSheet: SystemContainerSheet } } };
 class SystemUsageMessageData {}
 class SystemCheckMessageData {}
 class SystemSaveMessageData {}
@@ -328,6 +348,32 @@ else
    if (Object.getOwnPropertyDescriptor(sheet.prototype, 'fhcsMinWidth')?.get?.call({}) !== 500) { problems.push('the encounter sheet\'s least width is not dnd5e\'s 500'); }
 }
 
+// The vehicle sheet (SCOPE §4.13, 2026-11-10): vehicles only, not the default, dnd5e's sidebar gone, our header and tab
+// row first, every part of ours with its partials on disk.
+const vehicleRegistrations = registered.filter(([doc, , , opts]) => doc === globalThis.Actor && opts?.types?.includes('vehicle'));
+if (vehicleRegistrations.length !== 1) { problems.push(`expected one vehicle sheet registration, got ${vehicleRegistrations.length}`); }
+else
+{
+   const [, scope, sheet, options] = vehicleRegistrations[0];
+   const { VEHICLE_SHEET_CLASS_NAME } = await import('../src/constants.js');
+   if (scope !== 'fhcs') { problems.push(`vehicle sheet registered under "${scope}", not "fhcs"`); }
+   if (!(sheet.prototype instanceof SystemVehicleSheet)) { problems.push('vehicle sheet does not extend dnd5e\'s vehicle sheet'); }
+   if (sheet.name !== VEHICLE_SHEET_CLASS_NAME) { problems.push(`vehicle sheet class is named ${sheet.name}, not ${VEHICLE_SHEET_CLASS_NAME}`); }
+   if (options?.makeDefault) { problems.push('vehicle sheet must not make itself the default'); }
+   const parts = sheet.PARTS ?? {};
+   const ids = Object.keys(parts);
+   if (ids[0] !== 'header' || ids[1] !== 'tabs' || ids.includes('sidebar') || ids.includes('sidebarCollapser')) { problems.push(`vehicle sheet parts are ${ids.join()}`); }
+   for (const [id, part] of Object.entries(parts).filter(([, p]) => p.template?.startsWith('modules/fhcs/')))
+   {
+      if (!existsSync(new URL(`../${part.template.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`vehicle part template ${part.template} is missing`); }
+      for (const path of part.templates ?? []) { if (!existsSync(new URL(`../${path.replace(/^modules\/fhcs\//, '')}`, import.meta.url))) { problems.push(`vehicle ${id} partial ${path} is missing`); } }
+   }
+   for (const id of ['header', 'tabs'])
+   {
+      if (!parts[id]?.template?.startsWith('modules/fhcs/')) { problems.push(`the vehicle sheet's ${id} part is still dnd5e's`); }
+   }
+}
+
 // The NPC sheet (SCOPE §4.13, 2026-11-09): NPCs only, not the default, dnd5e's NPC class with our header and tab row
 // first, its sidebar gone, its tab bodies dnd5e's until their slices.
 const npcRegistrations = registered.filter(([doc, , , opts]) => doc === globalThis.Actor && opts?.types?.includes('npc'));
@@ -384,7 +430,7 @@ else
    if (!npcLabel.split('.').reduce((node, part) => node?.[part], npcLang)) { problems.push(`NPC sheet label ${npcLabel} is not in lang/en.json`); }
 }
 
-const characterRegistrations = registered.filter(([doc, , , opts]) => doc !== globalThis.Item && !['npc', 'group', 'encounter'].some((t) => opts?.types?.includes(t)));
+const characterRegistrations = registered.filter(([doc, , , opts]) => doc !== globalThis.Item && !['npc', 'group', 'encounter', 'vehicle'].some((t) => opts?.types?.includes(t)));
 const [documentClass, scope, sheet, options] = characterRegistrations[0] ?? [];
 if (characterRegistrations.length !== 1) { problems.push(`expected one character sheet registration, got ${characterRegistrations.length}`); }
 else

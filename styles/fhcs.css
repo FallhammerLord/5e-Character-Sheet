@@ -3594,6 +3594,37 @@
 .fhcs-sheet .fhcs-encounter-difficulty { flex: none; padding: var(--fhcs-s2); border: 1px solid var(--fhcs-line); border-radius: var(--fhcs-radius); }
 .fhcs-sheet .fhcs-encounter-difficulty > .fhcs-carried-text { white-space: nowrap; }
 
+/* ---------- The vehicle sheet's header (SCOPE §4.13, user 2026-11-10) ---------- */
+
+/* The group's header with a card row: Hull, AC and Speed, and Initiative and Quality when shown. */
+.fhcs-sheet .fhcs-vehicle-header .fhcs-group-portrait { width: 112px; height: 112px; }
+.fhcs-sheet .fhcs-vehicle-cards { display: grid; grid-template-columns: minmax(0, 3fr) minmax(72px, 1fr) minmax(0, 3fr); gap: var(--fhcs-s1); min-width: 0; }
+.fhcs-sheet .fhcs-vehicle-cards.fhcs-has-init { grid-template-columns: minmax(0, 3fr) minmax(72px, 1fr) minmax(0, 3fr) minmax(72px, 1fr); }
+.fhcs-sheet .fhcs-vehicle-cards.fhcs-has-quality { grid-template-columns: minmax(0, 3fr) minmax(72px, 1fr) minmax(0, 3fr) minmax(80px, 1fr); }
+.fhcs-sheet .fhcs-vehicle-cards.fhcs-has-init.fhcs-has-quality { grid-template-columns: minmax(0, 3fr) minmax(72px, 1fr) minmax(0, 3fr) minmax(72px, 1fr) minmax(80px, 1fr); }
+.fhcs-sheet .fhcs-vehicle-cards > .fhcs-origin-card { flex-direction: column; align-items: stretch; gap: var(--fhcs-s1); padding-right: var(--fhcs-s2); }
+.fhcs-sheet .fhcs-vehicle-cards .fhcs-origin-head { min-height: 24px; }
+.fhcs-sheet .fhcs-vehicle-cards > :is(.fhcs-vehicle-ac, .fhcs-vehicle-init, .fhcs-vehicle-quality) { align-items: center; padding-left: var(--fhcs-s1); padding-right: var(--fhcs-s1); }
+.fhcs-sheet .fhcs-vehicle-cards > :is(.fhcs-vehicle-ac, .fhcs-vehicle-init, .fhcs-vehicle-quality) > .fhcs-origin-head { justify-content: center; }
+.fhcs-sheet .fhcs-vehicle-init > .fhcs-button { justify-content: center; width: 100%; }
+.fhcs-sheet .fhcs-vehicle-quality > .fhcs-input { width: 100%; height: var(--fhcs-control); text-align: center; }
+/* HP: the bar, then the current HP as a field (dnd5e edits it inline, deltas too), then the maximum. */
+.fhcs-sheet .fhcs-vehicle-hp { display: flex; align-items: center; gap: var(--fhcs-s1); min-width: 0; white-space: nowrap; }
+.fhcs-sheet .fhcs-vehicle-hp-input { flex: none; width: 48px; height: 24px; text-align: right; }
+/* With every card shown at 644px, the bar gives way before the numbers do. */
+.fhcs-sheet .fhcs-vehicle-hp > .fhcs-member-bar { min-width: 12px; }
+.fhcs-sheet .fhcs-vehicle-pips { display: flex; flex: none; align-items: center; gap: var(--fhcs-s1); }
+.fhcs-sheet .fhcs-vehicle-abilities { min-width: 0; }
+/* Edit mode's display options, hanging from the name row's right. */
+.fhcs-sheet .fhcs-vehicle-options { position: relative; flex: none; }
+.fhcs-sheet .fhcs-vehicle-options > .fhcs-tray { left: auto; right: 0; z-index: 3; display: flex; flex-direction: column; gap: var(--fhcs-s1); width: 16rem; }
+.fhcs-sheet .fhcs-vehicle-option { display: flex; align-items: center; gap: var(--fhcs-s2); min-height: 24px; }
+.fhcs-sheet .fhcs-vehicle-option > input[type="checkbox"] { flex: none; width: 20px; height: 20px; margin: 0; }
+.fhcs-sheet .fhcs-vehicle-option:has(> .fhcs-input) { justify-content: space-between; }
+.fhcs-sheet .fhcs-vehicle-option > .fhcs-input { width: 56px; height: 24px; }
+.fhcs-sheet .fhcs-vehicle-thresholds { display: flex; gap: var(--fhcs-s1); }
+.fhcs-sheet .fhcs-vehicle-thresholds > .fhcs-input { flex: 1; min-width: 0; height: 24px; }
+
 /* ---------- Biography tab (SCOPE §4.8) ---------- */
 
 .fhcs-sheet .fhcs-biography.active { display: flex; flex-direction: column; gap: var(--fhcs-s2); }

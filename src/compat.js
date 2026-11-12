@@ -207,6 +207,67 @@ export async function encounterMembersFacts(sheet, context)
    };
 }
 
+/** dnd5e's vehicle sheet, which ours extends (SCOPE §4.13, the vehicle sheet). */
+export function systemVehicleSheet()
+{
+   return globalThis.dnd5e?.applications?.actor?.VehicleActorSheet;
+}
+
+/** Registers a sheet for vehicle actors, offered beside dnd5e's own (not the default). */
+export function registerVehicleSheet(sheetClass, label)
+{
+   foundry.applications.apps.DocumentSheetConfig.registerSheet(Actor, 'fhcs', sheetClass, { types: ['vehicle'], makeDefault: false, label });
+}
+
+/**
+ * Plain facts for the vehicle's header (src/sheet/vehicle.js), from the vehicle's data and dnd5e's sidebar rules
+ * (vehicle-sheet.mjs `_prepareSidebarContext`): size, type and cost; HP with its damage and mishap thresholds; AC;
+ * combat speed, travel speed per hour and pace per day, each when set; actions as pips unless they come from stations;
+ * initiative, quality and abilities when the vehicle's display options show them.
+ */
+export function vehicleHeaderFacts(sheet, context)
+{
+   const actor = sheet.actor;
+   const system = actor.system;
+   const attrs = system.attributes ?? {};
+   const config = CONFIG.DND5E;
+   const flag = (key) => !!actor.flags?.dnd5e?.[key];
+   const number = (n) => (Number(n) || 0).toLocaleString(game.i18n.lang);
+   const travel = attrs.travel ?? {};
+   const move = attrs.movement ?? {};
+   const travelUnit = (field) => unitAbbr(config.travelUnits, travel.units, field);
+   const price = attrs.price ?? {};
+   const typeKey = system.details?.type;
+   const type = config.vehicleTypes?.[typeKey];
+   const showAbilities = flag('showVehicleAbilities');
+   return {
+      name: actor.name,
+      nameSource: actor._source?.name ?? actor.name,
+      img: actor.img,
+      editing: !!sheet.isEditMode && !!sheet.isEditable,
+      size: game.i18n.localize(config.actorSizes?.[system.traits?.size]?.label ?? ''),
+      type: game.i18n.localize(typeof type === 'string' ? type : type?.label ?? ''),
+      cost: price.value ? `${number(price.value)} ${game.i18n.localize(config.currencies?.[price.denomination]?.abbreviation ?? price.denomination ?? '')}`.trim() : '',
+      hp: { value: attrs.hp?.value ?? 0, max: attrs.hp?.max ?? 0, dt: attrs.hp?.dt ?? null, mt: attrs.hp?.mt ?? null },
+      ac: attrs.ac?.value ?? null,
+      speeds: [
+         move.max ? `${move.max} ${unitAbbr(config.movementUnits, move.units || 'ft')}` : '',
+         travel.speeds?.max ? `${travel.speeds.max} ${travelUnit('abbreviationHour')}` : '',
+         travel.paces?.max ? `${travel.paces.max} ${travelUnit('abbreviationDay')}` : ''
+      ],
+      actions: { byStations: !!attrs.actions?.stations, max: attrs.actions?.max ?? 0, value: attrs.actions?.value ?? 0,
+         sourceMax: system._source?.attributes?.actions?.max ?? '', thresholds: system._source?.attributes?.actions?.thresholds ?? [] },
+      options: { abilities: showAbilities, initiative: flag('showVehicleInitiative'), quality: flag('showVehicleQuality') },
+      init: attrs.init?.total !== undefined ? `${attrs.init.total >= 0 ? '+' : '\u2212'}${Math.abs(attrs.init.total)}` : '+0',
+      quality: attrs.quality?.value ?? '',
+      abilities: showAbilities && sheet._prepareAbilities ? sheet._prepareAbilities(context).map((a) => ({
+         key: a.key, abbr: a.abbr, label: a.label, value: a.value, mod: a.mod,
+         source: system._source?.abilities?.[a.key]?.value ?? a.value,
+         save: a.save?.value ?? system.abilities?.[a.key]?.save?.value ?? a.mod, proficient: a.proficient ?? 0
+      })) : []
+   };
+}
+
 /**
  * Swaps dnd5e's data model for one chat message type with our subclass of it. Runs at init, after dnd5e's init set
  * CONFIG.ChatMessage.dataModels and before the world's messages are built.

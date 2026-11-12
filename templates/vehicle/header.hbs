@@ -1,0 +1,108 @@
+{{!-- The vehicle sheet's header (SCOPE §4.13, the vehicle sheet; the board, 2026-11-10): the portrait, the name with the
+      action pips (dnd5e's togglePip on what's spent) and edit mode's display options, one line "size · type · cost", the
+      card row (Hull, AC, Speed, and Initiative and Quality when shown), and the ability row when shown. dnd5e's actions
+      and fields keep their names: editImage, togglePip, showConfiguration (hitPoints, armorClass, movement, initiative),
+      roll (initiative). --}}
+{{#with fhcsVehicle}}
+<header class="fhcs-header fhcs-plate fhcs-group-header fhcs-vehicle-header">
+   <div class="fhcs-group-portrait fhcs-frame">
+      <img class="fhcs-portrait-art" src="{{ img }}" alt="{{ name }}"
+           {{#if editing}}data-action="editImage" data-edit="img"{{else}}data-action="showArtwork"{{/if}}>
+   </div>
+   <div class="fhcs-header-top">
+      <div class="fhcs-header-row">
+         {{#if editing}}
+         <input type="text" class="fhcs-input fhcs-display fhcs-name fhcs-name-input" name="name" value="{{ nameSource }}" aria-label="{{ text.name }}">
+         {{else}}
+         <span class="fhcs-display fhcs-name" data-fhcs-tip="{{ name }}" data-fhcs-tip-cut>{{ name }}</span>
+         {{/if}}
+         {{#if pips.length}}
+         <span class="fhcs-vehicle-pips fhcs-legendary-pips" role="group" aria-label="{{ pipsLabel }}" data-prop="system.attributes.actions.spent">
+            <span class="fhcs-label fhcs-muted">{{ pipsLabel }}</span>
+            {{#each pips}}
+            <button type="button" class="fhcs-slot{{#if filled}} fhcs-on{{/if}}" data-action="togglePip" data-n="{{ n }}"
+                    aria-pressed="{{#if filled}}true{{else}}false{{/if}}" aria-label="{{ label }}" data-fhcs-tip="{{ label }}"></button>
+            {{/each}}
+         </span>
+         {{/if}}
+         {{#with tray}}
+         <details class="fhcs-fold fhcs-vehicle-options" data-fold-key="vehicle-options">
+            <summary class="fhcs-chip" aria-label="{{ ../text.options }}" data-fhcs-tip="{{ ../text.options }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</summary>
+            <div class="fhcs-tray fhcs-vehicle-tray">
+               {{#each toggles}}
+               <label class="fhcs-vehicle-option fhcs-body"><input type="checkbox" name="{{ name }}" {{#if on}}checked{{/if}}>{{ label }}</label>
+               {{/each}}
+               {{#with count}}
+               <label class="fhcs-vehicle-option fhcs-body"><span class="fhcs-label">{{ ../../text.count }}</span>
+                  <input type="number" class="fhcs-input fhcs-body" name="system.attributes.actions.max" value="{{ max }}" min="0" step="1" placeholder="0"></label>
+               <span class="fhcs-label">{{ ../../text.thresholds }}</span>
+               <span class="fhcs-vehicle-thresholds">
+                  {{#each thresholds}}<input type="number" class="fhcs-input fhcs-body" name="{{ name }}" value="{{ value }}" min="0" step="1" aria-label="{{ label }}">{{/each}}
+               </span>
+               {{/with}}
+            </div>
+         </details>
+         {{/with}}
+      </div>
+      <div class="fhcs-header-row">
+         <span class="fhcs-body fhcs-muted fhcs-line">{{ line }}</span>
+      </div>
+      <div class="fhcs-vehicle-cards{{#if init}} fhcs-has-init{{/if}}{{#if quality}} fhcs-has-quality{{/if}}">
+         <div class="fhcs-origin-card fhcs-frame fhcs-vehicle-hull">
+            <div class="fhcs-origin-head">
+               <span class="fhcs-label fhcs-line">{{ text.hull }}</span>
+               {{#if editing}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="hitPoints"
+                       aria-label="{{ text.hpConfig }}" data-fhcs-tip="{{ text.hpConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}
+            </div>
+            <div class="fhcs-vehicle-hp">
+               <span class="fhcs-member-bar" role="meter" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ hull.pct }}" aria-label="{{ hull.label }}"><span style="width: {{ hull.pct }}%"></span></span>
+               <input type="text" class="fhcs-input fhcs-body fhcs-vehicle-hp-input" name="system.attributes.hp.value" data-dtype="Number"
+                      inputmode="numeric" pattern="^[+=\-]?\d*" value="{{ hull.value }}" placeholder="0" aria-label="{{ text.hpField }}">
+               <span class="fhcs-body">/ {{ hull.max }}</span>
+            </div>
+            {{#if hull.thresholds}}<span class="fhcs-body fhcs-muted fhcs-line">{{ hull.thresholds }}</span>{{/if}}
+         </div>
+         <div class="fhcs-origin-card fhcs-frame fhcs-vehicle-ac">
+            <div class="fhcs-origin-head">
+               <span class="fhcs-label">{{ text.ac }}</span>
+               {{#if editing}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="armorClass"
+                       aria-label="{{ text.acConfig }}" data-fhcs-tip="{{ text.acConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}
+            </div>
+            <span class="fhcs-display">{{ ac }}</span>
+         </div>
+         <div class="fhcs-origin-card fhcs-frame fhcs-vehicle-speed">
+            <div class="fhcs-origin-head">
+               <span class="fhcs-label fhcs-line">{{ text.speed }}</span>
+               {{#if editing}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="movement"
+                       aria-label="{{ text.speedConfig }}" data-fhcs-tip="{{ text.speedConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}
+            </div>
+            {{#each speeds}}<span class="fhcs-body fhcs-line">{{ this }}</span>{{/each}}
+         </div>
+         {{#if init}}
+         <div class="fhcs-origin-card fhcs-frame fhcs-vehicle-init">
+            <div class="fhcs-origin-head">
+               <span class="fhcs-label">{{ text.init }}</span>
+               {{#if editing}}<button type="button" class="fhcs-toggle fhcs-gear-button" data-action="showConfiguration" data-config="initiative"
+                       aria-label="{{ text.initConfig }}" data-fhcs-tip="{{ text.initConfig }}">{{> "modules/fhcs/templates/sheet/gear.hbs" }}</button>{{/if}}
+            </div>
+            <button type="button" class="fhcs-button fhcs-display {{ @root.rollableClass }}" data-action="roll" data-type="initiative" aria-label="{{ init.label }}">{{ init.text }}</button>
+         </div>
+         {{/if}}
+         {{#if quality}}
+         <div class="fhcs-origin-card fhcs-frame fhcs-vehicle-quality">
+            <div class="fhcs-origin-head"><span class="fhcs-label">{{ text.quality }}</span></div>
+            {{#if editing}}
+            <input type="text" class="fhcs-input fhcs-body" name="system.attributes.quality.value" inputmode="numeric" pattern="^[+=\-]?\d*"
+                   data-dtype="Number" value="{{ quality.value }}" placeholder="—" aria-label="{{ text.quality }}">
+            {{else}}
+            <span class="fhcs-display">{{ quality.text }}</span>
+            {{/if}}
+         </div>
+         {{/if}}
+      </div>
+      {{#if abilities}}
+      <div class="fhcs-vehicle-abilities" style="--fhcs-columns: {{ abilityCount }}">{{> "modules/fhcs/templates/sheet/abilities.hbs" }}</div>
+      {{/if}}
+   </div>
+</header>
+{{/with}}

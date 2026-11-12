@@ -12,6 +12,7 @@ import { keepStable } from '../src/sheet/death.js';
 import { columnChoice, containerColumnChoice, inventoryView } from '../src/sheet/inventory.js';
 import { groupHeaderView, groupMembersView } from '../src/sheet/group.js';
 import { encounterHeaderView, encounterMembersView } from '../src/sheet/encounter.js';
+import { vehicleHeaderView } from '../src/sheet/vehicle.js';
 import { canCast, prepState, spellbookView, spellColumnChoice, spellKind } from '../src/sheet/spellbook.js';
 import { featureColumnChoice, featuresView, groupingOf } from '../src/sheet/features.js';
 import { classSpans, levelUpChoices, originCards } from '../src/sheet/origins.js';
@@ -654,6 +655,25 @@ for (const [n, text] of [[3, '+3'], [0, '+0'], [-1, '\u22121']])
    const edit = encounterMembersView({ editing: true, members: [m({ quantity: { value: null, formula: '1d4' } })] }, { format, localize });
    if (!edit.add || edit.members[0].rollFormula || edit.difficulty) { problems.push(`encounter in edit mode: add ${edit.add}, roll ${!!edit.members[0].rollFormula}`); }
    if (!encounterMembersView({ members: [] }, { format, localize }).add) { problems.push('an empty encounter has no Add creature'); }
+}
+
+// The vehicle's header (SCOPE §4.13, 2026-11-10): the line skips what's unset; pips only when actions are a count, the
+// left ones filled first (dnd5e's togglePip index); thresholds joined; Initiative, Quality, abilities only when shown;
+// edit mode's tray, its count only when actions are a count.
+{
+   const facts = { name: 'Heron', size: 'Gargantuan', type: 'Water vehicle', cost: '', editing: false,
+      hp: { value: 240, max: 300, dt: 15, mt: 20 }, ac: 15, speeds: ['', '4 mph', '96 mi/d'],
+      actions: { byStations: false, max: 3, value: 2 }, options: { abilities: false, initiative: true, quality: false }, init: '+2',
+      abilities: [{ key: 'str', abbr: 'Str', label: 'Strength', value: 20, mod: 5, save: 5, proficient: 0 }] };
+   const v = vehicleHeaderView(facts, { format, localize });
+   const shape = [v.line, v.pips.map((p) => `${p.n}:${p.filled}`).join(' '), v.hull.thresholds, v.speeds.join('|'), v.init?.text, v.quality, v.abilities, v.tray];
+   try { deepStrictEqual(shape, ['Gargantuan · Water vehicle', '2:true 1:true 0:false', 'DT 15 · Mishap 20', '4 mph|96 mi/d', '+2', null, null, null]); }
+   catch { problems.push(`vehicle header: ${JSON.stringify(shape)}`); }
+   const e = vehicleHeaderView({ ...facts, editing: true, actions: { byStations: true }, options: { abilities: true } }, { format, localize });
+   const editShape = [e.pips.length, e.tray?.toggles.map((t) => t.on).join(), e.tray?.count, e.abilities?.[0]?.mod, e.speeds.join('|')];
+   try { deepStrictEqual(editShape, [0, 'true,false,false,true', null, '+5', '4 mph|96 mi/d']); }
+   catch { problems.push(`vehicle header in edit mode: ${JSON.stringify(editShape)}`); }
+   if (vehicleHeaderView({ ...facts, speeds: [] }, { format, localize }).speeds[0] !== '—') { problems.push('a vehicle with no speed shows nothing in Speed'); }
 }
 
 // Spellbook (SCOPE §4.7): preparation states and kinds, Can cast, section order, slot pips, the concentration mark.
