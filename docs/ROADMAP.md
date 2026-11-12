@@ -221,24 +221,24 @@ From the user's play of `main` (2026-11-08). Build one ask per slice, by CLAUDE.
   - [x] Container research (research note "The container sheet, closer", 2026-11-10) and decisions (SCOPE §4.13, user 2026-11-10)
   - [x] Container mocked up (canvas row "Phase 6.7 · the container sheet": a backpack light, a Bag of Holding with a pouch open dark, 500px with long names), waits on the user's review
   - [x] Container sheet built (2026-11-10): our item sheet around dnd5e's `ContainerSheet`, Contents on our Inventory rows, capacity and coins, Effects always for an editor; layout cases (`container*`, 500–740px, Forge), unit, load and a Quench test
-  - [ ] Container: Quench passed (2026-11-10 to 11-12); play and BUILT entry wait
+  - [ ] Container: Quench passed (2026-11-10 to 11-12), BUILT entry written (2026-11-12); play waits
   - [x] Group research (research note "The group sheet, closer", 2026-11-10) and decisions (SCOPE §4.13, user 2026-11-10)
   - [x] Group mocked up (canvas row "Phase 6.7 · the group sheet": a party of four light, its Inventory, allies and a wagon dark, 644px edit mode), waits on the user's review
   - [x] Group sheet built, in slices:
     - [x] Header and tab row (2026-11-10): registered beside dnd5e's group sheet, not the default; portrait, name, Place members and the rests, the member line, Travel (pace arrows, gear in edit mode, three speeds) and Advancement (Award, the XP pool)
     - [x] Members (2026-11-10): rows in Characters, NPCs, Vehicles; portrait, name (opens the member), HP and hit dice, AC, speed, Perception, Stealth and Survival rolling with their passives; a vehicle's travel and DT; edit mode's remove; dnd5e's `.member[data-uuid]` kept for its context menu and drops
     - [x] Inventory, Effects, Biography; Quench test (2026-11-10): the members above the list (carried, coins; drop an item on a line to give it), the container's columns, the Group / vehicle switch with the coins written to whichever shows; our Effects; Summary then Description in one column
-  - [ ] Group: Quench passed (2026-11-10 to 11-12); play and BUILT entry wait
+  - [ ] Group: Quench passed (2026-11-10 to 11-12), BUILT entry written (2026-11-12); play waits
   - [x] Encounter research (research note "The encounter sheet, closer") and decisions (SCOPE §4.13, user 2026-11-10); no boards, at the user's word
   - [x] Encounter sheet built (2026-11-10): header, Members with counts and formulas, the difficulty bar, Loot, Description; resizable from 500px; unit, load and layout cases (`encounter*`, 500–740px, Forge), a Quench test
-  - [ ] Encounter: Quench passed (2026-11-10 to 11-12); play and BUILT entry wait
+  - [ ] Encounter: Quench passed (2026-11-10 to 11-12), BUILT entry written (2026-11-12); play waits
   - [x] Vehicle research (research note "The vehicle sheet, closer") and decisions (SCOPE §4.13, user 2026-11-10)
   - [x] Vehicle mocked up (canvas row "Phase 6.7 · the vehicle sheet": a ship light, a siege wagon dark, 644px edit mode, Crew & Passengers), waits on the user's review
   - [x] Vehicle sheet built, in slices:
     - [x] Header and tab row (2026-11-12): registered beside dnd5e's, not the default, its sidebar gone; portrait, name, action pips, the line; Hull (HP field, DT, mishap), AC, Speed, Initiative and Quality when shown; the character's ability row when shown (now a shared partial); edit mode's gears and display-options tray
     - [x] Stations as the first tab (2026-11-12): Traits beside the action stations (cover, AC, DT, a weapon's rolls, HP and uses fields, crew places), the features as Inventory rows, draft animals, the add buttons
     - [x] Cargo, Crew & Passengers, Effects, Description; Quench test (2026-11-12): Cargo on our list with the cargo bar; crew and passengers as rows with counts (− field + in edit mode, dnd5e's adjustCrew), dragged between areas; our Effects; dnd5e's one description
-  - [ ] Vehicle: Quench passed (2026-11-10 to 11-12); play and BUILT entry wait
+  - [ ] Vehicle: Quench passed (2026-11-10 to 11-12), BUILT entry written (2026-11-12); play waits
 - [ ] The smaller windows: a skin
   - [x] Research (research note "The smaller windows, closer") and decisions (SCOPE §4.13, user 2026-11-12)
   - [x] Built (2026-11-12): `fhcs-skin` on dnd5e's windows for documents on our sheets (`src/apps/skin.js`), the token blocks widened to it, dnd5e's and Foundry's variables re-pointed; the item sheet's dnd5e tabs too; four copied windows in the layout check (`skin-*`), unit and load checks, a Quench test
